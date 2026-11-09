@@ -1,0 +1,46 @@
+DARK SLIME: THE LOOK, VERSION 3 (a crown of HORNS instead of flames). Written 2026-11-09. The alternative to version 2 (spiral curls): same method, another crown.
+
+WHY. The first dark picture (inbox/dark_slime_reference.jpg) kept the fire slime's construction exactly, which is good for reuse, but its crown was the fire slime's flames painted violet (the user: "it looks so similar to fire slime, just the darker version"). A recolour is not enough: the ice slime (crystals) and the lightning slime (bolt spikes) look different because the crown has another SHAPE. This version makes the crown a set of HORNS: curved, ridged, hard and sharp, nothing like a flickering flame. Horns also suit the animations: they are RIGID like the ice slime's crystals and the lightning slime's spikes, so the crown is the same in every frame and only rides with the body (the fire slime's flames had to be redrawn every frame).
+
+THE IDEA: the dark slime is the one with a menacing crown. Two big curved horns sweep back and up from the top of the head like a ram's or a demon's, three smaller thorn-horns stand between and in front of them, and a small horn grows out of each side of the body. The horns are black-violet with a ridged surface and polished pale-violet tips; the body keeps the black spirals.
+
+HOW TO USE
+- Attach ONE image: inbox/dark_slime_reference.jpg (the first dark picture: the creature to keep). Ask for the same shape as that picture (square), as large as it will give you. Paste everything between the two lines of equals signs. Gemini; generate several and keep the best.
+- Save the best in inbox/ (for example inbox/dark_slime_reference_v3_horns.jpg) and tell me.
+- What I check: (1) the creature is the SAME as in the first picture: the dome, the skirt, the face in the same place and size, the black spirals, the three-quarter view turned to the right, the same size and place, the green background; (2) the crown is made of HORNS and nothing else: two big curved horns, three smaller thorn-horns, no flame shapes, no wavy tongues, no leaf shapes; (3) a small horn on each side of the body; (4) the horns are solid, ridged, hard-edged, black-violet with lighter violet rim lights and pale polished tips; (5) the floating bits are violet crescents and black ink blobs; (6) the body a little darker; (7) crisp opaque edges, thin near-black indigo outline, no smoke, glow or haze; (8) one image, no GIF.
+- Known risks: it makes the face demonic (reply 2), it grows ears or a horned forehead (reply 2), it keeps flame shapes (reply 1), it adds smoke or glow (reply 3).
+
+==============================================================================
+OUTPUT: exactly ONE still image, and nothing else. Do NOT create a GIF, an animation, extra images or alternate versions.
+
+TASK: redraw the creature of the attached image EXACTLY as it is (the same dome, wavy skirt, face, black spiral swirls, three-quarter view, size, position in the picture, painting style, thin outline and flat green background), and change ONLY the four things listed below.
+
+KEEP EXACTLY: the low dome wider than tall with the flat wavy skirt; the face in the same place and size (heavy slanted brows, two narrow slanted eyes with glowing violet-pink pupils, the wavy grimace, nothing added to the face, no horns on the forehead, no ears); the black-indigo spiral swirls on the body in the same places and sizes; the three-quarter view turned about 30 degrees towards the RIGHT edge; the matte hand-painted style and the thin near-black indigo outline; the flat pure green (#00FF00) background identical in every pixel; the same size and position, centred, with at least 10% empty margin on every side.
+
+CHANGE ONLY THESE FOUR THINGS:
+1. THE CROWN. Remove the crown of flame-shaped tendrils. In its place rise HORNS from the top and back of the dome (never from the face or the forehead):
+   - TWO BIG CURVED HORNS, side by side on the top-back of the head, each a thick smooth horn that sweeps BACK and UP in a long curve like a ram's or a demon's horn and ends in a sharp point; the right one (nearer the enemy) slightly taller than the left; the taller one about as high above the dome as the old tallest flame was. Ridged: a few thin horizontal ring ridges across each horn, deeper near the base.
+   - THREE SMALLER THORN-HORNS between and just in front of the big ones, short and nearly straight with a slight backward lean, of different heights (about 60%, 45% and 35% of the big horns' height).
+   Painted as SOLID hard-edged forms: black-violet (#2A1650) with a lighter violet (#6A44B8) rim light on the edges facing the upper left, polished pale-violet tips (#C9B4F0, the last 15% of each horn), the same thin near-black indigo outline as the body. Fully opaque. NO flame shapes, NO wavy or flickering tongues, NO leaf shapes, NO spirals.
+2. THE SIDE PIECES. Instead of the flame-shaped tongue on each side of the body, one small curved horn growing out of each side, pointing outward and slightly back (the left one a little longer), ridged and tipped like the crown horns.
+3. THE FLOATING BITS. Instead of the small flame-leaf shapes and diamond shards floating around, about six to ten solid objects of two kinds: violet CRESCENTS (thin curved crescent blades with a lighter-violet rim light, hard-edged, different sizes, some tilted) and black ink blobs (round and teardrop shapes, hard-edged). In about the same places as before, around and above the horns.
+4. THE BODY COLOUR. A little darker and deeper than in the first picture: a mid-dark violet like #3A2278 with shadows towards the base and the lower left in dark indigo like #20124A, lighter violet only in small soft highlights. The black spirals stay black-indigo.
+
+STILL TRUE (so the picture can be cut out): every edge is crisp, hard and opaque. NO smoke clouds, NO mist, NO haze, NO soft glow, NO halo, NO blur, NO see-through parts, NO soft particles, NO light spilling onto the background. No shadow on the floor. Nothing green, yellow-green or teal on the creature.
+
+BACKGROUND: one flat pure GREEN (#00FF00) background filling the whole picture, identical in every pixel. No gradient, ground line, scenery, shadow or vignette. No text, labels or borders.
+
+FINAL REMINDER: exactly one image; the same creature, face, dome, skirt and black spirals as the attached picture; the flame-shaped crown replaced by two big curved ridged horns and three smaller thorn-horns, a small horn on each side, violet crescents and black ink blobs floating, a slightly darker body; the face untouched (no forehead horns, no ears); crisp and opaque, no smoke, no glow; flat pure green background.
+==============================================================================
+
+REPLY 1: IF IT STILL LOOKS LIKE FLAMES
+"Redo it. The crown must NOT look like flames: it is made of HORNS only, hard curved horns with ridges and sharp points: two big ones sweeping back and up and three small straight thorn-horns. No wavy tongues, no flickering shapes, no leaf shapes."
+
+REPLY 2: IF IT CHANGED THE FACE OR GREW HORNS ON THE FACE
+"Redo it. Keep the face exactly as in the attached picture (same place, same size, same eyes and grimace): no horns on the forehead, no ears, nothing added to the face. The horns rise from the top and back of the dome only."
+
+REPLY 3: IF IT ADDS SMOKE, GLOW OR HAZE
+"Redo it. NO smoke, NO mist, NO soft glow or haze anywhere: only crisp, solid, hard-edged horns, crescents and ink blobs with a thin outline, on the flat green background."
+
+REPLY 4: IF THE BACKGROUND OR COLOURS DRIFT
+"Redo it. The background is one flat pure green (#00FF00), identical in every pixel. The creature is deep violet with black-indigo spirals, black-violet horns and a near-black indigo outline: nothing green, no orange, no red."
