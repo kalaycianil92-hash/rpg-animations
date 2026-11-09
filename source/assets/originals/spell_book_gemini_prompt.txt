@@ -1,0 +1,17 @@
+OUTPUT: exactly ONE static image, a PNG, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create a game item picture of ONE ancient spell book, for a fantasy RPG. The book lies OPEN and its pages face UP, like a magic tome floating flat above an open hand. Nothing else is in the picture: no hand, no table, no stand, no shelf, no floor, no shadow on the ground.
+
+STYLE REFERENCE: the attached image shows two items of the same character: a mage's staff and an orb. Draw the book as the third item of that set, in exactly the same style: hand-painted stylised fantasy game art, THICK DARK OUTLINES all round the item, readable shapes, visible painterly shading, rich but slightly weathered colours. Take the materials from the reference: dark brown twisted, gnarled wood; aged bronze and gold metal trim with small engraved diamond shapes; curved claw-like bronze talons (like the ones holding the orb); and a pale white and lavender-violet magical light with a soft swirl (like the orb and the crystal on the staff). Do not copy the staff or the orb themselves, only their look.
+
+THE BOOK: very old and well used. A thick, heavy tome with a cracked dark brown leather cover, the leather worn pale at the edges and corners, the spine thick with raised bands. Bronze corner protectors with a small engraved diamond on each, and a bronze clasp strap that hangs open from one side with a small claw-shaped talon at its end. A frayed ribbon bookmark hangs from the thick block of pages. The page block is visible at the front edge as many stacked, yellowed, uneven parchment sheets.
+
+THE OPEN PAGES: two facing pages of old yellowed parchment, slightly curved towards the spine, with stained and torn edges. On the pages are faint hand-drawn arcane diagrams in violet ink: circles inside circles, a star shape, small rune-like marks, thin lines. NO readable text, NO letters, NO numbers, NO words of any kind. A soft pale white-lavender glow swirls up out of the middle of the pages (like the glow inside the orb); it is brightest at the spine and fades towards the page edges.
+
+VIEW AND SHAPE: seen from the front and a little from above (about 35 degrees above the book), so both open pages face up and are clearly visible. The book is symmetrical, the spine runs away from the viewer in the middle, the left cover and the right cover are spread out to both sides. The whole book is centred in the picture and fills about 70% of its width. The bottom of the book (the underside of the covers) is a clean, calm shape, because a hand will hold it from below.
+
+THE GLOW STAYS INSIDE THE ITEM: the magical light is drawn ON the pages and inside the outline of the book, as a glowing area on the parchment and a short glow rising from the spine. Do NOT draw a halo, aura, sparkles, floating particles, rays or a glow in the air around the book, because the item is cut out of the background afterwards.
+
+BACKGROUND: one flat mid-grey (#777777) background filling the whole image, the same grey as in the reference image, identical in every pixel. No gradient, no vignette, no shadow, no border. Leave about 10% empty margin around the book on every side. No text anywhere.
+
+FINAL REMINDER: output ONE single static PNG image only, with ONE open book facing up on the flat grey background. No GIF, no extra images, no hand, no text.

@@ -1,0 +1,22 @@
+OUTPUT: exactly ONE static image, a PNG, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Two images are attached.
+
+IMAGE 1 is the spell book to KEEP. It is already approved. Redraw THIS SAME BOOK in a new pose: the same cracked dark brown leather cover with worn pale edges, the same bronze corner caps with the engraved diamond, the same clasp strap that ends in a small bronze claw, the same ribbon bookmark, the same yellowed uneven parchment pages with the same violet arcane diagrams and rune-like marks, the same white-lavender swirl of light in the middle of the pages, the same hand-painted style with thick dark outlines, and the same flat grey background. Do not redesign anything. Only the pose changes.
+
+IMAGE 2 is an ANGLE REFERENCE ONLY. Take from it ONLY how the book is tilted and seen: the open book is rolled so that its right side is higher than its left side, and the thick block of stacked page edges on the right side shows. Do NOT take anything else from image 2: not its colours, not its cyan glow, sparks or smoke, not its glowing outline, not its ribbons, not its writing style, not its room or background.
+
+THE NEW POSE: the book floats, open, a little above the open palm of a mage who stands just to the LEFT of the book. The book is turned a little towards her, as if it were being shown to her or read by her. So:
+- The book is ROLLED, slightly: its right side is higher than its left side, by about 15 degrees. Not more: the book must stay mostly flat and open, it must not stand upright.
+- Because of the roll, both open pages face UP and a little to the LEFT (towards the mage), and the thick block of stacked page edges on the right side of the book is visible, like in image 2. The left cover is lower and the right cover is higher.
+- The camera is the same as before: in front of the book and about 35 degrees above it, with the spine running away from the viewer in the middle of the book (as in both images). Keep the perspective gentle, no strong wide-angle distortion.
+- The clasp strap with the claw still hangs down from the lower left side of the book, and the ribbon bookmark hangs down at the front. Both hang straight down with gravity.
+- The book is no longer perfectly symmetrical, that is correct. It is still centred in the picture and fills about 70% of its width. Its underside is a calm, clean shape, because a hand holds it from below.
+
+THE GLOW STAYS INSIDE THE ITEM: the magical light is drawn ON the pages and inside the outline of the book (the white-lavender swirl on the parchment). Do NOT draw a halo, aura, cyan or blue light round the edges, sparkles, floating particles, smoke, rays or any glow in the air around the book, because the item is cut out of the background afterwards.
+
+NOTHING ELSE IN THE PICTURE: no hand, no mage, no table, no stand, no shelf, no room, no floor, no shadow. No text anywhere, no readable letters or numbers (the rune-like marks on the pages stay as in image 1).
+
+BACKGROUND: one flat mid-grey background filling the whole image, exactly the same grey as in image 1, identical in every pixel. No gradient, no vignette, no shadow, no border. Leave about 10% empty margin around the book on every side. Square picture.
+
+FINAL REMINDER: output ONE single static PNG image only: the book of image 1, rolled about 15 degrees with its right side higher and its pages facing up and slightly left, on the flat grey background. No GIF, no extra images, no hand, no text, no glow in the air.
