@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rogue idle preview</title>
+<style>
+  :root { --bg: #5b6b4a; --fg: #eee; }
+  body { margin: 0; background: #222; color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+  header { padding: 12px 16px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+  label { display: flex; gap: 8px; align-items: center; }
+  #stage { display: flex; gap: 0; justify-content: center; flex-wrap: wrap; background: var(--bg); padding: 12px 0; }
+  .cell { width: 512px; height: 512px; position: relative; }
+  .cell .spr { position: absolute; inset: 0; background-repeat: no-repeat; background-size: 3072px 512px; image-rendering: auto; }
+  .cell .name { position: absolute; left: 8px; top: 6px; font-size: 12px; opacity: .8; }
+  .cell .ground { position: absolute; left: 0; right: 0; top: 470px; height: 1px; background: rgba(255,255,255,.25); }
+  .scale1 .cell { zoom: 0.75; }
+  p { padding: 0 16px; max-width: 900px; }
+</style>
+</head>
+<body>
+<header>
+  <strong>Rogue idle: six frames, 8 fps by default</strong>
+  <label>fps <input id="fps" type="range" min="2" max="16" value="8"> <span id="fpsv">8</span></label>
+  <label>background
+    <select id="bg">
+      <option value="#5b6b4a">forest green</option>
+      <option value="#777777">grey</option>
+      <option value="#1d1f2a">dark</option>
+      <option value="#e8e8e8">light</option>
+    </select>
+  </label>
+  <label><input id="cmp" type="checkbox" checked> show the warrior and the mage beside her</label>
+</header>
+<div id="stage" class="scale1">
+  <div class="cell" id="c-warrior"><div class="spr" style="background-image:url('../../../Warrior/idle/armored_idle_strip.png')"></div><div class="name">Warrior</div><div class="ground"></div></div>
+  <div class="cell" id="c-rogue"><div class="spr" style="background-image:url('../cloaked_idle_strip.png')"></div><div class="name">Rogue</div><div class="ground"></div></div>
+  <div class="cell" id="c-mage"><div class="spr" style="background-image:url('../../../Mage/idle/robed_idle_strip.png')"></div><div class="name">Mage</div><div class="ground"></div></div>
+</div>
+<p>The thin line is the shared ground line (42 px above the bottom of each frame). The three characters are cut to the same standard, so the boots should rest on it and the heads should be about the same size.</p>
+<script>
+  var frame = 0, timer = null;
+  var sprs = document.querySelectorAll('.spr');
+  function draw() {
+    for (var i = 0; i < sprs.length; i++) sprs[i].style.backgroundPosition = (-frame * 512) + 'px 0';
+  }
+  function start() {
+    if (timer) clearInterval(timer);
+    var fps = +document.getElementById('fps').value;
+    document.getElementById('fpsv').textContent = fps;
+    timer = setInterval(function () { frame = (frame + 1) % 6; draw(); }, 1000 / fps);
+  }
+  document.getElementById('fps').addEventListener('input', start);
+  document.getElementById('bg').addEventListener('change', function (e) {
+    document.documentElement.style.setProperty('--bg', e.target.value);
+  });
+  document.getElementById('cmp').addEventListener('change', function (e) {
+    document.getElementById('c-warrior').style.display = e.target.checked ? '' : 'none';
+    document.getElementById('c-mage').style.display = e.target.checked ? '' : 'none';
+  });
+  draw(); start();
+</script>
+</body>
+</html>

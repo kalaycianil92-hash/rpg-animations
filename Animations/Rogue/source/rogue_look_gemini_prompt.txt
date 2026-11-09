@@ -1,0 +1,62 @@
+ROGUE LOOK PROMPT (the first step of "Starting a new character" in docs/PLAYBOOK.md: look first)
+Written 2026-11-04 from the user's choices: young human woman, hood pushed back, charcoal leather with a crimson scarf.
+
+HOW TO USE
+- Attach ONE image: inbox/mage_style_reference_warrior_idle.png (the warrior's idle frame; it is only a STYLE reference, the prompt says so).
+- Ask for a 1:1 image. Paste everything between the two lines of equals signs.
+- Generate a few and keep the best; then use the edit prompts at the bottom to fix single things ("redraw this exact character, change only ...").
+- Save the winner as inbox/rogue_reference_image.png (move it to Animations/Rogue/ when the inbox is cleaned) and tell me. The idle comes next, with this picture attached.
+- What is a default of mine (not yet the user's word): the hair (short, choppy, silver-white), the eyes (amber), the skin (warm olive), the stance (low and light), the bare hands with leather bracers (no gloves: the hand-mark tool finds the fist by skin colour). Change any of them in the prompt before generating if you like.
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG character illustration, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create ONE full-body character design for a 2D fantasy RPG sprite: a single figure, standing, on a flat magenta background.
+
+STYLE REFERENCE: the attached image is a different character. Use it ONLY for the painted game-sprite style: the hand-painted shading, the thick dark outlines, the saturation of the colours and the proportions of a stylised but realistic fighter. Do NOT copy that character, his armor, his hair, his face or his pose.
+
+CHARACTER: a young human woman, a rogue and assassin. Lean, athletic and light on her feet, about seven and a half heads tall, narrower and more agile than a warrior. Warm olive skin, sharp feminine features, sharp amber eyes and a calm, alert, slightly confident expression. Short, choppy silver-white hair cut to the jaw with a longer side fringe, no braid and no ponytail. A charcoal-black hooded cloak with the hood PUSHED BACK and bunched around her neck and shoulders; the cloak is short, ends at her hips and has a ragged hem with a thin crimson trim. A crimson scarf is wrapped around her neck with one short tail hanging behind her shoulder. A fitted charcoal-black leather jerkin with crimson stitching and a few small dark-metal rivets, fitted dark-grey sleeves, black leather bracers on the forearms. Her hands are BARE (no gloves). A wide dark-brown leather belt with a plain buckle and two small pouches, a thin leather strap around one thigh, fitted dark charcoal trousers, and knee-high soft black-brown leather boots with buckled straps and flat soles. Colours: charcoal, black, crimson and brown, with the silver hair and the amber eyes as the bright notes. NO blue anywhere on her.
+
+VIEW: the body and legs are in strict side view and she faces RIGHT; the head is turned a little toward the viewer in a three-quarter view (the same body and head angle as a character whose body faces right and whose face looks slightly out of the picture). The enemy will be to her right.
+
+STANCE: a low, light ready stance. Feet about a shoulder width apart, the front foot ahead and the rear foot behind, both soles flat on the ground, the knees slightly bent, the weight on the rear leg, the torso leaning forward about 10 degrees, the head up and the eyes looking forward to the right. DO NOT COPY THE ARM POSE OF THE ATTACHED IMAGE: his fists are raised to chest and face height, hers must be LOW. Her upper arms hang down along her ribs, the elbows tucked in and bent about 90 degrees. The near arm (the one closest to the viewer) ends in a tight CLOSED FIST at belt height, just in front of her belt buckle, as if gripping a short handle that is not drawn. The far arm (the one farther from the viewer) ends in a tight CLOSED FIST at belt height too, held out in front of her about one forearm length ahead of her body. Both fists are BELOW her chest and well below her chin, about half way up her body, never raised to her face. Both hands are bare, tight closed fists, with nothing in them.
+
+NO WEAPONS AND NO ITEMS: no dagger, no knife, no sheath, no bandolier, no quiver, no bow, no crossbow, no bag on her back. Nothing in her hands and no weapon anywhere on her body. No glow, no smoke, no magic effects of any kind.
+
+SIZE AND FLOOR: she is drawn full length, from the top of her head to the soles of both boots, about 80% of the picture height, centered, with at least 8% empty margin on every side. The whole figure, with the scarf tail and the cloak, is inside the picture and never touches an edge.
+
+BACKGROUND: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, no floor, no ground line, no cast shadow, no glow, no vignette. No text, no numbers, no labels. No magenta or pink on the character herself.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================
+
+FIRST RESULT (2026-11-04, kept as look_v1_hands_up.png in this folder): the user liked the character (short burgundy bob, amber eyes, olive skin, charcoal leather, crimson scarf and cloak trim, pouches on the belt, thigh strap, brown boots). The arms were the problem: Gemini copied the warrior's guard from the style reference (near fist at chest height, far fist at face height; measured as 66% and 71% of her height, the same as the warrior's), and the cape and scarf tail stream out behind her as if in a gust. The "DO NOT COPY THE ARM POSE" sentence and the heights in the STANCE paragraph above are the fix for a regeneration; for this picture use the first edit prompt below (an edit keeps the character the user likes).
+
+SECOND RESULT (2026-11-04, kept as look_v2_hands_low.png, also still at inbox/rogue_reference_image.png): the hands came down to belt height as asked, but the silhouette is still a boxer's guard like the warrior's (upright, wide lunge, near fist at the belt, far fist out in front). The user wants a CROUCHED assassin stance instead: the main hand (the dagger hand, the FAR arm) swung back behind her, the off hand (the cutlass hand, the NEAR arm) much lower. That is a pose change of an approved design, so it is an edit prompt too (attach look_v2_hands_low.png, say what to keep, give heights and angles, say that the old arms are not to be kept). The cloak and scarf are told to hang calmly because a streaming cloak would cover the far fist behind her and the idle's breathing needs a calm cloak.
+
+THIRD RESULT (2026-11-04, `inbox/rogue_character_finalpose.png`, kept as look_v3_final_pose.png and as `Animations/Rogue/reference_image.png`): Gemini ran out of image capacity, but one picture came out during the CROUCH EDIT and the user liked it (they turned a JPEG into a PNG; it is a real 1024 x 1024 PNG, the magenta carries JPEG noise of 1 or 2 levels, harmless for a reference that is only attached to prompts). Measured against v2: the figure's box is identical (y 99 to 939, 82% of the picture), so there is NO crouch (the legs and torso did not change); the arms did: the back fist is at 44% of her height behind her hip (x 398 against a body centre of about 560), the front fist at 47% in front of her upper thigh (v2: 56% and 59%; the warrior's guard: about 70%); the scarf now hangs calmly and the cloak sweeps back less. The user accepted the look as "really close". The crouch can still be tried again when Gemini has capacity (the CROUCH EDIT below is unchanged), but the idle can also be made from this picture.
+
+CROUCH EDIT (paste in the same Gemini chat with look_v2_hands_low.png attached; if the crouch comes out weak, send the LEGS AND BODY paragraph alone first, then the two arm paragraphs on the result):
+Redraw this exact character in a NEW POSE. Keep everything about her identical: the same face and expression, the burgundy bob, the amber eyes, the hooded cloak with the hood pushed back, the crimson scarf, the charcoal leather jerkin with crimson stitching, the dark bracers, the belt with two pouches, the thigh strap, the dark trousers and the brown boots, the same painted game-sprite style and thick dark outlines. Same strict side view, she faces RIGHT, with the head in the same three-quarter turn toward the viewer.
+
+NEW POSE: a low, crouched assassin stance, ready to spring. Do NOT keep the arms and legs of the attached picture.
+
+LEGS AND BODY: she is crouched about 20% lower than in the attached picture: the top of her head ends up about 20% lower, her soles stay on the same floor line, the knees are deeply bent (the front knee about 90 degrees, the rear knee about 110 degrees), the hips are lowered, the torso leans forward about 30 degrees with a straight back, the head is up and the eyes look forward to the right. Both soles are flat on the floor, the front foot ahead and the rear foot behind, about one and a half shoulder widths apart.
+
+FAR ARM (the arm farther from the viewer): swung BACK behind her body. The upper arm angles back and down, the elbow is bent about 100 degrees, and the tight closed fist is at hip height BEHIND her hip, clearly behind the line of her back, as if gripping a short handle that is not drawn. The fist stays fully visible and is not hidden by the cloak.
+
+NEAR ARM (the arm closer to the viewer): LOW in front of her. The upper arm hangs down along her ribs, the elbow is bent about 100 degrees, and the tight closed fist is at the height of her upper thigh, well below her belt, about one forearm length ahead of her front thigh, the forearm pointing forward and slightly down, as if gripping a short handle that is not drawn.
+
+Both fists are bare, tight and closed, with nothing in them, and both are far below her chin and chest. No weapon anywhere on her.
+
+CLOAK AND SCARF: they hang down calmly behind her as if there is no wind; they do not stream out sideways.
+
+The whole figure, with the cloak and the scarf, stays fully inside the picture with a margin on every side and never touches an edge. Same flat pure magenta (#FF00FF) background, no ground, no shadow, no text. Output ONE static PNG only.
+
+EDIT PROMPTS (paste in the same Gemini chat, with the picture you want to keep attached)
+- LOWER THE HANDS (the one to use on look_v1_hands_up.png): "Redraw this exact character, change ONLY the arms and fists: lower both hands. Her upper arms hang down along her ribs with the elbows tucked in and bent about 90 degrees. The near fist (closest to the viewer) is a tight closed fist at belt height, just in front of her belt buckle. The far fist is a tight closed fist at belt height too, held out in front of her about one forearm length ahead of her body. Both fists are well below her chest and chin, about half way up her body, not raised to her face. Both fists are bare and empty. Keep everything else identical: the same face, the burgundy hair, the cloak, the scarf, the clothes, the legs, the feet and the same stance. Same flat magenta background. Output ONE static PNG only."
+- OPTIONAL, add to the end of the edit above if you also want a calm cape: "Also let the cloak and the scarf tail hang down calmly behind her, as if there is no wind (they must not stream out sideways)."
+- Hands: "Redraw this exact character, change only the hands: both hands must be tight closed fists, bare, with nothing in them. Keep everything else identical. Same flat magenta background. Output ONE static PNG only."
+- Head angle: "Redraw this exact character, change only the head angle: turn the head a little more toward the viewer (three-quarter view), keep the body in side view facing right. Keep everything else identical. Same flat magenta background. Output ONE static PNG only."
+- Outfit drift: "Redraw this exact character. Do not change the outfit: the hood is pushed back, the scarf is crimson, the jerkin and the cloak are charcoal-black, and no blue anywhere. Keep the pose. Same flat magenta background. Output ONE static PNG only."
+- A weapon appeared: "Redraw this exact character with empty hands: remove every weapon, sheath and strap that holds a weapon. Keep everything else identical. Same flat magenta background. Output ONE static PNG only."

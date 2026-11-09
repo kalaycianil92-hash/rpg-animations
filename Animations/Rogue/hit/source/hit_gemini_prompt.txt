@@ -1,0 +1,38 @@
+ROGUE HIT REACTION PROMPT (6 frames, 3 x 2). Written 2026-11-04. Works with Gemini or ChatGPT (the idle came from ChatGPT).
+
+HOW TO USE
+- Attach ONE image: Animations/Rogue/reference_image.png. Ask for a 3:2 image (ChatGPT: 1536 x 1024). Paste everything between the two lines of equals signs.
+- Generate several and keep the best. If only some frames are bad, ask again for those poses only and I join the good frames (a whole sheet of takes of one pose costs the same as one image).
+- Save the sheet in inbox/ (for example inbox/rogue_hit_sheet.png) and tell me.
+- What to look at: (1) the same woman in all six panels (burgundy bob, crimson scarf, charcoal cloak, no blue); (2) panels 1 and 6 are the reference stance (fists low, back fist behind the hip, front fist in front of the thigh); (3) the rear boot stays on the same spot in every panel; (4) both hands are empty closed fists in every panel; (5) the same size in every panel and nothing touches a panel edge (the idle came out at 86% of the panel although 65% was asked, so the prompt asks for a smaller figure; the cutter rescales, but there must be margin); (6) one image only.
+- Planned cut (default despill: the strict `--despill-band 10 --despill-thr 4` blackens her burgundy hair, see PLAYBOOK.md): `python slice_keypose_sheet.py rogue_hit_sheet.png cloaked_hit_6frame_strip.png --cols 3 --rows 2 --height 408 --scale-from median --modes heel --heel-x 170 --fit 1,6`. Frames 1 and 6 must then match her idle (heel 170, toe 416); check with `check_strip.py`. If some panels are drawn bigger or smaller than the rest, `--scale-mult` fixes it (measure face and boots).
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG sprite sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create the sprite sheet: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first, then the bottom row. The six panels are the key poses of a "hit reaction": the character is struck from the front, recoils, staggers and recovers.
+
+CHARACTER: the exact same character as in the attached reference image: a young human woman rogue, lean and athletic, with warm olive skin, sharp feminine features, sharp amber eyes and a calm, alert, slightly stern expression, short choppy burgundy (deep red-brown) hair cut to the jaw with a longer side fringe, a charcoal-black hooded cloak with the hood pushed back and bunched around her neck and shoulders (a ragged hem and a thin crimson trim), a crimson scarf wrapped around her neck with one short tail, a fitted charcoal-black leather jerkin with crimson stitching, fitted dark-grey sleeves, black leather bracers on the forearms, bare hands, a wide dark-brown leather belt with a buckle and two small pouches, a thin leather strap around one thigh, fitted dark charcoal trousers, and knee-high soft black-brown leather boots with buckled straps. Colours: charcoal, black, crimson, brown, burgundy hair and amber eyes, no blue anywhere. Keep the same painted game-sprite style, thick dark outlines, colors, proportions, face and three-quarter head angle. Do not redesign anything.
+
+VIEW: strict side view of the body and legs, she faces RIGHT in every panel, with the head turned a little toward the viewer in the same three-quarter view as in the reference (in the panels where she is thrown back, the head may turn with the blow). The attacker is off-screen to the right, so the blow comes from the front and throws her head and upper body back toward the LEFT.
+
+NO ITEMS AND NO EFFECTS: no dagger, no sword, no knife, no sheath, no weapon of any kind, nothing in her hands. No glow, smoke, sparks, impact stars, blood, sweat drops, motion lines or effects of any kind.
+
+HANDS (in every panel): both hands are bare, tight CLOSED FISTS with nothing in them, never open and never splayed.
+
+ARMS: the back arm (the one that hangs behind her hip in the reference) always stays behind the torso, and the front arm (the one held low in front of her thigh in the reference) always stays in front of the torso. Never swap them between panels.
+
+SAME SCALE AND FLOOR (very important): draw her at exactly the same size in all six panels, the same standing size as in the reference. Do not zoom in or out between panels, and do NOT make her bigger in the recoil frames. Her head, from the top of the hair to the chin, is about 11% of the panel height, and the standing figure, from the top of the head to the soles of the boots, is only about 60% of the panel height, so that there is plenty of empty space all round her. The floor is at the same height in every panel, about 82% down the panel. The WHOLE body, from the top of the head to the soles of both boots, is visible in every panel, never cropped. The rear foot (the left foot) stays on the floor at the same spot in every panel, as if on an invisible floor line; only the body, head, arms and front foot move. She does not travel across the panel.
+
+THE SIX FRAMES:
+1. Impact. Her ready stance exactly like the reference: knees bent, fists low (the back fist behind her hip, the front fist in front of her thigh), both feet planted. The blow has just landed: eyes squeezed shut, teeth gritted, head just starting to snap back.
+2. Peak recoil. Head and upper body thrown far back to the left, chin up, mouth open in pain, back arched. The front arm is flung out in front of her and up, the back arm flung out behind her, both fists clenched. The front foot is lifted slightly off the floor, the knees slightly bent. The cloak and the scarf tail swing forward past her body.
+3. Stagger. Still leaning back but starting to recover, the rear leg braced hard, the front foot touching down again, one arm swinging forward for balance, wincing. The cloak swings back.
+4. Recover. The torso comes forward again, the head drops to face right, the knees bent, both fists coming back down toward their places at her hips, grimacing.
+5. Settle. Nearly back in the stance, slightly hunched forward, the fists almost in place, eyes open and glaring at the enemy.
+6. Back to the stance. The same ready stance as the reference and as panel 1, the fists low in their places, neutral determined face. The cloak and the scarf tail hang still.
+
+BACKGROUND AND LAYOUT: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. No grid lines or borders between panels. Leave about 12% empty margin around the figure in each panel; the whole character, with the cloak, the scarf tail, the hands and the feet, must stay fully inside its own panel and never touch or cross a panel edge. No text, numbers, labels, dust or any other effects. No magenta or pink on the character herself.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

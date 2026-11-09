@@ -1,0 +1,173 @@
+{
+ "format": "hand-anchors/3",
+ "note": "Two tracks per frame: main (the left hand, far arm) and off (the right hand, near arm). x and y are fractions of one frame from its top left. Item length is a share of the frame WIDTH. a is degrees, 0 = item points up, clockwise is positive. front=false means the item is drawn behind the body. hide=true means no item on that frame. w squashes the item sideways (1 = normal width). Draw order: items behind (main, off), body, items in front (main, off), then the hand over each item in front whose overlay is true: only the hand's own pixels from the body frame, namely the pixels of the skin colour found around the mark (same hue, inside a circle of radius fist x frame width, connected to the mark), grown by 2 px to take in the outline; when no skin colour is found near the mark it is the whole circle. Each animation has offItem: what its off hand carries (kind shield, other = a second weapon or item, or none = no off-hand item, in which case the off track is all null) with its own length, pivot and overlay; for the off hand it takes precedence over the character-level items.off.",
+ "characters": [
+  {
+   "name": "Assassin",
+   "fist": 0.03,
+   "items": {
+    "main": {
+     "length": 0.32,
+     "pivot": 0.82,
+     "overlay": true,
+     "picture": "cutlass"
+    },
+    "off": {
+     "length": 0.32,
+     "pivot": 0.73,
+     "overlay": true,
+     "picture": "dagger"
+    }
+   },
+   "animations": [
+    {
+     "name": "assassin_abyssal_backstab_8frame",
+     "frames": 8,
+     "columns": 8,
+     "fps": 8,
+     "offItem": {
+      "kind": "other",
+      "picture": "dagger",
+      "length": 0.32,
+      "pivot": 0.73,
+      "overlay": true
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.763,
+        "y": 0.754,
+        "a": 36,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.778,
+        "y": 0.784,
+        "a": 36,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.612,
+        "y": 0.245,
+        "a": 27,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.466,
+        "y": 0.282,
+        "a": -144,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.608,
+        "y": 0.245,
+        "a": -27,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.762,
+        "y": 0.722,
+        "a": 135,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.789,
+        "y": 0.91,
+        "a": 57,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.738,
+        "y": 0.691,
+        "a": 48,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.552,
+        "y": 0.745,
+        "a": -138,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.723,
+        "y": 0.788,
+        "a": -156,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.554,
+        "y": 0.237,
+        "a": -45,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.417,
+        "y": 0.3,
+        "a": -156,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.556,
+        "y": 0.24,
+        "a": -33,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.725,
+        "y": 0.724,
+        "a": -153,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.47,
+        "y": 0.904,
+        "a": -90,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.429,
+        "y": 0.671,
+        "a": -90,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

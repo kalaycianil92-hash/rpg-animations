@@ -1,0 +1,28 @@
+WINTER'S KISS (the dagger throw): MESSAGE TO FIX THE BOTTOM ROW OF THE FIRST SHEET. Written 2026-11-04.
+
+WHAT IS WRONG with `rogue_dagger_throw_sheet.png` (v1, filed here as rogue_dagger_throw_sheet_v1_3x2.png):
+- The top row (panels 1 to 3: raise, wind-up, throw) is right: same woman, boots planted in the same place, fist raised behind her head, then the open hand stretched toward the enemy.
+- In the bottom row (panels 4 to 6: follow-through, hold, catch) the ARMS HAVE SWAPPED SIDES: in panels 1 to 3 the closed fist is in FRONT of her body, to the RIGHT of the belt buckle just below the belt; in panels 4 to 6 it has jumped to her BACK, to the LEFT of the buckle. Her chest is also turned toward the viewer instead of staying three-quarters to the right like in panel 3. Played as an animation the fist would teleport and the torso would spin between panels 3 and 4.
+- Why ChatGPT does not fix it when asked to "change the last three frames": it redraws the whole sheet each time and repeats the same mistake, and "front arm / rear arm" is ambiguous to it. The message below uses ONE new chat, the top row as a picture, and screen sides (left / right of the belt buckle).
+
+HOW TO USE
+- Open a NEW chat. Attach two pictures: `inbox/rogue_dagger_throw_top_row_only.png` (the correct top row) and `Animations/Rogue/reference_image.png`. Paste everything between the two lines of equals signs.
+- It asks for a 3:2 image with the three new poses in the middle band (so no unusual size is needed); I crop the band and put the three poses under the top row, matching the sizes.
+- Save the result as `inbox/rogue_dagger_throw_bottom_row.png` and tell me.
+- What to look at: the closed fist is to the RIGHT of the buckle in all three poses; the open hand is the throwing hand; same boots in the same place; nothing in the hands.
+
+==============================================================================
+Image 1 is the top row of my sprite sheet: three poses that are CORRECT. Do not change them and do not redraw them. Image 2 is the character reference.
+
+Draw ONLY three NEW poses, side by side in one row, each in its own square cell of one third of the image width, in the MIDDLE band of the image (plain magenta above and below the row). The same flat pure magenta (#FF00FF) background as image 1, the same woman, the same size, the same painted style with thick dark outlines, the same camera, the same boots in the same spot as in image 1 (the same wide stance, both boots flat on the floor, no step, no hop). Nothing in her hands, no weapon, no effects, no text. One image only.
+
+WHAT WAS WRONG in my old bottom row, so do not repeat it: the arms swapped sides and her chest turned toward the viewer. In image 1 her CLOSED FIST is in front of her body: on the RIGHT side of her belt buckle (the side the enemy is on), just below the belt, at upper-thigh height. In the old bottom row that fist jumped to her BACK, to the LEFT of the buckle. In all three new poses the closed fist must be in the same place as in the third pose of image 1: in front, to the RIGHT of the belt buckle, just below the belt. Also keep her chest turned three-quarters toward the RIGHT like in the third pose of image 1, NOT turned toward the viewer; her cloak and the belt pouch stay on the LEFT side (her back).
+
+The throwing arm is the same arm as in the third pose of image 1, the arm that is stretched out toward the enemy. Its hand is OPEN and empty in all three new poses.
+
+Pose 1 (follow-through): the third pose of image 1 one moment later: the throwing arm is still stretched toward the enemy but a little lower, about 10 degrees below horizontal, the open hand pointing at the enemy with the fingers spread; the torso leans forward about 25 degrees; the closed fist stays in front, right of the buckle, below the belt; a focused face.
+Pose 2 (hold): the throwing arm hangs lower and relaxed in front of her with the elbow slightly bent, the open hand loosely pointing toward the enemy; the torso is more upright; a cold, satisfied look; the closed fist stays in front, right of the buckle, below the belt.
+Pose 3 (catch): the throwing arm is bent at the elbow and held forward at chest height, the hand OPEN with the palm facing up and the fingers spread, as if about to catch something that is coming back; the torso leans back about 5 degrees, her eyes on the hand; the closed fist stays in front, right of the buckle, below the belt.
+
+Keep every pose fully inside its own cell with at least 8% empty margin on every side. Output ONE single static PNG, no GIF, no extra images.
+==============================================================================

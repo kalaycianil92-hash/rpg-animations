@@ -1,0 +1,39 @@
+ROGUE DODGE PROMPT (6 frames, 3 x 2). Written 2026-11-04. Works with Gemini or ChatGPT.
+
+HOW TO USE
+- Attach ONE image: Animations/Rogue/reference_image.png. Ask for a 3:2 image (ChatGPT: 1536 x 1024). Paste everything between the two lines of equals signs.
+- Generate several and keep the best. If only some frames are bad, ask again for those poses only; I join the good frames (the mage's dodge needed her idle's first frame pasted over a bad frame 1).
+- Save the sheet in inbox/ (for example inbox/rogue_dodge_sheet.png) and tell me.
+- What to look at: (1) the same woman in all six panels (burgundy bob, crimson scarf, charcoal cloak, no blue); (2) panels 1 and 6 are the reference stance, fists low; the fists stay low at her hips in every panel (no raised guard); (3) panels 3 and 4 are in the air: both boots off the floor, about 20% of her height in panel 3 and about 8% in panel 4; (4) the same size in every panel, and room above her head for the hop (the idle came out at 86% of the panel although 65% was asked, so the prompt asks for only 55% and for 25% empty space above the head); (5) both hands empty closed fists; (6) nothing touches a panel edge; (7) one image only.
+- This is the same dodge as the warrior's and the mage's: a quick hop up and back, in place; the page slides her back along a path file (`.placement.json`, the same hop-back path as theirs, the strike lands on frame 3). A shadow-step style dodge could come later with the backstab's vanish effect from code.
+- Planned cut (default despill, the strict one blackens her burgundy hair): `python slice_airborne_sheet.py rogue_dodge_sheet.png cloaked_dodge_6frame_strip.png --cols 3 --rows 2 --grounded 1,2,5,6 --standing 1,6 --ref-panel 1 --height 408 --align feet --feet-x 293 --fit 1,6`. Her idle's feet middle is already 293.
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG sprite sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create the sprite sheet: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first, then the bottom row. The six panels are the key poses of a "dodge": the character reacts to an incoming attack by quickly hopping up and back, lands, and returns to her ready stance.
+
+CHARACTER: the exact same character as in the attached reference image: a young human woman rogue, lean and athletic, with warm olive skin, sharp feminine features, sharp amber eyes and a calm, alert, slightly stern expression, short choppy burgundy (deep red-brown) hair cut to the jaw with a longer side fringe, a charcoal-black hooded cloak with the hood pushed back and bunched around her neck and shoulders (a ragged hem and a thin crimson trim), a crimson scarf wrapped around her neck with one short tail, a fitted charcoal-black leather jerkin with crimson stitching, fitted dark-grey sleeves, black leather bracers on the forearms, bare hands, a wide dark-brown leather belt with a buckle and two small pouches, a thin leather strap around one thigh, fitted dark charcoal trousers, and knee-high soft black-brown leather boots with buckled straps. Colours: charcoal, black, crimson, brown, burgundy hair and amber eyes, no blue anywhere. Keep the same painted game-sprite style, thick dark outlines, colors, proportions, face and three-quarter head angle. Do not redesign anything.
+
+VIEW: strict side view of the body and legs, she faces RIGHT in every panel, with the head turned a little toward the viewer in the same three-quarter view as in the reference. The attacker is off-screen to the right, so the hop goes up and slightly back toward the LEFT.
+
+NO ITEMS AND NO EFFECTS: no dagger, no sword, no knife, no sheath, no weapon of any kind, nothing in her hands. No glow, smoke, sparks, dust, motion lines, speed lines, afterimages or effects of any kind.
+
+HANDS (in every panel): both hands are bare, tight CLOSED FISTS with nothing in them. The fists stay LOW at her hips the whole time (the back fist behind her hip, the front fist in front of her thigh, as in the reference); they are never raised to her chest or her chin.
+
+ARMS: the back arm (the one that hangs behind her hip in the reference) always stays behind the torso, and the front arm (the one held low in front of her thigh in the reference) always stays in front of the torso. Never swap them between panels.
+
+SAME SCALE AND FLOOR (very important): the character is drawn at exactly the same size in all six panels, the same standing size as in the reference. Do not zoom in or out between panels. Her head, from the top of the hair to the chin, is about 10% of the panel height, and the standing figure, from the top of the head to the soles of the boots, is only about 55% of the panel height. The floor is at the same height in every panel, about 80% down the panel, so that in panel 1 there is at least 25% of the panel height empty above her head: that room is for the hop. The hop goes mostly UP; she stays at about the same horizontal position in every panel (the hips do not travel across the panel, at most a small lean and drift to the left at the peak). The WHOLE body is visible in every panel, never cropped.
+
+THE SIX FRAMES:
+1. React. Her ready stance exactly like the reference: knees bent, fists low, both feet planted on the floor. Eyes wide and focused on the enemy, the weight just beginning to shift onto the rear leg. The cloak and the scarf tail hang still.
+2. Coil. Both feet still on the floor, the knees bent deeper, the torso leaning back about 10 degrees, the weight on the rear leg, the front foot only on its toes, the fists still low at her hips.
+3. Peak of the hop. BOTH FEET OFF THE FLOOR by about 20% of her height, the knees tucked slightly, the torso leaning back about 15 degrees, the head back, the fists low at her hips, the eyes on the enemy. The cloak and the scarf tail billow up and forward.
+4. Coming down. Still in the air, the feet about 8% of her height above the floor, the legs extending down with the toes pointing toward the floor, the torso leaning back about 10 degrees, the fists still low. The cloak is settling.
+5. Landing. Both feet back on the floor, the knees deeply bent to absorb the impact, the torso leaning slightly forward, the fists low, looking at the enemy. The cloak catches up.
+6. Recover. The same ready stance as the reference and as panel 1: knees bent, fists low in their places, neutral determined face. The cloak and the scarf tail hang still.
+
+BACKGROUND AND LAYOUT: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. No grid lines or borders between panels. Leave about 10% empty margin around the figure in each panel; the whole character, with the cloak, the scarf tail, the hands and the feet, must stay fully inside its own panel and never touch or cross a panel edge. No text, numbers, labels, dust or any other effects. No magenta or pink on the character herself.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

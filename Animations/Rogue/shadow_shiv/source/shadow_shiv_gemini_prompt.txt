@@ -1,0 +1,44 @@
+SHADOW SHIV PROMPT (6 key poses, 3 x 2). Written 2026-11-04. Works with Gemini or ChatGPT.
+
+THE SKILL (the user's text): "A quick stab that automatically Critical Hits a target suffering Reduce Physical Def."
+THE ANIMATION (the user's idea): the Rogue runs really fast to the target, delivers a stab, and runs back to her starting place. Simple and quick: no vanishing, no cloak tricks.
+
+HOW IT IS BUILT (my plan, nothing of it is in the page yet)
+- The long parts are code and her EXISTING run strip: the dash to the target is her run (cloaked_run_8frame_strip.png) played fast while the page moves her, with a violet streak behind her; the way back is the same run MIRRORED (the page can mirror her since the backstab). That is why this sheet has no running poses beyond the first and last panel.
+- The new art is only the stab and the turn: panel 1 is the last stride of the dash (a flight pose with more lean than the run), 2 the braking step, 3 the STAB (the hit frame), 4 the pull-back, 5 the turn, 6 the first stride back (facing LEFT, so it can lead into the mirrored run; if it comes out badly, panel 5 can be dropped and the page flips her at once).
+- The page has one attack slot for the Rogue today (the backstab); a second Rogue skill needs a skill choice like the mage's and a second pack, which I would build when this strip exists. The backstab sheet is kept for another skill.
+
+HOW TO USE
+- Attach ONE image: Animations/Rogue/reference_image.png. Ask for a 3:2 image (ChatGPT: 1536 x 1024). Paste everything between the two lines of equals signs.
+- Generate several and keep the best panels; if only some are bad I join the good ones.
+- Save the sheet in inbox/ (for example inbox/rogue_shiv_sheet.png) and tell me.
+- What to look at: (1) the same woman in all six panels (burgundy bob, crimson scarf, charcoal cloak, no blue), empty fists, no weapon, no effects; (2) the SAME arm is the striking arm in panels 1 to 4 (the dagger goes in that hand in the hand tool); (3) panel 3 is a long low lunge with that arm thrust straight forward; (4) the same size in every panel, and the lunge with its cloak fully inside the panel (the last wide sheet had its fist 8 px from the edge: the prompt asks for a safer margin); (5) panel 6 faces LEFT, all others face RIGHT; (6) one image only.
+- Planned cut (default despill, the strict one blackens her burgundy hair): `slice_keypose_sheet.py ... --cols 3 --rows 2 --height <panel 1 height scaled so that her head matches the idle's, measure first> --scale-from panel1 --modes center,toe,toe,toe,feet,center --toe-x 410 --feet-x 293` (the front foot stays planted in panels 2 to 4; check the clipped pixels). File: `Animations/Rogue/shadow_shiv/cloaked_shadow_shiv_6frame_strip.png`, a `.placement.json` (fps 14, hitFrame 3, x and y 0), then hand marks in the tool (the dagger in the striking hand).
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG sprite sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create the sprite sheet: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first, then the bottom row. The six panels are the key poses of a "lightning-fast dash and stab": the character sprints at full speed toward the enemy, plants her foot, stabs once with one arm, pulls back, turns around and starts sprinting back.
+
+CHARACTER: the exact same character as in the attached reference image: a young human woman rogue, lean and athletic, with warm olive skin, sharp feminine features, sharp amber eyes and a calm, alert, slightly stern expression, short choppy burgundy (deep red-brown) hair cut to the jaw with a longer side fringe, a charcoal-black hooded cloak with the hood pushed back and bunched around her neck and shoulders (a ragged hem and a thin crimson trim), a crimson scarf wrapped around her neck with one short tail, a fitted charcoal-black leather jerkin with crimson stitching, fitted dark-grey sleeves, black leather bracers on the forearms, bare hands, a wide dark-brown leather belt with a buckle and two small pouches, a thin leather strap around one thigh, fitted dark charcoal trousers, and knee-high soft black-brown leather boots with buckled straps. Colours: charcoal, black, crimson, brown, burgundy hair and amber eyes, no blue anywhere. Keep the same painted game-sprite style, thick dark outlines, colors, proportions, face and three-quarter head angle. Do not redesign anything.
+
+VIEW: strict side view of the body and legs, with the head turned a little toward the viewer in the same three-quarter view as in the reference. In panels 1 to 5 she faces RIGHT (the enemy is off-screen to the right). In panel 6 only, she faces LEFT, because she is running back. The camera angle is the same in all six panels.
+
+NO ITEMS AND NO EFFECTS: no dagger, no sword, no knife, no sheath, no weapon of any kind, nothing in her hands. No speed lines, motion blur, afterimages, dust, smoke, glow, sparks or effects of any kind: they are added later. Both hands are bare, tight CLOSED FISTS in every panel.
+
+THE STRIKING ARM: in panels 1 to 4 it is always the SAME arm that is the striking arm (it is cocked back in panels 1 and 2, thrust forward in panel 3, pulled back in panel 4). The other arm is always the balancing arm. Never swap them between panels.
+
+SAME SCALE AND FLOOR (very important): draw her at exactly the same size in all six panels, the same size as in the reference. Do not zoom in or out between panels, and do NOT make her bigger in the lunge or in the sprint. Her head, from the top of the hair to the chin, is about 11% of the panel height, and standing upright she would be about 60% of the panel height. The floor is at the same height in every panel, about 82% down the panel (in panels 1 and 6 her boots are slightly above it). The WHOLE body, with the cloak, the scarf tail and both fists, is visible in every panel, never cropped. Keep the whole figure, including the thrust arm, the cloak and the trailing leg, inside the middle 80% of the panel width: leave at least 10% empty margin on the left and on the right, even in the lunge.
+
+THE SIX FRAMES:
+1. Sprint. Full-speed sprint, the flight phase: both boots slightly off the floor, the torso leaning forward about 35 degrees, the head low, the eyes locked on the enemy. The striking arm is cocked back with the fist at her hip, the balancing arm swings forward. The cloak and the scarf tail stream straight back behind her.
+2. Plant. The last step: the front boot slams down far ahead of her, the front knee bent about 90 degrees, the rear leg stretched out behind her, the body dropping low with the torso leaning forward about 40 degrees. The striking arm is drawn back beside her ribs, the fist tight, ready to thrust; the balancing arm is held forward. The cloak surges forward over her shoulders.
+3. Stab (the key frame). A long, low lunge: the front knee bent about 90 degrees, the rear leg straight behind her, the torso leaning forward about 45 degrees. The striking arm is thrust fully forward at shoulder height, straight as a spear, the fist tight; the balancing arm is swung back behind her. A fierce face, the mouth open in a short shout. The cloak streams out behind her.
+4. Withdraw. The strike is done: the striking arm snaps back with the elbow bent about 90 degrees, the torso rises to a forward lean of about 25 degrees, the weight shifts onto the rear leg, and she turns her head to look back over her rear shoulder. A cold, satisfied expression. The cloak sweeps forward past her.
+5. Turn. She spins away from the enemy: she pivots on the ball of her front foot, her hips and shoulders rotating toward the LEFT, still in side view, the knees bent, the head already looking to the left, the cloak whipping around her. She is half way between facing right and facing left.
+6. Sprint back. She runs away at full speed toward the LEFT, facing LEFT in this panel: the torso leaning forward about 35 degrees, one boot pushing off the floor, the other knee driven forward, the arms pumping, the cloak and the scarf tail streaming behind her to the RIGHT.
+
+BACKGROUND AND LAYOUT: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. No grid lines or borders between panels. The whole character, with the cloak, the scarf tail, the hands and the feet, must stay fully inside its own panel and never touch or cross a panel edge. No text, numbers, labels or any other effects. No magenta or pink on the character herself.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

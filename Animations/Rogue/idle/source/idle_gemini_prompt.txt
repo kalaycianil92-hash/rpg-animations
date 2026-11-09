@@ -1,0 +1,41 @@
+ROGUE IDLE PROMPT (6 frames, 3 x 2). Written 2026-11-04.
+
+HOW TO USE
+- Attach ONE image: Animations/Rogue/reference_image.png (the accepted look, see Animations/Rogue/source/rogue_look_gemini_prompt.txt). Ask for a 3:2 image. Paste everything between the two lines of equals signs.
+- Generate several and keep the best. If Gemini says it is out of image capacity, wait; do not shorten the prompt.
+- Save the sheet in inbox/ (for example inbox/rogue_idle_sheet.png) and tell me. I cut it into a strip and check it against the warrior's and the mage's idle.
+- What to look at in the result: (1) the same woman in all six panels (burgundy bob, crimson scarf, charcoal cloak, no blue); (2) panel 1 is the reference pose; (3) both fists stay at the same places (the back fist behind her hip, the front fist low in front of her thigh), empty, never swapped; (4) both boots stay on the same spot and the same floor height; (5) the six panels are almost the same: the differences are tiny; (6) she is the same size in every panel and nothing touches a panel edge; (7) no GIF and no extra images were made.
+- Known risks from the mage's idle (docs/PROMPTS.md): the whole upper body bobbed about 10 px in a 512 cell although "very small movements" was asked; `damp_motion.py --keep 0.5` halves that after cutting, no new generation needed. Gemini also drifts the size by a few percent between panels; the cutter fixes that with `--scale-from median`.
+- Planned cut (the numbers come from her idle after the first cut, run `check_strip.py` on it): `python slice_keypose_sheet.py rogue_idle_sheet.png robed_idle_strip.png --cols 3 --rows 2 --height 408 --scale-from median --modes heel --heel-x <her rear heel> --despill-band 10 --despill-thr 4`. Her stance is wide like the warrior's, so expect a rear heel near 165 and a front toe near 420 with the middle of the feet at 293 like the other two; measure, do not trust this. The strip name prefix is still to be chosen (the warrior's is `armored_`, the mage's `robed_`).
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG sprite sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create the sprite sheet: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first, then the bottom row. The six panels are the key poses of one calm standing breath of a character waiting for a fight: she breathes in, holds it for a moment, breathes out and settles. The differences between the six panels are TINY: someone looking at them must have to look hard to see them.
+
+CHARACTER: the exact same character as in the attached reference image: a young human woman rogue, lean and athletic, with warm olive skin, sharp feminine features, sharp amber eyes and a calm, alert, slightly stern expression, short choppy burgundy (deep red-brown) hair cut to the jaw with a longer side fringe, a charcoal-black hooded cloak with the hood pushed back and bunched around her neck and shoulders (a ragged hem and a thin crimson trim), a crimson scarf wrapped around her neck with one short tail, a fitted charcoal-black leather jerkin with crimson stitching, fitted dark-grey sleeves, black leather bracers on the forearms, bare hands, a wide dark-brown leather belt with a buckle and two small pouches, a thin leather strap around one thigh, fitted dark charcoal trousers, and knee-high soft black-brown leather boots with buckled straps. Colours: charcoal, black, crimson, brown, burgundy hair and amber eyes, no blue anywhere. Keep the same painted game-sprite style, thick dark outlines, colors, proportions, face and three-quarter head angle. Do not redesign anything.
+
+VIEW: strict side view of the body and legs, she faces RIGHT in every panel, with the head turned a little toward the viewer in the same three-quarter view as in the reference. The enemy is off-screen to the right. The camera angle is the same in all six panels.
+
+NO ITEMS AND NO EFFECTS: no dagger, no sword, no knife, no sheath, no weapon of any kind, nothing in her hands. No glow, smoke, sparks, magic or effects of any kind.
+
+HANDS (identical in every panel, exactly as in the reference): both hands are bare, tight CLOSED FISTS with nothing in them. The BACK arm hangs down along the back of her body and its fist rests behind her hip, at about the height of her upper thigh. The FRONT arm is held low in front of her with its fist in front of her upper thigh, the forearm pointing forward and slightly down. Never swap the two arms between panels, and the fists do not move from these places.
+
+ARMS: the back arm always stays behind the torso, and the front arm always stays in front of the torso. Never swap them between panels.
+
+SAME SCALE AND FLOOR (very important): draw her at exactly the same size in all six panels. Do not zoom in or out between panels. Her head, from the top of the hair to the chin, is about 12% of the panel height, and the whole figure, from the top of the head to the soles of the boots, is about 65% of the panel height. The floor is at the same height in every panel, about 85% down the panel. The WHOLE body, from the top of the head to the soles of both boots, is visible in every panel, never cropped. BOTH FEET AND BOTH BOOTS STAY PLANTED on exactly the same spot in every panel, flat on the floor; they never slide, lift or hop. The legs, the hips and the fists do not move at all.
+
+HOW LITTLE MOVES: the whole movement of the body is at most about 1% of the panel height. Only the chest, the shoulders and the head rise and sink by that tiny amount, and only the cloak hem, the scarf tail and the tips of the hair sway softly with a small delay. The expression stays calm and alert, the eyes stay open in every panel.
+
+THE SIX FRAMES:
+1. Rest. Exactly the pose of the reference image: the same stance, the same fists, the same face. The cloak and the scarf tail hang still.
+2. Breath begins. The chest and the shoulders rise by a hair (about 0.5% of the panel height), the head rises the same amount. Everything else is exactly as in panel 1.
+3. Breath in. The chest and the shoulders are about 1% of the panel height higher than in panel 1, the head about 0.5% higher. The scarf tail and the hair tips lift very slightly. The legs, the feet and the fists are exactly as in panel 1.
+4. Breath held. The same as panel 3, but the cloak hem and the scarf tail have swung slightly backward, a soft lagging sway.
+5. Breath out. The chest and the shoulders come down to about 0.5% BELOW their height in panel 1, the head lowers by about 0.5%, the knees give a hair. The cloak hem and the scarf tail swing slightly forward. The feet and the fists do not move.
+6. Settle. The chest and the shoulders rise back almost to their height in panel 1. This is the pose just before panel 1: nearly identical to it, with the cloak hem and the scarf tail a hair behind. It must not be an exact copy of panel 1.
+
+BACKGROUND AND LAYOUT: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. No grid lines or borders between panels. Leave about 10% empty margin around the figure in each panel; the whole character, with the cloak, the scarf tail, the hands and the feet, must stay fully inside its own panel and never touch or cross a panel edge. No text, numbers, labels, dust, motion lines, speed lines, afterimages or any other effects. No magenta or pink on the character herself.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

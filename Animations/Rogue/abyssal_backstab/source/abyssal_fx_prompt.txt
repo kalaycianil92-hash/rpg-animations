@@ -1,0 +1,36 @@
+ABYSSAL BACKSTAB EFFECT TEXTURES (one sheet, 3 x 2, no reference image, ask for 3:2). Written 2026-11-04. Works with Gemini or ChatGPT.
+
+WHY: the user wants the Abyssal Backstab "more powerful and dramatic". Its effects need their own look (like her electricity and her frost, not a copy of the mage's effects): ABYSSAL = a tear in the dark. Not soft violet smoke (the Umbral Shroud has that, in code): hard, jagged light cutting through darkness.
+- LOOK: crimson-white. A white-hot core, a deep crimson glow (her scarf's colour, #E0143C) and a narrow violet fringe (#7A3CFF) on the outermost edges. Sharp, torn, angular, high contrast; the shapes look ripped and cut, not painted or soft. No clouds, no smoke, no mist, no blur, no lightning (her Static Stiletto is lightning: these are tears and slashes).
+- Until the pictures exist the page draws the effects from code.
+
+WHAT THE PAGE DOES WITH THEM: panel 1 opens in the air above the target where she bursts out; panel 2 is the double slash that appears on the target's upper back at the impact (and is held a moment while the picture freezes); panel 3 is the burst on the impact point; panel 4 is the streak behind her dive; panel 5 lies on the ground under the target; panel 6 rises from the target's back for a moment after the hit.
+
+HOW TO USE
+- No attachment. Ask for a 3:2 image (ChatGPT: 1536 x 1024). Paste everything between the two lines of equals signs.
+- Generate once or twice and keep the best; if only some panels are good, ask a NEW chat for those (the sheet cannot be edited, it is redrawn).
+- Save the sheet in inbox/ (for example inbox/rogue_abyssal_fx_sheet.png) and tell me.
+- What to look at: (1) pure flat black everywhere (the page adds the pictures with additive blending, so black means transparent); (2) crisp torn shapes in crimson-white with a violet fringe, NOT soft smoke, NOT blue, NOT lightning; (3) nothing touches a panel edge and no glow reaches the edge; (4) one image only.
+- Cut: `python source/tools/cut_fx_sheet.py inbox/rogue_abyssal_fx_sheet.png source/assets/fx --cols 3 --rows 2 --min 40 --pad 12 "--names=ab_rift,ab_cross,ab_burst,ab_streak,ab_ground,ab_claws"`.
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG texture sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create a texture sheet of ABYSSAL SHADOW-TEAR effects for a 2D fantasy RPG game: a grid of 3 columns x 2 rows, six equal square panels (the whole image is 3:2), read left to right, top row first, then the bottom row. The effects belong to a rogue's brutal diving strike out of the dark; the name is only context, do not write it or any other text.
+
+BACKGROUND (very important): the whole image is PURE BLACK (#000000), perfectly flat and identical in every pixel. The effects will be added over a game scene with additive blending, so black means transparent and everything that is not black adds light. No gradient, no vignette, no dark-blue or dark-purple haze, no glow spreading across the panel (a glow may reach at most 4% beyond the shapes and must be pure black well before the panel edge), no outlines, no borders, no divider lines or frames between the panels.
+
+STYLE (the most important part): sharp, torn, angular tears and cuts of light, as if reality were ripped open: jagged edges with hard points, thin razor-sharp tips, slightly irregular. Each shape has a white-hot core 2 to 4 pixels wide, a deep crimson glow (#E0143C) hugging it closely, and a narrow violet fringe (#7A3CFF) only on the outermost edges and tips. Hand-inked and hard-edged in feeling. ABSOLUTELY NO soft painted smoke, no clouds, no mist, no blurry glow clouds, no lens flare, no lightning bolts, no fire, no ice, no blue. Most of every panel stays pure black. No characters, no weapons, no ground texture, no landscape, no text, no numbers.
+
+THE SIX PANELS:
+1. Rift. A tall narrow vertical TEAR in the air, like a rip in a dark curtain: a long jagged slit about 30% of the panel width and 90% of its height, centred, wider in the middle and pointed at both ends, its edges crackling crimson-white with small torn splinters flying off the rim, a few thin cracks running out from the ends. The INSIDE of the slit is empty black (it will show the scene darkened by the game), only the rim shines.
+2. Double slash. TWO big curved slashes crossing each other like an X: each a long, slightly curved, tapering streak (thick in the middle, pointed at both ends) with a white-hot core and crimson edge, one running from top-left to bottom-right and one from top-right to bottom-left, crossing at the centre, about 90% of the panel width and height, a few tiny sparks and torn splinters scattered along them.
+3. Impact burst. The instant of a brutal hit: a small white-hot core with 10 to 14 long jagged shadow-claw spikes radiating in all directions (different lengths, some very long, jagged and torn like broken glass), a few short snapping tears between them, a thin ragged ring of tiny splinters around, roughly round, centred, about 90% of the panel.
+4. Dive streak. A long narrow perfectly horizontal streak left behind by something plunging at great speed: bright and dense at the RIGHT end, made of 5 to 8 thin crimson-white lines with small torn gaps and splinters, a few violet-tipped sparks, thinning to nothing toward the LEFT end. About 92% of the panel width and 20% of its height, centred.
+5. Ground tear. Cracks in the ground radiating outward from an EMPTY black centre, seen from a low angle as a flat oval about 90% of the panel width and 25% of its height, centred: 10 to 16 jagged cracks, each glowing crimson-white from inside, brightest near the centre and thinning toward the rim, a few forking, with tiny splinters lifted at their ends.
+6. Shadow claws. A rising crown of 7 to 10 tall curved claw-like tongues of torn shadow-light, standing in a loose row on a flat base, about 80% of the panel width and 85% of its height, centred: each tongue is a long curved, tapering, jagged blade shape pointing up and slightly outward, a white-hot core line, a crimson edge and a violet tip, of different heights, with small splinters drifting up between them.
+
+LAYOUT: each effect is centred in its own panel with at least 6% pure black margin all round and never touches or crosses the panel edge.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

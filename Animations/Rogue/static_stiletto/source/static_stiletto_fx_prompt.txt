@@ -1,0 +1,35 @@
+STATIC STILETTO ELECTRICITY TEXTURES (one sheet, 3 x 2, no reference image, ask for 3:2). Written 2026-11-04. Works with Gemini or ChatGPT.
+
+WHY (the user, 2026-11-04): the lightning aura of the Static Stiletto was the same picture that is waiting for the mage's lightning skills (`lightning_aura`, a tall vortex of two spiralling ribbons round an empty middle, painted and soft); "using the same electric aura for mage and rogue looks like a really low effort design". So the Rogue gets her OWN electricity, different in form and in look:
+- FORM: not a turning vortex. A STATIC cage: a crackling shell of jagged filaments round her that flickers and snaps (the page flickers quickly between three different pictures of it, randomly mirrored, instead of turning one), arcs crawling along the ground, a burst on the target and a streak behind the leap.
+- LOOK: crisp, thin, high-contrast electricity (a Tesla coil, a Jacob's ladder), hairline zig-zag filaments with sharp angles and a white-hot core, a narrow acid-cyan glow and a magenta fringe on the outermost hairlines (her crimson scarf's cousin; the mage's lightning is blue-violet). No soft painted ribbons, no smoke, no clouds, lots of pure black between the filaments.
+- Until the pictures exist the page draws all of this from code (a first version of the same idea is already in: the halo of snapping arcs, the ground arcs, the burst and the streak, in the rogue's own palette white / cyan / magenta).
+
+HOW TO USE
+- No attachment. Ask for a 3:2 image (ChatGPT: 1536 x 1024). Paste everything between the two lines of equals signs.
+- Generate once or twice and keep the best; if only some panels are good, ask again for those and I join them.
+- Save the sheet in inbox/ (for example inbox/rogue_static_fx_sheet.png) and tell me.
+- What to look at: (1) pure flat black everywhere (the page adds the pictures with additive blending, so black means transparent); (2) the three halo panels are the same size and layout but different filaments, with an EMPTY black middle (a person stands there); (3) hairline crisp lines, not soft; cyan, white and a little magenta, nothing blue-violet-painted like the mage's; (4) nothing touches a panel edge and nothing glows out to the edge; (5) one image only.
+- Cut: `python source/tools/cut_fx_sheet.py --cols 3 --rows 2 --min 40 --pad 12 "--names=ss_halo_a,ss_halo_b,ss_halo_c,ss_ground,ss_burst,ss_trail"` into `source/assets/fx/` (the page then draws these in place of the code versions; the code versions stay as the fallback).
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG texture sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create a texture sheet of STATIC ELECTRICITY effects for a 2D fantasy RPG game: a grid of 3 columns x 2 rows, six equal square panels (the whole image is 3:2), read left to right, top row first, then the bottom row. The effects belong to a rogue's lightning-charged dagger stab; the name is only context, do not write it or any other text.
+
+BACKGROUND (very important): the whole image is PURE BLACK (#000000), perfectly flat and identical in every pixel. The effects will be added over a game scene with additive blending, so black means transparent and everything that is not black adds light. No gradient, no vignette, no dark-blue or dark-purple haze, no glow spreading across the panel (a glow may reach at most 4% beyond the filaments and must be pure black well before the panel edge), no outlines, no borders, no divider lines or frames between the panels.
+
+STYLE (the most important part): crisp, thin, high-contrast electricity, like a Tesla coil or a Jacob's ladder: hairline zig-zag filaments with sharp angles and fork-like branches, each with a white-hot core only 1 to 3 pixels wide, a narrow acid-cyan glow (#46EBE6) around it, and a magenta fringe (#D040C8) only on the thinnest outermost hairlines and on the tips of the branches. Tiny bright white sparks and short snapping arcs between the main filaments. Sharp, angular and nervous, hand-inked in feeling, with hard edges. ABSOLUTELY NO soft painted ribbons, no spiral vortex, no swirling wisps, no smoke, no clouds, no mist, no blurry glow clouds, no lens flare. Most of every panel stays pure black. Do not make it blue or violet: the colours are white, acid cyan and a little magenta. No characters, no weapons, no ground texture, no landscape, no text, no numbers.
+
+THE SIX PANELS:
+1. Static halo A. A crackling cage of static electricity in the shape of a tall oval standing upright, centred, about 55% of the panel width and 92% of its height. It is a loose shell of 25 to 40 thin jagged filaments that arc between points on the surface of an invisible oval; some branch, some end in a tiny spark, a few main arcs are brighter and longer than the rest. The MIDDLE of the oval is completely EMPTY, pure black, about 55% of its width and height (a person stands there and must be visible through it).
+2. Static halo B. The same size, the same position and the same rules as panel 1, but a completely different pattern of filaments (different arcs, different branches, different spark positions).
+3. Static halo C. The same again, a third different pattern.
+4. Ground crackle. Thin electric arcs crawling outward along the ground from an EMPTY black centre, seen from a low angle as a flat oval about 90% of the panel width and 25% of its height, centred: 12 to 18 jagged arcs radiating in all directions, a few forking, tiny sparks at their ends, the arcs brightest near the centre and thinning toward the edge.
+5. Discharge burst. The instant a lightning-charged stab hits: a small white-hot core with 9 to 14 long jagged bolts radiating in all directions (different lengths, some very long, most forked), a few short snapping arcs between them, a thin ring of tiny sparks around, a thin flat shock ring. Roughly round, centred, about 90% of the panel.
+6. Dash streak. A long narrow horizontal streak left behind by a lightning-fast dash: bright and dense at the RIGHT end, made of 4 to 7 thin crackling lines that run nearly straight with small zig-zags, plus scattered tiny sparks and short snapping arcs, thinning out and fading to nothing toward the LEFT end. About 92% of the panel width and 22% of its height, centred, perfectly horizontal.
+
+LAYOUT: each effect is centred in its own panel with at least 6% pure black margin all round and never touches or crosses the panel edge. Panels 1, 2 and 3 must be exactly the same size and position.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================
