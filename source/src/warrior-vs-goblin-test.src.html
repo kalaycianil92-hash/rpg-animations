@@ -5560,8 +5560,20 @@
     ctx.beginPath(); ctx.rect(-2 * r, -2 * r, 4 * r, 4 * r); ctx.arc(r * 0.42, 0, r * 0.86, 0, 6.2832, true);
     ctx.fillStyle = "rgba(" + DKC.bright + "," + Math.min(1, a).toFixed(3) + ")"; ctx.fill(); ctx.restore();
   }
+  // The user's painted dark pieces (2026-11-09, Animations/DarkSlime/source/dark_fx_glow_sheet.png and dark_fx_ink_sheet.png cut into dk_* in assets/fx): the GLOW (dk_orb, dk_burst, dk_fissure, dk_geyser, dk_ripple,
+  // dk_streak, dk_crescents, dk_motes, dk_tendrils) is added like light (fbTexDraw / mfxTex); the INK (dk_splash, dk_splat, dk_pool, dk_drips, dk_drops_a/b, dk_smear, dk_vines, dk_bubbles) is DARK and is drawn normally (inkTex).
+  // Without the pictures the code looks below are the fallback.
+  var DK_TEX = ["dk_orb", "dk_burst", "dk_fissure", "dk_geyser", "dk_ripple", "dk_streak", "dk_crescents", "dk_motes", "dk_tendrils", "dk_splash", "dk_splat", "dk_pool", "dk_drips", "dk_drops_a", "dk_drops_b", "dk_smear", "dk_vines", "dk_bubbles"];
+  function dkHasTex() { return DK_TEX.every(auraReady); }
+  function inkTex(ctx, im, x, y, w, a, flip, rot, ay, hs, ax) {                      // a picture of solid ink, drawn NORMALLY (it darkens what is behind it): w px wide, its point (ax, ay) (0..1, default the middle) at (x, y), turned by rot, its height scaled by hs (a growing vine)
+    if (!im || !im.naturalWidth || a <= 0.01) return;
+    var h = w * im.naturalHeight / im.naturalWidth * (hs === undefined ? 1 : hs);
+    ctx.save(); ctx.globalAlpha = Math.min(1, a); ctx.translate(x, y); if (rot) ctx.rotate(rot); if (flip) ctx.scale(-1, 1);
+    ctx.drawImage(im, -w * (ax === undefined ? 0.5 : ax), -h * (ay === undefined ? 0.5 : ay), w, h); ctx.restore();
+  }
   function darkBurst(s, cx, gy, rnd) {                                               // a hit: ink blobs fly out of the body and crescents spin away
     var i, a, v, y0 = gy - 0.3 * s;
+    MFX.ps.push({ kind: "dkpb", x: cx, y: y0, age: 0, life: 450, size: s * 0.9, flip: rnd() < 0.5, rot: rnd() * 6.2832 });          // the painted burst
     for (i = 0; i < 12; i++) { a = rnd() * 6.2832; v = (0.0004 + rnd() * 0.0009) * s; MFX.ps.push({ kind: "blob", x: cx + Math.cos(a) * 0.1 * s, y: y0 + Math.sin(a) * 0.08 * s, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 0.0003 * s, age: 0, life: 600 + rnd() * 500, size: Math.max(2, s * (0.012 + rnd() * 0.014)) }); }
     for (i = 0; i < 4; i++) { a = -3.14159 * rnd(); v = (0.0003 + rnd() * 0.0005) * s; MFX.ps.push({ kind: "cres", x: cx + (rnd() - 0.5) * 0.4 * s, y: y0, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 900 + rnd() * 600, size: s * (0.02 + 0.015 * rnd()), rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.01 }); }
   }
@@ -5572,6 +5584,11 @@
     glowDot(cb, cx, gy - 0.30 * s, 0.85 * s, DKC.mid, 0.11 * K * fl);
     mfxTex(cb, fbTex.dark_aura, cx, gy - 0.01 * s, 1.15 * s * (0.97 + 0.06 * f2), 0.9 * s * (0.97 + 0.06 * f2), 0.30 * K * (0.45 + 0.55 * fl), false);
     mfxTex(cb, fbTex.dark_aura, cx, gy - 0.01 * s, 1.0 * s * (1.03 - 0.06 * f2), 0.8 * s * (1.03 - 0.06 * f2), 0.2 * K * (0.45 + 0.55 * (1.2 - fl)), true);
+    if (dkHasTex()) {                                                                // the painted pieces: curling tendrils behind the slime, a flicker of motes in front (re-picked every 100 ms)
+      var rk = rngOf(Math.floor(now / 100) * 5 + 1);
+      fbTexDraw(cb, fbTex.dk_tendrils, cx, gy - 0.02 * s, 0, 0.95 * s, 0.26 * K * (0.5 + 0.5 * fl), 0.5, rk() < 0.5, 1);
+      fbTexDraw(cf, fbTex.dk_motes, cx, gy - 0.36 * s, 0, 0.95 * s, 0.3 * K * (0.5 + 0.5 * rk()), 0.5, rk() < 0.5);
+    }
     MFX.accSm = (MFX.accSm || 0) + 0.0030 * k * MFX.dieMul * dt; MFX.accCr = (MFX.accCr || 0) + 0.0010 * k * MFX.dieMul * dt; MFX.accMt = (MFX.accMt || 0) + 0.0035 * k * MFX.dieMul * dt;
     while (MFX.accSm >= 1) { MFX.accSm -= 1; MFX.ps.push({ kind: "smoke", x: cx + (rnd() - 0.5) * 0.7 * s, y: gy - (0.42 + rnd() * 0.2) * s, vx: (rnd() - 0.5) * 0.00006 * s, vy: -(0.00004 + rnd() * 0.00008) * s, age: 0, life: 2800 + rnd() * 1800, size: s * (0.10 + rnd() * 0.08), front: rnd() < 0.45 }); }
     while (MFX.accCr >= 1) { MFX.accCr -= 1; MFX.ps.push({ kind: "cres", x: cx + (rnd() - 0.5) * 0.6 * s, y: gy - (0.5 + rnd() * 0.2) * s, vx: (rnd() - 0.5) * 0.00003 * s, vy: -(0.00007 + rnd() * 0.00005) * s, age: 0, life: 2200 + rnd() * 1500, size: s * (0.018 + rnd() * 0.014), rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.002 }); }
@@ -5584,6 +5601,7 @@
       if (p.kind === "smoke") { p.x += p.vx * dt; p.y += p.vy * dt; smokeDot(p.front ? cf : cb, p.x, p.y, p.size * (0.8 + 0.7 * f), Math.sin(Math.min(1, f) * 3.14159) * 0.2 * K); }
       else if (p.kind === "cres") { p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.spin * dt; crescentDraw(cf, p.x, p.y, p.size, p.rot, Math.sin(f * 3.14159) * 0.9 * Math.min(1, K)); }
       else if (p.kind === "mote") { a = Math.sin(f * 3.14159) * K; glowDot(cf, p.x, p.y, p.size * 3, DKC.bright, a * 0.5); glowDot(cf, p.x, p.y, p.size, DKC.core, a * 0.8); }
+      else if (p.kind === "dkpb") { fbTexDraw(cf, fbTex.dk_burst, p.x, p.y, p.rot, p.size * (0.5 + 0.6 * clamp01(f * 3)), 0.9 * (1 - f) * Math.min(1, K), 0.5, p.flip); }
       else if (p.kind === "blob") {
         p.vy += 0.0000035 * s * dt; p.x += p.vx * dt; p.y += p.vy * dt; a = (1 - f) * Math.min(1, K * 1.5);
         cf.save(); cf.fillStyle = "rgba(24,10,48," + (0.9 * a).toFixed(3) + ")"; cf.beginPath(); cf.arc(p.x, p.y, p.size, 0, 6.2832); cf.fill(); cf.restore();
@@ -5771,7 +5789,7 @@
   function darkSpitParams() { var F = fbParams("ice"); F.pal = DK_PAL; F.painted = false; F.charge = 3; F.release = SPIT_REL; F.chance = 0; F.mul = 1.15; return F; }
   function darkChainParams() { var F = darkSpitParams(); F.size = 1.6; F.trail = 1.4; F.mul = CIN_MUL; F.ga = CIN_GLOW; F.big = true; return F; }
   function dkBoltDraw(ctx, now, L, F, u) {
-    var rnd = L.rnd, j, a;
+    var rnd = L.rnd, j, a, tex = dkHasTex();
     if (!L.p0) {
       var tip = L.from && L.from(), bp = bodyPoint(), tr = rectIn(L.T.unit), tx = tip ? tip.x : bp.x, ty = tip ? tip.y : bp.y;
       L.p0 = { x: tx, y: ty }; L.p1 = L.to || { x: tr.left + tr.width * 0.5, y: tr.top + tr.height * 0.42 };
@@ -5780,7 +5798,9 @@
     }
     var dt = Math.min(60, now - L.last) * speed; L.last = now;
     var s = clamp01((now - L.t0) / Math.max(1, L.t1 - L.t0)), e = Math.pow(s, L.pw || 1.3), pos = bez(L.p0, L.c, L.p1, e), R = u * 0.03 * Math.max(0.7, F.size) * 1.3, span = (u * 0.8 * F.trail) / L.len, q, f, tp, p;
-    for (q = 10; q >= 1; q--) {                                                      // a ribbon of dark smoke and violet glow behind the ball
+    var ahead = bez(L.p0, L.c, L.p1, Math.min(1, e + 0.02)), dir = Math.atan2(ahead.y - pos.y, ahead.x - pos.x);
+    if (tex) fbTexDraw(ctx, fbTex.dk_orb, pos.x, pos.y, dir, u * 1.05 * Math.max(0.7, F.trail) * (F.big ? 1.25 : 1), 0.95, 0.95, false);   // the painted orb with its tail of curling tendrils (its bright head at the right end)
+    for (q = 10; q >= 1 && !tex; q--) {                                              // (without the picture:) a ribbon of dark smoke and violet glow behind the ball
       f = q / 10; tp = bez(L.p0, L.c, L.p1, Math.max(0, e - f * span));
       smokeDot(ctx, tp.x, tp.y, R * (1.4 + 1.2 * f), 0.24 * (1 - f));
       glowDot(ctx, tp.x, tp.y, R * (1.2 * (1 - f) + 0.3), f < 0.5 ? DKC.bright : DKC.mid, Math.pow(1 - f, 1.4) * 0.4);
@@ -5795,7 +5815,21 @@
       ctx.save(); ctx.fillStyle = "rgba(24,10,48," + (0.9 * a).toFixed(3) + ")"; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill(); ctx.restore(); glowDot(ctx, p.x, p.y, p.size * 2, DKC.mid, 0.25 * a);
     }
   }
-  function dkImpact(T, F) {                                                          // the hit: a violet flash, ink blobs and crescents flung out, a dark pool with a ring on the ground, a short column of the painted dark twist (bigger for the Void Bolt)
+  function dkImpactTex(T, F) {                                                       // the hit with the painted pieces: the glowing burst and motes, the ink splash and pool at his feet that fade away
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width / 2, cy = r.top + r.height * 0.42, gy = r.top + r.height * 0.97, rnd = rngOf(now | 0), B = F.big ? 1.5 : 1, fl = rnd() < 0.5, fl2 = rnd() < 0.5, rot = rnd() * 6.2832;
+    shake(3 * F.shake * B, 200);
+    fxAdd({ t0: now, t1: now + 1500 * B / speed, draw: function (ctx, now2) {
+      var t = (now2 - now) * speed, e = 1 - Math.pow(1 - clamp01(t / 220), 2), al;
+      if (t < 260) { al = 1 - t / 260; glowDot(ctx, cx, cy, u * (0.1 + 0.3 * e) * B, DKC.mid, 0.5 * al); glowDot(ctx, cx, cy, u * (0.03 + 0.1 * e) * B, DKC.core, 0.95 * al); }
+      if (t < 100) flashAll(ctx, "205,170,255", 0.06 * B * (1 - t / 100));
+      if (t < 650 * B) fbTexDraw(ctx, fbTex.dk_burst, cx, cy, rot, u * (0.5 + 0.7 * e) * B, clamp01(1 - t / (650 * B)) * 0.95, 0.5, fl);
+      if (t < 900 * B) fbTexDraw(ctx, fbTex.dk_motes, cx, cy, 0, u * 0.8 * B, clamp01(1 - t / (900 * B)) * 0.85, 0.5, fl2);
+      inkTex(ctx, fbTex.dk_pool, cx, gy, u * 0.8 * B * (0.6 + 0.4 * e), 0.95 * (1 - clamp01((t - 700) / 800)), fl, 0, 0.5);
+      inkTex(ctx, fbTex.dk_splash, cx, gy, u * 0.55 * B * (0.45 + 0.55 * e), 0.98 * (t < 500 ? 1 : 1 - clamp01((t - 500) / 600)), fl2, 0, 0.96, 0.4 + 0.6 * e);
+    } });
+  }
+  function dkImpact(T, F) {
+    if (dkHasTex()) { dkImpactTex(T, F); return; }                                                          // the hit: a violet flash, ink blobs and crescents flung out, a dark pool with a ring on the ground, a short column of the painted dark twist (bigger for the Void Bolt)
     var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width / 2, cy = r.top + r.height * 0.42, gy = r.top + r.height * 0.97, rnd = rngOf(now | 0), B = F.big ? 1.5 : 1, ps = [], i, a, v;
     shake(3 * F.shake * B, 200);
     for (i = 0; i < Math.round(14 * B); i++) { a = rnd() * 6.2832; v = u * (0.3 + rnd() * 0.8) / 1000; ps.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 0.1 * u / 1000, age: 0, life: 520 + rnd() * 380, size: u * (0.012 + rnd() * 0.014), cres: false }); }
@@ -5817,7 +5851,13 @@
       }
     } });
   }
-  function eruptCrackDrawDk(ctx, cr, cx, gy, u, t, a, now) {                         // the dark cracks: the pattern's jagged lines as violet veins (a deep stroke, a violet stroke, a pale core), growing out from the middle, over a dark pool that spreads
+  function eruptCrackDrawDk(ctx, cr, cx, gy, u, t, a, now) {
+    if (dkHasTex()) {                                                                // the painted glowing fissure over a spreading pool of ink
+      inkTex(ctx, fbTex.dk_pool, cx, gy, u * (0.3 + 0.6 * t), 0.85 * a * Math.min(1, t * 2), false, 0, 0.5);
+      fbTexDraw(ctx, fbTex.dk_fissure, cx, gy - u * 0.01, 0, u * (0.5 + 0.9 * t), 0.95 * a * Math.min(1, t * 1.6), 0.5, Math.floor(now / 110) % 2 === 0);
+      glowEllipse(ctx, cx, gy, u * (0.2 + 0.4 * t), u * (0.05 + 0.08 * t), DKC.mid, 0.2 * a * t);
+      return;
+    }                         // the dark cracks: the pattern's jagged lines as violet veins (a deep stroke, a violet stroke, a pale core), growing out from the middle, over a dark pool that spreads
     var i, k, n, f, q, path, fl, S = [[0.016, DKC.deep, 0.4], [0.007, DKC.mid, 0.8], [0.003, DKC.core, 0.95]], z;
     ctx.save(); ctx.fillStyle = "rgba(20,8,40," + (0.45 * a * Math.min(1, t * 1.6)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(cx, gy - u * 0.01, u * (0.2 + 0.45 * t), u * (0.04 + 0.07 * t), 0, 0, 6.2832); ctx.fill(); ctx.restore();
     ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineJoin = "round"; ctx.lineCap = "round";
@@ -5834,7 +5874,27 @@
     ctx.restore();
     glowEllipse(ctx, cx, gy, u * (0.2 + 0.4 * t), u * (0.05 + 0.08 * t), DKC.mid, 0.25 * a * t);
   }
-  function eruptBlastDk(tE, cx, gy, u, F, geo) {                                     // the Abyssal Eruption: a flash, a COLUMN OF GLOOM (the painted dark twist stretched tall, two copies, with puffs of dark smoke climbing it), an ink geyser (blobs thrown up that fall back, crescents flung out), a dark pool, a ring
+  function eruptBlastDkTex(tE, cx, gy, u, F, geo) {                                  // the Abyssal Eruption with the painted pieces: the glowing geyser, shadow tendrils and ink vines bursting out of the ground, the burst and ripple, an ink splash, drops flung out, a pool that lingers
+    var rnd = rngOf((tE | 0) + 11), fl = rnd() < 0.5, fl2 = rnd() < 0.5;
+    fxAdd({ t0: tE, t1: tE + 2100 / speed, draw: function (ctx, now) {
+      var t = (now - tE) * speed, rt = clamp01(t / 520), er = 1 - Math.pow(1 - rt, 3), rise = clamp01(t / 150), fall = clamp01((t - 420) / 600), H = u * 1.5 * (1 - Math.pow(1 - rise, 2)) * (1 - fall * fall), fk = 0.85 + 0.15 * Math.sin(now * 0.04), vg = clamp01(t / 260), vh = vg * (1 - clamp01((t - 900) / 500));
+      if (geo && t < 1000) eruptCrackDrawDk(ctx, geo, cx, gy, u, 1, 0.9 * (1 - clamp01((t - 150) / 850)), now);
+      if (t < 200) { glowDot(ctx, cx, gy - u * 0.2, u * (0.6 + 0.8 * t / 200), DKC.mid, 0.7 * (1 - t / 200)); glowDot(ctx, cx, gy - u * 0.2, u * (0.3 + 0.5 * t / 200), DKC.core, 0.9 * (1 - t / 200)); }
+      inkTex(ctx, fbTex.dk_pool, cx, gy, u * (0.9 + 0.5 * er), 0.95 * (1 - clamp01((t - 900) / 1100)), fl, 0, 0.5);                                   // the pool lingers
+      if (t < 620) fbTexDraw(ctx, fbTex.dk_burst, cx, gy - u * 0.12, 0, u * (0.9 + 0.8 * clamp01(t / 240)), 0.95 * clamp01(1 - t / 620), 0.5, false);
+      if (t < 700) fbTexDraw(ctx, fbTex.dk_ripple, cx, gy, 0, u * (0.5 + 1.5 * er), 0.9 * (1 - rt), 0.5, false);
+      if (H > 6) {                                                                   // the geyser (two copies against each other) and the tendrils at its foot
+        mfxTex(ctx, fbTex.dk_geyser, cx, gy, u * 0.75 * (1 - 0.3 * fall), H * 1.05, 0.95 * fk * (1 - fall * 0.8), false);
+        mfxTex(ctx, fbTex.dk_geyser, cx, gy, u * 0.6 * (1 - 0.3 * fall), H * 0.92, 0.6 * (1.1 - fk) * 3 * (1 - fall * 0.8), true);
+        fbTexDraw(ctx, fbTex.dk_tendrils, cx, gy, 0, u * 1.0, 0.8 * (1 - fall), 0.5, fl2, 1);
+      }
+      inkTex(ctx, fbTex.dk_vines, cx, gy + u * 0.02, u * 0.8, 0.98, fl2, 0, 1, vh);                                                                    // ink vines burst up and sink back
+      inkTex(ctx, fbTex.dk_splash, cx, gy, u * 0.8 * (0.5 + 0.5 * er), 0.98 * (t < 500 ? 1 : 1 - clamp01((t - 500) / 700)), fl, 0, 0.96, 0.4 + 0.6 * er);
+      if (t < 1300) inkTex(ctx, fbTex.dk_drops_a, cx, gy - u * 0.5, u * (0.7 + 1.0 * er), 0.95 * (1 - clamp01((t - 250) / 1000)), fl, 0, 0.5);          // drops flung out
+    } });
+  }
+  function eruptBlastDk(tE, cx, gy, u, F, geo) {
+    if (dkHasTex()) { eruptBlastDkTex(tE, cx, gy, u, F, geo); return; }                                     // the Abyssal Eruption: a flash, a COLUMN OF GLOOM (the painted dark twist stretched tall, two copies, with puffs of dark smoke climbing it), an ink geyser (blobs thrown up that fall back, crescents flung out), a dark pool, a ring
     var rnd = rngOf((tE | 0) + 11), ps = [], i, a, v;
     for (i = 0; i < 22; i++) { a = -Math.PI * (0.12 + rnd() * 0.76); v = u * (0.7 + rnd() * 1.4) / 1000; ps.push({ x: cx + (rnd() - 0.5) * u * 0.25, y: gy - u * 0.05, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 800 + rnd() * 600, size: u * (0.014 + rnd() * 0.018), cres: false }); }
     for (i = 0; i < 6; i++) { a = -Math.PI * (0.1 + rnd() * 0.8); v = u * (0.4 + rnd() * 0.8) / 1000; ps.push({ x: cx, y: gy - u * 0.2, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 1100 + rnd() * 500, size: u * (0.025 + rnd() * 0.015), cres: true, rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.01 }); }
@@ -6699,7 +6759,17 @@
       }
     } });
   }
-  function bounceTrailFxDk(t0, t1, u) {                                              // the trail above the diving slime: a column of dark smoke puffs climbing away from it, violet glows, a few crescents and ink drops
+  function bounceTrailFxDkTex(t0, t1, u) {                                           // the dive's trail with the painted pieces: the glowing streak and an ink smear hanging above the slime
+    fxAdd({ t0: t0, t1: t1, rnd: rngOf(t0 | 0), draw: function (ctx, now, L) {
+      if (!monEl) return;
+      var r = rectIn(monEl), cx = r.left + r.width / 2, y0 = r.top + r.height * 0.4, rnd = L.rnd, fl = rnd() < 0.5;
+      inkTex(ctx, fbTex.dk_smear, cx, y0, u * 1.5, 0.85, fl, 1.5708, 0.5, 1, 0.95);
+      fbTexDraw(ctx, fbTex.dk_streak, cx + (rnd() - 0.5) * u * 0.05, y0, 1.5708, u * 1.9, 0.95, 1, !fl);
+      fbTexDraw(ctx, fbTex.dk_crescents, cx, y0 - u * 0.5, 1.5708 + 3.14159, u * 0.5, 0.6, 0.5, fl);
+    } });
+  }
+  function bounceTrailFxDk(t0, t1, u) {
+    if (dkHasTex()) { bounceTrailFxDkTex(t0, t1, u); return; }                                              // the trail above the diving slime: a column of dark smoke puffs climbing away from it, violet glows, a few crescents and ink drops
     fxAdd({ t0: t0, t1: t1, rnd: rngOf(t0 | 0), draw: function (ctx, now, L) {
       if (!monEl) return;
       var r = rectIn(monEl), cx = r.left + r.width / 2, y0 = r.top + r.height * 0.4, i, y, rnd = L.rnd;
@@ -6711,7 +6781,21 @@
       for (i = 0; i < 2; i++) crescentDraw(ctx, cx + (rnd() - 0.5) * u * 0.3, y0 - rnd() * u * 0.9, u * 0.03, rnd() * 6.28, 0.8);
     } });
   }
-  function bounceImpactFxDk(tI, cx, gy, u, F, k) {                                    // the crash (k = 1), the smaller second landing and the slam: a violet flash, an INK SPLASH (blobs thrown up and out, crescents flung), a dark pool that spreads, two rings on the ground, a short column of the painted dark twist
+  function bounceImpactFxDkTex(tI, cx, gy, u, F, k) {                                 // the crash / second landing / slam with the painted pieces: a flat ink splat and the crown of a splash, the pool, drops flung out, the glowing burst and ripple
+    var rnd = rngOf((tI | 0) + 5), fl = rnd() < 0.5, fl2 = rnd() < 0.5;
+    fxAdd({ t0: tI, t1: tI + 1900 / speed, draw: function (ctx, now) {
+      var t = (now - tI) * speed, rt = clamp01(t / 520), er = 1 - Math.pow(1 - rt, 3), e = 1 - Math.pow(1 - clamp01(t / 260), 2);
+      if (t < 160) { glowDot(ctx, cx, gy - u * 0.15 * k, u * k * (0.7 + 0.9 * t / 160), DKC.mid, 0.7 * (1 - t / 160)); glowDot(ctx, cx, gy - u * 0.15 * k, u * k * (0.35 + 0.5 * t / 160), DKC.core, 0.9 * (1 - t / 160)); }
+      inkTex(ctx, fbTex.dk_pool, cx, gy, u * k * (0.9 + 0.5 * er), 0.95 * (1 - clamp01((t - 700) / 1100)), fl, 0, 0.5);
+      inkTex(ctx, fbTex.dk_splat, cx, gy, u * k * (1.0 + 0.5 * er), 0.98 * (1 - clamp01((t - 600) / 900)), fl2, 0, 0.5);
+      inkTex(ctx, fbTex.dk_splash, cx, gy, u * k * 0.85 * (0.5 + 0.5 * e), 0.98 * (t < 450 ? 1 : 1 - clamp01((t - 450) / 650)), fl, 0, 0.96, 0.4 + 0.6 * e);
+      if (t < 1200) inkTex(ctx, fbTex.dk_drops_b, cx, gy - u * 0.45 * k, u * k * (0.8 + 1.1 * er), 0.95 * (1 - clamp01((t - 200) / 1000)), fl2, 0, 0.5);
+      if (t < 620) fbTexDraw(ctx, fbTex.dk_burst, cx, gy - u * 0.14 * k, 0, u * k * (0.9 + 0.8 * clamp01(t / 260)), 0.95 * clamp01(1 - t / 620), 0.5, false);
+      if (t < 800) fbTexDraw(ctx, fbTex.dk_ripple, cx, gy, 0, u * k * (0.5 + 1.6 * er), 0.9 * (1 - rt), 0.5, false);
+    } });
+  }
+  function bounceImpactFxDk(tI, cx, gy, u, F, k) {
+    if (dkHasTex()) { bounceImpactFxDkTex(tI, cx, gy, u, F, k); return; }                                    // the crash (k = 1), the smaller second landing and the slam: a violet flash, an INK SPLASH (blobs thrown up and out, crescents flung), a dark pool that spreads, two rings on the ground, a short column of the painted dark twist
     var rnd = rngOf((tI | 0) + 5), ps = [], i, a, v;
     for (i = 0; i < Math.round(26 * k); i++) { a = -Math.PI * (0.04 + rnd() * 0.92); v = u * (0.6 + rnd() * 1.4) / 1000; ps.push({ x: cx + (rnd() - 0.5) * u * 0.5, y: gy - u * 0.05, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 700 + rnd() * 500, size: u * (0.012 + rnd() * 0.018), cres: false }); }
     for (i = 0; i < Math.round(5 * k); i++) { a = -Math.PI * (0.05 + rnd() * 0.9); v = u * (0.4 + rnd() * 0.8) / 1000; ps.push({ x: cx + (rnd() - 0.5) * u * 0.4, y: gy - u * 0.1, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 900 + rnd() * 500, size: u * (0.022 + rnd() * 0.014), cres: true, rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.01 }); }
