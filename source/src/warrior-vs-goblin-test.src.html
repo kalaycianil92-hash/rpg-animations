@@ -238,7 +238,6 @@
     <label class="lbl" id="monSizeWrap" style="display:none">Monster size <input type="range" id="monSize" min="40" max="140" step="5" value="100" style="width:90px;vertical-align:middle"> <span id="monSizeV">100%</span></label>
     <label class="lbl" id="monSqWrap" style="display:none">Squash and stretch <input type="range" id="monSq" min="0" max="100" step="5" value="50" style="width:90px;vertical-align:middle"> <span id="monSqV">50%</span></label>
     <label class="lbl" id="monFxWrap" style="display:none"><span id="monFxName">Fire</span> effects <input type="range" id="monFx" min="0" max="150" step="5" value="80" style="width:90px;vertical-align:middle"> <span id="monFxV">80%</span></label>
-    <label class="lbl" id="monInkWrap" style="display:none">Ink <select id="monInk" title="How much of the painted ink the dark slime's effects use: Full = every ink piece, Light = a faint low pool and a few drops, None = the glow only"><option value="full">Full</option><option value="light">Light</option><option value="none">None</option></select></label>
     <span class="spacer"></span>
     <span class="lbl">Speed</span>
     <button data-speed="0.5">0.5x</button>
@@ -5337,7 +5336,6 @@
     $("monAtkWrap").style.display = idle && m.packs && m.packs.slam ? "" : "none";
     monEl = null; monFrame = 0;
     $("monFxWrap").style.display = idle && m.vfx ? "" : "none";
-    $("monInkWrap").style.display = idle && m.vfx === "dark" ? "" : "none"; $("monInk").value = DK_INK;
     if (idle && m.vfx) { var fxv = monFxShare(key); $("monFx").value = fxv; $("monFxV").textContent = fxv + "%"; $("monFxName").textContent = m.vfx === "ice" ? "Ice" : m.vfx === "lightning" ? "Lightning" : m.vfx === "dark" ? "Dark" : "Fire"; }
     monFxEnsure();
     if (!idle) {                                                                     // the placeholder (also the fallback for a monster whose art was not built)
@@ -5568,9 +5566,8 @@
   var DK_TEX = ["dk_orb", "dk_burst", "dk_fissure", "dk_geyser", "dk_ripple", "dk_streak", "dk_crescents", "dk_motes", "dk_tendrils", "dk_splash", "dk_splat", "dk_pool", "dk_drips", "dk_drops_a", "dk_drops_b", "dk_smear", "dk_vines", "dk_bubbles"];
   function dkHasTex() { return DK_TEX.every(auraReady); }
   // The INK LEVEL (2026-11-09, the user: the ink looks like too much next to the other slimes): "full" = every ink piece, "light" = only a faint low pool and a few small drops, "none" = the glow only.
-  // The Ink select next to the Dark effects slider sets it (remembered in localStorage). The default is "light".
+  // The user CHOSE "light" on 2026-11-09 after comparing all three with a temporary Ink select (removed); to change it, edit this one value.
   var DK_INK = "light";
-  try { var kInk = localStorage.getItem("wvg-dark-ink"); if (kInk === "full" || kInk === "light" || kInk === "none") DK_INK = kInk; } catch (e) {}
   function inkName(im) { if (im.__ink === undefined) { im.__ink = ""; for (var k in fbTex) if (fbTex[k] === im) { im.__ink = k; break; } } return im.__ink; }
   function inkTex(ctx, im, x, y, w, a, flip, rot, ay, hs, ax) {                      // a picture of solid ink, drawn NORMALLY (it darkens what is behind it): w px wide, its point (ax, ay) (0..1, default the middle) at (x, y), turned by rot, its height scaled by hs (a growing vine)
     if (!im || !im.naturalWidth || a <= 0.01) return;
@@ -6925,7 +6922,6 @@
     var v = +this.value; $("monFxV").textContent = v + "%";
     try { localStorage.setItem("wvg-monster-fire-" + monKey, v); } catch (e) {}
   };
-  $("monInk").onchange = function () { DK_INK = this.value; try { localStorage.setItem("wvg-dark-ink", DK_INK); } catch (e) {} };
   $("monSel").onchange = function () { setMonster(this.value); try { localStorage.setItem("wvg-monster", this.value); } catch (e) {} };
   $("monSq").oninput = function () {
     var v = +this.value; $("monSqV").textContent = v + "%"; monApplySq();
