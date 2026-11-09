@@ -1,0 +1,51 @@
+{
+ "format": "frame-placement/1",
+ "animation": "voltaic_eruption",
+ "file": "lightning_voltaic_eruption_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 139,
+   "bottom": 472,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 222,
+   "bottom": 472,
+   "baseW": 294.6,
+   "sizeAgainstIdle": 0.842
+  },
+  {
+   "lift": 0.0,
+   "top": 259,
+   "bottom": 476,
+   "baseW": 189.2,
+   "sizeAgainstIdle": 0.541
+  },
+  {
+   "lift": 0.0,
+   "top": 385,
+   "bottom": 469,
+   "baseW": 91.4,
+   "sizeAgainstIdle": 0.261
+  },
+  {
+   "lift": 0.0,
+   "top": 248,
+   "bottom": 470,
+   "baseW": 224.0,
+   "sizeAgainstIdle": 0.64
+  },
+  {
+   "lift": 0.0,
+   "top": 156,
+   "bottom": 470,
+   "baseW": 332.5,
+   "sizeAgainstIdle": 0.95
+  }
+ ]
+}

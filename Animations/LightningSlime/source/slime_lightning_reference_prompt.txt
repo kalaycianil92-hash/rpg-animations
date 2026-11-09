@@ -1,0 +1,55 @@
+LIGHTNING SLIME: THE LOOK (the reference picture, step 1). Written 2026-11-08, after the ice slime was concluded (5 skills, all built).
+
+WHY. Every slime of the game is the same creature in another element, so the lightning slime is the fire and ice slimes' ELECTRIC TWIN: the same dome, skirt, face construction, view, size and painting style (matte, thin dark outline), so that the animations of the other slimes (idle, spit, hit, death, dodge and the three heavy skills) can be redrawn frame by frame and every timing, path and hit frame of the page can be reused. What changes is the material and the element's own crisp parts: the crown of flames / crystals becomes a crown of JAGGED SPIKES shaped like stylised lightning bolts, the embers / ice chips become tiny solid zigzag bolts, the molten / frosted body becomes glossless electric-yellow jelly with hairline cyan-white crackle veins. The user's own lightning slime (the second attached picture) shows what it is made of; its soft blue arcs, glow and sparkle flares are NOT wanted (they cannot be keyed off the magenta; the page already has painted electricity from the Rogue's Static Stiletto and adds arcs, glints and glow later as code layers).
+
+HOW TO USE
+- Attach TWO images, in this order:
+  1. Animations/Slime/reference_image.png (the fire slime: the DESIGN, POSE, VIEW, SIZE and PAINTING STYLE to keep exactly).
+  2. Animations/Slime/source/variants/lightning_slime_x3.png (the user's lightning slime concept: only for its jagged spikes, its yellow and its cyan eyes).
+  Ask for a square (1:1) image, as large as it will give you. Paste everything between the two lines of equals signs. Gemini (the fire and ice looks came from Gemini); generate several and keep the best.
+- Save the best in inbox/ (for example inbox/slime_lightning_reference.jpg) and tell me. If it is right it becomes `Animations/LightningSlime/reference_image.png`.
+- What I check: (1) the SAME construction as the fire slime: dome wider than tall, wavy skirt base, the face in the same place and size with the same brows, eyes and grimace, the pockets in the same places, the three-quarter view turned to the right, same size and position, centred with 10% margin; (2) it is LIGHTNING: electric yellow jelly, a crown of tall jagged bolt-shaped spikes where the flames were, a spike on each side where the side flame tongues were, tiny solid zigzag bolts instead of embers, pale cyan-white pupils, a few hairline cyan-white crackle veins; no orange or red, no blue body; (3) the outline is thin and dark umber-brown (not black, not white), the body matte (not glossy plastic, not pale cream), hand-painted like the fire slime; (4) crisp opaque edges and NO glow, halo, blue arcs, haze, blur, sparkle flares, see-through parts or light spilling onto the background; (5) the body is a mid-saturated yellow, not white: the lightest cream tones only in small highlights and on the spike tips; (6) one image, no GIF.
+- What happens next: the idle sheet is redrawn from the ice slime's idle prompt ("same panels, same poses, lightning slime instead"), tested first on the idle; then the other animations. The prompts are made when the look is chosen.
+- Known risks: it draws the concept's soft blue arcs and glow round the body (the reply below), it keeps the orange (the reply below), it turns pale cream or washed out, it redraws the creature as a different shape.
+
+==============================================================================
+OUTPUT: exactly ONE still image, and nothing else. Do NOT create a GIF, an animation, extra images or alternate versions.
+
+TASK: redraw the creature of the FIRST attached image (the fire slime) as a LIGHTNING slime. Keep the DESIGN, POSE, VIEW, SIZE and PAINTING STYLE of the first image exactly; change only what it is made of, using the SECOND attached image (a lightning slime concept) only for what lightning looks like (hard jagged spikes, electric yellow, icy cyan eyes). Do NOT copy the concept's soft blue electric arcs, its glow, its sparkle flares or its grey background.
+
+KEEP EXACTLY (from the first image): the same creature construction: a low dome wider than tall, with a flat wavy skirt-like base that spreads on the floor in soft scallops; the same face construction in the same place and size: heavy slanted brows with a wrinkled forehead, two narrow slanted eyes, a wavy grimace with two small bumps at the corners; the same rounded pockets (blisters) in the same places and sizes; the same three-quarter view turned about 30 degrees towards the RIGHT edge of the picture; the same proportions; the same size and position in the picture, centred, with at least 10% empty margin on every side. No arms, no legs, no ears, no horns, no teeth, no tongue. The same MATTE hand-painted style as the first image: a thin dark outline of slightly varying weight, a fine grain on the surface, soft painterly shading, light from the upper left with a gentle rim light on the right edge, NO glossy plastic shine, no wet look.
+
+CHANGE TO LIGHTNING:
+- BODY: instead of molten orange-red jelly, ELECTRIC YELLOW jelly, matte like painted wax: a warm mid-saturated yellow (not pale cream, not white), golden-amber shading towards the base and on the lower left, deeper ochre in the shadows; the lightest cream tone only in small soft highlights. A few HAIRLINE crackle veins on the body: thin, crisp, fully opaque cyan-white zigzag lines (like tiny cracks of electricity under the skin), only four or five, short, with a thin dark outline.
+- POCKETS: the blisters become round charged pockets: paler yellow-white rounded pockets with a thin lighter rim and a tiny cyan-white centre, in the same places and sizes.
+- THE CROWN: instead of the crown of tall flames on top of the head, a crown of tall JAGGED SPIKES shaped like stylised lightning bolts: hard zigzag edges, fully opaque, solid yellow with cream-white tips and darker amber facets, with the same thin dark outline. One tall spike in the place of the tallest flame (leaning back a little, with a zigzag kink), four or five shorter ones beside it of different heights, the whole crown rising about as high as the flame crown did. Instead of the flame tongue on each side of the body, a spike growing out of each side (the left one longer).
+- FLOATING BITS: instead of the floating embers, a few tiny SOLID zigzag lightning bolts (small yellow-white bolt shapes with a thin dark outline) and a few tiny solid yellow-white diamond sparks floating around and above the crown: about the same number and places as the embers (six to ten). Every one crisp and opaque.
+- RIM: the base keeps its wavy scallops with a thin lighter-yellow rim; no spikes on it.
+- FACE: the same face construction, but wild and charged: the pupils are pale electric cyan-white instead of glowing yellow, the brows heavy, the mouth the same wavy grimace.
+- OUTLINE: thin (the same weight as the first image's), dark UMBER BROWN (like dark chocolate, about #3E2A0E), never black and never white or light.
+- COLOUR: electric yellow, golden amber, deep ochre; cream-white on the spike tips; cyan-white only on the pupils, the pocket centres and the hairline veins. NO orange or red anywhere on the creature. No blue body. No violet or pink tint anywhere (it must not drift towards the magenta background).
+
+STILL TRUE (so the picture can be cut out): every edge is crisp, hard and opaque. NO glow, NO halo, NO bloom, NO blue electric arcs round the body, NO sparkle flares or light rays, NO haze, NO blur, NO see-through parts, NO soft dots or fuzz round the body, NO light spilling onto the background. No scorch marks on the floor, no puddle, no cast shadow, no reflection.
+
+BACKGROUND: one flat pure magenta (#FF00FF) background filling the whole picture, identical in every pixel. No gradient, ground line, scenery, shadow or vignette. No text, labels or borders. No magenta or pink anywhere on the creature itself.
+
+FINAL REMINDER: exactly one image; the fire slime's design, pose, view, size and matte painted style redrawn as an electric-yellow slime with a crown of jagged bolt-shaped spikes, tiny solid zigzag bolts, pale cyan pupils, a few hairline cyan-white crackle veins and a thin dark umber outline; no glow, no blue arcs, no flares; flat magenta background.
+==============================================================================
+
+REPLY IF IT IS STILL ORANGE OR HAS FLAMES
+"Redo it. This is a LIGHTNING slime: electric yellow jelly, a crown of jagged bolt-shaped spikes instead of flames, tiny zigzag bolts instead of embers, pale cyan pupils. No orange or red anywhere."
+
+REPLY IF IT ADDS BLUE ARCS, GLOW OR FLARES
+"Redo it. NO blue electric arcs round the body, NO glow, NO haze, NO sparkle flares: only crisp opaque spikes, tiny solid zigzag bolts and a few thin cyan-white crackle veins ON the body, with a thin outline, on flat magenta."
+
+REPLY IF IT CHANGED THE DESIGN
+"Redo it. Keep the creature exactly as in the first image: the same dome and wavy skirt, the same face in the same place, the same pockets in the same places, the same view and size. Change only what it is made of (electric yellow jelly instead of fire)."
+
+REPLY IF IT IS GLOSSY, PALE OR WHITE
+"Redo it. The body is a matte mid-saturated electric yellow, not pale cream and not glossy plastic, with a fine grain and a thin dark umber outline like the first image's weight, painted by hand in the same style."
+
+==============================================================================
+VARIANT (2026-11-08, the user's wish): YELLOW BODY, AZURE SPIKES AND SPARKS. A code mockup of it is inbox/lightning_slime_yellow_azure_mockup.png (made by azure_mockup.py in this folder: only the parts outside the body are re-coloured). Use the mockup as the reference as it is, OR ask Gemini for a painted version: attach inbox/lightning_slime_reference.jpg (first) and the mockup (second) and paste:
+
+OUTPUT: exactly ONE still image. Redraw the creature of the FIRST image exactly (the same body, face, pockets, view, size, position, painting style and outline weight). Change ONLY the colour of the crown spikes, the spikes on the sides and the tiny floating zigzag bolts: they become AZURE BLUE (a clear mid blue, like the second image), with pale blue-white tips and a thin dark NAVY outline instead of the brown one. The body stays exactly the electric yellow of the first image with its brown outline; the pupils stay pale cyan-white. Every edge crisp and opaque: NO glow, NO halo, NO arcs, NO flares, NO haze. Flat pure magenta (#FF00FF) background, identical in every pixel, nothing else in the picture. One image only, no GIF.
+==============================================================================

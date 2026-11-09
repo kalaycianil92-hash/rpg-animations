@@ -1,0 +1,51 @@
+{
+ "format": "frame-placement/1",
+ "animation": "hit",
+ "file": "lightning_hit_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 139,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 173,
+   "bottom": 476,
+   "baseW": 354.0,
+   "sizeAgainstIdle": 1.011
+  },
+  {
+   "lift": 0.0,
+   "top": 149,
+   "bottom": 473,
+   "baseW": 337.6,
+   "sizeAgainstIdle": 0.964
+  },
+  {
+   "lift": 0.0,
+   "top": 146,
+   "bottom": 470,
+   "baseW": 343.2,
+   "sizeAgainstIdle": 0.981
+  },
+  {
+   "lift": 0.0,
+   "top": 134,
+   "bottom": 470,
+   "baseW": 373.5,
+   "sizeAgainstIdle": 1.067
+  },
+  {
+   "lift": 0.0,
+   "top": 139,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ]
+}

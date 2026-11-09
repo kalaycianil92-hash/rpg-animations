@@ -1,0 +1,26 @@
+{
+ "note": "the spark ball in the mouth on frames 4 and 5 and the open mouth on frame 6 (centre and size in the 512 cell, before the page mirrors the sprite): the spit leaves the mouth at the release frame 5",
+ "mouth": {
+  "4": {
+   "area": 627,
+   "x": 328.0,
+   "y": 389.2,
+   "w": 46,
+   "h": 35
+  },
+  "5": {
+   "area": 1224,
+   "x": 361.9,
+   "y": 364.4,
+   "w": 51,
+   "h": 51
+  },
+  "6": {
+   "area": 4731,
+   "x": 371.4,
+   "y": 386.6,
+   "w": 121,
+   "h": 80
+  }
+ }
+}

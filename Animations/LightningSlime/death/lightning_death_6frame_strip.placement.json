@@ -1,0 +1,51 @@
+{
+ "format": "frame-placement/1",
+ "animation": "death",
+ "file": "lightning_death_6frame_strip.png",
+ "frames": 6,
+ "fps": 8,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 138,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 153,
+   "bottom": 470,
+   "baseW": 345.5,
+   "sizeAgainstIdle": 0.987
+  },
+  {
+   "lift": 0.0,
+   "top": 154,
+   "bottom": 469,
+   "baseW": 345.0,
+   "sizeAgainstIdle": 0.986
+  },
+  {
+   "lift": 0.0,
+   "top": 194,
+   "bottom": 470,
+   "baseW": 331.2,
+   "sizeAgainstIdle": 0.946
+  },
+  {
+   "lift": 0.0,
+   "top": 272,
+   "bottom": 470,
+   "baseW": 342.6,
+   "sizeAgainstIdle": 0.979
+  },
+  {
+   "lift": 0.0,
+   "top": 352,
+   "bottom": 470,
+   "baseW": 293.5,
+   "sizeAgainstIdle": 0.839
+  }
+ ]
+}

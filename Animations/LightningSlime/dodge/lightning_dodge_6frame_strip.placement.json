@@ -1,0 +1,71 @@
+{
+ "format": "frame-placement/1",
+ "animation": "dodge",
+ "file": "lightning_dodge_6frame_strip.png",
+ "frames": 6,
+ "fps": 14,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 139,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 166,
+   "bottom": 470,
+   "baseW": 345.5,
+   "sizeAgainstIdle": 0.987
+  },
+  {
+   "lift": 7.4,
+   "top": 130,
+   "bottom": 462,
+   "baseW": 341.1,
+   "sizeAgainstIdle": 0.974
+  },
+  {
+   "lift": 133.0,
+   "top": 34,
+   "bottom": 337,
+   "baseW": 328.0,
+   "sizeAgainstIdle": 0.937
+  },
+  {
+   "lift": 0.0,
+   "top": 202,
+   "bottom": 470,
+   "baseW": 378.2,
+   "sizeAgainstIdle": 1.081
+  },
+  {
+   "lift": 0.0,
+   "top": 145,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ],
+ "evadeFrame": 4,
+ "smooth": true,
+ "xUnit": "character-widths",
+ "x": [
+  0,
+  -0.03,
+  -0.09,
+  -0.15,
+  -0.1,
+  -0.03
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "note": "The lightning slime's dodge path: the ice slime's (a short hop AWAY from the enemy, then back home). The hop's lift is drawn in the strip (frame 4, 133 px above the floor: the generator drew a bigger hop than the 8% asked). evadeFrame 4: the top of the hop."
+}

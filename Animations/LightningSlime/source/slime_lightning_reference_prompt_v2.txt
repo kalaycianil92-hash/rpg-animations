@@ -1,0 +1,48 @@
+LIGHTNING SLIME: THE LOOK, VERSION 2 (yellow body with blue-tone electric details, like the user's concept). Written 2026-11-08.
+
+WHY A SECOND PROMPT. The first picture (inbox/lightning_slime_reference.jpg) has the right creature (the fire slime's dome, face, pockets, view and size; electric-yellow matte body; bolt-shaped spikes) but not the look the user wants. The user's concept (Animations/Slime/source/variants/lightning_slime_x3.png) is a YELLOW slime crackling with BLUE electricity: cyan-white lightning arcs wrapping round the body and leaping off it, eyes and mouth lit electric blue, small bolts around. A recolour of the spikes (the azure mockup) was not it either. So this version keeps the creature of the first picture EXACTLY and ADDS the concept's blue electric details.
+
+THE ONE COMPROMISE (so the picture can be cut out of the magenta). The concept's arcs have a soft blue glow; a soft glow blends with the flat magenta background and leaves pink halos that cannot be cut cleanly. So here the arcs are drawn CRISP: thin hard-edged zigzag lines with a cyan-white core, an azure edge and a thin dark navy outline, fully opaque, like the electricity of a cartoon. The soft glow of the concept comes later from the page (a glow layer drawn in code round the slime, as for the fire and ice slimes, and the Rogue's painted electricity), so nothing is lost.
+
+HOW TO USE
+- Attach TWO images, in this order:
+  1. inbox/lightning_slime_reference.jpg (the user's yellow picture: the creature, pose, view, size, body colour and outline to keep EXACTLY).
+  2. Animations/Slime/source/variants/lightning_slime_x3.png (the concept: only for the BLUE ELECTRIC DETAILS: the arcs, the lit eyes, the lit mouth).
+  Ask for the same shape as the first picture (a wide 16:9-ish image, as large as it will give you). Paste everything between the two lines of equals signs. Gemini; generate several and keep the best.
+- Save the best in inbox/ (for example inbox/lightning_slime_reference_v2.jpg) and tell me. If it is right it becomes `Animations/LightningSlime/reference_image.png`.
+- What I check: (1) the creature is the SAME as in the first picture (same dome, wavy skirt, face and pockets in the same places, same view, same size and place, same bolt-shaped spikes; only the details below are new); (2) the body is still the electric yellow, with the brown outline; (3) the blue details: eight to twelve crisp, thin, jagged lightning arcs in cyan-white and azure with a thin navy outline, hugging the body and the spikes and leaping a short way into the air, some branching; the eyes lit cyan-white (as now), the grimace lined with a thin cyan-white electric line (same shape as now); the crackle veins on the body kept; some of the floating bolts in cyan-white; (4) the arcs never cover the face (eyes, brows, mouth stay clear), never touch the floor or the lowest part of the skirt, and stay inside the picture with a margin; (5) EVERY edge is crisp and opaque: no soft glow, no halo, no haze, no blur, no see-through parts, no light spilling onto the magenta; (6) no orange, red, green or violet anywhere; the blue is a clean cyan-azure; (7) one image, no GIF.
+- What happens next: the same as before: copy it to `Animations/LightningSlime/reference_image.png`, write the idle prompt (the arcs are a good thing in the idle: they are the life of it, a different set of zigzags in each panel while the body hardly moves), then the other animations.
+- Known risks: it draws the concept's soft glow (reply 1), it covers the face with arcs or draws too many (reply 2), it redraws the creature or the spikes (reply 3), it turns the body greenish or whitish (reply 4).
+
+==============================================================================
+OUTPUT: exactly ONE still image, and nothing else. Do NOT create a GIF, an animation, extra images or alternate versions.
+
+TASK: redraw the creature of the FIRST attached image exactly as it is (same shape, same pose, same view, same size and position in the picture, same face, same pockets, same bolt-shaped yellow spikes, same electric-yellow matte body, same thin dark brown outline and painting style) and ADD blue electric details, using the SECOND attached image (a lightning slime concept) only for how its blue electricity looks. Do NOT copy the concept's soft glow, its sparkle flares, its grey background or its body shape.
+
+KEEP EXACTLY (from the first image): the low dome wider than tall with the wavy flat skirt base; the face in the same place and size (heavy slanted brows, narrow slanted eyes with pale cyan-white glowing pupils, the wavy grimace with two small bumps at the corners); the round pale pockets with their cyan-white centres; the four or five hairline cyan-white crackle veins on the body; the crown of tall jagged bolt-shaped yellow spikes and the spike on each side; the tiny solid zigzag bolts floating around; the three-quarter view turned about 30 degrees towards the RIGHT edge; the same position and size, centred, with at least 10% empty margin on every side. The body stays the same matte electric yellow with golden-amber shading and the thin dark umber-brown outline. No arms, legs, ears, horns, teeth or tongue.
+
+ADD THESE BLUE-TONE ELECTRIC DETAILS (and nothing else):
+1. LIGHTNING ARCS: eight to twelve thin jagged lightning arcs in CYAN-WHITE with an AZURE edge, each with a thin dark NAVY outline (about #12385C), drawn crisp and fully opaque like a cartoon: they wrap round the body and the yellow spikes and leap a short distance (no more than about a tenth of the picture's width) away from them into the air; some run along the body's edge, some jump from a spike tip to a neighbouring spike, two or three branch once. Each arc is a hard-edged zigzag of constant thin width (about 0.8 to 1.2% of the picture's width), with sharp corners. They are spread round the creature, more on the left side and above the crown than on the right, and some are short and some long. Keep the arcs AWAY from the face: no arc crosses the eyes, the brows or the mouth. Keep them above the skirt: no arc touches the floor or the lowest part of the skirt.
+2. LIT EYES: the pupils stay pale cyan-white and glowing as in the first image, the narrow eye shapes get a thin azure rim light inside the eye outline.
+3. LIT MOUTH: a thin cyan-white electric line runs along the inside of the wavy grimace, following exactly the same mouth shape (the mouth's shape and place do not change), with a thin azure edge.
+4. SOME FLOATING BOLTS BLUE: of the tiny solid zigzag bolts floating around, make about a third cyan-white with a navy outline (the rest stay yellow-white).
+5. SPIKES: the yellow spikes stay yellow; only a thin azure rim light on their right-hand edges and tiny azure spark points at their tips.
+
+STILL TRUE (so the picture can be cut out): EVERY edge is crisp, hard and opaque. NO soft glow, NO halo, NO bloom, NO blur, NO haze or fog, NO sparkle flares or light rays, NO see-through or semi-transparent parts, NO gradient fade-outs, NO light spilling onto the background, NO glow on the arcs. No scorch marks on the floor, no puddle, no cast shadow, no reflection. No orange, red, green or violet anywhere on the creature or the arcs; the blue is a clean cyan-azure, the body stays yellow.
+
+BACKGROUND: one flat pure magenta (#FF00FF) background filling the whole picture, identical in every pixel. No gradient, ground line, scenery, shadow or vignette. No text, labels or borders. No magenta or pink anywhere on the creature or the arcs.
+
+FINAL REMINDER: exactly one image; the first image's yellow lightning slime unchanged, with crisp blue-white lightning arcs round it, lit blue eyes and mouth line, and a few blue floating bolts; every edge hard and opaque, no glow, no haze; flat magenta background.
+==============================================================================
+
+REPLY 1: IF IT ADDS SOFT GLOW OR HAZE
+"Redo it. NO glow and NO haze anywhere, the blue arcs included: every arc is a thin, hard-edged, fully opaque zigzag line with a thin navy outline, like a cartoon drawing, on the flat magenta background. Nothing soft, nothing see-through."
+
+REPLY 2: IF THE ARCS COVER THE FACE OR THERE ARE TOO MANY
+"Redo it. Only eight to twelve thin arcs, spread round the body and above the crown. No arc crosses the face (eyes, brows, mouth) and none touches the floor or the skirt. The arcs are thin, about 1% of the picture width."
+
+REPLY 3: IF IT CHANGED THE CREATURE OR THE SPIKES
+"Redo it. Keep the creature of the first image exactly: the same dome, face, pockets, view, size and the same yellow bolt-shaped spikes in the same places. The only new things are the thin blue arcs, the blue rim light in the eyes, the thin blue line in the mouth and a few blue floating bolts."
+
+REPLY 4: IF THE BODY TURNS GREENISH, WHITE OR BLUE
+"Redo it. The body stays the electric yellow of the first image (matte, with golden-amber shading, not green, not pale cream, not blue). Only the thin arcs and small details are blue."

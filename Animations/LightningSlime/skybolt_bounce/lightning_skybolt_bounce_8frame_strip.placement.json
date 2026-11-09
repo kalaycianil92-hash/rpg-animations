@@ -1,0 +1,66 @@
+{
+ "format": "frame-placement/1",
+ "animation": "skybolt_bounce",
+ "file": "lightning_skybolt_bounce_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 139,
+   "bottom": 471,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 189,
+   "bottom": 473,
+   "baseW": 332.1,
+   "sizeAgainstIdle": 0.949
+  },
+  {
+   "lift": -75.9,
+   "top": 65,
+   "bottom": 495,
+   "baseW": 139.8,
+   "sizeAgainstIdle": 0.399
+  },
+  {
+   "lift": -117.7,
+   "top": 13,
+   "bottom": 478,
+   "baseW": 204.3,
+   "sizeAgainstIdle": 0.584
+  },
+  {
+   "lift": 0.0,
+   "top": 197,
+   "bottom": 473,
+   "baseW": 414.7,
+   "sizeAgainstIdle": 1.185
+  },
+  {
+   "lift": 87.3,
+   "top": 1,
+   "bottom": 402,
+   "baseW": 226.0,
+   "sizeAgainstIdle": 0.646
+  },
+  {
+   "lift": 0.0,
+   "top": 156,
+   "bottom": 470,
+   "baseW": 348.2,
+   "sizeAgainstIdle": 0.995
+  },
+  {
+   "lift": 0.0,
+   "top": 140,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ],
+ "hitFrame": 5
+}

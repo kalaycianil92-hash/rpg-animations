@@ -1,0 +1,66 @@
+{
+ "format": "frame-placement/1",
+ "animation": "spark_spit",
+ "file": "lightning_spark_spit_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 140,
+   "bottom": 471,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 157,
+   "bottom": 474,
+   "baseW": 350.6,
+   "sizeAgainstIdle": 1.002
+  },
+  {
+   "lift": 0.0,
+   "top": 161,
+   "bottom": 470,
+   "baseW": 313.3,
+   "sizeAgainstIdle": 0.895
+  },
+  {
+   "lift": 0.0,
+   "top": 150,
+   "bottom": 473,
+   "baseW": 339.8,
+   "sizeAgainstIdle": 0.971
+  },
+  {
+   "lift": 0.0,
+   "top": 130,
+   "bottom": 480,
+   "baseW": 320.3,
+   "sizeAgainstIdle": 0.915
+  },
+  {
+   "lift": 0.0,
+   "top": 148,
+   "bottom": 482,
+   "baseW": 326.5,
+   "sizeAgainstIdle": 0.933
+  },
+  {
+   "lift": 0.0,
+   "top": 148,
+   "bottom": 469,
+   "baseW": 358.1,
+   "sizeAgainstIdle": 1.023
+  },
+  {
+   "lift": 0.0,
+   "top": 144,
+   "bottom": 471,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ],
+ "hitFrame": 5
+}

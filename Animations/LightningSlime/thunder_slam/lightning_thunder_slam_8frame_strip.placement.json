@@ -1,0 +1,66 @@
+{
+ "format": "frame-placement/1",
+ "animation": "thunder_slam",
+ "file": "lightning_thunder_slam_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 142,
+   "bottom": 471,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 179,
+   "bottom": 472,
+   "baseW": 349.3,
+   "sizeAgainstIdle": 0.998
+  },
+  {
+   "lift": -34.7,
+   "top": 122,
+   "bottom": 483,
+   "baseW": 161.6,
+   "sizeAgainstIdle": 0.462
+  },
+  {
+   "lift": 12.4,
+   "top": 118,
+   "bottom": 495,
+   "baseW": 199.5,
+   "sizeAgainstIdle": 0.57
+  },
+  {
+   "lift": 108.9,
+   "top": 63,
+   "bottom": 367,
+   "baseW": 229.6,
+   "sizeAgainstIdle": 0.656
+  },
+  {
+   "lift": -7.5,
+   "top": 113,
+   "bottom": 490,
+   "baseW": 218.5,
+   "sizeAgainstIdle": 0.624
+  },
+  {
+   "lift": 0.0,
+   "top": 228,
+   "bottom": 470,
+   "baseW": 380.7,
+   "sizeAgainstIdle": 1.088
+  },
+  {
+   "lift": 0.0,
+   "top": 166,
+   "bottom": 471,
+   "baseW": 295.7,
+   "sizeAgainstIdle": 0.845
+  }
+ ],
+ "hitFrame": 7
+}
