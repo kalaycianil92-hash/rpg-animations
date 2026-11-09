@@ -1,0 +1,508 @@
+<title>Sheet Prep Tool</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap">
+<style>
+  /* Layout: load a sheet, set the output frame, check and nudge the aligned frames, then save the strip and skin mask. Same dark look as the other game tools. */
+  :root {
+    --bg: #12101c; --panel: #1a1628; --line: #2d2745; --fg: #e9e4f5; --dim: #9a91b5;
+    --hero: #4cc3f0; --gold: #f2c14e; --ok: #7fd4a3; --foe: #e0685f;
+    --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --body: "Barlow", system-ui, sans-serif;
+    color-scheme: dark;
+  }
+  body {
+    background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px;
+    padding-block: 20px 36px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  h1 { font: 700 28px/1 var(--display); letter-spacing: .02em; margin: 0; }
+  h2 { font: 700 16px var(--display); letter-spacing: .08em; text-transform: uppercase; margin: 0; color: var(--dim); }
+  p { margin: 0; }
+  .sub { color: var(--dim); margin-top: 4px; line-height: 1.45; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+  .lbl, small { color: var(--dim); font-size: 13px; line-height: 1.4; }
+  button, .file span {
+    font: 600 14px var(--display); letter-spacing: .08em; text-transform: uppercase;
+    padding: 8px 14px; border-radius: 4px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer;
+  }
+  button.primary { background: var(--hero); border-color: var(--hero); color: #07202b; }
+  button.on { border-color: var(--gold); color: var(--gold); }
+  button:disabled { opacity: .4; cursor: default; }
+  button:focus-visible, .file input:focus-visible + span, input:focus-visible, select:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .file { position: relative; }
+  .file input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .file span { display: block; }
+  input[type=number], select { background: #0b0914; color: var(--fg); border: 1px solid var(--line); border-radius: 3px; padding: 5px 6px; font: inherit; min-width: 0; }
+  input[type=number] { width: 72px; }
+  label.f { display: flex; gap: 6px; align-items: center; color: var(--dim); font-size: 13px; }
+  input[type=range] { accent-color: var(--hero); min-width: 0; width: 130px; }
+  .rd { color: var(--fg); font-variant-numeric: tabular-nums; }
+
+  .thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+  .thumb { flex: 0 0 auto; width: 150px; border: 2px solid var(--line); border-radius: 4px; background: #0b0914; cursor: pointer; padding: 0; overflow: hidden; position: relative; }
+  .thumb canvas { display: block; width: 100%; height: auto; }
+  .thumb.cur { border-color: var(--gold); }
+  .thumb.bad { border-color: var(--foe); }
+  .thumb span { position: absolute; left: 4px; top: 2px; font: 700 12px var(--display); color: var(--dim); }
+  .two { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .ctl { display: flex; flex-direction: column; gap: 10px; }
+  @media (max-width: 700px) { .two { grid-template-columns: minmax(0, 1fr); } }
+  .pv { border: 1px solid var(--line); border-radius: 4px; background: #0b0914; }
+  .pv canvas { display: block; width: 100%; height: auto; }
+  .strip-box { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: #0b0914; }
+  .strip-box canvas { display: block; height: 150px; width: auto; }
+  .warn { color: var(--foe); font-size: 13px; line-height: 1.5; }
+  .msg { min-height: 18px; font-size: 13px; color: var(--ok); }
+  .tones { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tones button { padding: 5px 10px; }
+</style>
+
+<div class="wrap">
+  <div>
+    <h1>Sheet Prep Tool</h1>
+    <p class="sub">Turns a generated sheet of poses on a magenta background into a clean, aligned frame strip with a skin mask. Everything runs in this page. A sample idle sheet is loaded so you can see how it works.</p>
+  </div>
+
+  <div class="panel">
+    <h2>1. Sheet</h2>
+    <div class="row">
+      <label class="file"><input type="file" accept="image/*" id="fileIn"><span>Load sheet image</span></label>
+      <span class="lbl" id="fname">Sample: idle pack (reduced size)</span>
+    </div>
+    <div class="row">
+      <label class="f">Pack
+        <select id="pack"><option>idle</option><option>attack</option><option>hit</option><option>death</option><option>other</option></select>
+      </label>
+      <label class="f">Columns <input type="number" id="cols" value="3" min="1" max="12"></label>
+      <label class="f">Rows <input type="number" id="rows" value="2" min="1" max="12"></label>
+      <label class="f">Frames <input type="number" id="nframes" value="6" min="1" max="48"></label>
+      <label class="f">Background match <input type="range" id="tol" min="5" max="40" value="18"> <span class="rd" id="tolV">18%</span></label>
+      <label class="f">Edge shrink <select id="erode"><option>0</option><option selected>1</option><option>2</option><option>3</option></select> px</label>
+      <label class="f"><input type="checkbox" id="despill" checked> Remove pink edge tint</label>
+    </div>
+    <small>Poses are read left to right, top to bottom, one pose per grid cell. Small specks and bits that belong to a neighbouring cell are dropped.</small>
+  </div>
+
+  <div class="panel">
+    <h2>2. Output frame</h2>
+    <div class="row">
+      <label class="f">Width <input type="number" id="ow" value="512" min="64" max="2048"></label>
+      <label class="f">Height <input type="number" id="oh" value="512" min="64" max="2048"></label>
+      <label class="f">Character height % <input type="number" id="chp" value="80" min="20" max="98"></label>
+      <label class="f">Ground line % <input type="number" id="gp" value="92" min="50" max="99"></label>
+      <label class="f">Size from frame # <input type="number" id="refF" value="1" min="1" max="48"></label>
+      <label class="f">Manual scale % <input type="number" id="msc" placeholder="auto" min="5" max="400"></label>
+      <label class="f">Align on
+        <select id="align"><option value="heel">Rear heel (feet planted)</option><option value="bottom">Bottom centre</option><option value="center">Body centre</option></select>
+      </label>
+    </div>
+    <p class="rd" id="scaleInfo"></p>
+    <small>Every frame is scaled by the same factor, taken from the size-reference frame, so poses keep their true proportions. Use "Rear heel" for packs where the back foot stays planted, and "Bottom centre" or "Body centre" for the death pack.</small>
+  </div>
+
+  <div class="panel">
+    <h2>3. Check the frames</h2>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="row">
+      <span class="lbl" id="selInfo"></span>
+      <button id="nl">&larr;</button><button id="nr">&rarr;</button><button id="nu">&uarr;</button><button id="nd">&darr;</button>
+      <label class="f">Step <select id="step"><option>1</option><option selected>2</option><option>5</option><option>10</option></select> px</label>
+      <button id="nreset">Reset frame</button>
+      <button id="nresetAll">Reset all</button>
+    </div>
+    <div class="warn" id="warns"></div>
+    <div class="strip-box"><canvas id="stripView"></canvas></div>
+    <div class="two">
+      <div class="pv"><canvas id="pv" width="512" height="512"></canvas></div>
+      <div class="ctl">
+        <div class="row">
+          <button id="play" class="on">Stop</button>
+          <label class="f">fps <input type="number" id="fps" value="8" min="1" max="60"></label>
+        </div>
+        <small>Preview the loop in each skin tone to check the recolour.</small>
+        <div class="tones" id="tones"></div>
+        <label class="f">Skin sensitivity <input type="range" id="smin" min="4" max="30" value="12"></label>
+        <label class="f"><input type="checkbox" id="showMask"> Show the skin mask instead</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>4. Save</h2>
+    <div class="row">
+      <button class="primary" id="saveStrip">Save frame strip (PNG)</button>
+      <button id="saveMask">Save skin mask (PNG)</button>
+      <button id="saveJson">Save settings (JSON)</button>
+      <span class="msg" id="msg"></span>
+    </div>
+    <small id="saveInfo"></small>
+    <small id="saveNote" hidden>Saving files is not available in this view. Right-click the strip above and choose Save image as.</small>
+  </div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var TONES = { Original: null, Light: [236, 196, 170], Tan: [190, 138, 98], Brown: [130, 86, 58], Deep: [78, 50, 36] };
+  var PACK_DEFAULTS = { idle: { align: "heel", fps: 8 }, attack: { align: "heel", fps: 14 }, hit: { align: "heel", fps: 12 }, death: { align: "bottom", fps: 8 }, other: { align: "heel", fps: 10 } };
+  var SAMPLE = "__SAMPLE__";
+
+  var S = { raw: null, W: 0, H: 0, out: null, lab: null, owner: null, frames: [], nudge: [], sel: 0, strip: document.createElement("canvas"),
+            maskCanvas: null, maskAlpha: null, baseSkin: [200, 150, 110], tone: "Original", tinted: {}, pf: 0, timer: null, scale: 1, groundY: 0, dl: null };
+  var timers = {};
+  function later(key, fn, ms) { clearTimeout(timers[key]); timers[key] = setTimeout(fn, ms); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function num(id, def) { var v = parseFloat($(id).value); return isNaN(v) ? def : v; }
+
+  // ---------- 1. Load, key out the magenta, find the poses ----------
+  function loadSrc(src, name) {
+    var im = new Image();
+    im.onload = function () {
+      var c = document.createElement("canvas");
+      c.width = im.naturalWidth; c.height = im.naturalHeight;
+      var x = c.getContext("2d", { willReadFrequently: true });
+      x.drawImage(im, 0, 0);
+      S.raw = x.getImageData(0, 0, c.width, c.height);
+      S.W = c.width; S.H = c.height;
+      $("fname").textContent = name + " (" + S.W + " x " + S.H + ")";
+      analyze();
+    };
+    im.src = src;
+  }
+
+  function analyze() {
+    if (!S.raw) return;
+    var W = S.W, H = S.H, N = W * H, src = S.raw.data;
+    var out = new Uint8ClampedArray(src);
+    var br = 0, bg = 0, bb = 0, n = 0, corners = [[0, 0], [W - 16, 0], [0, H - 16], [W - 16, H - 16]];
+    corners.forEach(function (c) {
+      for (var y = c[1]; y < c[1] + 16; y++) for (var x = c[0]; x < c[0] + 16; x++) {
+        var p = (y * W + x) * 4; br += src[p]; bg += src[p + 1]; bb += src[p + 2]; n++;
+      }
+    });
+    br /= n; bg /= n; bb /= n;
+    var t0 = num("tol", 18) / 100, t1 = t0 + 0.22, despill = $("despill").checked;
+    var alpha = new Uint8Array(N);
+    for (var i = 0; i < N; i++) {
+      var p = i * 4;
+      var dr = (src[p] - br) / 255, dg = (src[p + 1] - bg) / 255, db = (src[p + 2] - bb) / 255;
+      var d = Math.sqrt(dr * dr + dg * dg + db * db);
+      var a = (d - t0) / (t1 - t0); a = a < 0 ? 0 : a > 1 ? 1 : a;
+      alpha[i] = Math.round(a * 255);
+      if (despill && a > 0.02 && a < 0.98) {
+        // un-mix the background colour from partly covered edge pixels
+        var r = (src[p] - (1 - a) * br) / a, g = (src[p + 1] - (1 - a) * bg) / a, b = (src[p + 2] - (1 - a) * bb) / a;
+        g = g < 0 ? 0 : g > 255 ? 255 : g;
+        out[p] = Math.min(r < 0 ? 0 : r, g + 30); out[p + 1] = g; out[p + 2] = Math.min(b < 0 ? 0 : b, g + 30);
+      } else if (despill && a >= 0.98 && Math.min(src[p], src[p + 2]) - src[p + 1] > 50) {
+        out[p] = Math.min(src[p], src[p + 1] + 30); out[p + 2] = Math.min(src[p + 2], src[p + 1] + 30);
+      }
+    }
+    var er = parseInt($("erode").value, 10) || 0;
+    for (var k = 0; k < er; k++) {
+      var tmp = new Uint8Array(alpha);
+      for (var y = 1; y < H - 1; y++) for (var x = 1; x < W - 1; x++) {
+        var q = y * W + x;
+        if (tmp[q]) { var m = tmp[q]; if (tmp[q - 1] < m) m = tmp[q - 1]; if (tmp[q + 1] < m) m = tmp[q + 1]; if (tmp[q - W] < m) m = tmp[q - W]; if (tmp[q + W] < m) m = tmp[q + W]; alpha[q] = m; }
+      }
+    }
+    if (despill) {
+      // within 2 px of the edge the outline is dark, so any leftover pink tint is background bleed
+      var band = new Uint8Array(N), cur = new Uint8Array(N);
+      for (var t = 0; t < N; t++) cur[t] = alpha[t] < 128 ? 1 : 0;
+      for (var pass = 0; pass < 2; pass++) {
+        var nxt = new Uint8Array(cur);
+        for (var y3 = 1; y3 < H - 1; y3++) for (var x3 = 1; x3 < W - 1; x3++) {
+          var q3 = y3 * W + x3;
+          if (!cur[q3] && (cur[q3 - 1] || cur[q3 + 1] || cur[q3 - W] || cur[q3 + W])) nxt[q3] = 1;
+        }
+        cur = nxt;
+      }
+      for (var e = 0; e < N; e++) {
+        if (cur[e] && alpha[e] > 0) { var pe = e * 4, ge = out[pe + 1]; if (out[pe] > ge + 6) out[pe] = ge + 6; if (out[pe + 2] > ge + 6) out[pe + 2] = ge + 6; }
+      }
+    }
+    for (var j = 0; j < N; j++) out[j * 4 + 3] = alpha[j];
+    S.out = out;
+
+    // connected pieces
+    var lab = new Int32Array(N), stack = new Int32Array(N), nl = 0, stats = [null];
+    for (var s0 = 0; s0 < N; s0++) {
+      if (alpha[s0] > 128 && !lab[s0]) {
+        nl++; var sp = 0; stack[sp++] = s0; lab[s0] = nl;
+        var area = 0, minx = W, maxx = 0, miny = H, maxy = 0, sx = 0, sy = 0;
+        while (sp) {
+          var pp = stack[--sp], px = pp % W, py = (pp / W) | 0;
+          area++; sx += px; sy += py;
+          if (px < minx) minx = px; if (px > maxx) maxx = px; if (py < miny) miny = py; if (py > maxy) maxy = py;
+          for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
+            if (!dx && !dy) continue;
+            var nx = px + dx, ny = py + dy;
+            if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+            var qq = ny * W + nx;
+            if (alpha[qq] > 128 && !lab[qq]) { lab[qq] = nl; stack[sp++] = qq; }
+          }
+        }
+        stats.push({ area: area, minx: minx, maxx: maxx, miny: miny, maxy: maxy, cx: sx / area, cy: sy / area });
+      }
+    }
+    var maxArea = 0;
+    for (var l = 1; l <= nl; l++) if (stats[l].area > maxArea) maxArea = stats[l].area;
+    var cols = clamp(Math.round(num("cols", 3)), 1, 12), rows = clamp(Math.round(num("rows", 2)), 1, 12), nf = clamp(Math.round(num("nframes", cols * rows)), 1, cols * rows);
+    var owner = new Int16Array(nl + 1), frames = [];
+    for (var f = 0; f < nf; f++) frames.push({ labels: [], l: W, t: H, r: 0, b: 0 });
+    for (var l2 = 1; l2 <= nl; l2++) {
+      var st = stats[l2];
+      if (st.area < Math.max(60, maxArea * 0.003)) continue;
+      var c = Math.min(cols - 1, Math.floor(st.cx / (W / cols))), r = Math.min(rows - 1, Math.floor(st.cy / (H / rows))), idx = r * cols + c;
+      if (idx >= nf) continue;
+      var fr = frames[idx];
+      fr.labels.push(l2); owner[l2] = idx + 1;
+      fr.l = Math.min(fr.l, st.minx); fr.t = Math.min(fr.t, st.miny); fr.r = Math.max(fr.r, st.maxx + 1); fr.b = Math.max(fr.b, st.maxy + 1);
+    }
+    S.lab = lab; S.owner = owner;
+    S.frames = frames.map(function (fr) {
+      if (!fr.labels.length) return null;
+      // rear heel: left-most pixel of the lowest 8% of the pose
+      var band = Math.max(1, Math.round((fr.b - fr.t) * 0.08)), heel = fr.r, ownerIdx = frames.indexOf(fr) + 1;
+      for (var y = fr.b - band; y < fr.b; y++) for (var x = fr.l; x < fr.r; x++) {
+        var li = lab[y * W + x]; if (li && owner[li] === ownerIdx && x < heel) heel = x;
+      }
+      fr.heel = heel; fr.idx = ownerIdx - 1; return fr;
+    });
+    S.nudge = S.frames.map(function () { return { x: 0, y: 0 }; });
+    S.sel = clamp(S.sel, 0, S.frames.length - 1);
+    render();
+  }
+
+  // ---------- 2. Scale, align and build the strip ----------
+  function frameImage(fr) {
+    var w = fr.r - fr.l, h = fr.b - fr.t, c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    var x = c.getContext("2d"), id = x.createImageData(w, h), d = id.data, W = S.W, owner = S.owner, lab = S.lab, o = S.out, me = fr.idx + 1;
+    for (var y = 0; y < h; y++) for (var xx = 0; xx < w; xx++) {
+      var si = (fr.t + y) * W + fr.l + xx;
+      if (lab[si] && owner[lab[si]] === me) { var sp = si * 4, dp = (y * w + xx) * 4; d[dp] = o[sp]; d[dp + 1] = o[sp + 1]; d[dp + 2] = o[sp + 2]; d[dp + 3] = o[sp + 3]; }
+    }
+    x.putImageData(id, 0, 0);
+    return c;
+  }
+
+  function render() {
+    if (!S.frames.length) return;
+    var OW = clamp(Math.round(num("ow", 512)), 64, 2048), OH = clamp(Math.round(num("oh", 512)), 64, 2048);
+    var chp = num("chp", 80), gp = num("gp", 92), mode = $("align").value;
+    var refN = clamp(Math.round(num("refF", 1)), 1, S.frames.length), ref = S.frames[refN - 1];
+    if (!ref) { for (var q = 0; q < S.frames.length; q++) if (S.frames[q]) { ref = S.frames[q]; break; } }
+    if (!ref) { $("warns").textContent = "No poses found. Check the columns and rows, or lower the background match."; return; }
+    var man = parseFloat($("msc").value), refH = ref.b - ref.t;
+    var sc = (!isNaN(man) && man > 0) ? man / 100 : (chp / 100 * OH) / refH;
+    S.scale = sc;
+    var groundY = Math.round(gp / 100 * OH); S.groundY = groundY;
+    var axOut = OW / 2 - ((ref.l + ref.r) / 2 - ref.heel) * sc;
+    S.strip.width = OW * S.frames.length; S.strip.height = OH;
+    var ctx = S.strip.getContext("2d", { willReadFrequently: true });
+    ctx.clearRect(0, 0, S.strip.width, OH);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+    var warn = [];
+    S.frames.forEach(function (fr, k) {
+      if (!fr) { warn.push("Frame " + (k + 1) + ": no pose found in its cell."); return; }
+      var nd = S.nudge[k] || { x: 0, y: 0 }, cx = (fr.l + fr.r) / 2, cy = (fr.t + fr.b) / 2, ox, oy;
+      if (mode === "heel") { ox = axOut - fr.heel * sc; oy = groundY - fr.b * sc; }
+      else if (mode === "bottom") { ox = OW / 2 - cx * sc; oy = groundY - fr.b * sc; }
+      else { ox = OW / 2 - cx * sc; oy = OH / 2 - cy * sc; }
+      ox += nd.x; oy += nd.y;
+      var dl = ox + fr.l * sc, dt = oy + fr.t * sc, dw = (fr.r - fr.l) * sc, dh = (fr.b - fr.t) * sc;
+      fr.clipped = dl < -0.5 || dt < -0.5 || dl + dw > OW + 0.5 || dt + dh > OH + 0.5;
+      fr.hpct = Math.round(dh / OH * 100);
+      if (fr.clipped) warn.push("Frame " + (k + 1) + " touches the edge of the output frame. Make the frame wider or taller, or lower the character height.");
+      ctx.save(); ctx.beginPath(); ctx.rect(k * OW, 0, OW, OH); ctx.clip();
+      ctx.drawImage(frameImage(fr), k * OW + dl, dt, dw, dh);
+      ctx.restore();
+    });
+    $("scaleInfo").textContent = "Scale " + sc.toFixed(3) + " from frame " + refN + ". Character about " + Math.round(refH * sc) + " px tall in a " + OW + " x " + OH + " px frame. Ground line at " + groundY + " px.";
+    $("warns").innerHTML = warn.join("<br>");
+    S.tinted = {};
+    computeSkin();
+    buildThumbs();
+    drawStripView();
+    $("saveInfo").textContent = "Strip: " + S.strip.width + " x " + S.strip.height + " px, " + S.frames.length + " frames in one row (columns = " + S.frames.length + ").";
+  }
+
+  // ---------- 3. Skin mask ----------
+  function computeSkin() {
+    var W = S.strip.width, H = S.strip.height, ctx = S.strip.getContext("2d", { willReadFrequently: true });
+    var d = ctx.getImageData(0, 0, W, H).data, N = W * H, m = new Uint8Array(N), smin = num("smin", 12) / 100;
+    for (var i = 0; i < N; i++) {
+      var p = i * 4; if (d[p + 3] < 128) continue;
+      var r = d[p] / 255, g = d[p + 1] / 255, b = d[p + 2] / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      if (mx < 0.38) continue;
+      var s = (mx - mn) / mx; if (s < smin || s > 0.85) continue;
+      var h; var df = mx - mn;
+      if (mx === r) h = ((g - b) / df) % 6; else if (mx === g) h = (b - r) / df + 2; else h = (r - g) / df + 4;
+      h *= 60; if (h < 0) h += 360;
+      if (h >= 5 && h <= 55) m[i] = 1;
+    }
+    var m2 = new Uint8Array(N);
+    for (var y = 1; y < H - 1; y++) for (var x = 1; x < W - 1; x++) {
+      var q = y * W + x, c = m[q - W - 1] + m[q - W] + m[q - W + 1] + m[q - 1] + m[q] + m[q + 1] + m[q + W - 1] + m[q + W] + m[q + W + 1];
+      m2[q] = c >= 5 ? 1 : 0;
+    }
+    var soft = new Uint8Array(N), sr = 0, sg = 0, sb = 0, cnt = 0;
+    for (var y2 = 1; y2 < H - 1; y2++) for (var x2 = 1; x2 < W - 1; x2++) {
+      var q2 = y2 * W + x2, c2 = m2[q2 - W - 1] + m2[q2 - W] + m2[q2 - W + 1] + m2[q2 - 1] + m2[q2] + m2[q2 + 1] + m2[q2 + W - 1] + m2[q2 + W] + m2[q2 + W + 1];
+      var v = Math.round(c2 / 9 * 255); soft[q2] = v;
+      if (m2[q2] && c2 === 9) { sr += d[q2 * 4]; sg += d[q2 * 4 + 1]; sb += d[q2 * 4 + 2]; cnt++; }
+    }
+    S.maskAlpha = soft;
+    if (cnt) S.baseSkin = [sr / cnt, sg / cnt, sb / cnt];
+    var mc = document.createElement("canvas"); mc.width = W; mc.height = H;
+    var mx2 = mc.getContext("2d"), id = mx2.createImageData(W, H), o = id.data;
+    for (var k = 0; k < N; k++) { var vv = soft[k]; o[k * 4] = vv; o[k * 4 + 1] = vv; o[k * 4 + 2] = vv; o[k * 4 + 3] = 255; }
+    mx2.putImageData(id, 0, 0);
+    S.maskCanvas = mc;
+  }
+
+  function tintedStrip(name) {
+    var tone = TONES[name];
+    if (!tone) return S.strip;
+    if (S.tinted[name]) return S.tinted[name];
+    var W = S.strip.width, H = S.strip.height, ctx = S.strip.getContext("2d", { willReadFrequently: true });
+    var id = ctx.getImageData(0, 0, W, H), d = id.data, m = S.maskAlpha, base = S.baseSkin;
+    var M = [tone[0] / base[0], tone[1] / base[1], tone[2] / base[2]];
+    for (var i = 0; i < W * H; i++) {
+      var a = m[i] / 255; if (!a) continue;
+      var p = i * 4;
+      for (var c = 0; c < 3; c++) { var t = d[p + c] * M[c]; if (t > 255) t = 255; d[p + c] = d[p + c] * (1 - a) + t * a; }
+    }
+    var cv = document.createElement("canvas"); cv.width = W; cv.height = H; cv.getContext("2d").putImageData(id, 0, 0);
+    S.tinted[name] = cv;
+    return cv;
+  }
+
+  // ---------- 4. Thumbnails, strip view, loop preview ----------
+  function guides(ctx, W, H) {
+    ctx.save(); ctx.lineWidth = Math.max(1, W / 256);
+    ctx.strokeStyle = "rgba(127,212,163,.7)"; ctx.beginPath(); ctx.moveTo(0, S.groundY + .5); ctx.lineTo(W, S.groundY + .5); ctx.stroke();
+    ctx.strokeStyle = "rgba(76,195,240,.45)"; ctx.setLineDash([6, 6]); ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke();
+    ctx.restore();
+  }
+  function buildThumbs() {
+    var box = $("thumbs"); box.innerHTML = "";
+    var OW = clamp(Math.round(num("ow", 512)), 64, 2048), OH = clamp(Math.round(num("oh", 512)), 64, 2048);
+    S.frames.forEach(function (fr, k) {
+      var b = document.createElement("button"); b.type = "button";
+      b.className = "thumb" + (k === S.sel ? " cur" : "") + (fr && fr.clipped ? " bad" : "");
+      var c = document.createElement("canvas"); c.width = 300; c.height = Math.round(300 * OH / OW);
+      var x = c.getContext("2d"); x.fillStyle = "#0b0914"; x.fillRect(0, 0, c.width, c.height);
+      var sc = 300 / OW; x.save(); x.scale(sc, sc);
+      x.drawImage(S.strip, k * OW, 0, OW, OH, 0, 0, OW, OH); guides(x, OW, OH); x.restore();
+      var sp = document.createElement("span"); sp.textContent = k + 1;
+      b.appendChild(c); b.appendChild(sp);
+      b.onclick = function () { S.sel = k; buildThumbs(); updateSel(); };
+      box.appendChild(b);
+    });
+    updateSel();
+  }
+  function updateSel() {
+    var nd = S.nudge[S.sel] || { x: 0, y: 0 }, fr = S.frames[S.sel];
+    $("selInfo").textContent = "Frame " + (S.sel + 1) + (fr ? ", " + fr.hpct + "% of frame height" : "") + ", nudge " + nd.x + ", " + nd.y + " px";
+  }
+  function drawStripView() {
+    var cv = $("stripView"); cv.width = S.strip.width; cv.height = S.strip.height;
+    var x = cv.getContext("2d"); x.fillStyle = "#0b0914"; x.fillRect(0, 0, cv.width, cv.height);
+    x.drawImage($("showMask").checked ? S.maskCanvas : S.strip, 0, 0);
+    x.strokeStyle = "rgba(255,255,255,.18)"; var OW = S.strip.width / S.frames.length;
+    for (var k = 1; k < S.frames.length; k++) { x.beginPath(); x.moveTo(k * OW + .5, 0); x.lineTo(k * OW + .5, cv.height); x.stroke(); }
+  }
+  function tickPreview() {
+    if (!S.frames.length) return;
+    var OW = S.strip.width / S.frames.length, OH = S.strip.height, cv = $("pv");
+    if (cv.width !== OW || cv.height !== OH) { cv.width = OW; cv.height = OH; }
+    var x = cv.getContext("2d"), k = S.pf % S.frames.length;
+    x.fillStyle = "#0b0914"; x.fillRect(0, 0, OW, OH);
+    var srcC = $("showMask").checked ? S.maskCanvas : tintedStrip(S.tone);
+    x.drawImage(srcC, k * OW, 0, OW, OH, 0, 0, OW, OH); guides(x, OW, OH);
+    S.pf++;
+  }
+  function restartTimer() {
+    clearInterval(S.timer); S.timer = null;
+    if ($("play").classList.contains("on")) S.timer = setInterval(tickPreview, 1000 / clamp(num("fps", 8), 1, 60));
+  }
+
+  // ---------- controls ----------
+  function nudge(dx, dy) {
+    var st = parseInt($("step").value, 10) || 1, n = S.nudge[S.sel]; if (!n) return;
+    n.x += dx * st; n.y += dy * st; render();
+  }
+  $("nl").onclick = function () { nudge(-1, 0); }; $("nr").onclick = function () { nudge(1, 0); };
+  $("nu").onclick = function () { nudge(0, -1); }; $("nd").onclick = function () { nudge(0, 1); };
+  $("nreset").onclick = function () { if (S.nudge[S.sel]) { S.nudge[S.sel] = { x: 0, y: 0 }; render(); } };
+  $("nresetAll").onclick = function () { S.nudge = S.frames.map(function () { return { x: 0, y: 0 }; }); render(); };
+  document.addEventListener("keydown", function (e) {
+    var t = e.target && e.target.tagName; if (t === "INPUT" || t === "SELECT" || t === "TEXTAREA") return;
+    var st = e.shiftKey ? 5 : 1, n = S.nudge[S.sel]; if (!n) return;
+    var map = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    if (map[e.key]) { n.x += map[e.key][0] * st; n.y += map[e.key][1] * st; render(); e.preventDefault(); }
+  });
+
+  Object.keys(TONES).forEach(function (name) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = name; if (name === S.tone) b.classList.add("on");
+    b.onclick = function () { S.tone = name; document.querySelectorAll("#tones button").forEach(function (x) { x.classList.toggle("on", x === b); }); $("showMask").checked = false; drawStripView(); tickPreview(); };
+    $("tones").appendChild(b);
+  });
+  $("play").onclick = function () { $("play").classList.toggle("on"); $("play").textContent = $("play").classList.contains("on") ? "Stop" : "Play"; restartTimer(); };
+  $("fps").oninput = restartTimer;
+  $("showMask").onchange = function () { drawStripView(); tickPreview(); };
+  $("smin").oninput = function () { later("skin", function () { S.tinted = {}; computeSkin(); drawStripView(); tickPreview(); }, 120); };
+
+  ["cols", "rows"].forEach(function (id) {
+    $(id).oninput = function () { $("nframes").value = clamp(Math.round(num("cols", 3)) * Math.round(num("rows", 2)), 1, 48); later("an", analyze, 250); };
+  });
+  ["nframes", "erode", "despill"].forEach(function (id) { $(id).onchange = function () { later("an", analyze, 100); }; });
+  $("tol").oninput = function () { $("tolV").textContent = $("tol").value + "%"; later("an", analyze, 250); };
+  ["ow", "oh", "chp", "gp", "refF", "msc"].forEach(function (id) { $(id).oninput = function () { later("rn", render, 200); }; });
+  $("align").onchange = render;
+  $("pack").onchange = function () {
+    var d = PACK_DEFAULTS[$("pack").value]; $("align").value = d.align; $("fps").value = d.fps; render(); restartTimer();
+  };
+  $("fileIn").onchange = function () {
+    var f = $("fileIn").files && $("fileIn").files[0]; if (!f) return;
+    var r = new FileReader(); r.onload = function () { loadSrc(r.result, f.name); }; r.readAsDataURL(f);
+  };
+
+  // ---------- saving ----------
+  var dl = null;
+  function say(t, bad) { var m = $("msg"); m.style.color = bad ? "var(--foe)" : ""; m.textContent = t; setTimeout(function () { if (m.textContent === t) m.textContent = ""; }, 4000); }
+  function save(name, data) {
+    if (!dl) return;
+    dl.save({ filename: name, data: data }).then(function () { say("Saved " + name + "."); },
+      function (e) { if (e && e.code === "declined") say("Not saved."); else say("Could not save: " + (e && e.message || "unavailable"), true); });
+  }
+  function pack() { return $("pack").value; }
+  $("saveStrip").onclick = function () { S.strip.toBlob(function (b) { save(pack() + "_strip.png", b); }, "image/png"); };
+  $("saveMask").onclick = function () { S.maskCanvas.toBlob(function (b) { save(pack() + "_skin_mask.png", b); }, "image/png"); };
+  $("saveJson").onclick = function () {
+    var OW = S.strip.width / S.frames.length;
+    var data = { format: "sheet-prep/1", pack: pack(), frames: S.frames.length, frameWidth: OW, frameHeight: S.strip.height, columns: S.frames.length, rows: 1,
+      scale: Math.round(S.scale * 10000) / 10000, groundLine: S.groundY, alignOn: $("align").value, sizeFromFrame: num("refF", 1),
+      nudges: S.nudge, skinSensitivity: num("smin", 12) / 100, baseSkinRGB: S.baseSkin.map(Math.round),
+      source: { width: S.W, height: S.H, columns: num("cols", 3), rows: num("rows", 2) } };
+    save(pack() + "_settings.json", JSON.stringify(data, null, 1));
+  };
+  try {
+    if (window.claude && window.claude.use) {
+      window.claude.use("downloads").then(function (d) {
+        dl = d;
+        if (!d) { ["saveStrip", "saveMask", "saveJson"].forEach(function (i) { $(i).disabled = true; }); $("saveNote").hidden = false; }
+      }, function () { ["saveStrip", "saveMask", "saveJson"].forEach(function (i) { $(i).disabled = true; }); $("saveNote").hidden = false; });
+    } else { ["saveStrip", "saveMask", "saveJson"].forEach(function (i) { $(i).disabled = true; }); $("saveNote").hidden = false; }
+  } catch (e) { $("saveNote").hidden = false; }
+
+  loadSrc(SAMPLE, "Sample: idle pack (reduced size)");
+  S.timer = setInterval(tickPreview, 1000 / 8);
+})();
+</script>

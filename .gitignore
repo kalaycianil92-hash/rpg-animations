@@ -1,0 +1,17 @@
+# ---- Generated: rebuild with `python source/tools/build.py` (then copy source/dist/warrior-vs-goblin-test.html to the project root, CRs removed).
+# Each is about 130 MB (the strips are embedded as base64), over GitHub's 100 MB per-file limit.
+/warrior-vs-goblin-test.html
+/source/dist/
+
+# ---- Raw generator downloads and scratch work stay on the author's disk (the sheets that were used are copied next to each animation, in Animations/<character>/<animation>/source/).
+/inbox/
+/source/backup_before_*/
+/reskin/work/
+
+# ---- Local tooling and machine-specific files
+/.claude/
+__pycache__/
+*.pyc
+_tmp*
+Thumbs.db
+desktop.ini
