@@ -1,0 +1,66 @@
+{
+ "format": "frame-placement/1",
+ "animation": "umbral_slam",
+ "file": "dark_umbral_slam_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 69,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 143,
+   "bottom": 470,
+   "baseW": 351.2,
+   "sizeAgainstIdle": 1.004
+  },
+  {
+   "lift": -4.3,
+   "top": 71,
+   "bottom": 473,
+   "baseW": 167.9,
+   "sizeAgainstIdle": 0.48
+  },
+  {
+   "lift": 80.0,
+   "top": 53,
+   "bottom": 390,
+   "baseW": 221.4,
+   "sizeAgainstIdle": 0.633
+  },
+  {
+   "lift": 138.0,
+   "top": 64,
+   "bottom": 331,
+   "baseW": 226.4,
+   "sizeAgainstIdle": 0.647
+  },
+  {
+   "lift": 62.1,
+   "top": 43,
+   "bottom": 407,
+   "baseW": 213.4,
+   "sizeAgainstIdle": 0.61
+  },
+  {
+   "lift": 0.0,
+   "top": 136,
+   "bottom": 470,
+   "baseW": 378.9,
+   "sizeAgainstIdle": 1.083
+  },
+  {
+   "lift": 0.0,
+   "top": 75,
+   "bottom": 469,
+   "baseW": 346.3,
+   "sizeAgainstIdle": 0.989
+  }
+ ],
+ "hitFrame": 7
+}

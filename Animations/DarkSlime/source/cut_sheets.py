@@ -2,7 +2,7 @@
 """Cuts the dark slime's generated sheets (the user's Gemini JPGs in inbox/Dark_Slime_animations, 2026-11-09, flat GREEN background) into 512 px strips with the green-key loader (dark_panels.py) and the
 piece-based cutter (dark_cut.py: row scales from panel 1 / the last panel or ONE shared scale, grounded panels on y 470, base centres on x 259, airborne panels at their real height).
 
-  python Animations/DarkSlime/source/cut_sheets.py [names...]      (names: hit death dodge gloom_spit abyssal_eruption; default all)
+  python Animations/DarkSlime/source/cut_sheets.py [names...]      (names: hit death dodge gloom_spit abyssal_eruption umbral_slam nightfall_bounce; default all)
 
 Output per animation: <folder>/dark_<name>_<n>frame_strip.png + .placement.json + a check picture; the spit also gets .mouth.json (where the page starts the spit).
 """
@@ -23,6 +23,8 @@ JOBS = {
     "death": ("dark_slime_death_sheet.jpg", "death", "dark_death_6frame_strip", [3, 3], [0, 1, 2, 3, 4, 5], 8, None, {"shared": True}),
     "dodge": ("dark_slime_dodge_sheet.jpg", "dodge", "dark_dodge_6frame_strip", [3, 3], [0, 1, 4, 5], 14, None, {}),
     "gloom_spit": ("dark_slime_gloom_spit_sheet.jpg", "gloom_spit", "dark_gloom_spit_8frame_strip", [4, 4], [0, 1, 2, 3, 4, 5, 6, 7], 12, 5, {}),
+    "umbral_slam": ("dark_slime_umbral_slam_sheet.jpg", "umbral_slam", "dark_umbral_slam_8frame_strip", [4, 4], [0, 1, 6, 7], 12, 7, {"shared": True, "mul": {4: 0.85}}),
+    "nightfall_bounce": ("dark_slime_nightfall_bounce_sheet.jpg", "nightfall_bounce", "dark_nightfall_bounce_8frame_strip", [4, 4], [0, 1, 4, 6, 7], 12, 5, {"shared": True}),
     "abyssal_eruption": ("dark_slime_abyssal_eruption_sheet.jpg", "abyssal_eruption", "dark_abyssal_eruption_6frame_strip", [3, 3], [0, 1, 2, 3, 4, 5], 12, None, {"shared": True}),
 }
 

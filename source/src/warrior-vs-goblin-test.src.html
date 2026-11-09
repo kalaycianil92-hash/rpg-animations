@@ -6188,7 +6188,7 @@
   }
   var SLAM_CHILL = 0.5;
   async function slamAct(e, myRun, A, T) {
-    var elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), pk = monPackOf("slam"), F = elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview;
+    var dark = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark"), elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), pk = monPackOf("slam"), F = dark ? darkSpitParams() : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview;
     F.imp = 0.55; F.stages = 1; F.shake = 0.3;
     for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
     var hitF = (pk.placement && pk.placement.hitFrame) || SLAM_HIT, t0 = performance.now(), tHit = t0 + starts[hitF - 1] + fm * ((pk.holds && pk.holds[hitF - 1]) || 1) * 0.4;
@@ -6217,7 +6217,7 @@
     await bsWait(tHit);
     if (myRun !== run) return;
     var rr = rectIn(monEl), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512;
-    if (elec) bounceImpactFxLt(tHit, lx, lgy, u, F, 0.75); else (ice ? slamRingIce : slamRing)(tHit, lx, lgy, u); shake(5, 260); monFxBurst({ x: lx, y: lgy - u * 0.12, w: 0 });
+    if (dark) bounceImpactFxDk(tHit, lx, lgy, u, F, 0.75); else if (elec) bounceImpactFxLt(tHit, lx, lgy, u, F, 0.75); else (ice ? slamRingIce : slamRing)(tHit, lx, lgy, u); shake(5, 260); monFxBurst({ x: lx, y: lgy - u * 0.12, w: 0 });
     if (e.dodge) {
       if (!pv) { say(A.name + " slams down, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
       if (dodgeRun) await dodgeRun;
@@ -6230,12 +6230,15 @@
         if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
       }
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
-      if (elec) ltImpact(T, F); else if (ice) icImpact(T, F); else fbImpact(T, F);
+      if (dark) dkImpact(T, F); else if (elec) ltImpact(T, F); else if (ice) icImpact(T, F); else fbImpact(T, F);
       if (!pv) {
-        floatNumber(T, (e.crit ? "CRIT " : "") + amount, elec ? "bolt" : ice ? "ice" : "fire");
-        say(A.name + " slams into " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + (elec ? " (Thunder Slam)." : ice ? " (Glacier Slam)." : " (Magma Slam)."), "g");
+        floatNumber(T, (e.crit ? "CRIT " : "") + amount, dark ? "dark" : elec ? "bolt" : ice ? "ice" : "fire");
+        say(A.name + " slams into " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + (dark ? " (Umbral Slam)." : elec ? " (Thunder Slam)." : ice ? " (Glacier Slam)." : " (Magma Slam)."), "g");
       }
-      if (elec) {
+      if (dark) {
+        var weak = T.hp > 0 && ($("spitBurn").checked || (!pv && Math.random() < SLAM_CHILL));
+        if (weak) { applyWard(T, 2); if (!pv) say(T.name + "'s magic defence is reduced for 2 turns.", "sys"); }
+      } else if (elec) {
         var shocked = T.hp > 0 && ($("spitBurn").checked || (!pv && Math.random() < SLAM_CHILL));
         if (shocked) { applyShocked(T, 2); if (!pv) say(T.name + " is shocked for 2 turns.", "sys"); }
       } else if (ice) {
@@ -6246,7 +6249,7 @@
         if (burn) { applyBurn(T, (T.burn ? T.burn.stacks : 0) + 1); if (!pv) say(T.name + " is set ablaze (Burn x" + T.burn.stacks + ", " + BURN_TURNS + " turns).", "sys"); }
       }
       await Promise.all([
-        anim(T.unit.querySelector(".sprite"), elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, 340),
+        anim(T.unit.querySelector(".sprite"), dark ? DARK_SHOCK : elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, 340),
         anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * 14) + "px)" }, { transform: "translateX(" + (-A.dir * 8) + "px)" }, { transform: "translateX(0)" }], 260),
         sleep(300)
       ]);
@@ -6582,7 +6585,7 @@
     fxAdd({ t0: t0, t1: t1 + 60, draw: function (ctx, now) {
       var t = clamp01((now - t0) / (t1 - t0)), pul = 0.75 + 0.25 * Math.sin(now * 0.035), j, sy, rx = u * (0.1 + 0.5 * t);
       ctx.save(); ctx.fillStyle = "rgba(18,6,0," + (0.22 + 0.38 * t).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(cx, gy, rx, rx * 0.2, 0, 0, 6.2832); ctx.fill(); ctx.restore();   // (the shadow only: the user, 2026-11-08, no orange line round it)
-      glowDot(ctx, cx, 2, u * (0.15 + 0.55 * t), ice ? "170,225,255" : "255,150,50", (0.25 + 0.55 * t) * pul);   // the glow at the top edge
+      glowDot(ctx, cx, 2, u * (0.15 + 0.55 * t), ice === "dark" ? DKC.mid : ice ? "170,225,255" : "255,150,50", (0.25 + 0.55 * t) * pul);   // the glow at the top edge
       for (j = 0; j < sparks.length; j++) {                                                                     // sparks falling from the top edge, more and faster as it nears
         sy = ((now * 0.0006 * speed * sparks[j].sp * (1 + 2 * t) + sparks[j].ph) % 1) * u * 1.6 * (0.3 + 0.7 * t);
         glowDot(ctx, sparks[j].x, sy, u * 0.012, ice === "dark" ? DKC.core : ice ? "235,248,255" : "255,220,150", 0.8 * t);
@@ -6696,8 +6699,44 @@
       }
     } });
   }
+  function bounceTrailFxDk(t0, t1, u) {                                              // the trail above the diving slime: a column of dark smoke puffs climbing away from it, violet glows, a few crescents and ink drops
+    fxAdd({ t0: t0, t1: t1, rnd: rngOf(t0 | 0), draw: function (ctx, now, L) {
+      if (!monEl) return;
+      var r = rectIn(monEl), cx = r.left + r.width / 2, y0 = r.top + r.height * 0.4, i, y, rnd = L.rnd;
+      for (i = 0; i < 9; i++) {
+        y = y0 - i * u * 0.2; if (y < -u * 0.2) break;
+        smokeDot(ctx, cx + Math.sin(now * 0.02 + i * 1.3) * u * 0.03, y, u * (0.15 + 0.02 * i), 0.32 * (1 - i / 9));
+        glowDot(ctx, cx + Math.sin(now * 0.017 + i) * u * 0.05, y, u * 0.08, DKC.mid, 0.2 * (1 - i / 9));
+      }
+      for (i = 0; i < 2; i++) crescentDraw(ctx, cx + (rnd() - 0.5) * u * 0.3, y0 - rnd() * u * 0.9, u * 0.03, rnd() * 6.28, 0.8);
+    } });
+  }
+  function bounceImpactFxDk(tI, cx, gy, u, F, k) {                                    // the crash (k = 1), the smaller second landing and the slam: a violet flash, an INK SPLASH (blobs thrown up and out, crescents flung), a dark pool that spreads, two rings on the ground, a short column of the painted dark twist
+    var rnd = rngOf((tI | 0) + 5), ps = [], i, a, v;
+    for (i = 0; i < Math.round(26 * k); i++) { a = -Math.PI * (0.04 + rnd() * 0.92); v = u * (0.6 + rnd() * 1.4) / 1000; ps.push({ x: cx + (rnd() - 0.5) * u * 0.5, y: gy - u * 0.05, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 700 + rnd() * 500, size: u * (0.012 + rnd() * 0.018), cres: false }); }
+    for (i = 0; i < Math.round(5 * k); i++) { a = -Math.PI * (0.05 + rnd() * 0.9); v = u * (0.4 + rnd() * 0.8) / 1000; ps.push({ x: cx + (rnd() - 0.5) * u * 0.4, y: gy - u * 0.1, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 900 + rnd() * 500, size: u * (0.022 + rnd() * 0.014), cres: true, rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.01 }); }
+    fxAdd({ t0: tI, t1: tI + 1900 / speed, draw: function (ctx, now, L) {
+      var t = (now - tI) * speed, dt = L.last ? Math.min(60, now - L.last) * speed : 0, rt = clamp01(t / 520), er = 1 - Math.pow(1 - rt, 3), rt2 = clamp01((t - 90) / 520), er2 = 1 - Math.pow(1 - rt2, 3), j, p, f, e = 1 - Math.pow(1 - clamp01(t / 260), 2);
+      L.last = now;
+      if (t < 160) { glowDot(ctx, cx, gy - u * 0.15 * k, u * k * (0.7 + 0.9 * t / 160), DKC.mid, 0.7 * (1 - t / 160)); glowDot(ctx, cx, gy - u * 0.15 * k, u * k * (0.35 + 0.5 * t / 160), DKC.core, 0.9 * (1 - t / 160)); }
+      ctx.save(); ctx.fillStyle = "rgba(20,8,40," + (0.55 * (1 - clamp01((t - 500) / 1300))).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(cx, gy, u * k * (0.3 + 0.45 * er), u * k * 0.075, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+      glowEllipse(ctx, cx, gy, u * k * (0.55 + 0.5 * clamp01(t / 300)), u * k * (0.13 + 0.07 * clamp01(t / 300)), DKC.mid, 0.4 * (1 - clamp01((t - 400) / 1000)));
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      ctx.strokeStyle = "rgba(" + DKC.bright + "," + (0.8 * (1 - rt)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.025 * (1 - rt) + 1);
+      ctx.beginPath(); ctx.ellipse(cx, gy, u * k * (0.1 + 1.25 * er), u * k * (0.1 + 1.25 * er) * 0.2, 0, 0, 6.2832); ctx.stroke();
+      if (t > 90) { ctx.strokeStyle = "rgba(" + DKC.core + "," + (0.55 * (1 - rt2)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.012 * (1 - rt2) + 1); ctx.beginPath(); ctx.ellipse(cx, gy, u * k * (0.1 + 1.0 * er2), u * k * (0.1 + 1.0 * er2) * 0.2, 0, 0, 6.2832); ctx.stroke(); }
+      ctx.restore();
+      if (t < 700) mfxTex(ctx, fbTex.dark_aura, cx, gy, u * 0.6 * k, u * 0.9 * k * e, 0.7 * (1 - clamp01(t / 700)), false);
+      for (j = ps.length - 1; j >= 0; j--) {
+        p = ps[j]; p.age += dt; if (p.age >= p.life) { ps.splice(j, 1); continue; }
+        f = p.age / p.life; p.vy += 0.0000045 * u * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        if (p.cres) { p.rot += p.spin * dt; crescentDraw(ctx, p.x, p.y, p.size, p.rot, Math.sin(f * 3.14159) * 0.9); }
+        else { ctx.save(); ctx.fillStyle = "rgba(24,10,48," + (0.9 * (1 - f * f)).toFixed(3) + ")"; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill(); ctx.restore(); glowDot(ctx, p.x, p.y, p.size * 2, DKC.mid, 0.3 * (1 - f)); }
+      }
+    } });
+  }
   async function bounceAct(e, myRun, A, T) {
-    var elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), pk = monPackOf("bounce"), F = elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, fm = 1000 / pk.fps / speed, pv = !!e.preview, el = monEl, dodgeRun = null, dead = false;
+    var dark = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark"), elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), pk = monPackOf("bounce"), F = dark ? darkSpitParams() : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, fm = 1000 / pk.fps / speed, pv = !!e.preview, el = monEl, dodgeRun = null, dead = false;
     var a = centerOf(A.unit), t = centerOf(T.unit), reach = (t.x - a.x) - A.dir * u * BOUNCE_LAND, ur = rectIn(uG), up = ur.top + ur.height + u * 0.7;     // up: how far the unit goes to be out of the stage
     var showF = function (i) { monPlayPack(pk, myRun, null, [0.01], [i]); };
     var setT = function (x, y) { uG.style.transform = "translate(" + x + "px," + y + "px)"; };
@@ -6706,10 +6745,10 @@
         T.hp -= amount; paintHp(T);
         if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
         if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
-        floatNumber(T, (e.crit && big ? "CRIT " : "") + amount, elec ? "bolt" : ice ? "ice" : "fire");
+        floatNumber(T, (e.crit && big ? "CRIT " : "") + amount, dark ? "dark" : elec ? "bolt" : ice ? "ice" : "fire");
       }
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
-      anim(T.unit.querySelector(".sprite"), elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, big ? 460 : 300).catch(function () {});
+      anim(T.unit.querySelector(".sprite"), dark ? DARK_SHOCK : elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, big ? 460 : 300).catch(function () {});
       anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * (big ? 30 : 16)) + "px)" }, { transform: "translateX(" + (-A.dir * (big ? 18 : 9)) + "px)" }, { transform: "translateX(0)" }], big ? 340 : 240).catch(function () {});
     };
     try {
@@ -6721,7 +6760,7 @@
       if (!await bnDrive(myRun, 330 / speed, function (s) { setT(0, -up * s * s); })) return;
       var tr0 = rectIn(T.unit), tx = tr0.left + tr0.width / 2, tgy = tr0.top + tr0.height - tr0.height * 0.03;
       var tNow = performance.now(), tImp = tNow + (BOUNCE_AWAY + BOUNCE_DIVE) / speed;                                  // 3. the warning
-      bounceWarnFx(tNow, tImp, tx, tgy, u, ice || elec);
+      bounceWarnFx(tNow, tImp, tx, tgy, u, dark ? "dark" : ice || elec);
       if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
         var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
         dodgeRun = runDodge(myRun, Math.max(0, ((tImp - performance.now()) - preMs / speed) * speed));
@@ -6731,19 +6770,20 @@
       if (myRun !== run) return;
       showF(3);                                                                                                       // 4. the dive
       var tDive = performance.now();
-      (elec ? bounceTrailFxLt : ice ? bounceTrailFxIce : bounceTrailFx)(tDive, tDive + (BOUNCE_DIVE + 120) / speed, u);
+      (dark ? bounceTrailFxDk : elec ? bounceTrailFxLt : ice ? bounceTrailFxIce : bounceTrailFx)(tDive, tDive + (BOUNCE_DIVE + 120) / speed, u);
       if (!await bnDrive(myRun, BOUNCE_DIVE / speed, function (s) { setT(reach, -up * (1 - s * s)); })) return;
       showF(4);                                                                                                       // 5. the crash
       setT(reach, 0);
       var rr = rectIn(el), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512, tI = performance.now();
-      if (elec) bounceImpactFxLt(tI, lx, lgy, u, F, 1); else { (ice ? bounceImpactFxIce : bounceImpactFx)(tI, lx, lgy, u, F, 1); (ice ? slamRingIce : slamRing)(tI, lx, lgy, u * 1.25); scorch(lx, lgy, u * 1.7, ice ? "frost" : undefined); } shake(18, 620); monFxBurst({ x: lx, y: lgy - u * 0.12, w: 0 });
+      if (dark) bounceImpactFxDk(tI, lx, lgy, u, F, 1); else if (elec) bounceImpactFxLt(tI, lx, lgy, u, F, 1); else { (ice ? bounceImpactFxIce : bounceImpactFx)(tI, lx, lgy, u, F, 1); (ice ? slamRingIce : slamRing)(tI, lx, lgy, u * 1.25); scorch(lx, lgy, u * 1.7, ice ? "frost" : undefined); } shake(18, 620); monFxBurst({ x: lx, y: lgy - u * 0.12, w: 0 });
       var first = Math.round((e.amount || 0) * BOUNCE_DMG), second = Math.round((e.amount || 0) * BOUNCE_DMG2);
       if (e.dodge) {
         if (!pv) { say(A.name + " plummets down, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
       } else {
         hitBy(first, true);
-        if (!pv) say(A.name + " plummets onto " + T.name + " for " + first + (e.crit ? " (crit!)" : "") + (elec ? " (Skybolt Bounce)." : ice ? " (Blizzard Bounce)." : " (Inferno Bounce)."), "g");
-        if (elec) { if (T.hp > 0) { applyShocked(T, 2); if (!pv) say(T.name + " is shocked for 2 turns.", "sys"); } }
+        if (!pv) say(A.name + " plummets onto " + T.name + " for " + first + (e.crit ? " (crit!)" : "") + (dark ? " (Nightfall Bounce)." : elec ? " (Skybolt Bounce)." : ice ? " (Blizzard Bounce)." : " (Inferno Bounce)."), "g");
+        if (dark) { if (T.hp > 0) { applyWard(T, 2); if (!pv) say(T.name + "'s magic defence is reduced for 2 turns.", "sys"); } }
+        else if (elec) { if (T.hp > 0) { applyShocked(T, 2); if (!pv) say(T.name + " is shocked for 2 turns.", "sys"); } }
         else if (ice) { if (T.hp > 0) { applyChilled(T, 2); if (!pv) say(T.name + " is chilled for 2 turns.", "sys"); } }
         else if (T.hp > 0) { applyBurn(T, (T.burn ? T.burn.stacks : 0) + BOUNCE_BURN); if (!pv) say(T.name + " is set ablaze (Burn x" + T.burn.stacks + ", " + BURN_TURNS + " turns).", "sys"); }
         dead = !pv && T.hp <= 0;
@@ -6754,7 +6794,7 @@
       if (!await bnDrive(myRun, fm * 3, function (s) { setT(reach, -u * 0.28 * Math.sin(s * Math.PI)); })) return;
       showF(6);                                                                                                       // 7. the heavy landing and the second hit
       var tI2 = performance.now(), lgy2 = rectIn(el); lgy2 = lgy2.top + lgy2.height - lgy2.width * 42 / 512;
-      if (elec) bounceImpactFxLt(tI2, lx, lgy2, u, F, 0.55); else { (ice ? bounceImpactFxIce : bounceImpactFx)(tI2, lx, lgy2, u, F, 0.55); (ice ? slamRingIce : slamRing)(tI2, lx, lgy2, u * 0.7); scorch(lx, lgy2, u * 1.0, ice ? "frost" : undefined); } shake(8, 320);
+      if (dark) bounceImpactFxDk(tI2, lx, lgy2, u, F, 0.55); else if (elec) bounceImpactFxLt(tI2, lx, lgy2, u, F, 0.55); else { (ice ? bounceImpactFxIce : bounceImpactFx)(tI2, lx, lgy2, u, F, 0.55); (ice ? slamRingIce : slamRing)(tI2, lx, lgy2, u * 0.7); scorch(lx, lgy2, u * 1.0, ice ? "frost" : undefined); } shake(8, 320);
       if (!e.dodge && !dead) {
         hitBy(second, false);
         if (!pv) say("The bounce hits " + T.name + " again for " + second + ".", "g");

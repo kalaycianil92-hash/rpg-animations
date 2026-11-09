@@ -1,0 +1,66 @@
+{
+ "format": "frame-placement/1",
+ "animation": "nightfall_bounce",
+ "file": "dark_nightfall_bounce_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 56,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 153,
+   "bottom": 469,
+   "baseW": 355.5,
+   "sizeAgainstIdle": 1.016
+  },
+  {
+   "lift": 96.3,
+   "top": 46,
+   "bottom": 373,
+   "baseW": 154.3,
+   "sizeAgainstIdle": 0.441
+  },
+  {
+   "lift": 24.4,
+   "top": 45,
+   "bottom": 445,
+   "baseW": 201.8,
+   "sizeAgainstIdle": 0.577
+  },
+  {
+   "lift": 0.0,
+   "top": 238,
+   "bottom": 470,
+   "baseW": 370.1,
+   "sizeAgainstIdle": 1.057
+  },
+  {
+   "lift": 42.7,
+   "top": 48,
+   "bottom": 427,
+   "baseW": 225.0,
+   "sizeAgainstIdle": 0.643
+  },
+  {
+   "lift": 0.0,
+   "top": 38,
+   "bottom": 470,
+   "baseW": 340.9,
+   "sizeAgainstIdle": 0.974
+  },
+  {
+   "lift": 0.0,
+   "top": 54,
+   "bottom": 470,
+   "baseW": 354.9,
+   "sizeAgainstIdle": 1.014
+  }
+ ],
+ "hitFrame": 5
+}
