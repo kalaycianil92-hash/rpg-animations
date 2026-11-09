@@ -1,12 +1,12 @@
 {
- "note": "per-frame proportions of the drawn slime against frame 1: h = height of the eyes above the ground, w = width of the base; fist = height of the floating fist's middle above the ground (px in the 512 cell); the page undoes a chosen share of the deformation",
+ "note": "per-frame proportions of the drawn slime against frame 1: h = height of the eyes above the ground, w = width of the base; fist = height of the floating fist's middle above the ground (px in the 512 cell); the page undoes a chosen share of the deformation. The dome's own stretch was already toned down in the strip (keep=0.30, see make_elite_idle_strip.py)",
  "h": [
   1.0,
-  1.003,
-  0.994,
-  1.024,
-  1.029,
-  1.004
+  1.001,
+  0.997,
+  1.006,
+  1.017,
+  1.003
  ],
  "w": [
   1.0,
@@ -17,12 +17,12 @@
   1.0
  ],
  "fist": [
-  182.8,
-  189.7,
-  180.2,
-  185.8,
-  183.2,
-  181.7
+  182.3,
+  189.8,
+  179.7,
+  185.3,
+  183.1,
+  181.8
  ],
  "match": [
   1.0,
