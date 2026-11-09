@@ -1,0 +1,36 @@
+DARK EFFECTS, SHEET 2 OF 2: THE INK (one sheet, 3 x 3, no reference image, ask for 1:1). Written 2026-11-09. Works with Gemini or ChatGPT.
+
+WHY. Sheet 1 (dark_fx_glow_prompt.txt) holds the violet GLOW, drawn additively on pure black. This sheet holds what is DARK and SOLID: the ink splashes, drips, droplets, the puddle. Dark cannot be added as light (black adds nothing), so these pieces are drawn normally over the scene, and the sheet is on a flat GREEN key (#00FF00), exactly like the dark slime's own sheets (the pieces are violet and black, violet is partly magenta, so green is the safe key).
+
+HOW TO USE
+- No attachment. Ask for a 1:1 image (ChatGPT: 1024 x 1024 or larger). Paste everything between the two lines of equals signs.
+- Generate once or twice and keep the best; if only some panels are good, ask again for those and I join them.
+- Save the sheet in inbox/ (for example inbox/dark_fx_ink_sheet.png) and tell me.
+- What to look at: (1) flat pure green (#00FF00) in every pixel between the pieces; (2) every panel is ONE separate piece, centred, with green all round; (3) crisp, solid, opaque, hard-edged ink: black-indigo with a thin violet rim light, no smoke, no mist, no glow, no soft edges; (4) nothing green on the pieces; (5) nothing touches a panel edge; (6) the nine panels clearly differ; (7) one image only.
+- Cut: the green-key tool of the dark slime (`Animations/DarkSlime/source/dark_panels.py` keys green; I add a small `cut_ink_sheet.py` that cuts the nine panels with it) into `source/assets/fx/dk_splash, dk_splat, dk_pool, dk_drips, dk_drops_a, dk_drops_b, dk_smear, dk_vines, dk_bubbles`. The page then draws the ink splashes of the hit, the slam, the crash and the eruption's geyser, the pool and the drips from these pictures instead of code.
+- Replies if it goes wrong. If it draws soft smoke, mist or glow: "Redo it. NO smoke, NO mist, NO glow, NO soft edges: only crisp, solid, hard-edged ink shapes with a thin violet rim light, on the flat green background." If it uses another colour: "Redo it. One colour family only: black-indigo (#18082F, #2C1559) with a thin violet rim light (#7A4FD0). No brown, no red, no blue, no green." If the background is not flat green: "Redo it. The background is one flat pure green (#00FF00), identical in every pixel, no gradient, no shadow, no borders." If pieces touch the edges or are cut: "Redo it. Each piece is centred in its panel with at least 8% green margin on every side."
+
+==============================================================================
+OUTPUT: exactly ONE static image, a texture sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create a texture sheet of INK effects for a 2D fantasy RPG game: a grid of 3 columns x 3 rows, nine equal square panels (the whole image is 1:1), read left to right, top row first, then the bottom row. Each panel holds ONE separate piece of thick dark ink, centred. Do not draw any creature, character, weapon, ground, landscape or text.
+
+BACKGROUND (very important): the whole image is flat pure GREEN (#00FF00), identical in every pixel. No gradient, no vignette, no shadow, no outlines, no borders, no divider lines or frames between the panels. Nothing on the pieces may be green, yellow-green or teal.
+
+STYLE: thick glossy-matte ink, hand-painted in the same style as a cartoon fantasy game: SOLID, OPAQUE, HARD-EDGED shapes in black-indigo (#18082F with #2C1559 for the lighter areas), a THIN VIOLET RIM LIGHT (#7A4FD0) along the edges that face the upper left, and a few tiny pale violet highlights (#C9B4F0). The same thin near-black indigo outline weight in every piece. Round, flowing, viscous shapes, like ink or tar: smooth blobs, tapering drips, curling tendrils. NO smoke, NO mist, NO clouds, NO glow, NO soft or fuzzy edges, NO transparency, NO gradients fading out. No sparkles.
+
+THE NINE PIECES:
+1. Splash. A big ink splash seen from the side, frozen at its highest moment: a thick central blob of ink thrown upward in a crown shape, with 8 to 12 tapering streams and round droplets flying outward and up in all directions (different lengths and sizes), a few droplets detached. About 85% of the panel width and 80% of its height, centred.
+2. Splat. A flat ink splat seen from a low angle, as a wide flat oval about 92% of the panel width and 30% of its height: a thick flat puddle-like splat with 10 to 14 pointed splashes radiating outward along the ground, a few round droplets beside it. Centred.
+3. Pool. A flat dark pool of ink on the ground seen from a low angle: a smooth wide oval about 88% of the panel width and 24% of its height, slightly irregular edge, a thin lighter violet rim line along its top edge, three or four round bubbles on it, a faint ring ripple in the middle. Centred.
+4. Drips. Five vertical dripping streaks hanging side by side from an invisible top edge (the top edge of the piece is a straight line), different lengths, each ending in a round hanging drop, with one drop just detached below the longest. About 55% of the panel width and 85% of its height, centred.
+5. Droplets A. About 14 solid ink droplets of many sizes (round and teardrop, the biggest about 12% of the panel, the smallest about 2%) scattered loosely in a roughly round area of about 80% of the panel, each with a rim light. Centred.
+6. Droplets B. A different arrangement of about 12 ink droplets (round and teardrop) mixed with 3 or 4 solid violet crescent blades (thin curved crescents with a lighter violet edge), scattered in a roughly round area of about 80% of the panel. Centred.
+7. Smear. A long streak of ink left on the air by something very fast, horizontal: a thick tapering smear that is fat and rounded at the RIGHT end and thins out to the LEFT with 5 to 8 stretched droplets and small blobs trailing behind it. About 92% of the panel width and 24% of its height, centred.
+8. Vines. Five or six thick curling ink tendrils growing upward from one point at the bottom centre like shadow vines, tapering, each ending in a tight curl, different heights, with a solid base blob where they join. About 60% of the panel width and 85% of its height, centred.
+9. Bubbles. A flat oval patch of ink about 80% of the panel width and 22% of its height seen from a low angle with 8 to 12 round bubbles of different sizes rising from it (the biggest about 9% of the panel), each bubble a thin violet-rimmed sphere with a small pale highlight and a dark ink fill. Centred.
+
+LAYOUT: each piece is centred in its own panel with at least 8% flat green margin all round and never touches or crosses the panel edge. The nine pieces must clearly differ in shape.
+
+FINAL REMINDER: output ONE single static image only. No GIF, no extra images. Solid, crisp, opaque black-indigo ink with a thin violet rim light on flat pure green; no smoke, no glow, no soft edges, nothing green on the pieces, no creatures.
+==============================================================================
