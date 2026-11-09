@@ -1,0 +1,43 @@
+DARK SLIME: THE LOOK, VERSION 2 (a crest of spiral curls instead of flames). Written 2026-11-09.
+
+WHY A SECOND PROMPT. The first picture (inbox/dark_slime_reference.jpg) keeps the fire slime's construction exactly (as the prompt asked), but its crown of "curling tendrils" came out as the fire slime's flames painted violet, so the creature reads as the fire slime in a darker colour (the user: "it looks so similar to fire slime, just the darker version"). The ice slime (crystals) and the lightning slime (bolt-shaped spikes) escaped this because their crowns have another SHAPE; a recolour is not enough. So this version keeps everything of the first picture that is good (the dome, the skirt, the face, the black spirals on the body, the view, the size, the green background: all of it is also what the animations reuse) and changes only what makes it look like fire: the SHAPE of the crown and of the side tongues, the floating bits, and the depth of the body colour.
+
+THE IDEA: dark = ink, shadow, void. Flames flicker upward and end in a sharp point. Ink curls: thick stalks that end in a round SPIRAL, like a fern's fiddlehead or the black spirals painted on the body (the motif repeats). So the crown becomes a crest of five spiral curls, the side tongues become two small spirals, the floating bits become violet CRESCENTS (the dark aura picture of the game is full of small crescent blades) and black ink blobs.
+
+HOW TO USE
+- Attach ONE image: inbox/dark_slime_reference.jpg (the first dark picture: the creature to keep). Ask for the same shape as that picture (square), as large as it will give you. Paste everything between the two lines of equals signs. Gemini; generate several and keep the best.
+- Save the best in inbox/ (for example inbox/dark_slime_reference_v2.jpg) and tell me. If it is right it becomes `Animations/DarkSlime/reference_image.png`.
+- What I check: (1) the creature is the SAME as in the first picture: the dome, the skirt, the face in the same place and size, the black spirals, the three-quarter view turned to the right, the same size and place; (2) the crown is NOT flame-shaped: five thick stalks of different heights that each end in a round spiral, none ends in a sharp flickering point, none looks like a flame or a leaf; (3) the two side pieces are small spirals; (4) the floating bits are violet crescents and black ink blobs, no flame-leaf shapes; (5) the body is a little darker than before; (6) crisp opaque edges, thin near-black indigo outline, no smoke, glow or haze; (7) flat pure green background, nothing green on the creature; (8) one image, no GIF.
+- Known risks: it turns the spirals back into flames (reply 1), it changes the face or the dome (reply 2), it adds soft smoke or glow (reply 3).
+
+==============================================================================
+OUTPUT: exactly ONE still image, and nothing else. Do NOT create a GIF, an animation, extra images or alternate versions.
+
+TASK: redraw the creature of the attached image EXACTLY as it is (the same dome, wavy skirt, face, black spiral swirls, three-quarter view, size, position in the picture, painting style, thin outline and flat green background), and change ONLY the four things listed below.
+
+KEEP EXACTLY: the low dome wider than tall with the flat wavy skirt; the face in the same place and size (heavy slanted brows, two narrow slanted eyes with glowing violet-pink pupils, the wavy grimace); the black-indigo spiral swirls on the body in the same places and sizes; the three-quarter view turned about 30 degrees towards the RIGHT edge; the matte hand-painted style and the thin near-black indigo outline; the flat pure green (#00FF00) background identical in every pixel; the same size and position, centred, with at least 10% empty margin on every side.
+
+CHANGE ONLY THESE FOUR THINGS:
+1. THE CROWN. Remove the crown of flame-shaped tendrils. In its place stands a CREST OF FIVE SPIRAL CURLS growing out of the top and back of the head: five thick stalks of different heights (the tallest about as high as the old tallest tendril, then about 80%, 70%, 55% and 45% of it), leaning back a little, each one a smooth thick tapering stalk that ends in a tight ROUND SPIRAL at its tip, like a fern's fiddlehead or an ink spiral (a stalk that curls over and winds into a coil, seen from the side). The coils all curl the same way (backwards, away from the face). NO sharp points, NO flickering tips, NO flame shapes, NO leaf shapes, NO wavy tongues: every stalk ends in a round coil. Painted as SOLID hard-edged forms: deep violet with a black-indigo core line along each stalk and inside each coil, a thin lighter-violet rim light on the edges facing the upper left, the same thin near-black indigo outline as the body. Fully opaque.
+2. THE SIDE PIECES. Instead of the flame-shaped tongue on each side of the body, one small spiral curl growing out of each side (the left one a little bigger), built the same way as the crest curls.
+3. THE FLOATING BITS. Instead of the small flame-leaf shapes and diamond shards floating around, about six to ten solid objects of two kinds: violet CRESCENTS (thin curved crescent blades with a lighter-violet rim light, hard-edged, of different sizes, some tilted) and black ink blobs (round and teardrop shapes, hard-edged). In about the same places as before, around and above the crest.
+4. THE BODY COLOUR. A little darker and deeper than in the first picture: a mid-dark violet like #3A2278 with shadows towards the base and the lower left in dark indigo like #20124A, lighter violet only in small soft highlights. The black spirals stay black-indigo.
+
+STILL TRUE (so the picture can be cut out): every edge is crisp, hard and opaque. NO smoke clouds, NO mist, NO haze, NO soft glow, NO halo, NO blur, NO see-through parts, NO soft particles, NO light spilling onto the background. No shadow on the floor. Nothing green, yellow-green or teal on the creature.
+
+BACKGROUND: one flat pure GREEN (#00FF00) background filling the whole picture, identical in every pixel. No gradient, ground line, scenery, shadow or vignette. No text, labels or borders.
+
+FINAL REMINDER: exactly one image; the same creature, face, dome, skirt and black spirals as the attached picture; the flame-shaped crown replaced by a crest of five spiral curls (every stalk ends in a round coil, no sharp flickering tips), two small side spirals, violet crescents and black ink blobs floating, a slightly darker body; crisp and opaque, no smoke, no glow; flat pure green background.
+==============================================================================
+
+REPLY 1: IF IT STILL LOOKS LIKE FLAMES
+"Redo it. The crown must NOT look like flames: five thick stalks, each ending in a ROUND SPIRAL coil like a fern fiddlehead, curling backwards. No sharp points, no flickering tongues, no leaf shapes anywhere on the crest or at the sides."
+
+REPLY 2: IF IT CHANGED THE FACE OR THE BODY
+"Redo it. Keep the dome, the skirt, the face (same place, same size, same eyes and grimace), the black spirals on the body and the view exactly as in the attached picture. Only the crest, the side pieces, the floating bits and the body's depth of colour change."
+
+REPLY 3: IF IT ADDS SMOKE, GLOW OR HAZE
+"Redo it. NO smoke, NO mist, NO soft glow or haze anywhere: only crisp, solid, hard-edged curls, crescents and ink blobs with a thin outline, on the flat green background."
+
+REPLY 4: IF THE BACKGROUND OR COLOURS DRIFT
+"Redo it. The background is one flat pure green (#00FF00), identical in every pixel. The creature is deep violet with black-indigo spirals and a near-black indigo outline: nothing green, no orange, no red."
