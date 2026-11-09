@@ -1,0 +1,4 @@
+{"format":"frame-placement/1","animation":"attack","file":"armored_jump_attack_8frame_strip.png","frames":8,"fps":14,"hitFrame":7,"smooth":true,
+"x":[-0.03,0,0.124,0.414,0.798,1.176,1.497,1.584],
+"y":[0,0,0.197,0.522,0.811,0.526,0,0],
+"note":"x: 0 = home position, 1 = strike point (target centre minus 0.8 character widths). y: extra lift in frame widths, up positive, never below 0 (the ground line). A frame is exactly at its x,y in the middle of its time slot; with smooth=true the position is linearly interpolated between frame middles, otherwise it jumps from frame to frame."}

@@ -1,0 +1,138 @@
+{
+ "format": "hand-anchors/3",
+ "note": "Two tracks per frame: main (the left hand, far arm) and off (the right hand, near arm). x and y are fractions of one frame from its top left. a is degrees, 0 = item points up, clockwise is positive. front=false means the item is drawn behind the body. hide=true means no item on that frame. w squashes the item sideways (1 = normal width). Draw order: items behind (main, off), body, items in front (main, off), then the hand over each item in front whose overlay is true: only the hand's own pixels from the body frame, namely the pixels of the skin colour found around the mark (same hue, inside a circle of radius fist x frame width, connected to the mark), grown by 2 px to take in the outline; when no skin colour is found near the mark it is the whole circle. Each animation has offItem: what its off hand carries (kind shield, other = a second weapon or item, or none = no off-hand item, in which case the off track is all null) with its own length, pivot and overlay; for the off hand it takes precedence over the character-level items.off.",
+ "characters": [
+  {
+   "name": "Warrior",
+   "fist": 0.09,
+   "items": {
+    "main": {
+     "length": 0.42,
+     "pivot": 0.81,
+     "overlay": true
+    },
+    "off": {
+     "length": 0.42,
+     "pivot": 0.81,
+     "overlay": true
+    }
+   },
+   "animations": [
+    {
+     "name": "armored_death_6frame",
+     "frames": 6,
+     "columns": 6,
+     "fps": 10,
+     "offItem": {
+      "kind": "other",
+      "length": 0.42,
+      "pivot": 0.81,
+      "overlay": true
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.755,
+        "y": 0.378,
+        "a": -27,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.757,
+        "y": 0.393,
+        "a": -18,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.639,
+        "y": 0.333,
+        "a": -42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.633,
+        "y": 0.436,
+        "a": -36,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.386,
+        "y": 0.512,
+        "a": -90,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.522,
+        "y": 0.819,
+        "a": -90,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.524,
+        "y": 0.416,
+        "a": 6,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.526,
+        "y": 0.407,
+        "a": 15,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.4,
+        "y": 0.634,
+        "a": 42,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.39,
+        "y": 0.621,
+        "a": 24,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.433,
+        "y": 0.729,
+        "a": -72,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.555,
+        "y": 0.963,
+        "a": -90,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

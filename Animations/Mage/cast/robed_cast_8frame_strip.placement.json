@@ -1,0 +1,1 @@
+{"format":"frame-placement/1","animation":"attack","file":"robed_cast_8frame_strip.png","frames":8,"fps":12,"hitFrame":5,"smooth":true,"x":[0,0,0,0,0,0,0,0],"y":[0,0,0,0,0,0,0,0],"note":"The cast plays in place (x and y all 0). hitFrame is the RELEASE frame of the cast: the frame on which the projectile leaves the top of the staff."}

@@ -1,0 +1,19 @@
+OUTPUT: exactly ONE static image, a PNG texture sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create a texture sheet of EXPLOSIVE FIRE effects for a 2D fantasy RPG game: a grid of 3 columns x 2 rows, six equal square panels (the whole image is 3:2), read left to right, top row first, then the bottom row.
+
+BACKGROUND (very important): the whole image is PURE BLACK (#000000), perfectly flat and identical in every pixel. The effects will be added over a game scene with additive blending, so black means transparent and everything that is not black adds light. No gradient, no vignette, no dark-red or brown haze, no glow spreading across the panel (a glow may reach at most 5% beyond the object and must be pure black well before the panel edge), no outlines, no borders, no divider lines or frames between the panels.
+
+STYLE: realistic hand-painted fantasy game fire, painterly brush shading, the same look as a painted RPG sprite, with real flame structure: licking tongues, billowing masses, flying sparks and glowing ember specks. Not cartoon, not flat vector, not photo. Colours: white-hot core (#FFF6D6), yellow (#FFD25A), orange (#FF8A22), deep red (#C8260F) and a dark ember red only in thin edges. No characters, no animals, no ground, no sky, no text, no numbers. Smoke, where it appears, is dark warm grey-brown lit orange from below, and must stay well inside the panel.
+
+THE SIX PANELS:
+1. The molten core. A compact ball of fire used as a projectile, FLYING TO THE RIGHT: a nearly round sphere of molten fire, a white-hot centre fading through yellow and orange to a ragged red edge, short flame tongues licking all round it, and a short stubby tail of flame and a few sparks trailing to the LEFT. The ball is about 55% of the panel height, the whole thing (with its tail) fills about 85% of the panel width, centered.
+2. The blast. The explosion fireball at its biggest: a roiling mass of fire with a white-hot heart, billowing orange and red masses around it, jagged flame tongues thrown out in all directions (some long), and flying sparks and ember streaks. Roughly round, centered, about 90% of the panel.
+3. The shock ring. A bright expanding ring of fire and heat seen face-on: a thin white-yellow hot inner line, a wider orange band with ragged flame tongues pointing outwards, scattered sparks around it. The CENTRE IS EMPTY AND PURE BLACK. Circular, centered, about 90% of the panel.
+4. Burning. A tall column of flames licking upwards from one flat straight base line, used to show that a character is on fire: many separate tongues of flame of different heights, swaying, a few rising embers and sparks, hot yellow at the roots and base and orange-red at the tips. The INSIDE IS EMPTY AND PURE BLACK between the outer tongues (a character stands behind it and must show through), so the fire is mostly on the left, right and top edges and along the base. About 70% of the panel width and 90% of its height, centered, with the base line at the bottom of the flames.
+5. The pop. A small sharp detonation: a bright white-yellow flash with a starburst of thin radiating spark streaks and short flame spikes, a tiny orange fireball at its heart and a thin shock ring. Roughly round, centered, about 70% of the panel.
+6. The aftermath. The dying phase after an explosion: glowing embers of different sizes, falling sparks, curling wisps of smoke and thin flames dissolving; no bright core, dimmer than panel 2. Roughly round, centered, about 90% of the panel.
+
+LAYOUT: each effect is centered in its own panel with at least 5% pure black margin around it and never touches or crosses the panel edge. Panel 1 must be perfectly horizontal.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.

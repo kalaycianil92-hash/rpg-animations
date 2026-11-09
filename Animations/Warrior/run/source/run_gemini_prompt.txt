@@ -1,0 +1,23 @@
+OUTPUT: exactly ONE static image, a PNG sprite sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+You get two reference images.
+The FIRST attached image is a sprite sheet of 5 key poses of a character running on the spot, in a grid of 3 columns x 2 rows, read left to right, top row first: panels 1 to 5 hold the poses and panel 6 is empty. Use it ONLY as a pose reference.
+The SECOND attached image shows the character I want: a warrior (a strip of his ready stance, use only his look: face, hair, armor and proportions).
+
+TASK: redraw the 5 poses of the first image with the warrior of the second image. Each panel must keep the exact pose of the same panel in the first image: the same lean of the body, the same head angle, the same arm positions, and the same legs (how far each boot is in front of or behind the hips, how high each boot is above the floor, how much each knee is bent), in strict side view facing RIGHT. Do not change, mirror, swap or improve any pose, and do not swap the near and far legs or arms. Only the character changes. The warrior's body is broader than the first character's, so his legs and arms are a little thicker, but the same joints are in the same places.
+
+Output ONE sprite sheet: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first. Panels 1 to 5 hold the five poses in the same order as the first image. Panel 6 stays EMPTY: flat magenta only.
+
+CHARACTER: the exact warrior of the second image: young muscular fighter, spiky black hair, tan skin, dark navy segmented plate armor with copper trim (shoulder pauldrons, chest plate, belt), brown leather bracers, dark trousers, navy plated shin guards, black boots. Keep the same painted game-sprite style, thick dark outlines, colors, proportions and face as in the second image. Do not redesign anything. Ignore the robe, the braid, the long hair and every other piece of clothing of the first image: in every panel he wears his own armor, trousers, shin guards and boots, and his own spiky hair, which does not trail like a braid.
+
+NO WEAPON, NO SHIELD, NO ITEMS: both hands are empty, tight fists (no open splayed fingers) in every panel, exactly where the hands are in the first image. No effects of any kind.
+
+RUNS ON THE SPOT: like in the first image, the character does NOT travel across the panel. The hips and torso are over the same spot in every panel, and the boot that is on the floor slides backward from panel to panel while the other leg swings forward, like running on a treadmill. Keep each figure at the same place inside its panel as in the first image.
+
+SCALE AND FLOOR: the same size and the same place in the panel as the figure in the first image: the whole body from the top of the head to the soles of the boots is visible, about 68% of the panel height, and the boots of the grounded poses rest on the same invisible floor line about 92% down the panel as in the first image. Do not zoom in or out between panels and do not make the warrior bigger than the first character. The up and down movement of the body is the same as in the first image (small, a quick running stride, not jumping).
+
+LAYERING: the near arm and the near leg (the ones closer to the viewer) are drawn in front, the far arm and the far leg behind the torso and the other limb, exactly as in the first image, in every panel.
+
+BACKGROUND AND LAYOUT: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. No grid lines or borders between panels. The whole character, with hands and feet, must stay fully inside its own panel and never touch or cross a panel edge. No text, numbers, labels, dust, motion lines, speed lines, afterimages or any other effects. No magenta or pink on the character itself.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.

@@ -1,0 +1,4 @@
+{"format":"frame-placement/1","animation":"dodge","file":"robed_dodge_6frame_strip.png","frames":6,"fps":14,"evadeFrame":3,"smooth":true,"xUnit":"frame-widths",
+"x":[0,-0.05,-0.15,-0.22,-0.14,-0.03],
+"y":[0,0,0,0,0,0],
+"note":"Same hop-back path as the warrior's dodge. x: character widths from the home position, negative = away from the enemy. y: extra lift in frame widths (0: the hop is drawn in the frames). evadeFrame: the frame on screen when the dodged strike would have landed (the peak of the hop)."}

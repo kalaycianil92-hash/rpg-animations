@@ -1,0 +1,13 @@
+OUTPUT: exactly ONE static image, a PNG sprite sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+The attached image is a sprite sheet: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first, then the bottom row. In every panel the same elf mage is shown in strict side view, facing RIGHT, in a running pose, on a flat pure magenta (#FF00FF) background.
+
+TASK: redraw this exact sheet, with the same grid, the same panel order and the same background, with ONE change in every panel: THE ARMS ARE SWAPPED.
+In the attached sheet, in every panel, the FAR arm (the arm farther from the viewer, partly hidden behind the torso) is swung forward and the NEAR arm (the arm closer to the viewer, drawn in front of the torso and the belt) is swung back.
+In your sheet, in every panel, it is the other way round: the NEAR arm (drawn in front of the torso) swings FORWARD, and the FAR arm (partly hidden behind the torso) swings BACK. Panel by panel the two arms trade places: the forward arm of your panel is at the height, angle and bend that the forward arm had in the same panel of the attached sheet, and the back arm is at the height, angle and bend that the back arm had there. Both hands are tight closed fists in every panel.
+
+KEEP EVERYTHING ELSE EXACTLY AS IT IS: the same head, face and expression, the same hair and braid, the same robe, belt and pouch, the same legs and boots in exactly the same positions (do not redraw the legs), the same body lean, the same size of the figure and the same position of the figure inside each panel, the same flat magenta background. The figures must not become bigger or smaller and must not move inside their panels.
+
+BACKGROUND AND LAYOUT: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. No grid lines or borders between panels. The whole character must stay fully inside its own panel and never touch or cross a panel edge. No text, numbers, labels, dust, motion lines or any other effects. No magenta or pink on the character itself.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
