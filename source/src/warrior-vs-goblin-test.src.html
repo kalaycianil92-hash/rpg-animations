@@ -133,6 +133,7 @@
   .num.burn { color: #fff1d6; font-size: 24px; letter-spacing: .08em; text-shadow: 0 0 8px #ff7a1a, 0 2px 0 #000; }
   .num.chill { color: #e9f8ff; font-size: 24px; letter-spacing: .08em; text-shadow: 0 0 8px #4cc3f0, 0 2px 0 #000; }
   .num.debuff { color: #cfe3ff; font-size: 24px; letter-spacing: .06em; text-shadow: 0 0 8px #6a8cff, 0 2px 0 #000; }
+  .num.dark { color: #f3e8ff; font-size: 42px; text-shadow: 0 0 8px #9b4dff, 0 0 20px #5a1fd0, 0 2px 0 #000; }
   .num.bolt { color: #e9edff; font-size: 42px; text-shadow: 0 0 8px #5a7dff, 0 0 20px #3b4fff, 0 2px 0 #000; }
   .num.dark { color: #f2eaff; font-size: 42px; text-shadow: 0 0 8px #9a66ff, 0 0 22px #3a1066, 0 2px 0 #000; }   /* Dark Damage (the Rogue's Umbral Shroud): pale with a violet glow on a deep violet halo */
   .num.abyss { color: #fff1f4; font-size: 58px; text-shadow: 0 0 8px #ff2a5a, 0 0 26px #7a3cff, 0 3px 0 #000; }   /* the Rogue's Abyssal Backstab: big, white-hot with a crimson and violet glow (her abyss colours) */
@@ -233,7 +234,7 @@
     <button class="primary" id="play">Play</button>
     <button id="reset">Reset</button>
     <label class="lbl" id="charWrap" style="display:none">Character <select id="charSel"><option value="warrior">Warrior</option><option value="mage">Elf mage (idle only so far)</option><option value="rogue">Rogue (idle only so far)</option><option value="assassin">Assassin (idle only so far)</option><option value="spellblade">Spellblade (idle only so far)</option></select></label>
-    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime (idle only so far)</option></select></label>
+    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime</option></select></label>
     <label class="lbl" id="monSizeWrap" style="display:none">Monster size <input type="range" id="monSize" min="40" max="140" step="5" value="100" style="width:90px;vertical-align:middle"> <span id="monSizeV">100%</span></label>
     <label class="lbl" id="monSqWrap" style="display:none">Squash and stretch <input type="range" id="monSq" min="0" max="100" step="5" value="50" style="width:90px;vertical-align:middle"> <span id="monSqV">50%</span></label>
     <label class="lbl" id="monFxWrap" style="display:none"><span id="monFxName">Fire</span> effects <input type="range" id="monFx" min="0" max="150" step="5" value="80" style="width:90px;vertical-align:middle"> <span id="monFxV">80%</span></label>
@@ -5280,6 +5281,9 @@
     // the lightning slime's packs (Animations/LightningSlime/<folder>, 2026-11-09): the Spark Spit (8 frames, the ice spit's holds), the Skybolt Bounce (8 frames), the hit (6), the death (6: cracks, chunks, a heap, a dull pile) and the dodge
     var DEFL = Object.assign({}, DEF, { hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] } });
     MONSTERS.lightning_slime.packs = build(LIGHT_ANIMS, DEFL); MONSTERS.lightning_slime.attackPack = MONSTERS.lightning_slime.packs.attack;
+    // the dark slime's packs (Animations/DarkSlime/<folder>, 2026-11-09): the Gloom Spit (8 frames, the ice spit's holds), the Abyssal Eruption (6 frames), the hit (6), the death (6: cracks, a slump with drips, a heap, a puddle of ink) and the dodge
+    var DEFD = Object.assign({}, DEF, { hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] } });
+    MONSTERS.dark_slime.packs = build(DARK_ANIMS, DEFD); MONSTERS.dark_slime.attackPack = MONSTERS.dark_slime.packs.attack;
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
   var MON = { seq: 0, deathP: null };                                                // seq: which attack/hit/death/dodge pack is current (a new one replaces the one before); deathP: the promise of the death pack once it has started
@@ -5326,7 +5330,7 @@
     [["monSpitPrev", "attack"], ["monPrevHit", "hit"], ["monPrevDeath", "death"], ["monPrevDodge", "dodge"], ["monPrevSlam", "slam"], ["monPrevCinder", "attack"], ["monPrevEruption", "eruption"], ["monPrevBounce", "bounce"]].forEach(function (b) {
       $(b[0]).style.display = m.packs && m.packs[b[1]] && (!b[2] || m.vfx === b[2]) ? "" : "none";
     });
-    var ICE = m.vfx === "ice", LT = m.vfx === "lightning", NAMES = LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
+    var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
     Array.prototype.forEach.call($("monAtk").options, function (o) { if (NAMES[o.value]) o.textContent = NAMES[o.value]; });
     $("monSpitPrev").textContent = NAMES.spit + " (loops)"; $("monPrevSlam").textContent = NAMES.slam + " (loops)"; $("monPrevCinder").textContent = NAMES.cinder + " (loops)"; $("monPrevEruption").textContent = NAMES.eruption + " (loops)"; $("monPrevBounce").textContent = NAMES.bounce + " (loops)";
     $("monAtkWrap").style.display = idle && m.packs && m.packs.slam ? "" : "none";
@@ -5758,6 +5762,104 @@
       for (j = 0; j < sp.length; j++) glowDot(ctx, sp[j].x + Math.cos(sp[j].a) * u * sp[j].v * 0.3 * rt, gy - u * (0.1 + 0.9 * sp[j].s * 60 * Math.sin(clamp01(t / 900) * Math.PI)), u * 0.014, "215,225,255", 0.85 * (1 - clamp01(t / 1100)));
     } });
   }
+  // DARK SPIT and CHAIN twin (2026-11-09): the Gloom Spit flings a ball of gloom (a violet orb with a pale pink core, a ribbon of dark smoke behind it, three crescents orbiting it, ink drops shed on the way) at the target, an
+  // ink splash on the hit (blobs and crescents flung out, a dark pool, a ring, a short column of the painted dark twist), 25% Magic Def reduced for 2 turns (the mage's ward status), x1.0 (placeholders). The VOID BOLT
+  // (the Cinder Burst / Glacial Lance / Chain Bolt twin on the spit's animation with the long charge) is bigger, x1.7, a guaranteed critical on a target whose Magic Def is reduced (the ward breaks).
+  var DK_PAL = { glow: DKC.mid, mid: DKC.bright, core: DKC.core, deep: DKC.deep, flash: "205,170,255" }, DK_WEAK = 0.25;
+  var DARK_SHOCK = [{ filter: "brightness(0.4) sepia(1) saturate(3) hue-rotate(235deg)", offset: 0 }, { filter: "brightness(1.5) sepia(.6) saturate(2) hue-rotate(235deg)", offset: 0.4 }, { filter: "brightness(1)", offset: 1 }];
+  var ERUPT_SEQ_DK = { shrink: [0, 1, 2, 3], shrinkH: [1.6, 1, 1, 1.2], dieT: [0.7, 0.45, 0.25, 0.1], shS: [1, 0.78, 0.45, 0.25], reform: [3, 2, 4, 5], reformH: [1.4, 1, 1.3, 1.8], reDie: [0.25, 0.5, 0.8, 1], reShS: [0.25, 0.45, 0.64, 0.98] };   // (frame sizes against the rest: 1.00, 0.78, 0.45, 0.25, 0.64, 0.98)
+  function darkSpitParams() { var F = fbParams("ice"); F.pal = DK_PAL; F.painted = false; F.charge = 3; F.release = SPIT_REL; F.chance = 0; F.mul = 1.15; return F; }
+  function darkChainParams() { var F = darkSpitParams(); F.size = 1.6; F.trail = 1.4; F.mul = CIN_MUL; F.ga = CIN_GLOW; F.big = true; return F; }
+  function dkBoltDraw(ctx, now, L, F, u) {
+    var rnd = L.rnd, j, a;
+    if (!L.p0) {
+      var tip = L.from && L.from(), bp = bodyPoint(), tr = rectIn(L.T.unit), tx = tip ? tip.x : bp.x, ty = tip ? tip.y : bp.y;
+      L.p0 = { x: tx, y: ty }; L.p1 = L.to || { x: tr.left + tr.width * 0.5, y: tr.top + tr.height * 0.42 };
+      var dx = L.p1.x - L.p0.x, dy = L.p1.y - L.p0.y; L.len = Math.sqrt(dx * dx + dy * dy) || 1;
+      L.c = { x: (L.p0.x + L.p1.x) / 2, y: Math.min(L.p0.y, L.p1.y) - L.len * 0.03 }; L.ps = []; L.last = now;
+    }
+    var dt = Math.min(60, now - L.last) * speed; L.last = now;
+    var s = clamp01((now - L.t0) / Math.max(1, L.t1 - L.t0)), e = Math.pow(s, L.pw || 1.3), pos = bez(L.p0, L.c, L.p1, e), R = u * 0.03 * Math.max(0.7, F.size) * 1.3, span = (u * 0.8 * F.trail) / L.len, q, f, tp, p;
+    for (q = 10; q >= 1; q--) {                                                      // a ribbon of dark smoke and violet glow behind the ball
+      f = q / 10; tp = bez(L.p0, L.c, L.p1, Math.max(0, e - f * span));
+      smokeDot(ctx, tp.x, tp.y, R * (1.4 + 1.2 * f), 0.24 * (1 - f));
+      glowDot(ctx, tp.x, tp.y, R * (1.2 * (1 - f) + 0.3), f < 0.5 ? DKC.bright : DKC.mid, Math.pow(1 - f, 1.4) * 0.4);
+    }
+    glowDot(ctx, pos.x, pos.y, R * 3.0, DKC.mid, 0.34); glowDot(ctx, pos.x, pos.y, R * 1.6, DKC.bright, 0.65); glowDot(ctx, pos.x, pos.y, R * 0.8, DKC.core, 0.95);
+    ctx.save(); ctx.fillStyle = "rgba(245,225,255,0.95)"; ctx.beginPath(); ctx.arc(pos.x, pos.y, R * 0.5, 0, 6.2832); ctx.fill(); ctx.restore();
+    for (j = 0; j < 3; j++) { a = (now - L.t0) * 0.012 * speed + j * 2.0944; crescentDraw(ctx, pos.x + Math.cos(a) * R * 2.1, pos.y + Math.sin(a) * R * 2.1, R * 0.7, a + 1.5708, 0.9); }   // three crescents orbit the ball
+    if (rnd() < 0.5 * dt / 16) L.ps.push({ x: pos.x, y: pos.y, vx: (rnd() - 0.5) * 0.06 * u / 1000, vy: (rnd() - 0.2) * 0.08 * u / 1000, age: 0, life: 350 + rnd() * 250, size: R * (0.18 + rnd() * 0.22) });   // ink drops
+    for (j = L.ps.length - 1; j >= 0; j--) {
+      p = L.ps[j]; p.age += dt; if (p.age >= p.life) { L.ps.splice(j, 1); continue; }
+      p.x += p.vx * dt; p.y += p.vy * dt; a = 1 - p.age / p.life;
+      ctx.save(); ctx.fillStyle = "rgba(24,10,48," + (0.9 * a).toFixed(3) + ")"; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill(); ctx.restore(); glowDot(ctx, p.x, p.y, p.size * 2, DKC.mid, 0.25 * a);
+    }
+  }
+  function dkImpact(T, F) {                                                          // the hit: a violet flash, ink blobs and crescents flung out, a dark pool with a ring on the ground, a short column of the painted dark twist (bigger for the Void Bolt)
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width / 2, cy = r.top + r.height * 0.42, gy = r.top + r.height * 0.97, rnd = rngOf(now | 0), B = F.big ? 1.5 : 1, ps = [], i, a, v;
+    shake(3 * F.shake * B, 200);
+    for (i = 0; i < Math.round(14 * B); i++) { a = rnd() * 6.2832; v = u * (0.3 + rnd() * 0.8) / 1000; ps.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 0.1 * u / 1000, age: 0, life: 520 + rnd() * 380, size: u * (0.012 + rnd() * 0.014), cres: false }); }
+    for (i = 0; i < Math.round(4 * B); i++) { a = -3.14159 * rnd(); v = u * (0.2 + rnd() * 0.4) / 1000; ps.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 700 + rnd() * 400, size: u * (0.02 + rnd() * 0.015), cres: true, rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.01 }); }
+    fxAdd({ t0: now, t1: now + 1300 * B / speed, draw: function (ctx, now2, L) {
+      var t = (now2 - now) * speed, dt = L.last ? Math.min(60, now2 - L.last) * speed : 0, e = 1 - Math.pow(1 - clamp01(t / 240), 2), j, p, f, al, rr;
+      L.last = now2;
+      if (t < 260) { al = 1 - t / 260; glowDot(ctx, cx, cy, u * (0.1 + 0.3 * e) * B, DKC.mid, 0.55 * al); glowDot(ctx, cx, cy, u * (0.06 + 0.2 * e) * B, DKC.bright, 0.8 * al); glowDot(ctx, cx, cy, u * (0.02 + 0.07 * e) * B, DKC.core, 0.95 * al); }
+      if (t < 100) flashAll(ctx, "205,170,255", 0.06 * B * (1 - t / 100));
+      ctx.save(); ctx.fillStyle = "rgba(20,8,40," + (0.5 * (1 - clamp01((t - 300) / 900))).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(cx, gy, u * 0.34 * (0.6 + 0.4 * e) * B, u * 0.06 * B, 0, 0, 6.2832); ctx.fill(); ctx.restore();      // the dark pool
+      rr = clamp01(t / 500); ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + DKC.bright + "," + (0.7 * (1 - rr)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.02 * (1 - rr) + 1);
+      ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.1 + 0.6 * (1 - Math.pow(1 - rr, 3))) * B, u * (0.1 + 0.6 * (1 - Math.pow(1 - rr, 3))) * 0.2 * B, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
+      if (t < 700) mfxTex(ctx, fbTex.dark_aura, cx, gy, u * 0.45 * B, u * 0.75 * B * e, 0.7 * (1 - clamp01(t / 700)), false);
+      for (j = ps.length - 1; j >= 0; j--) {
+        p = ps[j]; p.age += dt; if (p.age >= p.life) { ps.splice(j, 1); continue; }
+        f = p.age / p.life; p.vy += 0.0000035 * u * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        if (p.cres) { p.rot += p.spin * dt; crescentDraw(ctx, p.x, p.y, p.size, p.rot, Math.sin(f * 3.14159) * 0.9); }
+        else { ctx.save(); ctx.fillStyle = "rgba(24,10,48," + (0.9 * (1 - f)).toFixed(3) + ")"; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill(); ctx.restore(); glowDot(ctx, p.x, p.y, p.size * 2, DKC.mid, 0.3 * (1 - f)); }
+      }
+    } });
+  }
+  function eruptCrackDrawDk(ctx, cr, cx, gy, u, t, a, now) {                         // the dark cracks: the pattern's jagged lines as violet veins (a deep stroke, a violet stroke, a pale core), growing out from the middle, over a dark pool that spreads
+    var i, k, n, f, q, path, fl, S = [[0.016, DKC.deep, 0.4], [0.007, DKC.mid, 0.8], [0.003, DKC.core, 0.95]], z;
+    ctx.save(); ctx.fillStyle = "rgba(20,8,40," + (0.45 * a * Math.min(1, t * 1.6)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(cx, gy - u * 0.01, u * (0.2 + 0.45 * t), u * (0.04 + 0.07 * t), 0, 0, 6.2832); ctx.fill(); ctx.restore();
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineJoin = "round"; ctx.lineCap = "round";
+    for (i = 0; i < cr.length; i++) {
+      n = Math.min(cr[i].length - 1, t * (cr[i].length - 1)); k = Math.floor(n); path = cr[i].slice(0, k + 1);
+      if (k < cr[i].length - 1) { f = n - k; path.push([cr[i][k][0] + (cr[i][k + 1][0] - cr[i][k][0]) * f, cr[i][k][1] + (cr[i][k + 1][1] - cr[i][k][1]) * f]); }
+      if (path.length < 2) continue;
+      fl = 0.75 + 0.25 * Math.sin(now * 0.03 + i * 2.1);
+      for (z = 0; z < S.length; z++) {
+        ctx.strokeStyle = "rgba(" + S[z][1] + "," + Math.min(1, a * S[z][2] * fl).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * S[z][0]);
+        ctx.beginPath(); ctx.moveTo(cx + path[0][0], gy + path[0][1]); for (q = 1; q < path.length; q++) ctx.lineTo(cx + path[q][0], gy + path[q][1]); ctx.stroke();
+      }
+    }
+    ctx.restore();
+    glowEllipse(ctx, cx, gy, u * (0.2 + 0.4 * t), u * (0.05 + 0.08 * t), DKC.mid, 0.25 * a * t);
+  }
+  function eruptBlastDk(tE, cx, gy, u, F, geo) {                                     // the Abyssal Eruption: a flash, a COLUMN OF GLOOM (the painted dark twist stretched tall, two copies, with puffs of dark smoke climbing it), an ink geyser (blobs thrown up that fall back, crescents flung out), a dark pool, a ring
+    var rnd = rngOf((tE | 0) + 11), ps = [], i, a, v;
+    for (i = 0; i < 22; i++) { a = -Math.PI * (0.12 + rnd() * 0.76); v = u * (0.7 + rnd() * 1.4) / 1000; ps.push({ x: cx + (rnd() - 0.5) * u * 0.25, y: gy - u * 0.05, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 800 + rnd() * 600, size: u * (0.014 + rnd() * 0.018), cres: false }); }
+    for (i = 0; i < 6; i++) { a = -Math.PI * (0.1 + rnd() * 0.8); v = u * (0.4 + rnd() * 0.8) / 1000; ps.push({ x: cx, y: gy - u * 0.2, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 1100 + rnd() * 500, size: u * (0.025 + rnd() * 0.015), cres: true, rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.01 }); }
+    fxAdd({ t0: tE, t1: tE + 2100 / speed, draw: function (ctx, now, L) {
+      var t = (now - tE) * speed, dt = L.last ? Math.min(60, now - L.last) * speed : 0, rt = clamp01(t / 520), er = 1 - Math.pow(1 - rt, 3), rise = clamp01(t / 150), fall = clamp01((t - 420) / 600), H = u * 1.5 * (1 - Math.pow(1 - rise, 2)) * (1 - fall * fall), fk = 0.85 + 0.15 * Math.sin(now * 0.04), j, p, f, y;
+      L.last = now;
+      if (geo && t < 1000) eruptCrackDrawDk(ctx, geo, cx, gy, u, 1, 0.9 * (1 - clamp01((t - 150) / 850)), now);
+      if (t < 200) { glowDot(ctx, cx, gy - u * 0.2, u * (0.6 + 0.8 * t / 200), DKC.mid, 0.7 * (1 - t / 200)); glowDot(ctx, cx, gy - u * 0.2, u * (0.3 + 0.5 * t / 200), DKC.core, 0.9 * (1 - t / 200)); }
+      ctx.save(); ctx.fillStyle = "rgba(20,8,40," + (0.55 * (1 - clamp01((t - 700) / 1300))).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.3 + 0.35 * er), u * 0.07, 0, 0, 6.2832); ctx.fill(); ctx.restore();   // the dark pool, lingering
+      glowEllipse(ctx, cx, gy, u * (0.5 + 0.5 * clamp01(t / 300)), u * (0.12 + 0.06 * clamp01(t / 300)), DKC.mid, 0.4 * (1 - clamp01((t - 500) / 1500)));
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineWidth = Math.max(1.5, u * 0.02 * (1 - rt) + 1); ctx.strokeStyle = "rgba(" + DKC.bright + "," + (0.8 * (1 - rt)).toFixed(3) + ")";
+      ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.1 + 0.95 * er), u * (0.1 + 0.95 * er) * 0.2, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
+      if (H > 6) {                                                                   // the column: the painted dark twist stretched tall (two copies against each other) with smoke climbing it
+        mfxTex(ctx, fbTex.dark_aura, cx, gy, u * 0.85 * (1 - 0.3 * fall), H * 1.05, 0.95 * fk * (1 - fall * 0.8), false);
+        mfxTex(ctx, fbTex.dark_aura, cx, gy, u * 0.65 * (1 - 0.3 * fall), H * 0.95, 0.6 * (1.1 - fk) * 3 * (1 - fall * 0.8), true);
+        for (j = 0; j < 8; j++) { y = gy - H * (j / 7) * (0.9 + 0.1 * Math.sin(now * 0.01 + j)); smokeDot(ctx, cx + Math.sin(now * 0.012 + j * 1.3) * u * 0.05, y, u * (0.1 + 0.06 * j / 7), 0.3 * (1 - fall * 0.7)); }
+      }
+      for (j = ps.length - 1; j >= 0; j--) {
+        p = ps[j]; p.age += dt; if (p.age >= p.life) { ps.splice(j, 1); continue; }
+        f = p.age / p.life; p.vy += 0.0000045 * u * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        if (p.cres) { p.rot += p.spin * dt; crescentDraw(ctx, p.x, p.y, p.size, p.rot, Math.sin(f * 3.14159) * 0.9); }
+        else { ctx.save(); ctx.fillStyle = "rgba(24,10,48," + (0.9 * (1 - f * f)).toFixed(3) + ")"; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.2832); ctx.fill(); ctx.restore(); glowDot(ctx, p.x, p.y, p.size * 2, DKC.mid, 0.3 * (1 - f)); }
+      }
+    } });
+  }
   function monMouth(frame) {                                                         // the glowing mouth on an attack frame (numbered from 1) in stage px; null when the strip has no mark for that frame
     var m = MONSTERS[monKey], pk = m && m.attackPack, mk = pk && pk.mouth && pk.mouth.mouth && pk.mouth.mouth[frame];
     if (!mk || !monEl) return null;
@@ -5787,6 +5889,7 @@
     var r = rectIn(uG), s = r.width * (+uG.style.getPropertyValue("--ms") || 1), rnd = MFX.rnd, x = mp ? mp.x : r.left + r.width * 0.4, y = mp ? mp.y : r.top + r.height * 0.6, n;
     MFX.flare = 1;
     if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning") { lightBurst(s, x, y + 0.25 * s, rnd); return; }
+    if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark") { darkBurst(s, x, y + 0.25 * s, rnd); return; }
     if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice") {
       for (n = 0; n < 12; n++) MFX.ps.push({ kind: "chip", x: x, y: y, vx: (-0.0004 - rnd() * 0.0012) * s, vy: (rnd() - 0.7) * 0.0010 * s, age: 0, life: 550 + rnd() * 500, size: Math.max(2, s * (0.012 + rnd() * 0.01)), rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.02 });
       return;
@@ -5815,7 +5918,7 @@
     fbParticles(ctx, L.ps, dt, F, u);
   }
   async function spitAct(e, myRun, A, T) {
-    var elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), cin = !!e.cinder, pk = monSpitPack(), F = cin && elec ? lightChainParams() : cin ? (ice ? lanceSpitParams() : cinderParams()) : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, i, starts = [], tot = 0, pv = !!e.preview;
+    var dark = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark"), elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), cin = !!e.cinder, pk = monSpitPack(), F = cin && dark ? darkChainParams() : dark ? darkSpitParams() : cin && elec ? lightChainParams() : cin ? (ice ? lanceSpitParams() : cinderParams()) : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, i, starts = [], tot = 0, pv = !!e.preview;
     var holds = cin ? CIN_HOLDS : pk.holds;
     for (i = 0; i < n; i++) { starts.push(tot); tot += fm * (holds[i] || 1); }
     var t0 = performance.now(), tRel = t0 + starts[SPIT_REL - 1] + fm * (holds[SPIT_REL - 1] || 1) * (cin ? CIN_REL : 0.2), seed = t0 | 0;
@@ -5831,13 +5934,13 @@
     }
     var ready = monPlayPack(pk, myRun, null, cin ? CIN_HOLDS : null);
     fxAdd({ t0: t0 + starts[2], t1: tRel + 260 / speed, tRel: tRel, rnd: rngOf(seed + 3), ps: [], draw: function (ctx, now, L) { spitChargeDraw(ctx, now, L, F, u); } });
-    fxAdd({ t0: tRel, t1: tRel + flight2, T: T, rnd: rngOf(seed + 7), to: to, head: cin && !ice ? cbCore : undefined, headDraw: cin && ice ? lanceHeadDraw(F, u) : undefined, pw: ice || elec ? 1.3 : undefined,
+    fxAdd({ t0: tRel, t1: tRel + flight2, T: T, rnd: rngOf(seed + 7), to: to, head: cin && !ice ? cbCore : undefined, headDraw: cin && ice ? lanceHeadDraw(F, u) : undefined, pw: ice || elec || dark ? 1.3 : undefined,
       from: function () { var mp = monMouth(SPIT_REL), r = rectIn(uG); monFxBurst(mp); return mp || { x: r.left + r.width * 0.35, y: r.top + r.height * 0.6 }; },
-      draw: function (ctx, now, L) { if (elec) ltBoltDraw(ctx, now, L, F, u); else if (ice) icBoltDraw(ctx, now, L, F, u); else fbBoltDraw(ctx, now, L, F, u); } });
+      draw: function (ctx, now, L) { if (dark) dkBoltDraw(ctx, now, L, F, u); else if (elec) ltBoltDraw(ctx, now, L, F, u); else if (ice) icBoltDraw(ctx, now, L, F, u); else fbBoltDraw(ctx, now, L, F, u); } });
     await bsWait(tImp);
     if (myRun !== run) return;
     if (e.dodge) {
-      if (!pv) { say(A.name + (cin ? (elec ? " hurls a Chain Bolt, but " : ice ? " hurls a Glacial Lance, but " : " hurls a Cinder Burst, but ") : elec ? " spits a spark ball, but " : ice ? " spits an ice shard, but " : " spits an ember, but ") + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
+      if (!pv) { say(A.name + (cin ? (dark ? " hurls a Void Bolt, but " : elec ? " hurls a Chain Bolt, but " : ice ? " hurls a Glacial Lance, but " : " hurls a Cinder Burst, but ") : dark ? " spits a ball of gloom, but " : elec ? " spits a spark ball, but " : ice ? " spits an ice shard, but " : " spits an ember, but ") + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
       if (dodgeRun) await dodgeRun;
       else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
     } else {
@@ -5845,6 +5948,9 @@
       if (cin && ice) {                                                              // the lance: x1.7, a guaranteed critical on a Chilled target
         amount = Math.round(e.amount * LANCE_DMG);
         if (T.chilled) { lanceState = "chilled"; amount = Math.round(amount * 1.5); bonus = " (guaranteed critical on the chilled target)"; }
+      } else if (cin && dark) {                                                      // the void bolt: x1.7, a guaranteed critical on a target whose Magic Def is reduced (and the ward breaks)
+        amount = Math.round(e.amount * LANCE_DMG);
+        if (T.magDef) { lanceState = "weakened"; amount = Math.round(amount * 1.5); bonus = " (guaranteed critical on the weakened target)"; }
       } else if (cin && elec) {                                                      // the chain bolt: x1.7, a guaranteed critical on a Shocked target (and it discharges the shock)
         amount = Math.round(e.amount * LANCE_DMG);
         if (T.shocked) { lanceState = "shocked"; amount = Math.round(amount * 1.5); bonus = " (guaranteed critical on the shocked target)"; }
@@ -5858,17 +5964,22 @@
         if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
       }
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
-      if (elec) ltImpact(T, F); else if (cin && ice) slImpact(T, F, lanceState, null); else if (cin) cbImpact(T, F, burnN); else if (ice) icImpact(T, F); else fbImpact(T, F);
+      if (dark) dkImpact(T, F); else if (elec) ltImpact(T, F); else if (cin && ice) slImpact(T, F, lanceState, null); else if (cin) cbImpact(T, F, burnN); else if (ice) icImpact(T, F); else fbImpact(T, F);
       if (!pv) {
-        floatNumber(T, (e.crit ? "CRIT " : "") + amount, elec ? "bolt" : ice ? "ice" : "fire");
-        say(A.name + (cin ? (elec ? " hurls a Chain Bolt at " : ice ? " hurls a Glacial Lance at " : " hurls a Cinder Burst at ") : elec ? " spits a spark ball at " : ice ? " spits an ice shard at " : " spits an ember at ") + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + bonus + ".", "g");
+        floatNumber(T, (e.crit ? "CRIT " : "") + amount, dark ? "dark" : elec ? "bolt" : ice ? "ice" : "fire");
+        say(A.name + (cin ? (dark ? " hurls a Void Bolt at " : elec ? " hurls a Chain Bolt at " : ice ? " hurls a Glacial Lance at " : " hurls a Cinder Burst at ") : dark ? " spits a ball of gloom at " : elec ? " spits a spark ball at " : ice ? " spits an ice shard at " : " spits an ember at ") + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + bonus + ".", "g");
       }
       if (cin && ice) {
         if (lanceState === "chilled") { clearChilled(T); if (!pv) say("The chill on " + T.name + " shatters.", "sys"); }
+      } else if (cin && dark) {
+        if (lanceState === "weakened") { clearWard(T); if (!pv) say("The ward-break on " + T.name + " is consumed.", "sys"); }
       } else if (cin && elec) {
         if (lanceState === "shocked") { clearShocked(T); if (!pv) say("The shock on " + T.name + " discharges.", "sys"); }
       } else if (cin) {
         if (burnN) { clearBurn(T); if (!pv) say("The burn" + (burnN > 1 ? "s" : "") + " on " + T.name + " detonate" + (burnN > 1 ? "" : "s") + ".", "sys"); }
+      } else if (dark) {
+        var weak = T.hp > 0 && ($("spitBurn").checked || (!pv && Math.random() < DK_WEAK));
+        if (weak) { applyWard(T, 2); if (!pv) say(T.name + "'s magic defence is reduced for 2 turns.", "sys"); }
       } else if (elec) {
         var shock = T.hp > 0 && ($("spitBurn").checked || (!pv && Math.random() < LT_SHOCK));
         if (shock) { applyShocked(T, 2); if (!pv) say(T.name + " is shocked for 2 turns.", "sys"); }
@@ -5880,7 +5991,7 @@
         if (burn) { applyBurn(T, (T.burn ? T.burn.stacks : 0) + 1); if (!pv) say(T.name + " is set ablaze (Burn x" + T.burn.stacks + ", " + BURN_TURNS + " turns).", "sys"); }
       }
       await Promise.all([
-        anim(T.unit.querySelector(".sprite"), elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, cin ? 460 : 340),
+        anim(T.unit.querySelector(".sprite"), dark ? DARK_SHOCK : elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, cin ? 460 : 340),
         anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * (cin ? 18 : 10)) + "px)" }, { transform: "translateX(" + (-A.dir * (cin ? 11 : 6)) + "px)" }, { transform: "translateX(0)" }], 240),
         sleep(cin ? 420 : 300)
       ]);
@@ -5912,6 +6023,7 @@
         if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W);
         if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W);
         if (FIGHTERS.W.shocked) clearShocked(FIGHTERS.W);
+    if (FIGHTERS.W.magDef) clearWard(FIGHTERS.W);
         await sleep(700);
       }
     } finally { btn.classList.remove("on"); }
@@ -6158,13 +6270,14 @@
     }
   }
   monPrevLoop($("monPrevCinder"), async function (my) {                               // the warrior burns (two stacks) for a moment, then the Cinder Burst pops them
-    if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning") applyShocked(FIGHTERS.W, 3); else if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice") applyChilled(FIGHTERS.W, 3); else applyBurn(FIGHTERS.W, 2);
+    if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark") applyWard(FIGHTERS.W, 3); else if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning") applyShocked(FIGHTERS.W, 3); else if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice") applyChilled(FIGHTERS.W, 3); else applyBurn(FIGHTERS.W, 2);
     await sleep(900);
     if (my !== run) return;
     await spitAct({ actor: "G", amount: 0, preview: true, cinder: true }, my, FIGHTERS.G, FIGHTERS.W);
     if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W);
     if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W);
     if (FIGHTERS.W.shocked) clearShocked(FIGHTERS.W);
+    if (FIGHTERS.W.magDef) clearWard(FIGHTERS.W);
   });
   monPrevLoop($("monPrevSlam"), async function (my) { await slamAct({ actor: "G", amount: 0, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
   // ---------------------------------------------------------------- the fire slime's Magma Eruption (2026-11-08)
@@ -6181,7 +6294,7 @@
   var ERUPT_SEQ_ICE = { shrink: [0, 1, 2, 3], shrinkH: [1.6, 1, 1, 1.2], dieT: [0.7, 0.45, 0.25, 0.1], shS: [1, 1, 0.55, 0.28], reform: [3, 2, 4, 5, 6], reformH: [1.4, 1, 1.2, 1.2, 1.8], reDie: [0.2, 0.4, 0.6, 0.85, 1], reShS: [0.28, 0.55, 0.62, 0.9, 1] };
   var ERUPT_SHRINK = ERUPT_SEQ_FIRE.shrink, ERUPT_SHRINK_H = ERUPT_SEQ_FIRE.shrinkH, ERUPT_REFORM = ERUPT_SEQ_FIRE.reform, ERUPT_REFORM_H = ERUPT_SEQ_FIRE.reformH;
   function eruptTrail(t0, t1, u, ice) {                                              // the core's trail of lava glows along the ground and a few embers (the ice: cold glows)
-    var pts = [], ps = [], rnd = rngOf(t0 | 0), F = ice ? iceSpitParams() : spitParams();
+    var pts = [], ps = [], rnd = rngOf(t0 | 0), F = ice ? iceSpitParams() : spitParams(); if (ice === "dark") F.pal = DK_PAL;
     fxAdd({ t0: t0, t1: t1 + 520 / speed, draw: function (ctx, now, L) {
       var dt = L.last ? Math.min(60, now - L.last) * speed : 0, i, p, age, r, gy;
       L.last = now;
@@ -6193,8 +6306,8 @@
       while (pts.length && (now - pts[0].t) * speed > 520) pts.shift();
       for (i = 0; i < pts.length; i++) {
         p = pts[i]; age = clamp01((now - p.t) * speed / 520);
-        glowEllipse(ctx, p.x, p.gy, u * (0.13 - 0.05 * age), u * 0.032, ice ? "150,215,255" : "255,100,25", 0.5 * (1 - age));
-        if (i % 3 === 0) glowEllipse(ctx, p.x, p.gy, u * 0.06, u * 0.015, ice ? "235,248,255" : "255,220,150", 0.5 * (1 - age));
+        glowEllipse(ctx, p.x, p.gy, u * (0.13 - 0.05 * age), u * 0.032, ice === "dark" ? DKC.mid : ice ? "150,215,255" : "255,100,25", 0.5 * (1 - age));
+        if (i % 3 === 0) glowEllipse(ctx, p.x, p.gy, u * 0.06, u * 0.015, ice === "dark" ? DKC.core : ice ? "235,248,255" : "255,220,150", 0.5 * (1 - age));
       }
       fbParticles(ctx, ps, dt, F, u);
     } });
@@ -6289,12 +6402,13 @@
     shake(2.5, ERUPT_WARN);
     fxAdd({ t0: t0, t1: t1 + 40, draw: function (ctx, now) {
       var t = clamp01((now - t0) * speed / ERUPT_WARN), pul = 0.8 + 0.2 * Math.sin(now * 0.04), c, q;
-      glowEllipse(ctx, cx, gy, u * (0.2 + 0.5 * t), u * (0.05 + 0.1 * t), ice ? "150,215,255" : "255,90,20", (0.15 + 0.5 * t) * pul);
-      (ice === "elec" ? eruptCrackDrawLt : ice ? eruptCrackDrawIce : eruptCrackDraw)(ctx, cr, cx, gy, u, t, 1, now);
-      for (c = 0; c < cr.length; c += 2) { q = cr[c][Math.min(cr[c].length - 1, Math.floor(t * (cr[c].length - 1)))]; glowDot(ctx, cx + q[0], gy + q[1] - u * 0.03 * t * (1 + Math.sin(now * 0.02 + c)), u * 0.02, ice ? "235,248,255" : "255,220,150", 0.7 * t); }
+      glowEllipse(ctx, cx, gy, u * (0.2 + 0.5 * t), u * (0.05 + 0.1 * t), ice === "dark" ? DKC.mid : ice ? "150,215,255" : "255,90,20", (0.15 + 0.5 * t) * pul);
+      (ice === "dark" ? eruptCrackDrawDk : ice === "elec" ? eruptCrackDrawLt : ice ? eruptCrackDrawIce : eruptCrackDraw)(ctx, cr, cx, gy, u, t, 1, now);
+      for (c = 0; c < cr.length; c += 2) { q = cr[c][Math.min(cr[c].length - 1, Math.floor(t * (cr[c].length - 1)))]; glowDot(ctx, cx + q[0], gy + q[1] - u * 0.03 * t * (1 + Math.sin(now * 0.02 + c)), u * 0.02, ice === "dark" ? DKC.core : ice ? "235,248,255" : "255,220,150", 0.7 * t); }
     } });
   }
   function eruptBlast(tE, cx, gy, u, F, geo, ice) {                                       // the eruption itself
+    if (ice === "dark") return eruptBlastDk(tE, cx, gy, u, F, geo);
     if (ice === "elec") return eruptBlastLt(tE, cx, gy, u, F, geo);
     if (ice) return eruptBlastIce(tE, cx, gy, u, F, geo);
     var rnd = rngOf((tE | 0) + 11), rocks = [], ps = [], i, G = u * 0.000019;
@@ -6337,23 +6451,23 @@
     } });
   }
   function eruptEmber(t0, dur, from, to, u, ice) {                                   // the slime's core, a glowing ember (the ice: a cold orb), arcs from the crater back home
-    var ps = [], rnd = rngOf(t0 | 0), F = ice ? iceSpitParams() : spitParams();
+    var ps = [], rnd = rngOf(t0 | 0), F = ice ? iceSpitParams() : spitParams(); if (ice === "dark") F.pal = DK_PAL;
     fxAdd({ t0: t0, t1: t0 + dur + 260 / speed, draw: function (ctx, now, L) {
       var s = clamp01((now - t0) / dur), dt = L.last ? Math.min(60, now - L.last) * speed : 0, x, y, e = s * s * (3 - 2 * s);
       L.last = now;
       if (now >= t0) {
         x = from.x + (to.x - from.x) * e; y = from.y + (to.y - from.y) * e - Math.sin(s * Math.PI) * u * 0.9;
         if (s < 1) {
-          glowDot(ctx, x, y, u * 0.08, ice ? "150,215,255" : "255,150,40", 0.8); glowDot(ctx, x, y, u * 0.035, ice ? "235,248,255" : "255,240,190", 0.95);
+          glowDot(ctx, x, y, u * 0.08, ice === "dark" ? DKC.mid : ice ? "150,215,255" : "255,150,40", 0.8); glowDot(ctx, x, y, u * 0.035, ice === "dark" ? DKC.core : ice ? "235,248,255" : "255,240,190", 0.95);
           if (rnd() < 0.7) fbParticle(ps, x, y, (rnd() - 0.5) * 0.04 * u / 1000, (rnd() - 0.2) * 0.05 * u / 1000, 260 + rnd() * 240, u * 0.011, "ember");
-        } else glowDot(ctx, to.x, to.y, u * (0.1 + 0.15 * (now - t0 - dur) * speed / 260), ice ? "200,235,255" : "255,200,110", 0.6 * (1 - clamp01((now - t0 - dur) * speed / 260)));
+        } else glowDot(ctx, to.x, to.y, u * (0.1 + 0.15 * (now - t0 - dur) * speed / 260), ice === "dark" ? DKC.bright : ice ? "200,235,255" : "255,200,110", 0.6 * (1 - clamp01((now - t0 - dur) * speed / 260)));
       }
       fbParticles(ctx, ps, dt, F, u);
     } });
   }
   async function eruptAct(e, myRun, A, T) {
-    var elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), cold = elec ? "elec" : ice, SEQ = elec ? ERUPT_SEQ_LT : ice ? ERUPT_SEQ_ICE : ERUPT_SEQ_FIRE;
-    var pk = monPackOf("eruption"), F = elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, fm = 1000 / pk.fps / speed, pv = !!e.preview, el = monEl, i, starts = [], tot = 0;
+    var dark = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark"), elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), cold = dark ? "dark" : elec ? "elec" : ice, SEQ = dark ? ERUPT_SEQ_DK : elec ? ERUPT_SEQ_LT : ice ? ERUPT_SEQ_ICE : ERUPT_SEQ_FIRE;
+    var pk = monPackOf("eruption"), F = dark ? darkSpitParams() : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, fm = 1000 / pk.fps / speed, pv = !!e.preview, el = monEl, i, starts = [], tot = 0;
     for (i = 0; i < SEQ.shrink.length; i++) { starts.push(tot); tot += fm * SEQ.shrinkH[i]; }
     var t0 = performance.now(), tSlide = t0 + starts[3], a = centerOf(A.unit), t = centerOf(T.unit), full = t.x - a.x, dodgeRun = null, launched = null;
     try {
@@ -6393,7 +6507,7 @@
       eruptEmber(tEm, emDur, { x: cx, y: gy - u * 0.15 }, { x: hx, y: hy }, u, cold);
       var amount = Math.round((e.amount || 0) * ERUPT_DMG);
       if (e.dodge) {
-        if (!pv) { say(A.name + (elec ? " strikes up under " : ice ? " bursts up under " : " erupts under ") + T.name + ", but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
+        if (!pv) { say(A.name + (dark ? " rises under " : elec ? " strikes up under " : ice ? " bursts up under " : " erupts under ") + T.name + ", but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
         launched = dodgeRun || sleep(500);
       } else {
         if (!pv) {
@@ -6403,15 +6517,16 @@
         }
         if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
         if (!pv) {
-          floatNumber(T, (e.crit ? "CRIT " : "") + amount, elec ? "bolt" : ice ? "ice" : "fire");
-          say(A.name + (elec ? " strikes up under " : ice ? " bursts up under " : " erupts under ") + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + (elec ? " (Voltaic Eruption)." : ice ? " (Permafrost Eruption)." : " (Magma Eruption)."), "g");
+          floatNumber(T, (e.crit ? "CRIT " : "") + amount, dark ? "dark" : elec ? "bolt" : ice ? "ice" : "fire");
+          say(A.name + (dark ? " rises under " : elec ? " strikes up under " : ice ? " bursts up under " : " erupts under ") + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + (dark ? " (Abyssal Eruption)." : elec ? " (Voltaic Eruption)." : ice ? " (Permafrost Eruption)." : " (Magma Eruption)."), "g");
         }
-        if (elec) { if (T.hp > 0) { applyShocked(T, 2); if (!pv) say(T.name + " is shocked for 2 turns.", "sys"); } }
+        if (dark) { if (T.hp > 0) { applyWard(T, 2); if (!pv) say(T.name + "'s magic defence is reduced for 2 turns.", "sys"); } }
+        else if (elec) { if (T.hp > 0) { applyShocked(T, 2); if (!pv) say(T.name + " is shocked for 2 turns.", "sys"); } }
         else if (ice) { if (T.hp > 0) { applyChilled(T, 2); if (!pv) say(T.name + " is chilled for 2 turns.", "sys"); } }
         else if (T.hp > 0) { applyBurn(T, (T.burn ? T.burn.stacks : 0) + ERUPT_BURN); if (!pv) say(T.name + " is set ablaze (Burn x" + T.burn.stacks + ", " + BURN_TURNS + " turns).", "sys"); }
         var H = u * 0.8;
         launched = Promise.all([                                                                                      // he is thrown up and falls back (no stun)
-          anim(T.unit.querySelector(".sprite"), elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, 460),
+          anim(T.unit.querySelector(".sprite"), dark ? DARK_SHOCK : elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, 460),
           anim(T.unit, [{ transform: "translateY(0px)", easing: "cubic-bezier(.15,.75,.3,1)" }, { transform: "translateY(" + (-H) + "px)", offset: 0.42, easing: "cubic-bezier(.75,0,.95,.5)" }, { transform: "translateY(0px)" }], 950),
           sleep(950)
         ]);
@@ -6470,7 +6585,7 @@
       glowDot(ctx, cx, 2, u * (0.15 + 0.55 * t), ice ? "170,225,255" : "255,150,50", (0.25 + 0.55 * t) * pul);   // the glow at the top edge
       for (j = 0; j < sparks.length; j++) {                                                                     // sparks falling from the top edge, more and faster as it nears
         sy = ((now * 0.0006 * speed * sparks[j].sp * (1 + 2 * t) + sparks[j].ph) % 1) * u * 1.6 * (0.3 + 0.7 * t);
-        glowDot(ctx, sparks[j].x, sy, u * 0.012, ice ? "235,248,255" : "255,220,150", 0.8 * t);
+        glowDot(ctx, sparks[j].x, sy, u * 0.012, ice === "dark" ? DKC.core : ice ? "235,248,255" : "255,220,150", 0.8 * t);
       }
     } });
   }

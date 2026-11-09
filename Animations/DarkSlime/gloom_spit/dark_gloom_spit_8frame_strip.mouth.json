@@ -1,0 +1,26 @@
+{
+ "note": "the orb of dark energy in the mouth on frames 4 and 5 and the open mouth on frame 6 (centre and size in the 512 cell, before the page mirrors the sprite): the spit leaves the mouth at the release frame 5",
+ "mouth": {
+  "4": {
+   "area": 888,
+   "x": 305.2,
+   "y": 369.5,
+   "w": 33,
+   "h": 34
+  },
+  "5": {
+   "area": 1487,
+   "x": 355.3,
+   "y": 352.8,
+   "w": 46,
+   "h": 47
+  },
+  "6": {
+   "area": 6031,
+   "x": 378.8,
+   "y": 359.1,
+   "w": 122,
+   "h": 106
+  }
+ }
+}

@@ -1,0 +1,66 @@
+{
+ "format": "frame-placement/1",
+ "animation": "gloom_spit",
+ "file": "dark_gloom_spit_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 68,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 79,
+   "bottom": 469,
+   "baseW": 348.2,
+   "sizeAgainstIdle": 0.995
+  },
+  {
+   "lift": 0.0,
+   "top": 83,
+   "bottom": 468,
+   "baseW": 347.0,
+   "sizeAgainstIdle": 0.992
+  },
+  {
+   "lift": 0.0,
+   "top": 76,
+   "bottom": 469,
+   "baseW": 347.0,
+   "sizeAgainstIdle": 0.992
+  },
+  {
+   "lift": 0.0,
+   "top": 91,
+   "bottom": 470,
+   "baseW": 322.4,
+   "sizeAgainstIdle": 0.921
+  },
+  {
+   "lift": 0.0,
+   "top": 117,
+   "bottom": 470,
+   "baseW": 363.2,
+   "sizeAgainstIdle": 1.038
+  },
+  {
+   "lift": 0.0,
+   "top": 71,
+   "bottom": 469,
+   "baseW": 348.9,
+   "sizeAgainstIdle": 0.997
+  },
+  {
+   "lift": 0.0,
+   "top": 70,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ],
+ "hitFrame": 5
+}

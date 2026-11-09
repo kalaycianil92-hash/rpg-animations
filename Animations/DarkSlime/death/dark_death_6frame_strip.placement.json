@@ -1,0 +1,51 @@
+{
+ "format": "frame-placement/1",
+ "animation": "death",
+ "file": "dark_death_6frame_strip.png",
+ "frames": 6,
+ "fps": 8,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 89,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 100,
+   "bottom": 468,
+   "baseW": 382.5,
+   "sizeAgainstIdle": 1.093
+  },
+  {
+   "lift": 0.0,
+   "top": 124,
+   "bottom": 469,
+   "baseW": 399.7,
+   "sizeAgainstIdle": 1.142
+  },
+  {
+   "lift": 0.0,
+   "top": 158,
+   "bottom": 468,
+   "baseW": 465.3,
+   "sizeAgainstIdle": 1.33
+  },
+  {
+   "lift": 0.0,
+   "top": 250,
+   "bottom": 469,
+   "baseW": 472.2,
+   "sizeAgainstIdle": 1.349
+  },
+  {
+   "lift": 0.0,
+   "top": 347,
+   "bottom": 469,
+   "baseW": 398.0,
+   "sizeAgainstIdle": 1.137
+  }
+ ]
+}

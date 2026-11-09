@@ -1,0 +1,71 @@
+{
+ "format": "frame-placement/1",
+ "animation": "dodge",
+ "file": "dark_dodge_6frame_strip.png",
+ "frames": 6,
+ "fps": 14,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 88,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 181,
+   "bottom": 470,
+   "baseW": 379.8,
+   "sizeAgainstIdle": 1.085
+  },
+  {
+   "lift": -1.4,
+   "top": 73,
+   "bottom": 471,
+   "baseW": 257.0,
+   "sizeAgainstIdle": 0.734
+  },
+  {
+   "lift": 73.0,
+   "top": 57,
+   "bottom": 396,
+   "baseW": 265.1,
+   "sizeAgainstIdle": 0.757
+  },
+  {
+   "lift": 0.0,
+   "top": 184,
+   "bottom": 469,
+   "baseW": 432.1,
+   "sizeAgainstIdle": 1.235
+  },
+  {
+   "lift": 0.0,
+   "top": 80,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ],
+ "evadeFrame": 4,
+ "smooth": true,
+ "xUnit": "character-widths",
+ "x": [
+  0,
+  -0.03,
+  -0.09,
+  -0.15,
+  -0.1,
+  -0.03
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "note": "The dark slime's dodge path: the ice slime's (a short hop AWAY from the enemy, then back home). evadeFrame 4: the top of the hop."
+}
