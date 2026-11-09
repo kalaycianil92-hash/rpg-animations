@@ -1,0 +1,55 @@
+DARK SLIME: THE LOOK (the reference picture, step 1). Written 2026-11-09, after the lightning slime was finished (5 skills, painted effects).
+
+WHY. Every slime of the game is the same creature in another element, so the dark slime is the fire, ice and lightning slimes' SHADOW TWIN: the same dome, skirt, face construction, view, size and painting style (matte, thin dark outline), so that the animations of the other slimes can be redrawn frame by frame and every timing, path and hit frame of the page can be reused. What changes is the material and the element's own crisp parts: the crown of flames / crystals / bolt spikes becomes a crown of tall CURLING TENDRILS of dark smoke drawn as SOLID, hard-edged shapes, the embers / ice chips / bolts become solid black ink blobs, the body becomes matte deep-violet jelly with black spiral swirls. The user's own dark slime (the second attached picture) shows what it is made of; its soft smoke clouds and soft violet glow are NOT wanted in the picture (they cannot be cut out cleanly); the page adds the smoke, the dark mist and the glow later as layers, exactly as it did for the fire, ice and lightning slimes.
+
+THE ONE COLOUR OF THE ELEMENT: deep violet, the colour of the dark aura picture of the game (a violet-magenta wisp on black). Body mid-dark violet, black-indigo swirls, bright violet-pink only in the eyes.
+
+BACKGROUND IS GREEN THIS TIME (important). The previous slimes were drawn on magenta (#FF00FF). The dark slime is violet, and violet is partly magenta, so a magenta background would eat its edges. This one is drawn on flat pure GREEN (#00FF00); nothing on the creature may be green, yellow-green or teal.
+
+HOW TO USE
+- Attach TWO images, in this order:
+  1. Animations/Slime/reference_image.png (the fire slime: the DESIGN, POSE, VIEW, SIZE and PAINTING STYLE to keep exactly).
+  2. Animations/Slime/source/variants/dark_slime_x3.png (the user's dark slime concept: only for its violet, its black spiral swirls and its glowing violet eyes).
+  Ask for a wide image (16:9 or 3:2), as large as it will give you (the lightning slime's came as 2752 x 1536 and was fine). Paste everything between the two lines of equals signs. Gemini (the earlier looks came from Gemini); generate several and keep the best.
+- Save the best in inbox/ (for example inbox/slime_dark_reference.jpg) and tell me. If it is right it becomes `Animations/DarkSlime/reference_image.png`.
+- What I check: (1) the SAME construction as the fire slime: dome wider than tall, wavy skirt base, the face in the same place and size with the same brows, eyes and wavy grimace, the swirls where the pockets were, the three-quarter view turned to the right, same size and position, centred with 10% margin; (2) it is DARK: matte deep-violet jelly (not black, not pale lilac, not pink), black-indigo spiral swirls, a crown of tall curling tendrils where the flames were and a curl on each side where the side flames were, solid black ink blobs instead of embers, bright violet-pink glowing pupils; no orange, red, yellow, green or blue anywhere; (3) the outline is thin and near-black indigo, the body matte (not glossy plastic), hand-painted like the fire slime; (4) crisp opaque edges and NO smoke clouds, mist, haze, soft glow, halo, blur, see-through parts or light spilling onto the green; (5) the tendrils look like curls of smoke but are SOLID and hard-edged, so the cut-out keeps them; (6) one image, no GIF.
+- What happens next: the idle sheet is written from the lightning slime's idle prompt ("same panels, same poses, dark slime instead"), cut with a GREEN key (my cutter keys magenta today: I add the green version when the first sheet arrives), then the other animations and the five skills with the dark aura and violet effects.
+- Known risks: it draws the concept's soft smoke clouds and glow round the body (the reply below), it keeps the orange or turns blue, it makes the body black or too light, it paints the background magenta or grey, it redraws the creature as a different shape.
+
+==============================================================================
+OUTPUT: exactly ONE still image, and nothing else. Do NOT create a GIF, an animation, extra images or alternate versions.
+
+TASK: redraw the creature of the FIRST attached image (the fire slime) as a DARK slime. Keep the DESIGN, POSE, VIEW, SIZE and PAINTING STYLE of the first image exactly; change only what it is made of, using the SECOND attached image (a dark slime concept) only for what the dark element looks like (deep violet jelly, black spiral swirls, glowing violet eyes). Do NOT copy the concept's soft smoke clouds, its soft glow, its black floating dots' blur or its grey background.
+
+KEEP EXACTLY (from the first image): the same creature construction: a low dome wider than tall, with a flat wavy skirt-like base that spreads on the floor in soft scallops; the same face construction in the same place and size: heavy slanted brows with a wrinkled forehead, two narrow slanted eyes, a wavy grimace with two small bumps at the corners; the same three-quarter view turned about 30 degrees towards the RIGHT edge of the picture; the same proportions; the same size and position in the picture, centred, with at least 10% empty margin on every side. No arms, no legs, no ears, no horns, no teeth, no tongue. The same MATTE hand-painted style as the first image: a thin dark outline of slightly varying weight, a fine grain on the surface, soft painterly shading, light from the upper left with a gentle rim light on the right edge, NO glossy plastic shine, no wet look.
+
+CHANGE TO DARK:
+- BODY: instead of molten orange-red jelly, matte DEEP-VIOLET jelly (a mid-dark violet like #4A2C8F, shadows towards the base and on the lower left in dark indigo-violet like #2D1B5E, the lightest tone only in small soft highlights of a lighter violet like #7A4FD0). Dark, but clearly violet: not black, not grey, not pale lilac, not pink.
+- SWIRLS: the rounded pockets (blisters) become BLACK-INDIGO SPIRAL SWIRLS (#150B2B), like painted spirals of ink on the jelly (as in the second image), in the same places and about the same sizes as the pockets; a few small black dots between them. Hard-edged, flat, opaque.
+- THE CROWN: instead of the crown of tall flames on top of the head, a crown of tall CURLING TENDRILS of dark smoke, drawn as SOLID hard-edged shapes (like an inked smoke curl, not a cloud): deep violet with a darker black-indigo core and a thin lighter-violet rim light on the edges facing the upper left, the same thin dark outline as the body. One tall tendril in the place of the tallest flame (leaning back a little, curling over at its tip), four or five shorter ones beside it of different heights, the whole crown rising about as high as the flame crown did. Instead of the flame tongue on each side of the body, a curling tendril growing out of each side (the left one longer). Fully opaque, no soft edges, no transparency.
+- FLOATING BITS: instead of the floating embers, a few SOLID black ink blobs (round and teardrop shapes with a thin lighter-violet rim light, hard-edged) and two or three tiny solid violet diamond shards floating around and above the crown: about the same number and places as the embers (six to ten). Every one crisp and opaque.
+- FACE: the same face construction, but sinister: the pupils are GLOWING bright violet-pink (core #F0C8FF, ring #C060FF), with a thin violet rim light inside the narrow eye shapes; the brows heavy and dark, the mouth the same wavy grimace in black-indigo.
+- OUTLINE: thin (the same weight as the first image's), NEAR-BLACK INDIGO (about #0E0820), never pure black and never light.
+- COLOUR: deep violet, black-indigo, lighter violet highlights, bright violet-pink only in the pupils. NO orange, red, yellow, green, teal or blue anywhere on the creature. No pink body.
+
+STILL TRUE (so the picture can be cut out): every edge is crisp, hard and opaque. NO smoke clouds, NO mist, NO haze, NO soft violet glow, NO halo, NO bloom, NO blur, NO see-through parts, NO soft particles or fuzz round the body, NO light spilling onto the background. No shadow on the floor, no puddle, no cast shadow, no reflection.
+
+BACKGROUND: one flat pure GREEN (#00FF00) background filling the whole picture, identical in every pixel. No gradient, ground line, scenery, shadow or vignette. No text, labels or borders. No green, yellow-green or teal anywhere on the creature itself.
+
+FINAL REMINDER: exactly one image; the fire slime's design, pose, view, size and matte painted style redrawn as a deep-violet slime with black spiral swirls, a crown of solid curling smoke tendrils, solid black ink blobs, glowing violet-pink pupils and a thin near-black indigo outline; no smoke clouds, no glow, no haze; flat pure green background.
+==============================================================================
+
+REPLY IF IT IS STILL ORANGE OR HAS FLAMES
+"Redo it. This is a DARK slime: matte deep-violet jelly with black spiral swirls, a crown of curling smoke tendrils instead of flames, black ink blobs instead of embers, glowing violet-pink pupils. No orange, red or yellow anywhere."
+
+REPLY IF IT ADDS SMOKE CLOUDS, GLOW OR HAZE
+"Redo it. NO smoke clouds, NO mist, NO haze, NO soft glow round the body: only crisp, solid, hard-edged curling tendrils and ink blobs with a thin outline, on the flat green background."
+
+REPLY IF IT CHANGED THE DESIGN
+"Redo it. Keep the creature exactly as in the first image: the same dome and wavy skirt, the same face in the same place, the swirls where the pockets were, the same view and size. Change only what it is made of (deep violet jelly instead of fire)."
+
+REPLY IF IT IS BLACK, PALE OR GLOSSY
+"Redo it. The body is a matte mid-dark violet (not black, not pale lilac, not glossy plastic) with a fine grain and a thin near-black indigo outline, painted by hand like the first image."
+
+REPLY IF THE BACKGROUND IS NOT GREEN
+"Redo it. The background is one flat pure green (#00FF00), identical in every pixel, not magenta, not grey, no gradient."
