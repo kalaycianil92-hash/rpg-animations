@@ -5288,6 +5288,10 @@
     // the dark slime's packs (Animations/DarkSlime/<folder>, 2026-11-09): the Gloom Spit (8 frames, the ice spit's holds), the Abyssal Eruption (6 frames), the hit (6), the death (6: cracks, a slump with drips, a heap, a puddle of ink) and the dodge
     var DEFD = Object.assign({}, DEF, { hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] } });
     MONSTERS.dark_slime.packs = build(DARK_ANIMS, DEFD); MONSTERS.dark_slime.attackPack = MONSTERS.dark_slime.packs.attack;
+    // the Elite slime's packs (Animations/EliteSlime/<folder>, 2026-11-10): the Sword Slash (8 frames: gather, lift, top of the wind-up, the chop begins, THE STRIKE = the hit frame 6, follow-through, recover; the holds make the wind-up and
+    // the strike last longer). `melee`: the attack is played by slashAct (it steps in toward the target) instead of the spit.
+    var DEFE = { attack: { n: 8, fps: 12, holds: [1, 1.4, 1.1, 1.5, 1.2, 1.6, 1.4, 1] } };
+    MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
   var MON = { seq: 0, deathP: null };                                                // seq: which attack/hit/death/dodge pack is current (a new one replaces the one before); deathP: the promise of the death pack once it has started
@@ -5329,12 +5333,12 @@
     $("monSel").value = idle ? key : "goblin";
     $("monSizeWrap").style.display = idle ? "" : "none";
     $("monSqWrap").style.display = idle && m.squash ? "" : "none";
-    $("spitWrap").style.display = idle && m.attackPack ? "" : "none";
+    $("spitWrap").style.display = idle && m.attackPack && !m.melee ? "" : "none";
     $("monPrevRow").style.display = idle && m.packs ? "flex" : "none";
     [["monSpitPrev", "attack"], ["monPrevHit", "hit"], ["monPrevDeath", "death"], ["monPrevDodge", "dodge"], ["monPrevSlam", "slam"], ["monPrevCinder", "attack"], ["monPrevEruption", "eruption"], ["monPrevBounce", "bounce"]].forEach(function (b) {
-      $(b[0]).style.display = m.packs && m.packs[b[1]] && (!b[2] || m.vfx === b[2]) ? "" : "none";
+      $(b[0]).style.display = m.packs && m.packs[b[1]] && (!b[2] || m.vfx === b[2]) && !(m.melee && b[0] === "monPrevCinder") ? "" : "none";   // (the Elite has no Cinder Burst preview)
     });
-    var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
+    var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = m.melee ? { alt: "Alternate all five attacks", spit: "Sword Slash", slam: "Shield Bash", cinder: "Stone Guard", eruption: "Earthbreaker", bounce: "Rockfall Drop" } : DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
     Array.prototype.forEach.call($("monAtk").options, function (o) { if (NAMES[o.value]) o.textContent = NAMES[o.value]; });
     $("monSpitPrev").textContent = NAMES.spit + " (loops)"; $("monPrevSlam").textContent = NAMES.slam + " (loops)"; $("monPrevCinder").textContent = NAMES.cinder + " (loops)"; $("monPrevEruption").textContent = NAMES.eruption + " (loops)"; $("monPrevBounce").textContent = NAMES.bounce + " (loops)";
     $("monAtkWrap").style.display = idle && m.packs && m.packs.slam ? "" : "none";
@@ -6091,7 +6095,7 @@
     stage.classList.add("playing"); btn.classList.add("on");
     try {
       while (my === run) {
-        await spitAct({ actor: "G", amount: 0, preview: true }, my, FIGHTERS.G, FIGHTERS.W);
+        await (MONSTERS[monKey].melee ? slashAct : spitAct)({ actor: "G", amount: 0, preview: true }, my, FIGHTERS.G, FIGHTERS.W);
         if (my !== run) break;
         if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W);
         if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W);
@@ -6205,6 +6209,7 @@
   // box forces it). A target that dodges lets it land on empty ground ("slams down, but Warrior slips away"). Which attack the monster uses in a fight is the Monster's attack select (alternating by default).
   var SLAM_HIT = 7, SLAM_DMG = 1.6, SLAM_BURN = 0.5;
   function monAttackAct(e, myRun, A, T) {
+    if (MONSTERS[monKey] && MONSTERS[monKey].melee) return slashAct(e, myRun, A, T);       // the Elite: the Sword Slash (its other four skills follow, see docs/MONSTERS.md)
     var mode = $("monAtk").value, n = MON.atk = (MON.atk || 0) + 1, pick = mode;
     if (mode === "alt") pick = ["spit", "slam", "eruption", "cinder", "bounce"][(n - 1) % 5];   // the spit, the slam and the Eruption set the target ablaze, the Cinder Burst detonates it; the Eruption and the Bounce (2-turn-cooldown skills) come round every fifth turn
     if (pick === "slam" && monPackOf("slam")) return slamAct(e, myRun, A, T);
@@ -6323,6 +6328,130 @@
       }
       await Promise.all([
         anim(T.unit.querySelector(".sprite"), dark ? DARK_SHOCK : elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, 340),
+        anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * 14) + "px)" }, { transform: "translateX(" + (-A.dir * 8) + "px)" }, { transform: "translateX(0)" }], 260),
+        sleep(300)
+      ]);
+    }
+    if (myRun !== run) return;
+    var ok = await driver;                                                           // the pack plays to its end, then the slime slides home and goes back to its idle
+    if (myRun !== run || !ok) return;
+    await anim(uG, [{ transform: uG.style.transform }, { transform: "translateX(0)" }], 320, "ease-in-out");
+    uG.style.transform = ""; clearAnims(uG);
+    if (myRun !== run) return;
+    monStartIdle();
+    clearAnims(T.unit); clearAnims(stage);
+    T.unit.querySelector(".sprite").getAnimations().forEach(function (x) { x.cancel(); });
+    if (!pv && T.hp <= 0) {
+      clearBurn(T); clearChilled(T);
+      say(T.name + " is defeated.", "sys");
+      if (T === FIGHTERS.W && packs.death && packs.death.keyed && $("still").checked) {
+        keyPose("death", 0); await sleep(150); keyPose("death", 1); await sleep(260); keyPose("death", 2);
+      } else if (T === FIGHTERS.W && packs.death) await playPose("death", false);
+      else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
+    }
+  }
+  // ---------------------------------------------------------------- the Elite slime's Sword Slash (2026-11-10)
+  // A PHYSICAL melee attack (no element, no status): the sheet is Animations/EliteSlime/sword_slash (8 frames at 12 fps, the strike is the hit frame 6; the base stays on the same spot in every frame, the page moves the
+  // sprite). It gathers (1-2), rears back with the sword raised (3-4), steps in toward the target during the wind-up and the chop (SLASH_X: the share of the way to the landing spot reached at the start of each frame), chops
+  // (5-6: the blade ends steeply down in front of it), follows through (7), then the page slides it home while it recovers (8). The landing spot puts the blade's TIP (placement.tips[6]) on the target's middle.
+  // At the strike: a white slash streak across the target, a puff of stone dust along the ground, chips, a shake; during frames 5 to 6 a pale trail follows the blade's tip from its raised place (tips[5]) to its end (tips[6]).
+  // The target flashes white and takes SLASH_DMG x the turn's damage as a placeholder (decide with the engine, docs/SKILL_BEHAVIOR_LATER.md). A target that dodges lets the blade hit the ground ("swings, but Warrior slips away").
+  var SLASH_HIT = 6, SLASH_DMG = 1.3, SLASH_X = [0, 0, 0.08, 0.35, 0.8, 1, 1, 1];
+  var PHYS_SHOCK = [{ filter: "brightness(2.4)", offset: 0 }, { filter: "brightness(1.5)", offset: 0.4 }, { filter: "brightness(1)", offset: 1 }];
+  function slashTip(r, tp) {                                                          // a point of the 512 cell in stage px (the sprite is mirrored when the unit is flipped)
+    var flip = uG.classList.contains("flip");
+    return { x: r.left + (flip ? 1 - tp.x / 512 : tp.x / 512) * r.width, y: r.top + tp.y / 512 * r.height };
+  }
+  function slashTrailFx(t0, t1, tips) {                                               // a pale crescent that follows the blade's tip from its raised place to the strike's end
+    fxAdd({ t0: t0, t1: t1 + 160 / speed, draw: function (ctx, now) {
+      if (!monEl || !tips || !tips["5"] || !tips["6"]) return;
+      var r = rectIn(monEl), a = slashTip(r, tips["5"]), b = slashTip(r, tips["6"]), flip = uG.classList.contains("flip");
+      var k = clamp01((now - t0) / Math.max(1, t1 - t0)), fade = now > t1 ? 1 - clamp01((now - t1) * speed / 160) : 1, cx = a.x + (flip ? -1 : 1) * 0.1 * r.width + (b.x - a.x) * 0.55, cy = Math.min(a.y, b.y) - 0.12 * r.width, i, n = 18, px, py, tt, qx, qy, w;
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      for (i = 0; i < n; i++) {                                                       // the curve (a quadratic bezier a -> c -> b), drawn up to k, brightest at its head, thin at its tail
+        tt = i / n * k; qx = (1 - tt) * (1 - tt) * a.x + 2 * (1 - tt) * tt * cx + tt * tt * b.x; qy = (1 - tt) * (1 - tt) * a.y + 2 * (1 - tt) * tt * cy + tt * tt * b.y;
+        tt = (i + 1) / n * k; px = (1 - tt) * (1 - tt) * a.x + 2 * (1 - tt) * tt * cx + tt * tt * b.x; py = (1 - tt) * (1 - tt) * a.y + 2 * (1 - tt) * tt * cy + tt * tt * b.y;
+        w = i / n;
+        ctx.strokeStyle = "rgba(225,235,250," + (0.62 * w * w * fade).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, r.width * 0.045 * w);
+        ctx.beginPath(); ctx.moveTo(qx, qy); ctx.lineTo(px, py); ctx.stroke();
+      }
+      ctx.restore();
+    } });
+  }
+  function slashImpactFx(tHit, x, y, gy, u, dir) {                                    // the strike: a white slash streak across the target (x, y), stone dust and chips along the ground (gy)
+    var rnd = rngOf(tHit | 0), dust = [], chips = [], i;
+    for (i = 0; i < 10; i++) dust.push({ vx: (rnd() - 0.5) * 2.2, r: 0.025 + rnd() * 0.04, h: 0.02 + rnd() * 0.06, a: 0.35 + rnd() * 0.3 });
+    for (i = 0; i < 9; i++) chips.push({ a: -0.2 - rnd() * 2.7, v: 0.5 + rnd() * 1.0, s: 0.006 + rnd() * 0.008 });
+    fxAdd({ t0: tHit, t1: tHit + 800 / speed, draw: function (ctx, now) {
+      var t = clamp01((now - tHit) * speed / 600), s = clamp01((now - tHit) * speed / 170), j, d, px, py, x0 = x - dir * u * 0.2, y0 = y - u * 0.28, x1 = x + dir * u * 0.12, y1 = y + u * 0.1;
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";                          // the streak: it draws itself over 170 ms, then fades
+      var hx = x0 + (x1 - x0) * s, hy = y0 + (y1 - y0) * s, fa = 1 - clamp01((t - 0.15) / 0.5);
+      if (fa > 0.01) {
+        ctx.strokeStyle = "rgba(190,210,245," + (0.55 * fa).toFixed(3) + ")"; ctx.lineWidth = Math.max(2, u * 0.05 * fa); ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(hx, hy); ctx.stroke();
+        ctx.strokeStyle = "rgba(255,255,255," + (0.9 * fa).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.014 * fa); ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(hx, hy); ctx.stroke();
+      }
+      ctx.restore();
+      for (j = 0; j < dust.length; j++) {                                             // dust: grey-brown puffs that rise a little, swell and fade
+        d = dust[j]; px = x + d.vx * u * 0.22 * (0.2 + t); py = gy - u * d.h * Math.sin(Math.min(1, t * 1.4) * 1.57) - u * 0.01;
+        ctx.save(); ctx.fillStyle = "rgba(150,140,126," + (d.a * (1 - t) * 0.55).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(px, py, u * d.r * (0.7 + 1.1 * t), u * d.r * (0.5 + 0.8 * t), 0, 0, 6.2832); ctx.fill(); ctx.restore();
+      }
+      for (j = 0; j < chips.length; j++) {                                            // stone chips thrown up and falling
+        d = chips[j]; px = x + Math.cos(d.a) * u * 0.28 * d.v * t; py = gy + Math.sin(d.a) * u * 0.28 * d.v * t + u * 0.25 * t * t;
+        ctx.save(); ctx.fillStyle = "rgba(120,118,124," + (0.9 * (1 - t)).toFixed(3) + ")"; ctx.fillRect(px - u * d.s / 2, py - u * d.s / 2, u * d.s, u * d.s); ctx.restore();
+      }
+    } });
+  }
+  async function slashAct(e, myRun, A, T) {
+    var pk = monPackOf("attack"), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, pl = pk.placement || {}, tips = pl.tips, hitF = pl.hitFrame || SLASH_HIT;
+    for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
+    var t0 = performance.now(), tHit = t0 + starts[hitF - 1] + fm * ((pk.holds && pk.holds[hitF - 1]) || 1) * 0.15;
+    var r0 = rectIn(monEl), tip6 = tips && tips["6"] ? slashTip(r0, tips["6"]) : centerOf(A.unit), t = centerOf(T.unit);
+    var reach = (t.x - tip6.x) - A.dir * u * 0.16, done = false;                      // the landing spot: the tip of the strike's blade a little in front of the target's middle (the blade is short next to the warrior, the body must not stand on him)
+    var dodgeRun = null;
+    if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
+      var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
+      dodgeRun = runDodge(myRun, Math.max(0, ((tHit - performance.now()) - preMs / speed) * speed));   // the evade frame is on screen when the blade comes down
+    }
+    var played = monPlayPack(pk, myRun).then(function (ok) { done = true; return ok; });
+    function xAt(tt) {
+      var k = 0, f, x0, x1;
+      while (k + 1 < n && tt >= starts[k + 1]) k++;
+      f = k + 1 < n ? (tt - starts[k]) / (starts[k + 1] - starts[k]) : 1;
+      x0 = SLASH_X[k] || 0; x1 = SLASH_X[Math.min(n - 1, k + 1)] || 0;
+      return reach * (x0 + (x1 - x0) * clamp01(f));
+    }
+    var driver = new Promise(function (resolve) {
+      (function tick() {
+        if (myRun !== run) { resolve(false); return; }
+        uG.style.transform = "translateX(" + xAt(performance.now() - t0) + "px)";
+        if (done) resolve(true); else requestAnimationFrame(tick);
+      })();
+    });
+    slashTrailFx(t0 + starts[4], tHit, tips);                                          // frames 5 and 6: the trail
+    await bsWait(tHit);
+    if (myRun !== run) return;
+    var tr = rectIn(T.unit), ix = tr.left + tr.width * 0.5, iy = tr.top + tr.height * 0.62, igy = tr.top + tr.height - tr.width * 0.06;
+    shake(4, 220);
+    if (e.dodge) {
+      slashImpactFx(tHit, ix - A.dir * u * 0.12, igy - u * 0.1, igy, u, A.dir);       // the blade bites the ground in front of him
+      if (!pv) { say(A.name + " swings the sword, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
+      if (dodgeRun) await dodgeRun;
+      else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
+    } else {
+      var amount = Math.round((e.amount || 0) * SLASH_DMG);
+      slashImpactFx(tHit, ix, iy, igy, u, A.dir);
+      if (!pv) {
+        T.hp -= amount; paintHp(T);
+        if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
+        if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
+      }
+      if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
+      if (!pv) {
+        floatNumber(T, (e.crit ? "CRIT " : "") + amount, e.crit ? "crit" : "");
+        say(A.name + " slashes " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + " (Sword Slash).", "g");
+      }
+      await Promise.all([
+        anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, 320),
         anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * 14) + "px)" }, { transform: "translateX(" + (-A.dir * 8) + "px)" }, { transform: "translateX(0)" }], 260),
         sleep(300)
       ]);

@@ -10,7 +10,7 @@ Panel dict keys: p (RGBA array, tight window of the panel's own pixels), box, bw
 fist (bool mask of the detached pieces), row.
 """
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 from scipy import ndimage as ndi
 
 MIN_PIECE = 400
@@ -21,7 +21,32 @@ def _alpha(arr):
     return 1 - np.clip((np.minimum(r, b) - g - 70) / 110, 0, 1)
 
 
-def load_panels(path, row_counts, splits=(), min_piece=MIN_PIECE):
+def poly_mask(points, shape, y_min=0, y_max=None):
+    im = Image.new("L", (shape[1], shape[0]), 0); ImageDraw.Draw(im).polygon([tuple(p) for p in points], fill=1)
+    m = np.array(im) > 0
+    m[:y_min] = False
+    if y_max is not None: m[y_max + 1:] = False
+    return m
+
+
+def open_measure(main, radius=28):
+    """The body measured through a morphological opening (a disc of `radius` px): thin things that overlap the body (a sword blade lying across the skirt) vanish, the skirt stays.
+    Returns (bw, low, mid): the widest row of the lowest 22% of the opened body, its lowest row, the middle of that widest row."""
+    import cv2
+    k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * radius + 1, 2 * radius + 1))
+    mo = cv2.morphologyEx(main.astype(np.uint8), cv2.MORPH_OPEN, k) > 0
+    my, mx = np.where(mo); y0, y1 = my.min(), my.max()
+    best = None
+    for y in range(int(y1 - 0.22 * (y1 - y0)), y1 + 1):
+        xs = np.where(mo[y])[0]
+        if len(xs) and (best is None or xs.max() - xs.min() > best[0]): best = (xs.max() - xs.min(), (xs.min() + xs.max()) / 2.0)
+    return int(best[0]), int(y1), float(best[1])
+
+
+def load_panels(path, row_counts, splits=(), min_piece=MIN_PIECE, carves=(), force_owner=()):
+    """carves: [{"remove": [pts], "assign": [pts], "to": k, "y_min": y, "y_max": y}, ...] for a piece the generator drew ACROSS the next panel (the strike's blade tip lying on the next panel's skirt): the pixels of the
+    `remove` polygon (from row y_min down) are taken out of the picture before the pieces are found (so the two panels fall apart), and the pixels of the `assign` polygon are added to panel k afterwards
+    (the two polygons may differ by the blade's outline, which both panels keep: the neighbour's skirt then ends in the blade's dark outline)."""
     im0 = Image.open(path).convert("RGB")
     arr = np.array(im0).astype(float)
     r, g, b = arr[..., 0], arr[..., 1], arr[..., 2]
@@ -39,6 +64,11 @@ def load_panels(path, row_counts, splits=(), min_piece=MIN_PIECE):
     solid = rgba[..., 3] > 128
     cut = np.zeros_like(solid)
     for (x, y0, y1) in splits: cut[y0:y1 + 1, x] = True
+    assigned = {}; carve_cut = np.zeros_like(solid)
+    for cv in carves:
+        carve_cut |= poly_mask(cv["remove"], solid.shape, cv.get("y_min", 0), cv.get("y_max")) & solid
+        cut |= poly_mask(cv["remove"], solid.shape, cv.get("y_min", 0), cv.get("y_max")) & solid
+        assigned.setdefault(cv["to"], np.zeros_like(solid)); assigned[cv["to"]] |= poly_mask(cv["assign"], solid.shape, cv.get("y_min", 0), cv.get("y_max")) & solid
     lab, n = ndi.label(solid & ~cut)
     # the cut column's own pixels: to the piece on their left
     for (x, y0, y1) in splits:
@@ -61,6 +91,10 @@ def load_panels(path, row_counts, splits=(), min_piece=MIN_PIECE):
         m = lab == i
         dd = [float(d[m].min()) for d in dist]; owner[i] = int(np.argmin(dd))
         if min(dd) > 150: print("  warning: piece of %d px is %.0f px from its nearest body: kept anyway" % (sizes[i - 1], min(dd)))
+    for (x, y, kk) in force_owner:                        # a piece the distance rule gets wrong (a skirt lump cut off by a carve): the piece under the point (x, y) belongs to panel kk (0-based)
+        i = int(lab[y, x])
+        if i > 0 and i not in panel_ids: owner[i] = kk; print("  piece under (%d, %d) forced to panel %d" % (x, y, kk + 1))
+        else: print("  warning: nothing to force under (%d, %d)" % (x, y))
     panels = []
     for k in range(N):
         main_i = panel_ids[k]
@@ -69,8 +103,10 @@ def load_panels(path, row_counts, splits=(), min_piece=MIN_PIECE):
             if kk != k: continue
             if i == main_i: mask |= (lab == i)
             else: mask |= (lab == i); fist |= (lab == i)
+        if k in assigned: mask |= assigned[k]; fist |= assigned[k] & ~(lab == main_i)
         main = lab == main_i
         grow = ndi.binary_dilation(mask, iterations=3) & (rgba[..., 3] > 0)
+        if carves: grow &= ~(carve_cut & ~assigned.get(k, np.zeros_like(solid)))          # the 3 px halo must not pull in the pixels carved out for ANOTHER panel (the blade's edge round a skirt lump)
         ys_, xs_ = np.where(grow)
         wx0, wx1 = max(0, xs_.min() - 30), min(Wd, xs_.max() + 31); wy0, wy1 = max(0, ys_.min() - 30), min(H, ys_.max() + 31)
         # pixels of ANOTHER panel's pieces inside this window are removed (the neighbour's skirt)
@@ -79,8 +115,9 @@ def load_panels(path, row_counts, splits=(), min_piece=MIN_PIECE):
         ys, xs = np.where(p[..., 3] > 128)
         my, mx = np.where(m); y0, y1 = my.min(), my.max()
         bw = max(mx[my == y].max() - mx[my == y].min() for y in range(int(y1 - 0.22 * (y1 - y0)), y1 + 1) if (my == y).any())
+        obw, olow, omid = open_measure(m)
         panels.append({"p": p, "box": (int(xs.min()), int(ys.min()), int(xs.max()), int(ys.max())), "bw": int(bw), "low": int(y1), "main": m, "fist": f, "row": rowof[k],
-                       "origin": (int(wx0), int(wy0))})
+                       "origin": (int(wx0), int(wy0)), "bw_open": obw, "low_open": olow, "mid_open": omid})
     return {"panels": panels}
 
 
