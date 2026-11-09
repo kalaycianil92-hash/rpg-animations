@@ -1,0 +1,49 @@
+ICE SLIME: THE LOOK (the reference picture, step 1). Written 2026-11-08, after the fire slime was concluded (5 skills, all built).
+
+WHY. Every slime of the game is the same creature in another element, so the ice slime must be the fire slime's COLD TWIN: the same dome, skirt, face construction, view, size and painting style (matte, thin dark outline), so that the animations of the fire slime (idle, spit, hit, death, dodge and the three heavy skills) can be redrawn as ice frame by frame and every timing, path and hit frame of the page can be reused. What changes is the material and the element's own crisp parts: the crown of flames becomes a crown of ICE CRYSTALS, the embers become ice chips and tiny snowflakes, the molten body becomes frosted ice-blue jelly. The user's own ice slime (the second attached picture) shows what it is made of; its soft frost mist, soft white snow dots and glow are NOT wanted (they cannot be keyed off the magenta; the page adds cold mist and glints later as code layers).
+
+HOW TO USE
+- Attach TWO images, in this order:
+  1. Animations/Slime/reference_image.png (the fire slime: the DESIGN, POSE, VIEW, SIZE and PAINTING STYLE to keep exactly).
+  2. Animations/Slime/source/variants/ice_slime_x3.png (the user's ice slime concept: only for its crystals, its frost and its pale blue colours).
+  Ask for a square (1:1) image, as large as it will give you. Paste everything between the two lines of equals signs. Gemini or ChatGPT (the fire slime's look came from Gemini); generate several and keep the best.
+- Save the best in inbox/ (for example inbox/slime_ice_reference.png or .jpg) and tell me. If it is right it becomes `Animations/IceSlime/reference_image.png`.
+- What I check: (1) the SAME construction as the fire slime: dome wider than tall, wavy skirt base, the face in the same place and size with the same brows, eyes and grimace, the pockets in the same places, the three-quarter view turned to the right, same size and position, centred with 10% margin; (2) it is ICE: pale frosted blue jelly, a crown of tall faceted crystals where the flames were, a crystal on each side of the body where the side flame tongues were, ice chips and tiny snowflakes instead of embers, a frosty rim along the base, pupils pale cyan-white; no yellow, orange or red anywhere; (3) the outline is thin and dark blue-teal (not black, not white), the body matte (not glossy plastic, not pure white), hand-painted like the fire slime; (4) crisp opaque edges and NO mist, glow, halo, haze, blur, see-through parts or light spilling onto the background; (5) the body is a mid-light blue, not white: the lightest tones only in small highlights and on the crystal tips; (6) one image, no GIF.
+- What happens next: the idle sheet is redrawn from the fire slime's idle sheet (attach the fire sheet and this look: "same panels, same poses, ice slime instead"), tested first on the idle; then the other animations. The prompts are made when the look is chosen.
+- Known risks: it keeps the orange (the reply below), it adds frost mist and white fuzz like the concept (the reply below), it turns white and washed-out, it redraws the creature as a different shape.
+
+==============================================================================
+OUTPUT: exactly ONE still image, and nothing else. Do NOT create a GIF, an animation, extra images or alternate versions.
+
+TASK: redraw the creature of the FIRST attached image (the fire slime) as an ICE slime. Keep the DESIGN, POSE, VIEW, SIZE and PAINTING STYLE of the first image exactly; change only what it is made of, using the SECOND attached image (an ice slime concept) only for what ice looks like (faceted crystals, frosty speckles, pale blue). Do NOT copy the concept's soft white mist, its soft glowing white dots or its grey background.
+
+KEEP EXACTLY (from the first image): the same creature construction: a low dome wider than tall, with a flat wavy skirt-like base that spreads on the floor in soft scallops; the same face construction in the same place and size: heavy slanted brows with a wrinkled forehead, two narrow slanted eyes, a wavy grimace with two small bumps at the corners; the same rounded pockets (blisters) in the same places and sizes; the same three-quarter view turned about 30 degrees towards the RIGHT edge of the picture; the same proportions; the same size and position in the picture, centred, with at least 10% empty margin on every side. No arms, no legs, no ears, no horns, no teeth, no tongue. The same MATTE hand-painted style as the first image: a thin dark outline of slightly varying weight, a fine grain on the surface, soft painterly shading, light from the upper left with a gentle cool rim light on the right edge, NO glossy plastic shine, no wet look.
+
+CHANGE TO ICE:
+- BODY: instead of molten orange-red jelly, pale FROSTED ICE-BLUE jelly, matte like frosted sea-glass, with a fine frost speckle grain and a few hairline cracks. A mid-light blue (not white): steel-blue shading towards the base and on the lower left, deeper teal in the shadows; the lightest near-white tone only in small soft highlights.
+- POCKETS: the blisters become frozen air bubbles: rounded, paler blue-white pockets with a thin lighter rim, in the same places and sizes.
+- THE CROWN: instead of the crown of tall flames on top of the head, a crown of tall jagged ICE CRYSTALS: faceted, fully opaque, pale blue with white-cyan tips and darker blue facets, with the same thin dark outline. One tall crystal in the place of the tallest flame (leaning back a little), four or five shorter ones beside it of different heights, the whole crown rising about as high as the flame crown did. Instead of the flame tongue on each side of the body, a crystal growing out of each side (the left one longer).
+- FLOATING BITS: instead of the floating embers, a few small SOLID ice chips (tiny faceted shards with a thin outline) and a few tiny solid six-point snowflakes floating around and above the crown: about the same number and places as the embers (six to ten). Every one crisp and opaque.
+- FROST: a frosty rim along the base's scallops: a crisp, opaque edge of tiny crystals and a few small icicle points, no mist.
+- FACE: the same face construction, but cold and stern: the pupils are pale icy cyan-white instead of glowing yellow, the brows heavy, the mouth a stern grimace.
+- OUTLINE: thin (the same weight as the first image's), dark BLUE-TEAL (like deep ocean ice, about #1F3A52), never black and never white or light. Crystal edges use thin darker blue lines.
+- COLOUR: pale ice blue, steel blue, deep teal; a touch of cold white on the crystal tips. NO yellow, orange or red anywhere on the creature. No violet or pink tint anywhere (it must not drift towards the magenta background).
+
+STILL TRUE (so the picture can be cut out): every edge is crisp, hard and opaque. NO glow, NO halo, NO bloom, NO frost mist, NO snow haze, NO fog, NO blur, NO see-through parts, NO sparkle flares or light rays, NO white fuzz round the body, NO light spilling onto the background. No ice on the floor, no puddle, no cast shadow, no reflection.
+
+BACKGROUND: one flat pure magenta (#FF00FF) background filling the whole picture, identical in every pixel. No gradient, ground line, scenery, shadow or vignette. No text, labels or borders. No magenta or pink anywhere on the creature itself.
+
+FINAL REMINDER: exactly one image; the fire slime's design, pose, view, size and matte painted style redrawn as a frosted ice-blue slime with a crown of faceted crystals, ice chips and tiny snowflakes, pale cyan pupils and a thin dark blue-teal outline; no mist, no glow, no white fuzz; flat magenta background.
+==============================================================================
+
+REPLY IF IT IS STILL ORANGE OR HAS FLAMES
+"Redo it. This is an ICE slime: pale frosted blue jelly, a crown of ice crystals instead of flames, ice chips instead of embers, pale cyan pupils. No yellow, orange or red anywhere."
+
+REPLY IF IT ADDS MIST, GLOW OR WHITE FUZZ
+"Redo it. NO frost mist, NO glow, NO haze, NO soft white dots or fuzz round the body: only crisp opaque crystals, ice chips and snowflakes with a thin outline, on flat magenta."
+
+REPLY IF IT CHANGED THE DESIGN
+"Redo it. Keep the creature exactly as in the first image: the same dome and wavy skirt, the same face in the same place, the same pockets in the same places, the same view and size. Change only what it is made of (ice instead of fire)."
+
+REPLY IF IT IS GLOSSY, WHITE OR TOO PALE
+"Redo it. The body is a matte mid-light blue, not white and not glossy plastic, with a fine frosted grain and a thin dark blue-teal outline like the first image's weight, painted by hand in the same style."

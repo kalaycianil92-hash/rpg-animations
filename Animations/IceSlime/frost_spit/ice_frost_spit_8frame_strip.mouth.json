@@ -1,0 +1,26 @@
+{
+ "note": "the ice shard in the mouth on frames 4 and 5 and the open mouth on frame 6 (centre and size in the 512 cell, before the page mirrors the sprite): the spit leaves the mouth at the release frame 5",
+ "mouth": {
+  "4": {
+   "area": 417,
+   "x": 338.0,
+   "y": 386.0,
+   "w": 28,
+   "h": 23
+  },
+  "5": {
+   "area": 597,
+   "x": 387.2,
+   "y": 371.0,
+   "w": 40,
+   "h": 24
+  },
+  "6": {
+   "area": 2236,
+   "x": 386.7,
+   "y": 373.6,
+   "w": 66,
+   "h": 71
+  }
+ }
+}

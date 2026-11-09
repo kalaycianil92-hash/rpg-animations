@@ -1,0 +1,67 @@
+{
+ "format": "frame-placement/1",
+ "animation": "blizzard_bounce",
+ "file": "ice_blizzard_bounce_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 188,
+   "bottom": 468,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 242,
+   "bottom": 469,
+   "baseW": 337.8,
+   "sizeAgainstIdle": 0.965
+  },
+  {
+   "lift": -17.5,
+   "top": 146,
+   "bottom": 477,
+   "baseW": 189.4,
+   "sizeAgainstIdle": 0.541
+  },
+  {
+   "lift": -16.9,
+   "top": 183,
+   "bottom": 476,
+   "baseW": 189.4,
+   "sizeAgainstIdle": 0.541
+  },
+  {
+   "lift": 0.0,
+   "top": 223,
+   "bottom": 469,
+   "baseW": 340.7,
+   "sizeAgainstIdle": 0.974
+  },
+  {
+   "lift": 80.7,
+   "top": 86,
+   "bottom": 388,
+   "baseW": 193.5,
+   "sizeAgainstIdle": 0.553
+  },
+  {
+   "lift": 0.0,
+   "top": 258,
+   "bottom": 469,
+   "baseW": 341.8,
+   "sizeAgainstIdle": 0.977
+  },
+  {
+   "lift": 0.0,
+   "top": 179,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ],
+ "hitFrame": 5,
+ "note": "frames: 1 rest, 2 crouch, 3 launch, 4 plummet, 5 CRASH (the hit frame), 6 bounce, 7 heavy landing, 8 settle. The page lifts and drops the unit itself; lift = body height above the floor in the cell."
+}

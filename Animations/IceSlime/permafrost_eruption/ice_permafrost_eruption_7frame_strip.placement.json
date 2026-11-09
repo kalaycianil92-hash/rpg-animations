@@ -1,0 +1,60 @@
+{
+ "format": "frame-placement/1",
+ "animation": "permafrost_eruption",
+ "file": "ice_permafrost_eruption_7frame_strip.png",
+ "frames": 7,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 187,
+   "bottom": 468,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 228,
+   "bottom": 469,
+   "baseW": 348.3,
+   "sizeAgainstIdle": 0.995
+  },
+  {
+   "lift": 0.0,
+   "top": 301,
+   "bottom": 469,
+   "baseW": 177.8,
+   "sizeAgainstIdle": 0.508
+  },
+  {
+   "lift": 0.0,
+   "top": 375,
+   "bottom": 469,
+   "baseW": 82.3,
+   "sizeAgainstIdle": 0.235
+  },
+  {
+   "lift": 0.0,
+   "top": 282,
+   "bottom": 469,
+   "baseW": 202.3,
+   "sizeAgainstIdle": 0.578
+  },
+  {
+   "lift": 0.0,
+   "top": 232,
+   "bottom": 469,
+   "baseW": 308.6,
+   "sizeAgainstIdle": 0.882
+  },
+  {
+   "lift": 0.0,
+   "top": 179,
+   "bottom": 468,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ],
+ "slideFrame": 4,
+ "note": "7 frames: the shrink plays 1, 2, 3, 4 (the tiny ball), the re-forming plays 4, 3, 5, 6, 7; frame sizes by base width against the idle's 350 px"
+}

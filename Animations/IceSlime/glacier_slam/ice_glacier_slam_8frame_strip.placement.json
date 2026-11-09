@@ -1,0 +1,79 @@
+{
+ "format": "frame-placement/1",
+ "animation": "glacier_slam",
+ "file": "ice_glacier_slam_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 188,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 213,
+   "bottom": 469,
+   "baseW": 353.3,
+   "sizeAgainstIdle": 1.009
+  },
+  {
+   "lift": 23.5,
+   "top": 169,
+   "bottom": 446,
+   "baseW": 319.6,
+   "sizeAgainstIdle": 0.913
+  },
+  {
+   "lift": 52.7,
+   "top": 112,
+   "bottom": 417,
+   "baseW": 314.1,
+   "sizeAgainstIdle": 0.897
+  },
+  {
+   "lift": 136.3,
+   "top": 70,
+   "bottom": 333,
+   "baseW": 331.7,
+   "sizeAgainstIdle": 0.948
+  },
+  {
+   "lift": 68.4,
+   "top": 86,
+   "bottom": 401,
+   "baseW": 237.7,
+   "sizeAgainstIdle": 0.679
+  },
+  {
+   "lift": 0.0,
+   "top": 221,
+   "bottom": 469,
+   "baseW": 330.7,
+   "sizeAgainstIdle": 0.945
+  },
+  {
+   "lift": 0.0,
+   "top": 194,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ],
+ "hitFrame": 7,
+ "x": [
+  0,
+  0,
+  0.04,
+  0.3,
+  0.62,
+  0.88,
+  1,
+  1
+ ],
+ "smooth": true,
+ "xUnit": "fractions of the way from home to the landing spot (0.62 character widths in front of the target)",
+ "note": "The ice slime's Glacier Slam path: the Magma Slam's (it stays home through the crouch, crosses most of the way while rising and at the top, lands at the start of frame 7 = the hit frame, the page slides it home). The height of the leap is drawn in the strip."
+}
