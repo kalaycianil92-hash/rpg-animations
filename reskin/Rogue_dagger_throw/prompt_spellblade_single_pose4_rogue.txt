@@ -1,0 +1,29 @@
+SPELLBLADE WINTER'S KISS, POSE 4 (FOLLOW-THROUGH), ONE IMAGE, WITH THE ROGUE'S OWN FRAME AS THE POSE EXAMPLE. Made 2026-11-06. Works with Gemini or ChatGPT.
+
+WHY: the silhouette guide for this pose is not clear enough (a flat shape cannot show which way the head looks, how far the torso bends, which arm is nearer). Here the pose example is the Rogue's real frame of this pose, coloured, from her animation.
+
+HOW TO USE
+- Attach (1) reference_image.png (the Spellblade: her look) and (2) ref_uid03.png (the Rogue in the pose to copy). Ask for a 1:1 image (ChatGPT: 1024 x 1024). Paste everything between the two lines of equals signs.
+- Save the result as inbox/spellblade_winters_kiss_pose4.png and tell me. (If it is wrong again, tell me WHAT looks wrong: the head, the arm, the legs, the size.)
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG character illustration, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Draw the character of image 1 in EXACTLY the pose of the character in image 2, as one full-body figure on a flat magenta background.
+
+IMAGE 2 IS A POSE EXAMPLE ONLY. It shows a DIFFERENT character (a woman with burgundy hair, a grey hooded cloak and dark trousers) in the pose to copy. Copy ONLY her posture: the angle of her head and the direction it looks, the bend and lean of her torso, both arms (which one is extended, the shape of the hands), the position and spacing of both legs and both feet, the height of the figure and where it stands in the picture. Do NOT copy her face, her burgundy hair, her hood, her cloak, her scarf, her trousers, her colours or her style: none of those may appear. The character is the one in image 1, fully drawn in her own look.
+
+CHARACTER: the exact same character as in image 1: a lean, slender, feminine young woman, a Spellblade, with warm honey-tan skin and a fully visible face (no mask), a calm, slightly proud, faintly smiling look; warm amber-gold eyes with a thin dark liner; a polished, layered, jaw-length bob of vivid copper-scarlet (orange-leaning red) hair, parted on the side and swept back behind the far ear (her ear is visible), with a long side fringe on the viewer's side that curves in toward her cheek and ends softly flicked outward; a fitted ivory-white bodysuit with a high ivory collar edged in gold, a plunging V neckline edged in gold (a little cleavage), swirling gold filigree line-work on the bodice, and a cut-out at the waist showing a band of bare honey-tan skin between the gold-edged lower hem of the bodice and the gold-edged upper edge of the hip piece, which are joined at the front by a round gold ring and thin gold straps (no belt, no pouch, nothing else around the waist); long fitted ivory sleeves covering the arms down to the wrists, with a thin gold line along the seams; ornate gold bracers with engraved filigree over the sleeves; bare hands; one small rounded ivory pauldron with a gold edge and gold filigree on the shoulder at her back; fitted ivory leggings with thin gold lines down the outer sides and small gold filigree at the hips; knee-high cream leather boots (a shade deeper than the suit) with a gold-edged scalloped cuff, a gold band at the shin, gold toe caps and flat soles; no skirt; an ivory-white cape with a clean hem, a gold edge and a golden-yellow lining, fastened at her throat by a small gold clasp with a gold-yellow gem, hanging calmly behind her. Colours: ivory-white and gold; copper-scarlet red only in the hair; no black, violet, blue, green or silver. Keep the same painted game-sprite style, thick dark outlines, colours, proportions, face and three-quarter head angle as image 1. Do not redesign anything. Her cape hangs behind her as in image 2's pose, in her own ivory-white and gold.
+
+THE POSE IN WORDS (so that nothing is lost): a follow-through after throwing, standing in place. Her boots, knees and hips are placed exactly as in image 2: the stance wide, the rear foot far behind, the front foot ahead, both soles flat. The torso leans forward a little (about 15 degrees from vertical) and the head is tilted slightly forward, looking along her extended arm toward the enemy. The far arm is extended forward almost straight, a little below shoulder height, the hand OPEN with the fingers spread (empty). The near arm is bent with its closed fist at her hip. The cape settles behind her.
+
+VIEW: strict side view, facing right, the head turned a little toward the viewer as in image 1.
+
+NO ITEMS AND NO EFFECTS: no weapon, no dagger, no sword, nothing in the hands: the near hand is a bare, tight CLOSED FIST, the extended hand is bare and OPEN (the items are added later). No glow, smoke, sparks, speed lines, motion blur or effects of any kind. No dots or marks on the character.
+
+SAME SCALE (very important): the figure must have the same height as the character in image 2 (not bigger) and stand in the same place of the picture. The WHOLE body, with the cape, both hands and both boots, is visible, never cropped, and nothing touches an edge.
+
+BACKGROUND: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, no ground line, no cast shadow, no text, no numbers, no labels. No magenta or pink on the character.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

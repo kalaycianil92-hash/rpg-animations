@@ -1,0 +1,26 @@
+RE-SKIN PROMPT (pose-guided sheet). Made by make_pose_guides.py for Rogue / shadow_shiv. Works with Gemini or ChatGPT.
+
+HOW TO USE
+- Attach TWO images: (1) the reference picture of the character's NEW look, (2) one guide sheet from this folder (guide_sheet_1.png). Ask for a 3:2 image. Paste everything between the two lines of equals signs and fill in the one bracket.
+- The panels of the sheet you get back must be in the same order as the guide's (left to right, top row first): that order is how the pieces are cut and matched to the animation.
+- Save the sheet in inbox/ and tell me. Then: cut it with source/tools/slice_keypose_sheet.py, check it with source/tools/check_reskin.py (--map frame_map.json), rebuild with source/tools/reskin_strip.py.
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG sprite sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Create a sprite sheet: a grid of 3 columns x 2 rows of equal panels, read left to right, top row first. In every panel draw the character of image 1 in EXACTLY the pose of the matching panel of image 2.
+
+IMAGE 2 IS A POSE GUIDE ONLY. Its grey silhouettes show where the head, body, arms, legs and cloak must be in each panel: same pose, same size, same place in the panel, the feet where the silhouette's feet are (on the thin line where there is one, in the air where there is none), the head where the silhouette's head is. Do NOT copy its grey colour, its flat look or its outline: the character must be fully drawn in her or his own colours, clothes and face from image 1. The two dots mark the two hands: a RED dot and a BLUE dot; put one closed fist exactly on each dot. The dots are for positioning ONLY: do NOT draw any dot, circle, ring, spot or colour mark on the character (not on the fists, the nails, the boots or the clothes).
+
+CHARACTER: the exact same character as in image 1: [PASTE THE NEW LOOK'S DESCRIPTION HERE]. Keep the same painted game-sprite style, thick dark outlines, colours, proportions, face and three-quarter head angle as image 1. Do not redesign anything. Her or his face looks the same in every panel.
+
+VIEW: strict side view, facing the direction of the silhouette (right unless the guide shows otherwise), the head turned a little toward the viewer as in image 1. The camera angle is the same in every panel.
+
+NO ITEMS AND NO EFFECTS: no weapon, no dagger, no sword, nothing in the hands: both hands are bare, tight CLOSED FISTS (the items are added later). No glow, smoke, sparks, speed lines, motion blur or effects of any kind.
+
+SAME SCALE (very important): the character must have exactly the same height in every panel as the silhouette in the same panel. Do not zoom in or out between panels. The WHOLE body, with the cloak, both fists and both boots, is visible in every panel, never cropped, and nothing touches a panel edge.
+
+BACKGROUND AND LAYOUT: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, no ground line, no cast shadow, no grid lines or borders between panels, no text, no numbers, no labels. No magenta or pink on the character.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

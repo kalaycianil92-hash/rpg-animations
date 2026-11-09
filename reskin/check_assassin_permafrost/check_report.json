@@ -1,0 +1,192 @@
+{
+ "median_scale": 1.0080000000000002,
+ "summary": {
+  "OK": 5,
+  "FIXED": 2,
+  "BAD": 0
+ },
+ "frames": [
+  {
+   "frame": 1,
+   "uid": 0,
+   "orig_position": 1,
+   "iou_best": 0.8299392495551046,
+   "scale": 1.0080000000000002,
+   "h_ratio": 1.0,
+   "feet_delta": 0,
+   "iou_raw": 0.8261724415491035,
+   "centre_delta": 6.733424129976167,
+   "grounded": true,
+   "scale_used": 1.0080000000000002,
+   "shift": [
+    140,
+    59
+   ],
+   "iou_aligned": 0.8278980314113944,
+   "front_err": 5.393643031784841,
+   "front_frac": 0.013187391275757559,
+   "extent_delta": {
+    "left": -9,
+    "right": 1,
+    "top": -3
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 2,
+   "uid": 1,
+   "orig_position": 5,
+   "iou_best": 0.8298465671674323,
+   "scale": 1.0080000000000002,
+   "h_ratio": 1.0,
+   "feet_delta": 0,
+   "iou_raw": 0.8244140144412868,
+   "centre_delta": 6.821126837214925,
+   "grounded": true,
+   "scale_used": 1.0080000000000002,
+   "shift": [
+    150,
+    59
+   ],
+   "iou_aligned": 0.8273764972232882,
+   "front_err": 4.904645476772616,
+   "front_frac": 0.01199179823171789,
+   "extent_delta": {
+    "left": -10,
+    "right": 2,
+    "top": -3
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 3,
+   "uid": 2,
+   "orig_position": 12,
+   "iou_best": 0.7976091252403658,
+   "scale": 1.0040000000000002,
+   "h_ratio": 1.0148367952522255,
+   "feet_delta": -1,
+   "iou_raw": 0.7167562349450016,
+   "centre_delta": 8.140448963450902,
+   "grounded": true,
+   "scale_used": 1.0080000000000002,
+   "shift": [
+    84,
+    126
+   ],
+   "iou_aligned": 0.7027316540686729,
+   "front_err": 17.26112759643917,
+   "front_frac": 0.05121996319418151,
+   "extent_delta": {
+    "left": -7,
+    "right": 5,
+    "top": -8
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 4,
+   "uid": 3,
+   "orig_position": 13,
+   "iou_best": 0.840697098731722,
+   "scale": 1.0120000000000002,
+   "h_ratio": 1.0257234726688103,
+   "feet_delta": 0,
+   "iou_raw": 0.6728043820388192,
+   "centre_delta": 19.521854811480235,
+   "grounded": true,
+   "scale_used": 1.0080000000000002,
+   "shift": [
+    60,
+    149
+   ],
+   "iou_aligned": 0.8247548831876279,
+   "front_err": 7.511254019292605,
+   "front_frac": 0.024151942184220596,
+   "extent_delta": {
+    "left": 6,
+    "right": -2,
+    "top": -11
+   },
+   "status": "FIXED"
+  },
+  {
+   "frame": 5,
+   "uid": 4,
+   "orig_position": 14,
+   "iou_best": 0.8077782113538604,
+   "scale": 0.9840000000000002,
+   "h_ratio": 1.0392156862745099,
+   "feet_delta": 0,
+   "iou_raw": 0.7469310155821814,
+   "centre_delta": 10.06513526824517,
+   "grounded": true,
+   "scale_used": 0.9840000000000002,
+   "shift": [
+    52,
+    158
+   ],
+   "iou_aligned": 0.7795091471798856,
+   "front_err": 11.183006535947712,
+   "front_frac": 0.036545772993293174,
+   "extent_delta": {
+    "left": -2,
+    "right": 10,
+    "top": -7
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 6,
+   "uid": 5,
+   "orig_position": 15,
+   "iou_best": 0.7722699802335374,
+   "scale": 0.9760000000000002,
+   "h_ratio": 1.0459016393442624,
+   "feet_delta": 0,
+   "iou_raw": 0.6791477433108993,
+   "centre_delta": 22.767565872449605,
+   "grounded": true,
+   "scale_used": 0.9760000000000002,
+   "shift": [
+    118,
+    160
+   ],
+   "iou_aligned": 0.7718819103561414,
+   "front_err": 10.38360655737705,
+   "front_frac": 0.03404461166353131,
+   "extent_delta": {
+    "left": -9,
+    "right": -5,
+    "top": -6
+   },
+   "status": "FIXED"
+  },
+  {
+   "frame": 7,
+   "uid": 6,
+   "orig_position": 18,
+   "iou_best": 0.8309257364206747,
+   "scale": 1.0080000000000002,
+   "h_ratio": 1.0,
+   "feet_delta": 0,
+   "iou_raw": 0.7918488790922287,
+   "centre_delta": 2.4559078420174165,
+   "grounded": true,
+   "scale_used": 1.0080000000000002,
+   "shift": [
+    72,
+    128
+   ],
+   "iou_aligned": 0.8120665705312559,
+   "front_err": 10.421828908554572,
+   "front_frac": 0.03074285813732912,
+   "extent_delta": {
+    "left": 4,
+    "right": -1,
+    "top": -3
+   },
+   "status": "OK"
+  }
+ ]
+}

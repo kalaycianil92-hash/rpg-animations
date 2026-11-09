@@ -1,0 +1,27 @@
+SPELLBLADE PERMAFROST EXECUTION, THE RETREAT (one pose, pose-guided single image). Made 2026-11-06. Works with Gemini or ChatGPT.
+
+HOW TO USE
+- Attach (1) reference_image.png and (2) guide_uid06.png. Ask for a 1:1 image. Paste everything between the two lines of equals signs.
+- Save the result as inbox/spellblade_permafrost_retreat.png and tell me.
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG character illustration, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Draw the character of image 1 in EXACTLY the pose of the grey silhouette in image 2, as one full-body figure on a flat magenta background.
+
+IMAGE 2 IS A POSE GUIDE ONLY. Its grey silhouette shows where the head, body, arms, legs and the cloak of the OLD character must be: same pose, same size, same place in the picture, the head where the silhouette's head is. She is IN THE AIR: no ground line. Do NOT copy its grey colour, its flat look or its outline: the character must be fully drawn in her own colours, clothes and face from image 1. The two dots mark the two hands: a RED dot and a BLUE dot; put one closed fist exactly on each dot. The dots are for positioning ONLY: do NOT draw any dot, circle, ring, spot or colour mark on the character (not on the fists, the nails, the boots or the clothes). Draw the NEW character's own cape, flying the way the pose needs it.
+
+CHARACTER: the exact same character as in image 1: a lean, slender, feminine young woman, a Spellblade, with warm honey-tan skin and a fully visible face (no mask), a calm, slightly proud, faintly smiling look; warm amber-gold eyes with a thin dark liner; a polished, layered, jaw-length bob of vivid copper-scarlet (orange-leaning red) hair, parted on the side and swept back behind the far ear (her ear is visible), with a long side fringe on the viewer's side that curves in toward her cheek and ends softly flicked outward; a fitted ivory-white bodysuit with a high ivory collar edged in gold, a plunging V neckline edged in gold (a little cleavage), swirling gold filigree line-work on the bodice, and a cut-out at the waist showing a band of bare honey-tan skin between the gold-edged lower hem of the bodice and the gold-edged upper edge of the hip piece, which are joined at the front by a round gold ring and thin gold straps (no belt, no pouch, nothing else around the waist); long fitted ivory sleeves covering the arms down to the wrists, with a thin gold line along the seams; ornate gold bracers with engraved filigree over the sleeves; bare hands; one small rounded ivory pauldron with a gold edge and gold filigree on the shoulder at her back; fitted ivory leggings with thin gold lines down the outer sides and small gold filigree at the hips; knee-high cream leather boots (a shade deeper than the suit) with a gold-edged scalloped cuff, a gold band at the shin, gold toe caps and flat soles; no skirt; an ivory-white cape with a clean hem, a gold edge and a golden-yellow lining, fastened at her throat by a small gold clasp with a gold-yellow gem, hanging calmly behind her. Colours: ivory-white and gold; copper-scarlet red only in the hair; no black, violet, blue, green or silver. Keep the same painted game-sprite style, thick dark outlines, colours, proportions, face and three-quarter head angle as image 1. Do not redesign anything.
+
+THE POSE (Retreat): she has pushed off backward and is flying away from the enemy, in the air, but she is still FACING RIGHT, toward the enemy, and watching it: the body leaning back about 25 degrees, the knees bent, both boots well off the floor with the legs stretched out in front of her and low, both arms loose at her sides a little away from the body for balance, the fists closed. A cold, satisfied look in the eyes. The cape billows forward, toward the enemy.
+
+VIEW: strict side view, facing right, the head turned a little toward the viewer as in image 1.
+
+NO ITEMS AND NO EFFECTS: no weapon, no dagger, no sword, nothing in the hands: both hands are bare, tight CLOSED FISTS (the items are added later). No glow, smoke, sparks, speed lines, motion blur or effects of any kind.
+
+SAME SCALE (very important): the figure must have exactly the same height as the silhouette and stand in the same place of the picture. The WHOLE body, with the cape, both fists and both boots, is visible, never cropped, and nothing touches an edge.
+
+BACKGROUND: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel. No gradient, no ground line, no cast shadow, no text, no numbers, no labels. No magenta or pink on the character.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

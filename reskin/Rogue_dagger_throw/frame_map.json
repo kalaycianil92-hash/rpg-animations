@@ -1,0 +1,91 @@
+{
+ "format": "reskin-map/1",
+ "orig_strip": "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\dagger_throw\\cloaked_winters_kiss_16frame_strip.png",
+ "cell": [
+  512,
+  512
+ ],
+ "positions": 16,
+ "uniques": [
+  {
+   "id": 0,
+   "positions": [
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "shared": null
+  },
+  {
+   "id": 1,
+   "positions": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "shared": null
+  },
+  {
+   "id": 2,
+   "positions": [
+    10
+   ],
+   "shared": null
+  },
+  {
+   "id": 3,
+   "positions": [
+    11,
+    12,
+    13
+   ],
+   "shared": null
+  },
+  {
+   "id": 4,
+   "positions": [
+    14,
+    15
+   ],
+   "shared": null
+  },
+  {
+   "id": 5,
+   "positions": [
+    16
+   ],
+   "shared": {
+    "strip": 0,
+    "frame": 0
+   }
+  }
+ ],
+ "guided": [
+  0,
+  1,
+  2,
+  3,
+  4
+ ],
+ "sheets": [
+  {
+   "file": "guide_sheet_1.png",
+   "uids": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "cols": 3,
+   "rows": 2
+  }
+ ],
+ "share_with": [
+  "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\idle\\cloaked_idle_strip.png"
+ ],
+ "marks": "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\dagger_throw\\cloaked_winters_kiss_16frame_strip.hand-anchors.json"
+}

@@ -1,0 +1,64 @@
+{
+ "format": "reskin-map/1",
+ "orig_strip": "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\shadow_shiv\\cloaked_shadow_shiv_5frame_strip.png",
+ "cell": [
+  512,
+  512
+ ],
+ "positions": 5,
+ "uniques": [
+  {
+   "id": 0,
+   "positions": [
+    1
+   ],
+   "shared": null
+  },
+  {
+   "id": 1,
+   "positions": [
+    2,
+    4
+   ],
+   "shared": null
+  },
+  {
+   "id": 2,
+   "positions": [
+    3
+   ],
+   "shared": null
+  },
+  {
+   "id": 3,
+   "positions": [
+    5
+   ],
+   "shared": {
+    "strip": 0,
+    "frame": 0
+   }
+  }
+ ],
+ "guided": [
+  0,
+  1,
+  2
+ ],
+ "sheets": [
+  {
+   "file": "guide_sheet_1.png",
+   "uids": [
+    0,
+    1,
+    2
+   ],
+   "cols": 3,
+   "rows": 2
+  }
+ ],
+ "share_with": [
+  "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\idle\\cloaked_idle_strip.png"
+ ],
+ "marks": "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\shadow_shiv\\cloaked_shadow_shiv_5frame_strip.hand-anchors.json"
+}

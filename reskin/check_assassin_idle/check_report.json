@@ -1,0 +1,166 @@
+{
+ "median_scale": 1.0320000000000003,
+ "summary": {
+  "OK": 6,
+  "FIXED": 0,
+  "BAD": 0
+ },
+ "frames": [
+  {
+   "frame": 1,
+   "uid": 0,
+   "orig_position": 1,
+   "iou_best": 0.7410972560878119,
+   "scale": 1.0360000000000003,
+   "h_ratio": 1.0024509803921569,
+   "feet_delta": 0,
+   "iou_raw": 0.7123530598011475,
+   "centre_delta": 4.468300438042276,
+   "grounded": true,
+   "scale_used": 1.0320000000000003,
+   "shift": [
+    146,
+    49
+   ],
+   "iou_aligned": 0.7410894283398048,
+   "front_err": 5.889705882352941,
+   "front_frac": 0.014435553633217992,
+   "extent_delta": {
+    "left": -3,
+    "right": -4,
+    "top": -14
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 2,
+   "uid": 1,
+   "orig_position": 2,
+   "iou_best": 0.7388384595201124,
+   "scale": 1.0280000000000002,
+   "h_ratio": 1.0049019607843137,
+   "feet_delta": 0,
+   "iou_raw": 0.7099403854505235,
+   "centre_delta": 4.431925707703362,
+   "grounded": true,
+   "scale_used": 1.0320000000000003,
+   "shift": [
+    148,
+    48
+   ],
+   "iou_aligned": 0.7382403625425144,
+   "front_err": 5.916666666666667,
+   "front_frac": 0.014501633986928105,
+   "extent_delta": {
+    "left": -1,
+    "right": -4,
+    "top": -15
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 3,
+   "uid": 2,
+   "orig_position": 3,
+   "iou_best": 0.7181314373320341,
+   "scale": 1.0320000000000003,
+   "h_ratio": 0.9975669099756691,
+   "feet_delta": 0,
+   "iou_raw": 0.6949979215541569,
+   "centre_delta": 6.391495870323284,
+   "grounded": true,
+   "scale_used": 1.0320000000000003,
+   "shift": [
+    152,
+    48
+   ],
+   "iou_aligned": 0.7172141453566183,
+   "front_err": 5.788321167883212,
+   "front_frac": 0.01408350649120003,
+   "extent_delta": {
+    "left": 4,
+    "right": -3,
+    "top": -12
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 4,
+   "uid": 3,
+   "orig_position": 4,
+   "iou_best": 0.7091859703160495,
+   "scale": 1.0200000000000002,
+   "h_ratio": 1.002439024390244,
+   "feet_delta": 0,
+   "iou_raw": 0.6907259028852599,
+   "centre_delta": 6.312474699607051,
+   "grounded": true,
+   "scale_used": 1.0320000000000003,
+   "shift": [
+    152,
+    47
+   ],
+   "iou_aligned": 0.7087553733123848,
+   "front_err": 5.746341463414634,
+   "front_frac": 0.014015466983938131,
+   "extent_delta": {
+    "left": 13,
+    "right": -3,
+    "top": -14
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 5,
+   "uid": 4,
+   "orig_position": 5,
+   "iou_best": 0.740832131391645,
+   "scale": 1.0320000000000003,
+   "h_ratio": 1.0123152709359606,
+   "feet_delta": 0,
+   "iou_raw": 0.7198231169766708,
+   "centre_delta": 1.9524785596636842,
+   "grounded": true,
+   "scale_used": 1.0320000000000003,
+   "shift": [
+    148,
+    47
+   ],
+   "iou_aligned": 0.740510121697719,
+   "front_err": 5.834975369458128,
+   "front_frac": 0.01437186051590672,
+   "extent_delta": {
+    "left": 3,
+    "right": -3,
+    "top": -18
+   },
+   "status": "OK"
+  },
+  {
+   "frame": 6,
+   "uid": 5,
+   "orig_position": 6,
+   "iou_best": 0.7370773632493931,
+   "scale": 1.0320000000000003,
+   "h_ratio": 1.0073529411764706,
+   "feet_delta": 0,
+   "iou_raw": 0.7135742487558355,
+   "centre_delta": 3.478630950482941,
+   "grounded": true,
+   "scale_used": 1.0320000000000003,
+   "shift": [
+    148,
+    47
+   ],
+   "iou_aligned": 0.736522532482596,
+   "front_err": 5.659313725490196,
+   "front_frac": 0.013870866974240677,
+   "extent_delta": {
+    "left": 5,
+    "right": -3,
+    "top": -16
+   },
+   "status": "OK"
+  }
+ ]
+}

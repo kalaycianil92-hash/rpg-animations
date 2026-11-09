@@ -1,0 +1,117 @@
+{
+ "format": "reskin-map/1",
+ "orig_strip": "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\permafrost_execution\\cloaked_permafrost_execution_19frame_strip.png",
+ "cell": [
+  512,
+  512
+ ],
+ "positions": 19,
+ "uniques": [
+  {
+   "id": 0,
+   "positions": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "shared": null
+  },
+  {
+   "id": 1,
+   "positions": [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11
+   ],
+   "shared": null
+  },
+  {
+   "id": 2,
+   "positions": [
+    12
+   ],
+   "shared": null
+  },
+  {
+   "id": 3,
+   "positions": [
+    13
+   ],
+   "shared": null
+  },
+  {
+   "id": 4,
+   "positions": [
+    14
+   ],
+   "shared": null
+  },
+  {
+   "id": 5,
+   "positions": [
+    15,
+    16,
+    17
+   ],
+   "shared": null
+  },
+  {
+   "id": 6,
+   "positions": [
+    18
+   ],
+   "shared": null
+  },
+  {
+   "id": 7,
+   "positions": [
+    19
+   ],
+   "shared": {
+    "strip": 0,
+    "frame": 0
+   }
+  }
+ ],
+ "guided": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+ ],
+ "sheets": [
+  {
+   "file": "guide_sheet_1.png",
+   "uids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "cols": 3,
+   "rows": 2
+  },
+  {
+   "file": "guide_sheet_2.png",
+   "uids": [
+    6
+   ],
+   "cols": 3,
+   "rows": 2
+  }
+ ],
+ "share_with": [
+  "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\idle\\cloaked_idle_strip.png"
+ ],
+ "marks": "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\permafrost_execution\\cloaked_permafrost_execution_19frame_strip.hand-anchors.json"
+}

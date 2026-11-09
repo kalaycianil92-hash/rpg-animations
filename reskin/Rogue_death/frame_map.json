@@ -1,0 +1,80 @@
+{
+ "format": "reskin-map/1",
+ "orig_strip": "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\death\\cloaked_death_6frame_strip.png",
+ "cell": [
+  512,
+  512
+ ],
+ "positions": 6,
+ "uniques": [
+  {
+   "id": 0,
+   "positions": [
+    1
+   ],
+   "shared": null
+  },
+  {
+   "id": 1,
+   "positions": [
+    2
+   ],
+   "shared": null
+  },
+  {
+   "id": 2,
+   "positions": [
+    3
+   ],
+   "shared": null
+  },
+  {
+   "id": 3,
+   "positions": [
+    4
+   ],
+   "shared": null
+  },
+  {
+   "id": 4,
+   "positions": [
+    5
+   ],
+   "shared": null
+  },
+  {
+   "id": 5,
+   "positions": [
+    6
+   ],
+   "shared": null
+  }
+ ],
+ "guided": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5
+ ],
+ "sheets": [
+  {
+   "file": "guide_sheet_1.png",
+   "uids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "cols": 3,
+   "rows": 2
+  }
+ ],
+ "share_with": [
+  "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\idle\\cloaked_idle_strip.png"
+ ],
+ "marks": "C:\\Users\\Anil\\Desktop\\Animations Start Over\\Animations\\Rogue\\death\\cloaked_death_6frame_strip.hand-anchors.json"
+}
