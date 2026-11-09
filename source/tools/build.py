@@ -24,6 +24,7 @@ ASSASSIN_DIR = root.parent / "Animations" / "Assassin"
 SPELLBLADE_DIR = root.parent / "Animations" / "Spellblade"
 SLIME_DIR = root.parent / "Animations" / "Slime"          # the fire slime (monsters, 2026-11-07): the right-hand fighter's art; only the idle so far
 ICESLIME_DIR = root.parent / "Animations" / "IceSlime"       # the ice slime (2026-11-08): the cold twin of the fire slime, same slots
+DARKSLIME_DIR = root.parent / "Animations" / "DarkSlime"                  # the dark slime (2026-11-09): violet, horns, a green key
 LIGHTNINGSLIME_DIR = root.parent / "Animations" / "LightningSlime"   # the lightning slime (2026-11-09): yellow with blue-white arcs, same slots
 SLOTS = {"idle": "idle", "jump_attack": "attack", "cast": "attack", "umbral_shroud": "attack", "abyssal_backstab": "attack", "shadow_shiv": "attack", "static_stiletto": "attack", "dagger_throw": "attack", "permafrost_execution": "attack", "ember_spit": "attack", "magma_slam": "slam", "magma_eruption": "eruption", "inferno_bounce": "bounce", "frost_spit": "attack", "spark_spit": "attack", "thunder_slam": "slam", "voltaic_eruption": "eruption", "skybolt_bounce": "bounce", "glacier_slam": "slam", "permafrost_eruption": "eruption", "blizzard_bounce": "bounce","hit": "hit", "death": "death", "dodge": "dodge", "run": "run"}  # folder -> pack slot in the test page
 
@@ -131,6 +132,8 @@ for src in sorted((root / "src").glob("*.src.html")):
         text = text.replace("__SLIME_ANIMS__", default_anims(SLIME_DIR))
     if "__ICESLIME_ANIMS__" in text:
         text = text.replace("__ICESLIME_ANIMS__", default_anims(ICESLIME_DIR))
+    if "__DARKSLIME_ANIMS__" in text:
+        text = text.replace("__DARKSLIME_ANIMS__", default_anims(DARKSLIME_DIR))
     if "__LIGHTNINGSLIME_ANIMS__" in text:
         text = text.replace("__LIGHTNINGSLIME_ANIMS__", default_anims(LIGHTNINGSLIME_DIR))
     if "__SLIME_CANDIDATES__" in text:

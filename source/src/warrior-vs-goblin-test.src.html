@@ -233,7 +233,7 @@
     <button class="primary" id="play">Play</button>
     <button id="reset">Reset</button>
     <label class="lbl" id="charWrap" style="display:none">Character <select id="charSel"><option value="warrior">Warrior</option><option value="mage">Elf mage (idle only so far)</option><option value="rogue">Rogue (idle only so far)</option><option value="assassin">Assassin (idle only so far)</option><option value="spellblade">Spellblade (idle only so far)</option></select></label>
-    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option></select></label>
+    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime (idle only so far)</option></select></label>
     <label class="lbl" id="monSizeWrap" style="display:none">Monster size <input type="range" id="monSize" min="40" max="140" step="5" value="100" style="width:90px;vertical-align:middle"> <span id="monSizeV">100%</span></label>
     <label class="lbl" id="monSqWrap" style="display:none">Squash and stretch <input type="range" id="monSq" min="0" max="100" step="5" value="50" style="width:90px;vertical-align:middle"> <span id="monSqV">50%</span></label>
     <label class="lbl" id="monFxWrap" style="display:none"><span id="monFxName">Fire</span> effects <input type="range" id="monFx" min="0" max="150" step="5" value="80" style="width:90px;vertical-align:middle"> <span id="monFxV">80%</span></label>
@@ -5244,6 +5244,9 @@
   // The LIGHTNING slime (2026-11-09): yellow with blue-white arcs (Animations/LightningSlime, same slots); its idle is in, the other animations follow. vfx "lightning": its aura (a flickering light, crackling arcs, sparks).
   var LIGHT_ANIMS = __LIGHTNINGSLIME_ANIMS__;
   MONSTERS.lightning_slime = { name: "Lightning Slime", anims: LIGHT_ANIMS, fps: 8, squash: (LIGHT_ANIMS.filter(function (a) { return a.slot === "idle"; })[0] || {}).squash, sizeDef: 95, sqDef: 50, fxDef: 80, vfx: "lightning" };
+  // The DARK slime (2026-11-09): violet with black spirals and a crown of horns (Animations/DarkSlime, same slots, drawn on a GREEN key); its idle is in, the other animations follow. vfx "dark": its aura (smoke, a violet twist, crescents).
+  var DARK_ANIMS = __DARKSLIME_ANIMS__;
+  MONSTERS.dark_slime = { name: "Dark Slime", anims: DARK_ANIMS, fps: 8, squash: (DARK_ANIMS.filter(function (a) { return a.slot === "idle"; })[0] || {}).squash, sizeDef: 95, sqDef: 50, fxDef: 80, vfx: "dark" };
   // Candidate idle sheets of the re-looked fire slime (2026-11-07): every Animations/Slime/idle/candidates/<tag>_fire_idle_strip.png gets its own entry in the Monster select, to be compared in a fight.
   var SLIME_CANDIDATES = __SLIME_CANDIDATES__, CAND_LABEL = { gpt: "ChatGPT sheet", gemini: "Gemini v3 sheet (heavy bounce)", gemini2: "Gemini v4 sheet (calm)" }, CAND_SQ = {};   // CAND_SQ: the Squash and stretch default of a candidate (the calm v4 sheet is shown as drawn)
   SLIME_CANDIDATES.forEach(function (c) {
@@ -5329,7 +5332,7 @@
     $("monAtkWrap").style.display = idle && m.packs && m.packs.slam ? "" : "none";
     monEl = null; monFrame = 0;
     $("monFxWrap").style.display = idle && m.vfx ? "" : "none";
-    if (idle && m.vfx) { var fxv = monFxShare(key); $("monFx").value = fxv; $("monFxV").textContent = fxv + "%"; $("monFxName").textContent = m.vfx === "ice" ? "Ice" : m.vfx === "lightning" ? "Lightning" : "Fire"; }
+    if (idle && m.vfx) { var fxv = monFxShare(key); $("monFx").value = fxv; $("monFxV").textContent = fxv + "%"; $("monFxName").textContent = m.vfx === "ice" ? "Ice" : m.vfx === "lightning" ? "Lightning" : m.vfx === "dark" ? "Dark" : "Fire"; }
     monFxEnsure();
     if (!idle) {                                                                     // the placeholder (also the fallback for a monster whose art was not built)
       uG.classList.remove("mon"); uG.style.aspectRatio = ""; uG.classList.toggle("big", !!packs.idle);
@@ -5363,7 +5366,7 @@
   function monFxClear() { ["mfxB", "mfxF"].forEach(function (id) { fxCtx(id).clearRect(0, 0, stage.clientWidth, stage.clientHeight); }); MFX.ps.length = 0; }
   function monFxEnsure() {
     var m = MONSTERS[monKey];
-    if (m && (m.vfx === "fire" || m.vfx === "ice" || m.vfx === "lightning")) { if (!MFX.raf) { MFX.last = 0; MFX.raf = requestAnimationFrame(monFxLoop); } }
+    if (m && (m.vfx === "fire" || m.vfx === "ice" || m.vfx === "lightning" || m.vfx === "dark")) { if (!MFX.raf) { MFX.last = 0; MFX.raf = requestAnimationFrame(monFxLoop); } }
     else { if (MFX.raf) { cancelAnimationFrame(MFX.raf); MFX.raf = 0; } monFxClear(); }
   }
   function mfxTex(ctx, im, x, y, w, h, a, flip) {                                       // a painted picture (or the masked canvas made from it), additive, its bottom edge centred on x and standing on y
@@ -5536,12 +5539,60 @@
       }
     }
   }
+  // DARK AURA (2026-11-09). The dark slime's element colour is the violet of the dark_aura picture (measured: body blue-violet 105,6,255, bright parts 175,74,255). Drawn on the same two canvases as the other auras, subtle:
+  // BEHIND it a dark pool on the ground with a violet rim, a violet halo and the painted violet twist (dark_aura, two copies breathing against each other); plus soft puffs of dark smoke (normal blending: they darken
+  // what is behind them) that rise slowly from the horns, half of them in front of it and half behind, small violet crescents that float up and turn, and a few violet motes. A hit throws out ink blobs and crescents.
+  var DKC = { core: "235,205,255", bright: "175,74,255", mid: "105,20,255", deep: "60,10,170" };
+  function smokeDot(ctx, x, y, r, a) {                                               // a soft puff of dark violet smoke
+    if (a <= 0.004 || r < 2) return;
+    var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, "rgba(44,18,84," + a.toFixed(3) + ")"); g.addColorStop(0.6, "rgba(34,14,66," + (a * 0.55).toFixed(3) + ")"); g.addColorStop(1, "rgba(28,10,56,0)");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fill();
+  }
+  function crescentDraw(ctx, x, y, r, rot, a) {                                      // a violet crescent with a soft glow (a circle with a shifted circle cut out of it)
+    glowDot(ctx, x, y, r * 2.4, DKC.mid, 0.35 * a);
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.translate(x, y); ctx.rotate(rot);
+    ctx.beginPath(); ctx.arc(0, 0, r, 0, 6.2832); ctx.clip();
+    ctx.beginPath(); ctx.rect(-2 * r, -2 * r, 4 * r, 4 * r); ctx.arc(r * 0.42, 0, r * 0.86, 0, 6.2832, true);
+    ctx.fillStyle = "rgba(" + DKC.bright + "," + Math.min(1, a).toFixed(3) + ")"; ctx.fill(); ctx.restore();
+  }
+  function darkBurst(s, cx, gy, rnd) {                                               // a hit: ink blobs fly out of the body and crescents spin away
+    var i, a, v, y0 = gy - 0.3 * s;
+    for (i = 0; i < 12; i++) { a = rnd() * 6.2832; v = (0.0004 + rnd() * 0.0009) * s; MFX.ps.push({ kind: "blob", x: cx + Math.cos(a) * 0.1 * s, y: y0 + Math.sin(a) * 0.08 * s, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 0.0003 * s, age: 0, life: 600 + rnd() * 500, size: Math.max(2, s * (0.012 + rnd() * 0.014)) }); }
+    for (i = 0; i < 4; i++) { a = -3.14159 * rnd(); v = (0.0003 + rnd() * 0.0005) * s; MFX.ps.push({ kind: "cres", x: cx + (rnd() - 0.5) * 0.4 * s, y: y0, vx: Math.cos(a) * v, vy: Math.sin(a) * v, age: 0, life: 900 + rnd() * 600, size: s * (0.02 + 0.015 * rnd()), rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.01 }); }
+  }
+  function darkFxDraw(cb, cf, now, dt, K, k, s, cx, gy, rnd) {
+    var fl = 0.85 + 0.15 * Math.sin(now * 0.0021), f2 = 0.5 + 0.5 * Math.sin(now * 0.0016), i, p, f, a;
+    cb.save(); cb.fillStyle = "rgba(20,8,40," + (0.3 * K).toFixed(3) + ")"; cb.beginPath(); cb.ellipse(cx, gy - 0.005 * s, 0.62 * s, 0.085 * s, 0, 0, 6.2832); cb.fill(); cb.restore();   // the dark pool on the ground
+    glowEllipse(cb, cx, gy, 0.6 * s, 0.09 * s, DKC.mid, 0.26 * K * fl);
+    glowDot(cb, cx, gy - 0.30 * s, 0.85 * s, DKC.mid, 0.11 * K * fl);
+    mfxTex(cb, fbTex.dark_aura, cx, gy - 0.01 * s, 1.15 * s * (0.97 + 0.06 * f2), 0.9 * s * (0.97 + 0.06 * f2), 0.30 * K * (0.45 + 0.55 * fl), false);
+    mfxTex(cb, fbTex.dark_aura, cx, gy - 0.01 * s, 1.0 * s * (1.03 - 0.06 * f2), 0.8 * s * (1.03 - 0.06 * f2), 0.2 * K * (0.45 + 0.55 * (1.2 - fl)), true);
+    MFX.accSm = (MFX.accSm || 0) + 0.0030 * k * MFX.dieMul * dt; MFX.accCr = (MFX.accCr || 0) + 0.0010 * k * MFX.dieMul * dt; MFX.accMt = (MFX.accMt || 0) + 0.0035 * k * MFX.dieMul * dt;
+    while (MFX.accSm >= 1) { MFX.accSm -= 1; MFX.ps.push({ kind: "smoke", x: cx + (rnd() - 0.5) * 0.7 * s, y: gy - (0.42 + rnd() * 0.2) * s, vx: (rnd() - 0.5) * 0.00006 * s, vy: -(0.00004 + rnd() * 0.00008) * s, age: 0, life: 2800 + rnd() * 1800, size: s * (0.10 + rnd() * 0.08), front: rnd() < 0.45 }); }
+    while (MFX.accCr >= 1) { MFX.accCr -= 1; MFX.ps.push({ kind: "cres", x: cx + (rnd() - 0.5) * 0.6 * s, y: gy - (0.5 + rnd() * 0.2) * s, vx: (rnd() - 0.5) * 0.00003 * s, vy: -(0.00007 + rnd() * 0.00005) * s, age: 0, life: 2200 + rnd() * 1500, size: s * (0.018 + rnd() * 0.014), rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.002 }); }
+    while (MFX.accMt >= 1) { MFX.accMt -= 1; MFX.ps.push({ kind: "mote", x: cx + (rnd() - 0.5) * 0.9 * s, y: gy - (0.1 + rnd() * 0.65) * s, age: 0, life: 500 + rnd() * 500, size: s * (0.008 + rnd() * 0.01) }); }
+    if (MFX.ps.length > 160) MFX.ps.splice(0, MFX.ps.length - 160);
+    for (i = MFX.ps.length - 1; i >= 0; i--) {
+      p = MFX.ps[i]; p.age += dt;
+      if (p.age >= p.life) { MFX.ps.splice(i, 1); continue; }
+      f = p.age / p.life;
+      if (p.kind === "smoke") { p.x += p.vx * dt; p.y += p.vy * dt; smokeDot(p.front ? cf : cb, p.x, p.y, p.size * (0.8 + 0.7 * f), Math.sin(Math.min(1, f) * 3.14159) * 0.2 * K); }
+      else if (p.kind === "cres") { p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.spin * dt; crescentDraw(cf, p.x, p.y, p.size, p.rot, Math.sin(f * 3.14159) * 0.9 * Math.min(1, K)); }
+      else if (p.kind === "mote") { a = Math.sin(f * 3.14159) * K; glowDot(cf, p.x, p.y, p.size * 3, DKC.bright, a * 0.5); glowDot(cf, p.x, p.y, p.size, DKC.core, a * 0.8); }
+      else if (p.kind === "blob") {
+        p.vy += 0.0000035 * s * dt; p.x += p.vx * dt; p.y += p.vy * dt; a = (1 - f) * Math.min(1, K * 1.5);
+        cf.save(); cf.fillStyle = "rgba(24,10,48," + (0.9 * a).toFixed(3) + ")"; cf.beginPath(); cf.arc(p.x, p.y, p.size, 0, 6.2832); cf.fill(); cf.restore();
+        glowDot(cf, p.x, p.y, p.size * 2, DKC.mid, 0.3 * a);
+      }
+    }
+  }
   function monFxLoop(now) {
     MFX.raf = requestAnimationFrame(monFxLoop);
     var m = MONSTERS[monKey], cb = fxCtx("mfxB"), cf = fxCtx("mfxF"), W = stage.clientWidth, H = stage.clientHeight;
     cb.clearRect(0, 0, W, H); cf.clearRect(0, 0, W, H);
     var k = (+$("monFx").value || 0) / 100;
-    if (!m || (m.vfx !== "fire" && m.vfx !== "ice" && m.vfx !== "lightning") || k <= 0.01) { MFX.ps.length = 0; return; }
+    if (!m || (m.vfx !== "fire" && m.vfx !== "ice" && m.vfx !== "lightning" && m.vfx !== "dark") || k <= 0.01) { MFX.ps.length = 0; return; }
     var dt = MFX.last ? Math.min(60, now - MFX.last) : 16, rnd = MFX.rnd, i, n, p, f, col, a;
     MFX.last = now;
     var r = rectIn(uG), op = +getComputedStyle(uG).opacity || 0;
@@ -5551,6 +5602,7 @@
     MFX.flare += ((hit ? 1 : 0) - MFX.flare) * Math.min(1, dt / (hit ? 70 : 380));
     if (hit && !MFX.hit && m.vfx === "ice") for (n = 0; n < 14; n++) { var ca = rnd() * 6.2832, cv = (0.0004 + rnd() * 0.0010) * s; MFX.ps.push({ kind: "chip", x: cx + (rnd() - 0.5) * 0.5 * s, y: gy - (0.3 + rnd() * 0.3) * s, vx: Math.cos(ca) * cv, vy: Math.sin(ca) * cv - 0.0005 * s, age: 0, life: 650 + rnd() * 500, size: Math.max(2, s * (0.012 + rnd() * 0.012)), rot: rnd() * 6.28, spin: (rnd() - 0.5) * 0.02 }); }
     else if (hit && !MFX.hit && m.vfx === "lightning") lightBurst(s, cx, gy, rnd);
+    else if (hit && !MFX.hit && m.vfx === "dark") darkBurst(s, cx, gy, rnd);
     else if (hit && !MFX.hit) for (n = 0; n < 12; n++) MFX.ps.push({ kind: "ember", x: cx + (rnd() - 0.5) * 0.6 * s, y: gy - (0.35 + rnd() * 0.3) * s, vx: (rnd() - 0.5) * 0.0011 * s, vy: -(0.0006 + rnd() * 0.0009) * s, age: 0, life: 700 + rnd() * 700, size: Math.max(1.4, s * 0.012) });
     MFX.hit = hit;
     var fl = 0.86 + 0.08 * Math.sin(now * 0.017) + 0.06 * Math.sin(now * 0.043 + 1.3), K;
@@ -5558,6 +5610,7 @@
     K = k * op * op * (1 + 0.6 * MFX.flare) * MFX.dieMul;   // (op squared: the fire goes out a little faster than the body fades)
     if (m.vfx === "ice") { iceFxDraw(cb, cf, now, dt, K, k, s, cx, gy, rnd); return; }
     if (m.vfx === "lightning") { lightFxDraw(cb, cf, now, dt, K, k, s, cx, gy, rnd); return; }
+    if (m.vfx === "dark") { darkFxDraw(cb, cf, now, dt, K, k, s, cx, gy, rnd); return; }
     // behind: the warm halo, the light on the ground, the painted flames
     glowDot(cb, cx, gy - 0.34 * s, 0.85 * s, "255,110,30", 0.27 * K * fl);
     glowEllipse(cb, cx, gy, 0.68 * s, 0.11 * s, "255,100,20", 0.45 * K * fl);
