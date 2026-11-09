@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fire slime idle preview</title>
+<style>
+  :root { --bg:#16221a; --fg:#e8efe6; --mute:#9db3a2; --panel:#22352a; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.4 system-ui, sans-serif; padding:16px; }
+  h1 { font-size:18px; margin:0 0 4px; }
+  p { margin:4px 0 12px; color:var(--mute); }
+  .wrap { display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; }
+  canvas { background:linear-gradient(#35603f 0%, #2c5136 70%, #234329 100%); border-radius:8px; max-width:100%; height:auto; }
+  .ctl { background:var(--panel); padding:12px 14px; border-radius:8px; min-width:240px; }
+  .ctl label { display:block; margin:8px 0 2px; }
+  .ctl input[type=range] { width:100%; }
+  button { background:#3c5c47; color:var(--fg); border:0; border-radius:6px; padding:6px 12px; margin:6px 6px 0 0; cursor:pointer; }
+  .val { color:var(--mute); }
+</style>
+</head>
+<body>
+<h1>Fire slime idle (6 frames)</h1>
+<p>The strip as cut from the generated sheet. The "breath boost" slider only stretches the picture up and down in this preview (it does not change the file), so you can judge whether the body should breathe more.</p>
+<div class="wrap">
+  <canvas id="c" width="512" height="512"></canvas>
+  <div class="ctl">
+    <label>Speed: <span class="val" id="fpsv">8</span> frames per second</label>
+    <input id="fps" type="range" min="2" max="16" step="1" value="8">
+    <label>Breath boost: <span class="val" id="bv">0</span> %</label>
+    <input id="boost" type="range" min="0" max="12" step="1" value="0">
+    <label>Size: <span class="val" id="szv">100</span> %</label>
+    <input id="sz" type="range" min="50" max="150" step="10" value="100">
+    <div>
+      <button id="play">Pause</button>
+      <button id="prev">&#9664; Frame</button>
+      <button id="next">Frame &#9654;</button>
+    </div>
+    <p>Frame: <span id="fi" class="val">1</span> / 6</p>
+  </div>
+</div>
+<script>
+(function () {
+  var img = new Image();
+  var c = document.getElementById('c'), ctx = c.getContext('2d');
+  var FR = 6, F = 512, GROUND = 470;
+  var idx = 0, playing = true, last = 0, acc = 0;
+  // how much of the boost each frame gets: frame 3 is the generated squash, 4 and 6 lead in and out of the stretch, 5 is the peak
+  var BOOST = [0, 0, 0, 0.5, 1, 0.5];
+  function $(id) { return document.getElementById(id); }
+  function draw() {
+    ctx.clearRect(0, 0, F, F);
+    var sc = $('sz').value / 100, b = $('boost').value / 100 * BOOST[idx];
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.beginPath(); ctx.moveTo(0, GROUND + 0.5); ctx.lineTo(F, GROUND + 0.5); ctx.stroke();
+    ctx.save();
+    ctx.translate(F / 2, GROUND);
+    ctx.scale(sc, sc * (1 + b));
+    ctx.translate(-F / 2, -GROUND);
+    ctx.drawImage(img, idx * F, 0, F, F, 0, 0, F, F);
+    ctx.restore();
+    $('fi').textContent = (idx + 1);
+  }
+  function tick(t) {
+    if (playing) {
+      var step = 1000 / $('fps').value;
+      acc += t - last;
+      while (acc >= step) { acc -= step; idx = (idx + 1) % FR; }
+    }
+    last = t;
+    draw();
+    requestAnimationFrame(tick);
+  }
+  $('fps').oninput = function () { $('fpsv').textContent = this.value; };
+  $('boost').oninput = function () { $('bv').textContent = this.value; };
+  $('sz').oninput = function () { $('szv').textContent = this.value; };
+  $('play').onclick = function () { playing = !playing; this.textContent = playing ? 'Pause' : 'Play'; };
+  $('prev').onclick = function () { playing = false; $('play').textContent = 'Play'; idx = (idx + FR - 1) % FR; };
+  $('next').onclick = function () { playing = false; $('play').textContent = 'Play'; idx = (idx + 1) % FR; };
+  img.onload = function () { requestAnimationFrame(function (t) { last = t; tick(t); }); };
+  img.src = 'fire_idle_strip.png';
+})();
+</script>
+</body>
+</html>

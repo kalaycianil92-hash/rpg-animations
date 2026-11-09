@@ -1,0 +1,27 @@
+{
+ "format": "frame-placement/1",
+ "animation": "dodge",
+ "file": "fire_dodge_6frame_strip.png",
+ "frames": 6,
+ "fps": 14,
+ "evadeFrame": 4,
+ "smooth": true,
+ "xUnit": "character-widths",
+ "x": [
+  0,
+  -0.03,
+  -0.09,
+  -0.15,
+  -0.1,
+  -0.03
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "note": "The fire slime's dodge path: a short hop AWAY from the enemy (the monster stands near the right edge of the stage, so only 0.15 of a character width at the top, the warrior's is 0.22), then it slides back home. The hop's lift is drawn in the strip (52 px above the floor at frame 4). evadeFrame 4: the top of the hop, on screen when the dodged strike would land."
+}

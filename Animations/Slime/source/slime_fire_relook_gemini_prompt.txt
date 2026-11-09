@@ -1,0 +1,43 @@
+FIRE SLIME RE-LOOK PROMPT: the same slime, painted to belong in the forest. Written 2026-11-07.
+
+WHY (the user, 2026-11-07, seeing the slime in the test page): "the entire slime looks like a cartoon and does not fit the stage design-wise". My blend test (docs/blend_test_1.png) showed the cause: the stage is soft, pastel and hazy with no black lines, the warrior is dark with thin outlines, but the slime has a thick black outline, glossy white-yellow highlights and a very saturated orange body, so it reads as a sticker. A colour filter cannot fix that without turning it into a dull brown blob, and blurring only makes it look out of focus. The fix is in the PAINTING: this prompt repaints the same design in the style of the world. The page's blend sliders (Stage blend panel) then do the last bit of matching.
+
+HOW TO USE
+- Attach TWO images, in this order:
+  1. Animations/Slime/reference_image.png (the slime: the DESIGN to keep exactly).
+  2. Animations/Slime/source/relook_style_reference.png (the STYLE target: the warrior standing in the Glimmerwood forest, taken from the game stage; no slime in it).
+  Ask for a square (1:1) image, as large as it will give you. Paste everything between the two lines of equals signs. Works in Gemini and in ChatGPT; one image per try, generate several and keep the best.
+- Save the best in inbox/ (for example inbox/slime_fire_relook.png or .jpg) and tell me.
+- What I check: (1) the SAME slime (same shape, face, blister places, flame crown, two side tongues, embers, no smoke, facing right, same size and place in the picture); (2) the outline is thin and dark warm brown, NOT black; (3) the body is matte and earthy, not glossy; the flames are the brightest part; (4) crisp hard edges everywhere and no glow, halo or haze (it must still key off the magenta cleanly); (5) it looks painted in the same hand as the warrior and the forest; (6) one image, no GIF.
+- What happens next: if it is right, it becomes the official look (`Animations/Slime/reference_image.png`; the glossy one is kept as `reference_image_v1_glossy.png`), and the idle sheet is generated again from it with the new idle prompt (version 3, `idle/source/slime_fire_idle_gemini_prompt.txt`), then cut with the same tools.
+- Known risks: it may copy the warrior or the forest (the reply below), or keep the black outline and gloss (the other reply). Do not let it add a floor, shadow or background scenery: the slime must be on flat magenta.
+
+==============================================================================
+OUTPUT: exactly ONE still image, and nothing else. Do NOT create a GIF, an animation, extra images or alternate versions.
+
+TASK: repaint the creature of the FIRST attached image (the fire slime) so that it looks painted in the same style as the SECOND attached image (a warrior standing in a forest). Keep the DESIGN of the first image exactly; change only HOW IT IS PAINTED. Do NOT copy the warrior, the forest, the plants, the light beams or any object of the second image; copy only its painting style.
+
+KEEP EXACTLY (from the first image): the same creature: a low dome of molten orange-red jelly, wider than tall, with a flat wavy skirt-like base; the same angry face (heavy slanted brows, narrow slanted eyes with glowing yellow pupils, wavy grimace with two small bumps at the corners); the same bubbles (blisters) in the same places and sizes; the same crown of tall flames on top of the head, the same flame tongue on each side of the body, the same few small floating embers. No smoke, no arms, no legs, no ears, no horns. The same three-quarter view turned to the right, the same pose, the same proportions, and the same size and position in the picture, centred, with at least 10% empty margin on every side.
+
+CHANGE THE PAINTING STYLE (to match the second image):
+- OUTLINE: much thinner than the first image, about 40% of its present thickness, a dark warm red-brown (like dried blood or dark rust), NEVER black and never pure dark grey. A hand-painted line of slightly varying weight, thinner where the light hits, like the warrior's outlines. It must still be dark enough to separate the creature cleanly from the background.
+- BODY: matte and earthy instead of glossy: a deep molten red-orange with darker, warmer shading like cooling magma or hot clay, soft painterly gradients, and a fine surface texture (small cracks, mottling, tiny glowing veins) like the textured painting in the second image. NO big white-yellow glossy specular highlights and no wet plastic shine: use only a few small, soft, subdued highlights.
+- BUBBLES: the blisters stay in the same places but become matte, softly glowing pockets (like embers trapped under the skin) instead of shiny wet spheres; softer rims, smaller highlights.
+- COLOUR: a more muted, natural palette: a little less saturated and slightly darker than the first image, in harmony with the greens and browns of the second image. The FLAMES stay the brightest and most luminous part of the picture (yellow-white core, orange body, red tips), because the flames are this creature's light, but they are painted with the same softer, painterly shading and the same thin warm-brown outline, and they stay crisp and fully opaque.
+- LIGHT: soft light from the upper left, a gentle warm rim light on the right edge, soft shading, no hard black shadow shapes. The overall feel is hand-painted game art made by the same artist as the second image, NOT a glossy vector sticker, NOT a mobile-game icon and NOT a 3D render.
+
+STILL TRUE (so the picture can be cut out): every edge is crisp, hard and opaque. NO glow, NO halo, NO bloom, NO heat haze, NO blur, NO see-through parts, NO smoke, NO light spilling onto the background. No fire on the floor, no puddle, no cast shadow.
+
+BACKGROUND: one flat pure magenta (#FF00FF) background filling the whole picture, identical in every pixel. No gradient, ground line, scenery, shadow, reflection or vignette. No text, labels or borders. No magenta or pink anywhere on the creature itself.
+
+FINAL REMINDER: exactly one image; the same fire slime repainted in the painting style of the second image (thin warm-brown outline, matte earthy body, bright crisp flames); do not copy the warrior or the forest; flat magenta background.
+==============================================================================
+
+REPLY IF IT COPIES THE WARRIOR OR THE FOREST
+"Redo it. Draw ONLY the fire slime from the first image on a flat magenta background. Do not draw the warrior, the forest or anything else from the second image; take only its soft painted style."
+
+REPLY IF THE OUTLINE IS STILL BLACK OR THE BODY STILL GLOSSY
+"Redo it. The outline must be thin (about 40% of the first image's) and dark warm red-brown, not black. The body must be matte and earthy with a fine painted texture and only a few small soft highlights, not glossy. The flames stay bright and crisp."
+
+REPLY IF IT CHANGED THE DESIGN
+"Redo it. Keep the creature exactly as in the first image: the same face, the same bubbles in the same places, the same flames and embers, the same shape and view. Change only the paint style."

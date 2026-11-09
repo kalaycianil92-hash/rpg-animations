@@ -1,0 +1,105 @@
+NOTE 2026-11-07 (later): the user decided the fire slime should have NO smoke in its sprite (smoke is not a main feature; a little vague smoke may come later as a faint soft layer). This file's version 2 describes the SMOKY picture the user generated (Animations/Slime/source/fire_reference_with_smoke.png); the official reference is now the same picture with the smoke removed by colour (Animations/Slime/reference_image.png). To make a fresh smoke-free reference with a generator, delete the smoke sentences of the CHARACTER, ITS FIRE paragraph and the SIZE line (whole creature about 70% of the height).
+
+SLIME, FIRE VARIANT: the reference picture WITH its flames and smoke drawn in (2026-11-07, version 2). Step 1 of the slime's default animations.
+==================================================================================================================================
+
+DECISION (the user, 2026-11-07): the elemental parts are drawn IN the sprites, not added later by code, because a
+bare body with code effects would look too simple. Our own effects (hit flashes, the aura and status looks, extra
+glow) are still added on top later. Version 1 of this file (the bare body, no effects) is kept at the end as the
+fallback.
+
+THE RULE FOR WHAT GOES INTO THE SPRITE
+- IN THE SPRITE: everything CRISP and OPAQUE with a clean edge: the flame crown, flame tongues, embers as small
+  solid flames, stylised smoke as solid cartoon clouds with an outline, crystals, spikes, hairline arcs, star
+  sparkles, ink wisps.
+- LEFT OUT of the sprite: everything SOFT, GLOWING or TRANSPARENT: glow, halo, bloom, light rays, heat haze,
+  frost mist, soft see-through smoke. Why: the sheets are drawn on a flat magenta background and cut out by
+  colour; a soft or glowing edge cannot be separated from the background (it stays as a pink halo). Those parts
+  come later as separate painted layers (like the mage's skill textures, drawn additively over the sprite).
+Because the effects are different in every panel (flames flicker, smoke drifts, arcs jump) the animation gets a
+natural flicker; only the BODY has to stay the same from panel to panel.
+
+WHAT TO ATTACH
+ONE image: variants/fire_slime_x3.png (the fire slime cut from the user's sheet, 3x enlarged).
+Ask for a 3:2 image (a 1:1 also works).
+
+WHAT TO DO WITH THE RESULT
+Save the winner as inbox/slime_fire_reference.png and tell me. I check: the same slime, face and blisters; the
+flames and smoke drawn crisp and solid; NO glow or haze; turned a little to the right; flat magenta with no pink
+fringe; the base resting flat. If it draws a glow or soft smoke anyway, send the REPLY at the bottom in the same
+chat.
+
+THE PROMPT (paste everything between the lines)
+-----------------------------------------------------------------------------------------------------
+OUTPUT: make exactly ONE still image. No GIF, no animation, no extra images.
+
+Make a character reference picture of a small monster for a 2D fantasy RPG: the FIRE SLIME from the attached
+picture, with its flames and smoke. Keep the same painted game-sprite style, thick dark outlines, colours,
+blisters and face. Do not redesign the character.
+
+CHARACTER, THE BODY: a low dome of glossy molten orange-red jelly, wider than tall (the width is about 1.7 times
+the height of the body, like the attached picture). Its underside is a flat, wavy, skirt-like edge that spreads
+out on the ground in soft scallops. Thick dark red-brown outline around the body, a lighter yellow-orange rim
+light along the lower edge, and glossy yellow-orange blisters (bubbles) of different sizes scattered over the
+body exactly like the attached picture. The face: heavy slanted angry brows, two narrow slanted eyes with glowing
+yellow pupils, and a wavy grimace with two small bumps at the corners. No arms, no legs, no ears, no horns.
+
+CHARACTER, ITS FIRE (drawn like the attached picture, but crisp): a crown of tall flames burning on top of its
+head, and one flame tongue licking up on each side of the body. Every flame is painted with a bright yellow core,
+an orange body and red tips, and has a clean dark red-brown outline like the body's, fully opaque. A few small
+solid flames or embers float just above the crown. Behind and above the flames, two or three puffs of smoke, drawn
+as SOLID, fully opaque, stylised cartoon clouds in dark grey with a darker grey outline and simple flat shading.
+The flames and the smoke are part of the creature and stay close to it: the flames rise at most about one body
+height above the dome, the smoke a little higher.
+
+NO SOFT EFFECTS: no glow, no light halo, no bloom, no lens flare, no heat haze, no blur, no soft or see-through
+smoke, no gradient fade-outs, no light spilling onto the background. Every part of the picture has a crisp,
+hard, opaque edge. No fire on the floor, no puddle, no cast shadow.
+
+VIEW: a three-quarter view, the whole body and the face turned about 30 degrees towards the RIGHT edge of the
+picture, as if it were looking at an enemy standing on the right. The base rests flat on an invisible floor.
+
+SIZE AND FLOOR: the slime is centred. The body (the dome) is about 45% of the picture width; the lowest point of
+its base is at about 82% of the picture height; with the flames and smoke the whole creature is at most 70% of
+the picture height. At least 10% empty margin on every side; nothing touches an edge.
+
+BACKGROUND: one flat pure magenta (#FF00FF) background filling the whole picture, identical in every pixel. No
+gradient, ground line, shadow, reflection, glow or vignette. No text, labels or borders. No magenta or pink
+anywhere on the creature itself; the outlines are dark red-brown or dark grey and hard-edged.
+
+FINAL REMINDER: exactly one image; the fire slime with crisp opaque flames and solid cartoon smoke; no glow, no
+haze, no soft edges; facing right; flat magenta background.
+-----------------------------------------------------------------------------------------------------
+
+REPLY IF IT DRAWS A GLOW, A HALO OR SOFT SMOKE
+"Redo it. Keep the same slime, flames and smoke, but make every part crisp and opaque: NO glow, NO halo, NO heat
+haze, NO see-through or blurry smoke anywhere. The smoke must be solid cartoon clouds with a darker outline.
+Flat magenta background."
+
+REPLY IF IT COPIES THE FRONT VIEW
+"Redo it. Turn the whole slime, face included, about 30 degrees to the right, so its face looks towards the
+right edge of the picture and the left side of its body is a little more visible. The base stays flat on the
+floor."
+
+ELEMENT NOTES (for the other four, later; same prompt, swap the CHARACTER paragraphs)
+- ICE (variants/ice_slime_x3.png): IN: the crystals on its back and sides, the frosty rim, a few crisp ice chips
+  and snow dots (solid, small). LEFT OUT: the frost mist and the glow. Angry, frowning face.
+- LIGHTNING (variants/lightning_slime_x3.png): IN: the spiky yellow body, the jagged cyan mouth and eyes, and
+  HAIRLINE jagged cyan-white arcs crackling round it, crisp with no glow (the arcs will differ in every frame,
+  which is what we want). LEFT OUT: the glow.
+- DARK (variants/dark_slime_x3.png): IN: the carved swirl pattern, the glowing violet eyes (crisp), thick solid
+  smoke wisps in dark violet-black with a darker outline, solid black blobs. LEFT OUT: haze and glow. NOTE: it is
+  VIOLET, so a magenta background would eat its edge: ask for a flat pure GREEN (#00FF00) background for this one
+  and tell me, the cutters need a different key colour.
+- HOLY (variants/holy_slime_x3.png): IN: the smooth golden dome, glossy highlights, the happy closed eyes with the
+  smile, crisp four-point star sparkles (solid white-gold). LEFT OUT: the light rays and the glow (rays look best
+  as an additive layer behind it, which we add later). Keep the outline a darker gold-brown so a magenta key does
+  not fringe.
+
+=====================================================================================================
+VERSION 1, THE FALLBACK: the bare body, no effects (use only if the version above keeps coming out soft)
+=====================================================================================================
+Same as above, but replace the paragraph "CHARACTER, ITS FIRE" with: "NO EFFECTS: draw NO flames, NO smoke, NO
+embers, NO sparks and NO glow. The top of the dome is a smooth dome (the blisters stay, the flames do not). The
+effects will be added later by code, so the picture must be the plain body only." and ask for the body at about
+55% of the picture width with the base at 80%.

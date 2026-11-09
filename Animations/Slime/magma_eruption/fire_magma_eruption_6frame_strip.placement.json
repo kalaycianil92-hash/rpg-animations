@@ -1,0 +1,55 @@
+{
+ "format": "frame-placement/1",
+ "animation": "magma_eruption",
+ "file": "fire_magma_eruption_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "sizeAgainstIdle": [
+  1.03,
+  0.919,
+  0.656,
+  0.383,
+  0.913,
+  0.97
+ ],
+ "frameInfo": [
+  {
+   "x": 243.0,
+   "bottom": 469,
+   "top": 90,
+   "bodyW": 388.0
+  },
+  {
+   "x": 257.5,
+   "bottom": 468,
+   "top": 159,
+   "bodyW": 321.0
+  },
+  {
+   "x": 260.5,
+   "bottom": 469,
+   "top": 219,
+   "bodyW": 233.0
+  },
+  {
+   "x": 267.5,
+   "bottom": 469,
+   "top": 332,
+   "bodyW": 141.0
+  },
+  {
+   "x": 257.5,
+   "bottom": 470,
+   "top": 135,
+   "bodyW": 319.0
+  },
+  {
+   "x": 243.5,
+   "bottom": 469,
+   "top": 134,
+   "bodyW": 365.0
+  }
+ ],
+ "slideFrame": 4,
+ "note": "frame sizes by base width against the idle's 350 px; frame 4 (index 3) is the tiny core the page slides; the shrink plays frames 1 to 4, the re-forming plays 4, 3, 5, 6 (the generator drew frame 5 almost full size)"
+}

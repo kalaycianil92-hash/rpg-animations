@@ -1,0 +1,21 @@
+{
+ "format": "frame-placement/1",
+ "animation": "magma_slam",
+ "file": "fire_magma_slam_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "hitFrame": 7,
+ "smooth": true,
+ "xUnit": "fractions of the way from home to the landing spot (0.62 character widths in front of the target)",
+ "x": [
+  0,
+  0,
+  0.04,
+  0.3,
+  0.62,
+  0.88,
+  1,
+  1
+ ],
+ "note": "The fire slime's Magma Slam path: it stays home through the crouch, leaves the floor in frame 3, crosses most of the way while rising and at the top of the leap (frames 4 and 5), is nearly there when it falls (6), lands on the landing spot at the start of frame 7 (the splat, the hit frame) and stays there for the rebound (8); the page then slides it home. The height of the leap (about 160 px at the top in the 512 px cell) is drawn in the strip."
+}

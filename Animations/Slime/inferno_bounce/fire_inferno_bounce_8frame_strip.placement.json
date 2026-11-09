@@ -1,0 +1,67 @@
+{
+ "format": "frame-placement/1",
+ "animation": "inferno_bounce",
+ "file": "fire_inferno_bounce_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "hitFrame": 5,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 84,
+   "bottom": 471,
+   "baseW": 350.0,
+   "bodyBottomY": 470
+  },
+  {
+   "lift": 0.0,
+   "top": 158,
+   "bottom": 471,
+   "baseW": 332.5,
+   "bodyBottomY": 470
+  },
+  {
+   "lift": 16.9,
+   "top": 118,
+   "bottom": 489,
+   "baseW": 145.3,
+   "bodyBottomY": 453
+  },
+  {
+   "lift": 0.0,
+   "top": 72,
+   "bottom": 483,
+   "baseW": 223.5,
+   "bodyBottomY": 470
+  },
+  {
+   "lift": 0.0,
+   "top": 216,
+   "bottom": 470,
+   "baseW": 352.2,
+   "bodyBottomY": 470
+  },
+  {
+   "lift": 40.9,
+   "top": 59,
+   "bottom": 433,
+   "baseW": 245.0,
+   "bodyBottomY": 429
+  },
+  {
+   "lift": 0.0,
+   "top": 181,
+   "bottom": 470,
+   "baseW": 328.1,
+   "bodyBottomY": 470
+  },
+  {
+   "lift": 0.0,
+   "top": 68,
+   "bottom": 470,
+   "baseW": 357.0,
+   "bodyBottomY": 470
+  }
+ ],
+ "note": "frames: 1 rest, 2 crouch, 3 launch (a ball with a tail of flame below it, in the air), 4 plummet (a teardrop, flames streaming up), 5 CRASH (the hit frame), 6 bounce (startled, a little above the floor), 7 heavy landing, 8 settle. The page lifts and drops the unit itself; lift = body height above the floor in the cell."
+}

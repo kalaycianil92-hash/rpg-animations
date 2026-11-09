@@ -1,0 +1,27 @@
+{
+ "note": "per-frame proportions of the drawn slime against frame 1: h = height of the face above the ground, w = width of the base; the page undoes a chosen share of the deformation",
+ "h": [
+  1.0,
+  0.807,
+  0.634,
+  0.992,
+  1.107,
+  0.975
+ ],
+ "w": [
+  1.0,
+  0.997,
+  1.029,
+  0.974,
+  0.937,
+  0.997
+ ],
+ "match": [
+  1.0,
+  0.87,
+  0.75,
+  0.95,
+  0.95,
+  0.96
+ ]
+}

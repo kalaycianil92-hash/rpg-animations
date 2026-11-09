@@ -1,0 +1,26 @@
+{
+ "note": "the glowing mouth interior per frame (centre and size in the 512 cell, before the page mirrors the sprite): the spit leaves the mouth at the release frame 5",
+ "mouth": {
+  "4": {
+   "area": 1484,
+   "x": 300.0,
+   "y": 375.6,
+   "w": 42,
+   "h": 46
+  },
+  "5": {
+   "area": 1215,
+   "x": 318.1,
+   "y": 358.8,
+   "w": 38,
+   "h": 43
+  },
+  "6": {
+   "area": 873,
+   "x": 368.9,
+   "y": 388.6,
+   "w": 34,
+   "h": 37
+  }
+ }
+}
