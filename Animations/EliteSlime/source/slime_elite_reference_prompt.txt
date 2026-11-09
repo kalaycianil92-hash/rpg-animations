@@ -1,0 +1,64 @@
+ELITE SLIME: THE LOOK (the reference picture, step 1). Written 2026-11-09, after the dark slime was finished (5 skills, painted glow with light ink).
+
+WHY. The four elemental slimes (fire, ice, lightning, dark) are one creature in four elements. The Elite is different on purpose (the user, 2026-11-09): a slime of STONE in BODY ARMOUR, holding a SWORD and a SHIELD, with no real hands (one blob-like fist holds the sword; the hand that holds the shield is never seen), and its main feature is PHYSICAL attacks, so it carries no element, no aura and no glowing parts. It keeps what makes the family readable and reusable: the dome wider than tall, the wavy skirt on the floor, the face in the same place and size, the three-quarter view turned to the right, the matte hand-painted style with a thin dark outline, and the same size on the stage.
+
+THE IDEA: a grey stone slime that has learned to fight like a knight. Body: matte grey stone with hairline cracks, chips and mineral flecks (it still sags and squashes like a slime). Armour: a steel back-plate of overlapping plates over the top and back of the dome, a belt with a buckle round the lower body, a round plate where the sword arm leaves the body. Shield: a big heater shield of dark steel with a bronze rim and a stone boss, held in front of the body on the near (left) side, so its hand is hidden behind it. Sword: a worn steel sword held upright by a rounded blob fist on a short stalk of the slime's own stone material, on the enemy side (right), beside the face and never across it.
+
+RULES FOR THE LATER ANIMATIONS (they decide the drawing now): the ARMOUR, the SHIELD and the SWORD are rigid, hard-edged objects (they keep their shape in every frame and only ride with the body); only the grey stone body squashes and stretches. The face stays bare (no helmet, no visor) so the hit, death and dodge frames can change it. Keep the sword and the shield clearly apart, with the face between them, so a swing never has to cross the shield.
+
+BACKGROUND IS MAGENTA (#FF00FF) as for the fire, ice and lightning slimes (the creature is grey, steel and bronze; none of it is pink, magenta or purple, so the key is safe).
+
+HOW TO USE
+- Attach ONE image: Animations/Slime/reference_image.png (the fire slime: ONLY for the construction, view, face placement, painting style and outline weight to keep; the Elite is NOT a recolour of it). Ask for a SQUARE image (1:1), as large as it will give you (the others came as 2048 x 2048). Paste everything between the two lines of equals signs. Gemini (the earlier looks came from Gemini); generate several and keep the best.
+- Save the best in inbox/ (for example inbox/slime_elite_reference.jpg) and tell me. If it is right it becomes `Animations/EliteSlime/reference_image.png`.
+- What I check: (1) the creature is a SLIME: a low dome wider than tall with a wavy skirt on the floor, the face in the same place and size as the fire slime's, three-quarter view turned to the right, centred with at least 8% margin on every side INCLUDING the sword and the shield; (2) it is STONE: matte grey with cracks, chips and flecks, not metal, not smooth plastic, not a rock golem; (3) the armour is a back-plate of overlapping plates on the top and back, a belt with a buckle, a round plate at the sword arm, steel with bronze trim and rivets, the FACE bare; (4) the shield is on the near (left) side in front of the body, dark steel with a bronze rim and a boss, NO hand or arm visible; (5) the sword is held upright by ONE rounded blob fist on a short stalk of stone, on the right, beside the face (not across it), blade about as long as the dome is tall; (6) no legs, no second arm, no helmet, no ears, no horns, no teeth; (7) crisp opaque edges, thin near-black outline, no glow, no dust clouds, no shadow, no floating objects; (8) one image, no GIF.
+- What happens next: if it is right, the idle sheet is written from the lightning slime's idle prompt (same panels and timing, but the armour, shield and sword stay rigid and only the stone body breathes), cut with the magenta key (the lightning cutters), the dome (not the sword) sets the scale: I draw the Elite's base about 280 to 300 px wide in the 512 cell so the sword is not clipped, then hit, death, dodge and the five physical skills.
+- Known risks: it makes a humanoid knight (arms, legs, helmet), it covers the face with the shield or a visor, it puts the sword across the face, it draws the stone as smooth grey jelly or as a rock golem, it makes the whole body metal, it adds glow, dust or a ground shadow, it paints the background grey, it crowds the sword and the shield together.
+
+==============================================================================
+OUTPUT: exactly ONE still image, and nothing else. Do NOT create a GIF, an animation, extra images or alternate versions.
+
+TASK: draw a NEW creature, an ARMOURED STONE SLIME, using the attached image (a fire slime) ONLY as a guide for the construction, the face placement, the view, the matte hand-painted style and the outline weight. Do NOT copy its fire, its orange colour, its flames, its blisters or its embers.
+
+KEEP FROM THE ATTACHED IMAGE: the same kind of creature: a low dome wider than tall, with a flat wavy skirt-like base that spreads on the floor in scallops (for stone: a little heavier and more rounded, like soft pebbles); the same face construction in the same place and size on the right half of the dome, but STERN and disciplined instead of angry: low, nearly flat heavy brows, two narrow eyes, a flat, slightly wavy tight mouth, nothing added to the face (no helmet, no visor, no ears, no teeth); the same three-quarter view turned about 30 degrees towards the RIGHT edge of the picture; the same MATTE hand-painted style: a thin dark outline of slightly varying weight, a fine grain on the surface, soft painterly shading, light from the upper left, NO glossy plastic shine. No legs, no arms except the one blob fist described below.
+
+SIZE AND PLACE: the whole figure including the sword and the shield is centred in the picture with at least 8% empty margin on every side. To make room, the DOME is smaller than in the attached image: about 58% of the picture's width.
+
+THE BODY: matte GREY STONE: a mid grey like #8C9097, shadows towards the base and the lower left in a darker grey like #5A5F68, small soft highlights in a lighter grey like #B9BDC4. The surface is stone: a few hairline cracks (#3A3D44), small chips and pits, fine pale mineral flecks (#D5D8DC) and a few darker flecks, and two or three shallow rounded bumps like inset pebbles where the fire slime had blisters. Still a slime: soft rounded edges, the skirt sagging onto the floor. Not metal, not glossy, not a cracked-rock golem, not smooth jelly.
+
+THE FACE: stern and calm. Small narrow eyes with pale AMBER pupils (#FFC24D, a ring of #E8941E), no glow outside the eye, heavy flat grey brows, a flat slightly wavy mouth in near-black. This is the only warm colour on the face.
+
+THE ARMOUR (rigid, hard-edged, solid): a BACK-PLATE of four or five overlapping curved steel plates covering the top and the back (left) of the dome like a knight's back armour or an armadillo's shell, leaving the face and the right-front of the dome bare; a wide dark-leather BELT with a bronze buckle round the lower body just above the skirt; one rounded steel plate (a pauldron) on the right side, where the sword arm leaves the body. Steel: dark blue-grey like #4A5563 with lighter edge highlights like #8D9AAB; bronze trim, rivets and buckle: #B58A3E with highlights #E0B766 and shadows #6F5222; leather: dark brown #4A3524. Lightly worn: a few scratches and dents.
+
+THE SHIELD (rigid): a large heater shield (a rounded-top, pointed-bottom shield) standing in front of the body on the near (left) side, seen almost front-on and turned slightly towards the right like the body, about 32% of the dome's width and 60% of its height, its lower tip just above the floor. Dark blue-grey steel face (#4A5563) with a bronze rim (#B58A3E), a raised round stone-grey boss in the middle and a simple bronze chevron below it. NO arm, hand, strap or fingers visible: the shield simply stands in front of the body. It must not cover the face.
+
+THE SWORD (rigid) AND ITS FIST: on the right side, beside the face and NEVER across it, a short thick stalk of the same grey stone material grows out of the body at about the height of the mouth, outside the round steel plate, and ends in ONE rounded blob fist, like a mitten with no fingers and no thumb (at most two shallow grooves where it grips), the same grey stone and the same outline as the body. The fist grips the grip of a worn steel arming sword held UPRIGHT, tilted about 15 degrees towards the right (towards the enemy): a straight double-edged blade (light steel #B9C3CF, a darker fuller line #8793A2, a bright edge highlight #EEF2F6, a few small nicks in the edge) about as long as the dome is tall, a bronze crossguard, a dark-brown wrapped grip, a round bronze pommel. The blade is clearly separate from the face and from the shield.
+
+COLOUR RULES: grey, steel blue-grey, bronze, dark brown, near-black outline, amber only in the eyes. NO pink, magenta, purple, red-violet, green or bright blue anywhere on the creature (the background is magenta). The outline is thin, NEAR-BLACK blue-grey (about #14171C), never pure black.
+
+STILL TRUE (so the picture can be cut out): every edge is crisp, hard and opaque. NO glow, NO halo, NO bloom, NO blur, NO dust clouds, NO smoke, NO mist, NO see-through parts, NO soft particles, NO sparks, NO light spilling onto the background. No floating objects of any kind. No shadow on the floor, no puddle, no cast shadow, no reflection.
+
+BACKGROUND: one flat pure MAGENTA (#FF00FF) background filling the whole picture, identical in every pixel. No gradient, ground line, scenery, shadow or vignette. No text, labels or borders.
+
+FINAL REMINDER: exactly one image; a grey STONE slime (low dome, wavy skirt, the fire slime's face construction but stern with amber pupils), a steel back-plate of overlapping plates with bronze trim, a belt with a buckle, a round plate on the right, a dark steel heater shield with a bronze rim standing in front of the left side with no hand visible, a worn steel sword held upright by one rounded blob fist on a short stone stalk on the right beside the face (not across it); the face bare; no legs, no helmet, no glow, no dust, no floating objects; crisp and opaque; flat pure magenta background.
+==============================================================================
+
+REPLY 1: IF IT DREW A HUMANOID KNIGHT
+"Redo it. This is a SLIME, not a knight: a low dome wider than tall with a wavy skirt on the floor, no legs, no arms, no helmet, no visor. The only limb is ONE rounded blob fist (no fingers) on a short thick stalk of the body's own stone material, holding the sword. The shield stands in front of the body with no hand or arm visible."
+
+REPLY 2: IF THE FACE IS COVERED OR THE SWORD CROSSES IT
+"Redo it. The face is completely bare and stays where it is on the right half of the dome. The shield is on the LEFT side of the body, the sword is held upright on the RIGHT, beside the face, and neither of them overlaps the face."
+
+REPLY 3: IF THE BODY IS NOT STONE (SMOOTH JELLY, METAL OR A ROCK GOLEM)
+"Redo it. The body is a slime made of matte grey STONE: soft rounded edges and a sagging wavy skirt, with hairline cracks, small chips and pale mineral flecks on the surface. Not smooth glossy jelly, not metal, not a golem made of boulders."
+
+REPLY 4: IF IT ADDS GLOW, DUST OR A SHADOW
+"Redo it. NO glow, NO dust, NO smoke, NO sparks, NO floating bits and NO shadow anywhere: only crisp, solid, hard-edged shapes with a thin near-black outline, on the flat magenta background."
+
+REPLY 5: IF THE BACKGROUND OR COLOURS DRIFT
+"Redo it. The background is one flat pure magenta (#FF00FF), identical in every pixel, not grey, no gradient. The creature is grey stone with dark blue-grey steel, bronze trim and dark brown leather, with amber only in the pupils: no pink, no purple, no green, no bright blue."
+
+REPLY 6: IF IT IS TOO BIG FOR THE PICTURE OR THE SWORD IS CUT
+"Redo it. Make the whole figure smaller: the dome about 58% of the picture's width, and the whole figure including the sword tip and the shield at least 8% away from every edge of the picture."
+
+REPLY 7 (IF YOU WANT THE HAND DETACHED INSTEAD): "Redo it, but draw the sword's blob fist WITHOUT the stalk: a detached rounded stone fist floating just beside the body, holding the sword."
