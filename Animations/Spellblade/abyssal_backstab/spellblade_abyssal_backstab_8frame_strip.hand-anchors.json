@@ -1,0 +1,173 @@
+{
+ "format": "hand-anchors/3",
+ "note": "Two tracks per frame: main (the left hand, far arm) and off (the right hand, near arm). x and y are fractions of one frame from its top left. Item length is a share of the frame WIDTH. a is degrees, 0 = item points up, clockwise is positive. front=false means the item is drawn behind the body. hide=true means no item on that frame. w squashes the item sideways (1 = normal width). Draw order: items behind (main, off), body, items in front (main, off), then the hand over each item in front whose overlay is true: only the hand's own pixels from the body frame, namely the pixels of the skin colour found around the mark (same hue, inside a circle of radius fist x frame width, connected to the mark), grown by 2 px to take in the outline; when no skin colour is found near the mark it is the whole circle. Each animation has offItem: what its off hand carries (kind shield, other = a second weapon or item, or none = no off-hand item, in which case the off track is all null) with its own length, pivot and overlay; for the off hand it takes precedence over the character-level items.off.",
+ "characters": [
+  {
+   "name": "SpellBlade",
+   "fist": 0.02,
+   "items": {
+    "main": {
+     "length": 0.32,
+     "pivot": 0.82,
+     "overlay": true,
+     "picture": "cutlass"
+    },
+    "off": {
+     "length": 0.32,
+     "pivot": 0.73,
+     "overlay": true,
+     "picture": "dagger"
+    }
+   },
+   "animations": [
+    {
+     "name": "spellblade_abyssal_backstab_8frame",
+     "frames": 8,
+     "columns": 8,
+     "fps": 8,
+     "offItem": {
+      "kind": "other",
+      "picture": "dagger",
+      "length": 0.32,
+      "pivot": 0.73,
+      "overlay": true
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.776,
+        "y": 0.742,
+        "a": 36,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.735,
+        "y": 0.773,
+        "a": 36,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.618,
+        "y": 0.245,
+        "a": 12,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.427,
+        "y": 0.305,
+        "a": -117,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.61,
+        "y": 0.236,
+        "a": -27,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.782,
+        "y": 0.712,
+        "a": 150,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.82,
+        "y": 0.925,
+        "a": 42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.76,
+        "y": 0.685,
+        "a": 42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.588,
+        "y": 0.742,
+        "a": -159,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.67,
+        "y": 0.771,
+        "a": -159,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.549,
+        "y": 0.236,
+        "a": -27,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.36,
+        "y": 0.324,
+        "a": -117,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.548,
+        "y": 0.237,
+        "a": -42,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.74,
+        "y": 0.718,
+        "a": 171,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.467,
+        "y": 0.921,
+        "a": -81,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.367,
+        "y": 0.67,
+        "a": -75,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}
