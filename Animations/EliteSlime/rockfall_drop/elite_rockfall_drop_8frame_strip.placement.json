@@ -1,0 +1,66 @@
+{
+ "format": "frame-placement/1",
+ "animation": "rockfall_drop",
+ "file": "elite_rockfall_drop_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "hitFrame": 5,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 166,
+   "bottom": 469,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 123,
+   "bottom": 469,
+   "baseW": 320.5,
+   "sizeAgainstIdle": 0.916
+  },
+  {
+   "lift": 15.7,
+   "top": 107,
+   "bottom": 454,
+   "baseW": 228.7,
+   "sizeAgainstIdle": 0.653
+  },
+  {
+   "lift": 9.6,
+   "top": 157,
+   "bottom": 460,
+   "baseW": 235.6,
+   "sizeAgainstIdle": 0.673
+  },
+  {
+   "lift": 0.0,
+   "top": 175,
+   "bottom": 470,
+   "baseW": 350.2,
+   "sizeAgainstIdle": 1.001
+  },
+  {
+   "lift": 48.3,
+   "top": 101,
+   "bottom": 421,
+   "baseW": 262.0,
+   "sizeAgainstIdle": 0.749
+  },
+  {
+   "lift": 0.0,
+   "top": 170,
+   "bottom": 470,
+   "baseW": 352.5,
+   "sizeAgainstIdle": 1.007
+  },
+  {
+   "lift": 0.0,
+   "top": 167,
+   "bottom": 469,
+   "baseW": 354.7,
+   "sizeAgainstIdle": 1.013
+  }
+ ]
+}

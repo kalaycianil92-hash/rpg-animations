@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Cuts the Elite slime's HIT, DEATH and DODGE sheets (the user's Gemini JPGs, 2752 x 1536, 3 x 2, inbox/Elite_slime_animations/, 2026-11-10) into 512 px strips.
 
-  python Animations/EliteSlime/source/cut_pack.py [hit] [death] [dodge]        (default: all three)
+  python Animations/EliteSlime/source/cut_pack.py [hit] [death] [dodge] [shield_bash] [rockfall_drop]        (default: all three)
 
 The same machinery as the Sword Slash (make_slash_strip.py): elite_panels.load_panels (the body is the biggest piece, the floating fist and sword go to the body they are nearest to), the base width, the floor row and the
 base centre measured through a morphological opening (a blade lying across the skirt vanishes) times the factor measured on panel 1 (where nothing lies on the skirt), every panel placed so that its base is 350 px wide
@@ -35,6 +35,10 @@ JOBS = {
                   extra={"evadeFrame": 3, "smooth": True, "xUnit": "character-widths", "x": [0, -0.02, -0.07, -0.1, -0.06, -0.02], "y": [0, 0, 0, 0, 0, 0]}),
     # the Shield Bash (2026-11-10): the user generated it twice; Gemini's (elite_slime_shield_bash_gemini.jpg: skirts of the bottom row touching, an arm on the fist in panel 3, three near-identical panels) was not usable;
     # ChatGPT's (1774 x 887, 4 x 2: the same size in every panel, base 72% of the panel as asked, the fist floating in all eight) is the one cut here. front: the body's right-most point on the strike frame (the page lands it on the target)
+    # the Rockfall Drop (2026-11-10, the user's Gemini sheet, 2752 x 1536, 4 x 2): the bottom row is drawn about 4.5% bigger than the top row (the bases of the rest-like panels 5, 7, 8 measure 663 to 671 against panel 1's 637):
+    # mul 0.955 for panels 5 to 8; airborne panels 3 (launch), 4 (plummet, the body tilted), 6 (the rebound hop, 92 sheet px above the floor = 12% of the panel's height, the prompt asked 7% at most) at their real height
+    "rockfall_drop": dict(file="elite_slime_rockfall_drop.jpg", folder="rockfall_drop", mode="shared", rows=[4, 4], airborne=[2, 3, 5], swap=[], fps=12, mul={4: 0.955, 5: 0.955, 6: 0.955, 7: 0.955}, dx={},
+                          extra={"hitFrame": 5}),
     "shield_bash": dict(file="elite_slime_shield_bash_chatgpt.png", folder="shield_bash", mode="shared", rows=[4, 4], airborne=[], swap=[], fps=12, mul={}, dx={}, front=6,
                         extra={"hitFrame": 6}),
 }

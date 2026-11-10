@@ -5292,7 +5292,8 @@
     // the strike last longer). `melee`: the attack is played by slashAct (it steps in toward the target) instead of the spit.
     // the hit (6 frames: it rocks back, cracks flash across the dome and fade, the fist and sword are jolted up and back), the death (6 frames: cracks, chunks, a heap, a pile of rubble with the shield, the belt and the sword lying on and beside it) and the dodge (6 frames: a heavy hop, the evade frame is 3, the top of the hop)
     var DEFE = { attack: { n: 8, fps: 12, holds: [1, 1.4, 1.1, 1.5, 1.2, 1.6, 1.4, 1] }, hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 14, holds: null },
-                  slam: { n: 8, fps: 12, holds: [0.9, 1, 1, 1.2, 1.3, 1.7, 1.4, 1] } };   // slam = the Granite Ram (8 frames, the strike is frame 6)
+                  slam: { n: 8, fps: 12, holds: [0.9, 1, 1, 1.2, 1.3, 1.7, 1.4, 1] },   // slam = the Granite Ram (8 frames, the strike is frame 6)
+                  bounce: { n: 8, fps: 12, holds: null } };   // bounce = the Rockfall Drop (8 frames: dropAct shows them one by one, the crash is frame 5)
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
@@ -6211,8 +6212,9 @@
   // box forces it). A target that dodges lets it land on empty ground ("slams down, but Warrior slips away"). Which attack the monster uses in a fight is the Monster's attack select (alternating by default).
   var SLAM_HIT = 7, SLAM_DMG = 1.6, SLAM_BURN = 0.5;
   function monAttackAct(e, myRun, A, T) {
-    if (MONSTERS[monKey] && MONSTERS[monKey].melee) {                                      // the Elite: the Sword Slash and the Granite Ram (its other two skills follow, see docs/MONSTERS.md)
-      var md = $("monAtk").value, nn = MON.atk = (MON.atk || 0) + 1, pk2 = md === "alt" ? ["spit", "slam"][(nn - 1) % 2] : md;
+    if (MONSTERS[monKey] && MONSTERS[monKey].melee) {                                      // the Elite: the Sword Slash, the Granite Ram and the Rockfall Drop (its other two skills follow, see docs/MONSTERS.md)
+      var md = $("monAtk").value, nn = MON.atk = (MON.atk || 0) + 1, pk2 = md === "alt" ? ["spit", "slam", "bounce"][(nn - 1) % 3] : md;
+      if (pk2 === "bounce" && monPackOf("bounce")) return dropAct(e, myRun, A, T);
       if (pk2 === "slam" && monPackOf("slam")) return bashAct(e, myRun, A, T);
       return slashAct(e, myRun, A, T);
     }
@@ -6488,7 +6490,8 @@
   // the body's front (placement.front, the right-most point of the body on the strike frame) a little in front of the target's middle. At the impact: a grey-white flash, a ring and a cloud of dust along the ground,
   // stone chips, a hard shake (8 px) and the target is knocked back and flashes white. BASH_DMG x the turn's damage is a placeholder; the stun chance is NOT applied yet (docs/SKILL_BEHAVIOR_LATER.md).
   var BASH_HIT = 6, BASH_DMG = 1.6, BASH_X = [0, 0, 0, 0.12, 0.55, 1, 1, 1], BASH_LEAN = [0, 0, 0, 0, 7, 14, 7, 0];
-  function bashImpactFx(tHit, x, y, gy, u, dir) {                                    // the charge's impact at (x, y) on the target, the ground line gy
+  function bashImpactFx(tHit, x, y, gy, u, dir, k) {                                 // the charge's impact at (x, y) on the target, the ground line gy; k: a size factor (the Rockfall Drop's crash is 1.7)
+    u = u * (k || 1);
     var rnd = rngOf((tHit | 0) + 5), dust = [], chips = [], i;
     for (i = 0; i < 16; i++) dust.push({ a: (i / 16) * 6.2832 + rnd() * 0.3, v: 0.6 + rnd() * 0.6, r: 0.03 + rnd() * 0.05, a0: 0.35 + rnd() * 0.3 });
     for (i = 0; i < 12; i++) chips.push({ a: -0.1 - rnd() * 2.9, v: 0.5 + rnd() * 1.1, s: 0.006 + rnd() * 0.01 });
@@ -7158,7 +7161,108 @@
       if (myRun === run && uG.style.transform.indexOf("translate(") === 0) uG.style.transform = "";                      // (never leave the unit in the air)
     }
   }
-  monPrevLoop($("monPrevBounce"), async function (my) { await bounceAct({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
+  // ---------------------------------------------------------------- the Elite slime's Rockfall Drop (2026-11-10)
+  // The Elite's third skill, the other slimes' bounce done as a heavy rock (the sheet: Animations/EliteSlime/rockfall_drop, the user's Gemini sheet, 8 frames at 12 fps, the slot `bounce`, the crash is the hit frame 5). The
+  // sequence is bounceAct's: the rest pose and the crouch (frames 1, 2), the LAUNCH (3: the body lifted, its skirt hanging in stone drips, eyes shut) while the page lifts the sprite out of the top of the stage, a warning on the
+  // ground (a shadow that grows, grey dust and little stones falling from the top edge), the DIVE (4: the body tilted forward and down like a falling boulder), the CRASH (5: shake, a big ring and cloud of dust, chips, the first
+  // hit), the REBOUND (6: a hop with the skirt hanging) and the heavy landing with a second, smaller hit (7), the settle (8) and the slide home. Physical: no status. DROP_DMG x the turn's damage is a placeholder.
+  var DROP_DMG = 2.5, DROP_DMG2 = 0.4;
+  function dropWarnFx(t0, t1, cx, gy, u) {                                           // the warning while the Elite is away: a shadow grows on the ground, grey dust and small stones fall from the top edge
+    var rnd = rngOf(t0 | 0), bits = [], i;
+    for (i = 0; i < 12; i++) bits.push({ x: cx + (rnd() - 0.5) * u * 0.6, ph: rnd(), sp: 0.6 + rnd() * 0.8, s: 0.008 + rnd() * 0.01 });
+    shake(2, t1 - t0);
+    fxAdd({ t0: t0, t1: t1 + 60, draw: function (ctx, now) {
+      var t = clamp01((now - t0) / (t1 - t0)), j, sy, rx = u * (0.1 + 0.5 * t);
+      ctx.save(); ctx.fillStyle = "rgba(14,12,10," + (0.22 + 0.38 * t).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(cx, gy, rx, rx * 0.2, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+      for (j = 0; j < bits.length; j++) {
+        sy = ((now * 0.0006 * speed * bits[j].sp * (1 + 2 * t) + bits[j].ph) % 1) * u * 1.6 * (0.3 + 0.7 * t);
+        ctx.save(); ctx.fillStyle = "rgba(130,126,128," + (0.8 * t).toFixed(3) + ")"; ctx.fillRect(bits[j].x - u * bits[j].s / 2, sy, u * bits[j].s, u * bits[j].s * 1.3); ctx.restore();
+      }
+    } });
+  }
+  async function dropAct(e, myRun, A, T) {
+    var pk = monPackOf("bounce"), u = uW.offsetWidth, fm = 1000 / pk.fps / speed, pv = !!e.preview, el = monEl, dodgeRun = null, dead = false;
+    var a = centerOf(A.unit), t = centerOf(T.unit), reach = (t.x - a.x) - A.dir * u * BOUNCE_LAND, ur = rectIn(uG), up = ur.top + ur.height + u * 0.7;     // up: how far the unit goes to be out of the stage
+    var showF = function (i) { monPlayPack(pk, myRun, null, [0.01], [i]); };
+    var setT = function (x, y) { uG.style.transform = "translate(" + x + "px," + y + "px)"; };
+    var hitBy = function (amount, big) {                                                // one hit on the target: the damage, the numbers, the shove
+      if (!pv) {
+        T.hp -= amount; paintHp(T);
+        if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
+        if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
+        floatNumber(T, (e.crit && big ? "CRIT " : "") + amount, e.crit && big ? "crit" : "");
+      }
+      if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
+      anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, big ? 460 : 300).catch(function () {});
+      anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * (big ? 30 : 16)) + "px)" }, { transform: "translateX(" + (-A.dir * (big ? 18 : 9)) + "px)" }, { transform: "translateX(0)" }], big ? 340 : 240).catch(function () {});
+    };
+    try {
+      var t0 = performance.now();
+      monPlayPack(pk, myRun, null, [1, 2.2], [0, 1]);                                                                 // 1. the rest pose, then the crouch held
+      await bsWait(t0 + fm * 3.2);
+      if (myRun !== run) return;
+      showF(2);                                                                                                       // 2. launch
+      if (!await bnDrive(myRun, 330 / speed, function (s) { setT(0, -up * s * s); })) return;
+      var tr0 = rectIn(T.unit), tx = tr0.left + tr0.width / 2, tgy = tr0.top + tr0.height - tr0.height * 0.03;
+      var tNow = performance.now(), tImp = tNow + (BOUNCE_AWAY + BOUNCE_DIVE) / speed;                                  // 3. the warning
+      dropWarnFx(tNow, tImp, tx, tgy, u);
+      if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
+        var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
+        dodgeRun = runDodge(myRun, Math.max(0, ((tImp - performance.now()) - preMs / speed) * speed));
+      }
+      setT(reach, -up);
+      await bsWait(tImp - BOUNCE_DIVE / speed);
+      if (myRun !== run) return;
+      showF(3);                                                                                                       // 4. the dive
+      if (!await bnDrive(myRun, BOUNCE_DIVE / speed, function (s) { setT(reach, -up * (1 - s * s)); })) return;
+      showF(4);                                                                                                       // 5. the crash
+      setT(reach, 0);
+      var rr = rectIn(el), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512, tI = performance.now();
+      bashImpactFx(tI, lx, lgy - u * 0.08, lgy, u, A.dir, 1.7); shake(18, 620);
+      var first = Math.round((e.amount || 0) * DROP_DMG), second = Math.round((e.amount || 0) * DROP_DMG2);
+      if (e.dodge) {
+        if (!pv) { say(A.name + " plummets down, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
+      } else {
+        hitBy(first, true);
+        if (!pv) say(A.name + " drops onto " + T.name + " for " + first + (e.crit ? " (crit!)" : "") + " (Rockfall Drop).", "g");
+        dead = !pv && T.hp <= 0;
+      }
+      await bsWait(tI + fm * 1.4);                                                                                    // 6. the rebound
+      if (myRun !== run) return;
+      showF(5);
+      if (!await bnDrive(myRun, fm * 3, function (s) { setT(reach, -u * 0.2 * Math.sin(s * Math.PI)); })) return;
+      showF(6);                                                                                                       // 7. the heavy landing and the second hit
+      var tI2 = performance.now(), lgy2 = rectIn(el); lgy2 = lgy2.top + lgy2.height - lgy2.width * 42 / 512;
+      bashImpactFx(tI2, lx, lgy2 - u * 0.05, lgy2, u, A.dir, 0.9); shake(8, 320);
+      if (!e.dodge && !dead) {
+        hitBy(second, false);
+        if (!pv) say("The landing hits " + T.name + " again for " + second + ".", "g");
+        dead = !pv && T.hp <= 0;
+      }
+      await bsWait(tI2 + fm * 1.5);
+      if (myRun !== run) return;
+      showF(7);                                                                                                       // 8. settle, then home
+      await bsWait(performance.now() + fm * 1.6);
+      if (myRun !== run) return;
+      var ok = await bnDrive(myRun, 380 / speed, function (s) { var ez = s < 0.5 ? 2 * s * s : 1 - Math.pow(-2 * s + 2, 2) / 2; setT(reach * (1 - ez), 0); });
+      if (!ok) return;
+      uG.style.transform = "";
+      if (dodgeRun) await dodgeRun;
+      monStartIdle();
+      clearAnims(T.unit); clearAnims(stage);
+      T.unit.querySelector(".sprite").getAnimations().forEach(function (x) { x.cancel(); });
+      if (dead) {
+        say(T.name + " is defeated.", "sys");
+        if (T === FIGHTERS.W && packs.death && packs.death.keyed && $("still").checked) {
+          keyPose("death", 0); await sleep(150); keyPose("death", 1); await sleep(260); keyPose("death", 2);
+        } else if (T === FIGHTERS.W && packs.death) await playPose("death", false);
+        else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
+      }
+    } finally {
+      if (myRun === run && uG.style.transform.indexOf("translate(") === 0) uG.style.transform = "";                      // (never leave the unit in the air)
+    }
+  }
+  monPrevLoop($("monPrevBounce"), async function (my) { await (MONSTERS[monKey].melee ? dropAct : bounceAct)({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
   $("monFx").oninput = function () {
     var v = +this.value; $("monFxV").textContent = v + "%";
     try { localStorage.setItem("wvg-monster-fire-" + monKey, v); } catch (e) {}
