@@ -7425,6 +7425,84 @@
       }
     } });
   }
+  // ---- The Earthbreaker's PAINTED pieces (2026-11-10, the user: "the effect needs painted figures"): Animations/EliteSlime/earthbreaker/source/earthbreaker_fx_sheet.png (a ChatGPT sheet, nine pieces on magenta) cut by
+  // cut_earth_fx.py into source/assets/fx/eb_*.png. Stone, earth and dust are SOLID, so they are drawn NORMALLY (ebDraw), not added as light. `earthPaintFx` replaces the code crack and spikes (earthCrackFx and earthSpikesFx stay as
+  // the fallback while the pictures are missing): the plunge burst where the blade enters (eb_plunge, a few chips), the crack laid along the ground and revealed from the sword toward the target as its head runs (eb_crack),
+  // spikes that slide up out of the ground along it (eb_spike_a, eb_spike_b, eb_twin: each is clipped at its base line, which is the bottom edge of its picture), the big cluster under the target (eb_cluster, BEHIND the
+  // characters so he stays visible in front of it) with two spikes in front of him, the dust ring rolling out and the dust plume rising behind him, a spray of debris at the burst; the spikes stand EARTH_STAND, sink back and crumble.
+  var EB_TEX = ["eb_cluster", "eb_spike_a", "eb_spike_b", "eb_twin", "eb_crack", "eb_plunge", "eb_debris", "eb_dust_ring", "eb_dust_plume"];
+  function ebReady() { return EB_TEX.every(auraReady); }
+  function ebDraw(ctx, nm, x, y, w, a, flip, ay, hs, ax) {                           // a painted piece drawn normally: w px wide, its point (ax, ay) (0..1, default the middle; ay 1 = the bottom edge) at (x, y), its height scaled by hs
+    var im = fbTex[nm];
+    if (!im || !im.naturalWidth || a <= 0.01) return;
+    var h = w * im.naturalHeight / im.naturalWidth * (hs === undefined ? 1 : hs);
+    ctx.save(); ctx.globalAlpha = Math.min(1, a); ctx.translate(x, y); if (flip) ctx.scale(-1, 1);
+    ctx.drawImage(im, -w * (ax === undefined ? 0.5 : ax), -h * (ay === undefined ? 0.5 : ay), w, h); ctx.restore();
+  }
+  function ebBack(k) { var c1 = 1.70158, c3 = c1 + 1, q = k - 1; return k >= 1 ? 1 : 1 + c3 * q * q * q + c1 * q * q; }   // ease out back (a little overshoot) for 0..1
+  function ebSpike(ctx, it, g, a) {                                                  // a spike slides up out of the ground: its picture is clipped at its base line (it.y), g 0..1 (a little over 1 at the top of the rise)
+    var im = fbTex[it.nm], h = it.w * im.naturalHeight / im.naturalWidth;
+    ctx.save(); ctx.beginPath(); ctx.rect(it.x - it.w, it.y - h * 1.4, it.w * 2, h * 1.4 + 2); ctx.clip();
+    ebDraw(ctx, it.nm, it.x, it.y + (1 - g) * h * 1.02, it.w, a, it.flip, 1);
+    ctx.restore();
+  }
+  function ebFlash(tE, cx, cy, u) {                                                  // the burst's flash (the painted version does without the code dust and chips)
+    fxAdd({ t0: tE, t1: tE + 260 / speed, draw: function (ctx, now) {
+      var k = clamp01((now - tE) * speed / 220);
+      glowDot(ctx, cx, cy, u * (0.2 + 0.3 * k), "235,235,240", 0.65 * (1 - k));
+    } });
+  }
+  function earthPaintFx(t0, tArr, P, foot, x1, y1, y0, u, dir) {
+    var rnd = rngOf((tArr | 0) + 9), runMs = tArr - t0, tC = tArr + EARTH_STAND / speed, tEnd = tC + (EARTH_CRUMBLE + 450) / speed, tPl = t0, items = [], i, sd = x1 > foot.x ? 1 : -1;
+    var xa = foot.x, ya = y0, ang = Math.atan((y1 - y0) / (x1 - foot.x || 1)), Lc = Math.abs(x1 - foot.x) * 1.05 + u * 0.12, chs = Math.min(1, u * 0.17 / (Lc * 93 / 395));   // the crack: from the sword to the target, its height about 0.17 of a character width
+    [["eb_spike_a", 4, 0.2, false], ["eb_twin", 6, 0.27, true], ["eb_spike_b", 8, 0.33, false], ["eb_spike_a", 10, 0.42, true], ["eb_twin", 12, 0.5, false]].forEach(function (a) {      // along the crack, small near the sword and taller toward the target
+      var im = fbTex[a[0]], hh = u * a[2] * (0.88 + rnd() * 0.24);
+      items.push({ nm: a[0], x: P.pts[a[1]][0] + (rnd() - 0.5) * u * 0.03, y: P.pts[a[1]][1] + u * 0.01, w: hh * im.naturalWidth / im.naturalHeight, flip: a[3], at: t0 + runMs * a[1] / P.n, front: true, big: false });
+    });
+    items.push({ nm: "eb_cluster", x: x1, y: y1 + u * 0.03, w: u * 1.15, flip: false, at: tArr, front: false, big: true });                                        // the cluster under the target, behind him
+    items.push({ nm: "eb_twin", x: x1 - sd * u * 0.34, y: y1 + u * 0.02, w: u * 0.42, flip: sd > 0, at: tArr + 35 / speed, front: true, big: true });                // two spikes in front of him
+    items.push({ nm: "eb_spike_b", x: x1 + sd * u * 0.36, y: y1 + u * 0.015, w: u * 0.3, flip: sd < 0, at: tArr + 70 / speed, front: true, big: true });
+    function drawItems(ctx, now, front) {
+      var j, it, tl, g, a, lc;
+      for (j = 0; j < items.length; j++) {
+        it = items[j];
+        if (it.front !== front) continue;
+        tl = (now - it.at) * speed; if (tl < 0) continue;
+        lc = clamp01((now - tC) * speed / EARTH_CRUMBLE);                            // after the stand it sinks back into the ground and fades
+        g = ebBack(tl / 170) * (1 - lc * lc); a = 1 - clamp01((lc - 0.55) / 0.45);
+        ebSpike(ctx, it, g, a);
+      }
+    }
+    function chips(ctx, tS, cx, cy, w, now, rise, life) {                               // a spray of painted debris thrown up from (cx, cy) and falling
+      var k = clamp01((now - tS) * speed / life);
+      if (now < tS || k >= 1) return;
+      ebDraw(ctx, "eb_debris", cx, cy - rise * Math.sin(k * 2.4) + u * 0.3 * k * k, w * (0.8 + 0.4 * k), 0.95 * (1 - k * k), false, 0.5);
+    }
+    fxAdd({ t0: t0, t1: tEnd, drawBack: function (ctx, now) {
+      var kp = clamp01((now - tArr) * speed / 360), fp = (now - tArr) * speed;
+      drawItems(ctx, now, false);
+      if (fp > 0 && fp < 1300) ebDraw(ctx, "eb_dust_plume", x1, y1 + u * 0.03, u * 0.55 * (0.55 + 0.5 * ebBack(kp)), clamp01(fp / 70) * (1 - clamp01((fp - 350) / 800)) * 0.92, false, 1);      // the plume rises behind him
+    }, draw: function (ctx, now) {
+      var k, fa, head = clamp01((now - t0) / Math.max(1, tArr - t0)), ft = (now - tPl) * speed, cx, cy, hx, kr;
+      if (ft >= 0 && ft < 750) {                                                       // the plunge burst under the blade (frame 3)
+        ebDraw(ctx, "eb_plunge", foot.x, y0 + u * 0.012, u * 0.55, clamp01(ft / 50) * (1 - clamp01((ft - 380) / 370)), false, 0.62);
+        chips(ctx, tPl, foot.x, y0 - u * 0.08, u * 0.4, now, u * 0.3, 520);
+      }
+      if (now >= t0) {                                                                 // the crack, revealed from the sword toward the target, stays, fades
+        fa = 1 - clamp01((now - tArr) / Math.max(1, tEnd - tArr - 300 / speed));
+        cx = (foot.x + x1) / 2; cy = (y0 + y1) / 2; hx = foot.x + (x1 - foot.x) * head;
+        ctx.save(); ctx.beginPath(); ctx.rect(Math.min(foot.x, hx) - 2, Math.min(y0, y1) - u, Math.abs(hx - foot.x) + 4, u * 2); ctx.clip();
+        ctx.translate(cx, cy); ctx.rotate(ang); ctx.translate(-cx, -cy);
+        ebDraw(ctx, "eb_crack", cx, cy, Lc, fa, false, 0.5, chs);
+        ctx.restore();
+      }
+      drawItems(ctx, now, true);
+      kr = (now - tArr) * speed / 820;                                                 // the dust ring rolls out from under the target and fades; the debris is thrown up at the burst
+      if (kr > 0 && kr < 1) ebDraw(ctx, "eb_dust_ring", x1, y1 + u * 0.035, u * (0.65 + 1.15 * (1 - Math.pow(1 - kr, 2))), 0.85 * Math.pow(1 - kr, 1.3), false, 0.78);
+      chips(ctx, tArr, x1, y1 - u * 0.3, u * 0.95, now, u * 0.45, 760);
+      chips(ctx, tC, x1, y1 - u * 0.25, u * 0.7, now, u * 0.25, 600);                // ... and again as the spikes crumble
+    } });
+  }
   async function earthAct(e, myRun, A, T) {
     var pk = monPackOf("eruption"), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, pl = pk.placement || {};
     for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
@@ -7441,12 +7519,15 @@
     var P = earthPath(foot.x, y0, x1, y1, u, t0 | 0);
     await bsWait(tc0);
     if (myRun !== run) return;
-    shake(2.5, runMs); earthCrackFx(tc0, tArr, tArr + 1100 / speed, P, u); earthSpikesFx(tc0, tArr, P, x1, y1, u, A.dir);
+    shake(2.5, runMs);
+    if (ebReady()) earthPaintFx(tc0, tArr, P, foot, x1, y1, y0, u, A.dir);                                        // the painted pieces (2026-11-10); the code crack and spikes are the fallback
+    else { earthCrackFx(tc0, tArr, tArr + 1100 / speed, P, u); earthSpikesFx(tc0, tArr, P, x1, y1, u, A.dir); }
     await bsWait(tArr);
     if (myRun !== run) return;
     var iy = tr.top + tr.height * 0.6;
     shake(12, 460);
-    bashImpactFx(tArr, x1, iy, y1, u, A.dir, 1.25); B.fx();
+    if (ebReady()) ebFlash(tArr, x1, iy, u); else bashImpactFx(tArr, x1, iy, y1, u, A.dir, 1.25);
+    B.fx();
     if (e.dodge) {
       if (!pv) { say(A.name + " drives the sword into the ground, but " + T.name + " slips away from the spikes.", "g"); floatNumber(T, "MISS", "miss"); }
       if (dodgeRun) await dodgeRun;
