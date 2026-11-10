@@ -3196,18 +3196,19 @@
   // Where the half circle is at time `now` (cached for the two passes of one frame) and how bright everything is. It stands on the side she faces (the side the enemy is on), the centre of the circle at her.
   function brState(L, now) {
     if (L.S && L.sn === now) return L.S;
-    var P = brParams(), cr = rectIn(uW), br = bodyPoint(), u = uW.offsetWidth, sc = L.sc, age = now - L.t0, form = clamp01(age / L.castMs), out = 1, bro = 1, flash = 0, d, S = L.S || (L.S = {});
+    var P = brParams(), cr = rectIn(uW), br = L.geo ? { x: 0 } : bodyPoint(), u = uW.offsetWidth, sc = L.sc, age = now - L.t0, form = clamp01(age / L.castMs), out = 1, bro = 1, flash = 0, d, S = L.S || (L.S = {});
     var gr = FIGHTERS.G && FIGHTERS.G.unit ? rectIn(FIGHTERS.G.unit) : null;
     if (L.endAt) { d = clamp01((now - L.endAt) / L.dropMs); out = 1 - d * d * (3 - 2 * d); if (L.broken) bro = 1 + 1.8 * (1 - d); }
     if (age >= L.castMs) { flash = clamp01(1 - (age - L.castMs) / (380 * sc)); flash *= flash; }
     S.sd = gr && gr.left + gr.width / 2 < cr.left + cr.width / 2 ? -1 : 1;                                          // +1: the enemy is on the right
     S.r = u * 0.5 * P.size; S.cx = br.x + S.sd * u * 0.08; S.gy = cr.top + cr.height - 3; S.cy = S.gy - S.r + u * 0.03;     // a round circle, its bottom just under the ground line
+    if (L.geo) { S.sd = L.geo.sd; S.r = L.geo.r; S.cx = L.geo.cx; S.gy = L.geo.gy; S.cy = S.gy - S.r; }              // a BLOCK's glass (blockFx): the same Barrier on any fighter, its bottom ON the ground line (the draw clips there)
     S.form = form; S.front = form * 1.5 - 0.2; S.rot = age * 0.00022 + (1 - form) * (1 - form) * 1.4; S.age = age; S.flash = flash; S.rim = clamp01(form * 1.6) * out;
-    S.K = P.vis * out * bro * (1 + 0.07 * Math.sin(now * 0.0021)) * (1 + 0.9 * flash + (form < 1 ? 0.5 * form : 0));
+    S.K = (L.geo ? L.geo.vis : P.vis) * out * bro * (1 + 0.07 * Math.sin(now * 0.0021)) * (1 + 0.9 * flash + (form < 1 ? 0.5 * form : 0));
     L.S = S; L.sn = now; return S;
   }
   function brDraw(ctx, now, L, back) {
-    var S = brState(L, now), K = S.K, r = S.r, cx = S.cx, cy = S.cy, gy = S.gy, sd = S.sd, sc = L.sc, C = BR_RGB, ringR = r * 0.7, ringY = ringR * 0.17;
+    var S = brState(L, now), K = S.K, r = S.r, cx = S.cx, cy = S.cy, gy = S.gy, sd = S.sd, sc = L.sc, C = BR_RGB, ringR = r * 0.7, ringY = ringR * (L.geo ? 0.05 : 0.17);
     var i, j, a, g, sy, yw, aw, rr, t2, ra, rp, ar, bx, by, ph, pos, th, x, oc, n, h, a0 = back ? (sd > 0 ? 4.7124 : 3.1416) : (sd > 0 ? 0 : 1.5708), a1 = a0 + 1.5708;   // a0..a1: the quarter of an ellipse that is in front of her (the far one on the back pass, the near one on the front pass)
     if (K < 0.004) return;
     ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
@@ -3276,12 +3277,12 @@
     g = x.createLinearGradient(0, 0, r * 0.2, 0); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,1)");
     x.fillStyle = g; x.fillRect(-h, -h, n, n);
     x.restore();
-    ctx.save(); ctx.beginPath(); ctx.rect(cx - r * 1.6, sy, r * 3.2, cy + r * 1.6 - sy); ctx.clip();
+    ctx.save(); ctx.beginPath(); ctx.rect(cx - r * 1.6, sy, r * 3.2, (L.geo ? gy + 1 : cy + r * 1.6) - sy); ctx.clip();      // (a block's glass never goes below the ground line)
     ctx.drawImage(oc, cx - h, cy - h);
     glowDot(ctx, cx + sd * r * 0.6, cy - r * 0.66, r * 0.07, C.core, Math.min(1, 0.6 * a));
     ctx.restore();
     // a ripple: a flash where the blow landed, a bright arc that runs along the rim both ways and a ring of light that spreads across the glass (only in the half that exists)
-    ctx.save(); ctx.beginPath(); ctx.rect(sd > 0 ? cx : cx - r * 1.6, cy - r * 1.6, r * 1.6, r * 3.2); ctx.clip();
+    ctx.save(); ctx.beginPath(); ctx.rect(sd > 0 ? cx : cx - r * 1.6, cy - r * 1.6, r * 1.6, (L.geo ? gy + 1 : cy + r * 1.6) - (cy - r * 1.6)); ctx.clip();
     for (j = 0; j < L.rip.length; j++) {
       rp = L.rip[j]; ar = (now - rp.t) / (BR_RIPPLE_MS * sc); if (ar < 0 || ar > 1) continue;
       bx = cx + r * 0.98 * rp.x; by = cy - r * 0.98 * rp.y; th = Math.atan2(by - cy, bx - cx); a = (1 - ar) * (1 - ar) * Math.min(1, K * 1.6);
@@ -3857,6 +3858,8 @@
       amount = Math.round(e.amount * 1.7);
       if (burnN) { var det = burnN * burnLeft * BURN_TICK; amount += det; bonus = " (+" + det + " from detonating " + burnN + " burn" + (burnN > 1 ? "s" : "") + ")"; }
     }
+    var blk = !!e.block && !e.dodge, bSpec = blk && T === FIGHTERS.G ? blockSpec() : null, blockRun = null;     // a BLOCKED cast (2026-11-10): no crit, 20% less, the spell meets the Barrier's glass
+    if (blk) { amount = blockAmount(amount); crit = false; }
     playPose("attack", false, SK.holds && SK.holds()).then(backToIdle);
     var dodge = !!e.dodge;                                                           // (2026-11-08: a dodged cast is still cast: the spell flies on past the target, which slips away)
     var clk = player.clock, fb = SK.start(clk, T, { freeze: fz, state: state, frozen: state === "frozen" ? T.frozen : null, burn: burnN, dodge: dodge }), n = nFrames("attack"), wait = fb.tHit - performance.now();
@@ -3865,6 +3868,7 @@
       var dpk = monPackOf("dodge"), dpre = (((dpk.placement && dpk.placement.evadeFrame) || 4) - 1 + 0.4) * 1000 / dpk.fps;
       dodgeRun = monDodge(myRun, Math.max(0, wait * speed - dpre));
     }
+    if (bSpec) blockRun = monBlock(myRun, Math.max(0, wait * speed - blockPre(bSpec)), bSpec);                  // the blocker's guard is up when the spell arrives
     if (wait > 0) await new Promise(function (r) { setTimeout(r, wait); });
     if (myRun !== run) return;
     if (dodge) {
@@ -3875,15 +3879,16 @@
     } else {
       T.hp -= amount; paintHp(T);
       fb.impact();
-      floatNumber(T, (crit ? "CRIT " : "") + amount, SK.num);
-      say(A.name + " " + SK.verb + " " + T.name + " for " + amount + (crit ? " (crit!)" : "") + bonus + ".", "w");
+      if (blk) blockFx(T, -A.dir, performance.now());
+      floatNumber(T, (blk ? "BLOCK " : crit ? "CRIT " : "") + amount, blk ? "block" : SK.num);
+      say(A.name + " " + SK.verb + " " + T.name + " for " + amount + (blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage" + (e.crit ? ", the critical hit is cancelled" : "") + ")" : crit ? " (crit!)" : "") + bonus + ".", "w");
       afterHit(SK, T, state, fz, fb, false, burnN);
     }
     var rest = clk.t0 + (clk.total || n * clk.frameMs) - performance.now();
     await Promise.all([
       !dodge && SK.shock && state !== "frozen" ? anim(T.unit.querySelector(".sprite"), SK.shock, SK.shockMs) : null,
       !dodge && SK.push ? anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * SK.push) + "px)" }, { transform: "translateX(" + (-A.dir * SK.push * 0.6) + "px)" }, { transform: "translateX(0)" }], 240) : null,
-      sleep(350), new Promise(function (r) { setTimeout(r, Math.max(0, rest)); })
+      sleep(350), new Promise(function (r) { setTimeout(r, Math.max(0, rest)); }), blockRun
     ]);
     if (myRun !== run) return;
     clearAnims(T.unit); clearAnims(stage);
@@ -3996,7 +4001,8 @@
       if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }       // the mage's Barrier ripples, and breaks if she falls
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
       if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
-      if (blk) blockFx(T, -sign, performance.now()); else if (skill) skill.impact(); else if (!e.noSlash) slash(T, sign);
+      if (blk) blockFx(T, -sign, performance.now());
+      if (skill) skill.impact(); else if (!blk && !e.noSlash) slash(T, sign);
       floatNumber(T, (blk ? "BLOCK " : cr ? "CRIT " : "") + amt, blk ? "block" : e.numCls || (skill ? "bolt" : (cr ? "crit" : "")));
       say(A.name + " " + (e.verb || "slashes") + " " + T.name + " for " + amt + (blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage" + (e.crit ? ", the critical hit is cancelled" : "") + ")" : cr ? " (crit!)" : "") + (e.note || "") + ".", e.actor === "W" ? "w" : "g");
       var spr = T.unit.querySelector(".sprite");
@@ -4424,7 +4430,7 @@
     await useRogueSkill(key); if (myRun !== run) return;
     if (key === "abyssal") return abyssalAct(e, myRun, A, T, false);                  // Abyssal Backstab: the air strike with both weapons (abyssalAct)
     if (key === "shroud") return backstabAct(e, myRun, A, T, false);                  // Umbral Shroud (the dissolve-and-reappear mechanics are still called backstab*: Abyssal Backstab will share them)
-    var hitF = Math.max(1, +$("hitFrame").value || 3), e2 = { actor: e.actor, dodge: e.dodge, crit: e.crit, amount: e.amount, verb: "stabs", note: " with Shadow Shiv" };
+    var hitF = Math.max(1, +$("hitFrame").value || 3), e2 = { actor: e.actor, dodge: e.dodge, block: e.block, crit: e.crit, amount: e.amount, verb: "stabs", note: " with Shadow Shiv" };
     if (key === "kiss") {                                                             // Winter's Kiss: she stands in place, frost aura, the dagger freezes, is thrown, hits and flies back (kissFx)
       e2.verb = "hurls a frozen dagger at"; e2.note = " (Winter's Kiss, Ice Damage)"; e2.numCls = "frost"; e2.shock = !e.dodge; e2.shockAnim = ICE_SHOCK; e2.noSlash = true;
       kissFx(T, hitF, { myRun: myRun, dodge: e.dodge });
@@ -5317,7 +5323,7 @@
                   eruption: { n: 6, fps: 12, holds: [1, 1.6, 1.1, 3.4, 1.4, 1.4] },   // eruption = the Earthbreaker
                   guard: { n: 6, fps: 10, holds: [1, 1.2, 1.5, 2.4, 2.4, 1.3] } };   // guard = the Stone Guard (6 frames, the ChatGPT sheet: rest, the shield a little higher, across the body, in front of the face (held twice), home; guardAct plays 1, 2, 3, 4, 5, 3, 6 with its own holds) (6 frames: gather, raise, the blade into the floor, strain (the hit frame 4), pull, recover)
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
-    MONSTERS.elite_slime.block = { pack: "guard", order: [1, 2, 3, 4, 2, 5], holds: [0.9, 0.9, 1.3, 2.4, 0.9, 1.1], fps: 14, idx: 2 };   // its Block has no strip of its own: the Stone Guard's frames (the shield floats up in front of the face; the block frame is the face frame, 3rd played)
+    MONSTERS.elite_slime.block = { pack: "guard", order: [1, 2, 3, 4, 2, 5], holds: [0.9, 0.9, 1.3, 2.4, 0.9, 1.1], fps: 14, idx: 2, r: 0.36 };   // (r: the glass's radius as a share of its cell: the Elite is low and wide) its Block has no strip of its own: the Stone Guard's frames (the shield floats up in front of the face; the block frame is the face frame, 3rd played)
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
   var MON = { seq: 0, deathP: null };                                                // seq: which attack/hit/death/dodge pack is current (a new one replaces the one before); deathP: the promise of the death pack once it has started
@@ -7511,12 +7517,15 @@
   }
   // ---------------------------------------------------------------- BLOCK (2026-11-10, the user's design for every character)
   // "Blocked hit cannot crit and block reduces the damage taken by 20% (may change in the future)." A block is a REACTION like the Dodge (the user, 2026-11-10: it happens when a hit lands, not a stance): the blocker's block
-  // pack plays so that its guard is up when the blow lands (placement idx: the block frame), the damage is cut by BLOCK_REDUCE, a blocked hit is never a critical one, and the blow meets a short, subtle HALF CIRCLE OF GLASS
-  // in front of the blocker (the look of the mage's Barrier, the same for everybody: one look means 'blocked') with a ripple and a few sparks where it lands; no white flash and no hit pose. The page only DRAWS it: the
-  // numbers are the engine's (docs/SKILL_BEHAVIOR_LATER.md). A turn is blocked with `block: true` in the script (the scenario 'the monster blocks one strike'). Wired so far: the warrior's basic attack on a MONSTER with a
-  // block (`MONSTERS[key].block`); every skill act (castAct, rogueAct, the Elite's own attacks on the warrior...) needs the same few lines, and the other characters need their block packs (Warrior, Mage, Rogue, Assassin,
-  // Spellblade). The Elite's block has no strip of its own: it plays the Stone Guard's frames 2, 3, 4, 5, 3, 6 (the shield floats up in front of the face, the block frame is the face frame) at 14 fps.
-  var BLOCK_REDUCE = 0.2;
+  // pack plays so that its guard is up when the blow lands (placement idx: the block frame), the damage is cut by BLOCK_REDUCE, a blocked hit is never a critical one, and the blow meets the MAGE'S OWN BARRIER: brDraw, the same
+  // renderer as her passive (the half circle of glass on the side the blow comes from, the glow on the ground, the ripple where the blow lands, the flash), on any fighter, short: it snaps up in BLOCK_CAST_MS, holds
+  // BLOCK_HOLD_MS and lets go over BLOCK_DROP_MS (`L.geo` in brState / brDraw gives it the blocker's size and place instead of the mage's). (The first version, a few hours earlier, was a NEW drawing in the same colours; the user
+  // asked whether it was her Barrier and said it went below the feet: it is her Barrier now, and with `geo` the circle's bottom is ON the ground line (the clip stops there) and the ground ring is flattened.) No white hit flash and
+  // no hit pose for a blocked blow, only a small recoil and a faint brighten. The page only DRAWS it: the numbers are the engine's (docs/SKILL_BEHAVIOR_LATER.md). A turn is blocked with `block: true` in the script (the scenario
+  // 'the monster blocks two strikes'). Wired so far (the blocker is a monster that has `MONSTERS[key].block`): the warrior's attack (act), the Rogue's Shadow Shiv, Static Stiletto, Winter's Kiss and Permafrost Execution (they go
+  // through act), and the mage's casts (castAct). NOT wired: the Umbral Shroud and the Abyssal Backstab (the blow comes from BEHIND: can a block stop it? the user's call), the monsters' attacks on a character, and a character
+  // blocking (the characters have no block pack yet). The Elite's block has no strip of its own: it plays the Stone Guard's frames 2, 3, 4, 5, 3, 6 (the shield floats up in front of the face, the block frame is the face frame) at 14 fps.
+  var BLOCK_REDUCE = 0.2, BLOCK_CAST_MS = 110, BLOCK_HOLD_MS = 380, BLOCK_DROP_MS = 380, BLOCK_VIS = 0.85;
   function blockAmount(amount) { return Math.max(1, Math.round(amount * (1 - BLOCK_REDUCE))); }
   function blockSpec() {                                                             // the monster's block: a pack played in an order (the Elite: the Stone Guard's frames), or its own strip
     var m = MONSTERS[monKey], b = m && m.block, pk;
@@ -7538,34 +7547,14 @@
       return monPlayPack(pk2, myRun, null, sp.holds, sp.order).then(function (ok) { MON.blocking = false; if (ok && myRun === run) monStartIdle(); return ok; });
     });
   }
-  function blockFx(T, sd, tHit) {                                                    // the half circle of glass on the side the blow comes from (sd: -1 left, +1 right), a ripple and sparks where it lands
-    var mon = T === FIGHTERS.G && monEl, rr = rectIn(mon ? monEl : T.unit), w = rr.width, gy = rr.top + rr.height - w * 42 / 512, R = w * (mon ? 0.46 : 0.5), cx = rr.left + w * 0.505 + sd * w * 0.03, cy = gy - R * 0.32;
-    var rnd = rngOf(tHit | 0), sp = [], i, P = BR_RGB, ix = cx + sd * R, iy = cy - R * 0.05, ph = sd > 0 ? [-1.5708, 1.5708] : [1.5708, 4.7124];
-    for (i = 0; i < 8; i++) sp.push({ a: (sd > 0 ? 0 : Math.PI) + (rnd() - 0.5) * 2.2, v: 0.3 + rnd() * 0.5, l: 0.04 + rnd() * 0.06 });
-    fxAdd({ t0: tHit - 20, t1: tHit + 650 / speed, draw: function (ctx, now) {
-      var t = (now - tHit) * speed, a = clamp01((t + 20) / 70) * (1 - clamp01((t - 180) / 380)), k = clamp01(t / 420), j, p, d, g;
-      if (a <= 0.01) return;
-      ctx.save(); ctx.globalCompositeOperation = "lighter";
-      ctx.beginPath(); ctx.rect(sd > 0 ? cx : cx - R * 1.2, cy - R * 1.2, R * 1.2, R * 2.4); ctx.clip();                  // the glass: only the half on the attacker's side
-      g = ctx.createRadialGradient(cx, cy, R * 0.55, cx, cy, R);
-      g.addColorStop(0, "rgba(" + P.glow + ",0)"); g.addColorStop(0.8, "rgba(" + P.glow + "," + (0.12 * a).toFixed(3) + ")"); g.addColorStop(1, "rgba(" + P.core + "," + (0.38 * a).toFixed(3) + ")");
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.fill();
-      ctx.restore();
-      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = "rgba(" + P.line + "," + (0.85 * a).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, R * 0.03); ctx.beginPath(); ctx.arc(cx, cy, R, ph[0], ph[1]); ctx.stroke();                 // the rim
-      ctx.strokeStyle = "rgba(" + P.core + "," + (0.5 * a).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, R * 0.012); ctx.beginPath(); ctx.arc(cx, cy, R * 0.96, ph[0] + 0.5, ph[0] + 1.3); ctx.stroke();   // a highlight
-      glowEllipse(ctx, cx, gy, R * 0.95, R * 0.17, P.glow, 0.3 * a);                                                                                                                          // the ground in front of it
-      if (t > 0) {                                                                                                                                                                              // the blow: a flash, a ring spreading on the glass, sparks
-        glowDot(ctx, ix, iy, R * (0.1 + 0.2 * (1 - k)), P.core, 0.8 * (1 - k));
-        ctx.strokeStyle = "rgba(" + P.core + "," + (0.7 * (1 - k)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, R * 0.02 * (1 - k) + 1); ctx.beginPath(); ctx.arc(ix, iy, R * (0.06 + 0.3 * k), 0, 6.2832); ctx.stroke();
-        ctx.lineWidth = Math.max(1, R * 0.012);
-        for (j = 0; j < sp.length; j++) {
-          p = sp[j]; d = R * p.v * k; ctx.strokeStyle = "rgba(255,255,255," + (0.9 * (1 - k)).toFixed(3) + ")";
-          ctx.beginPath(); ctx.moveTo(ix + Math.cos(p.a) * d, iy + Math.sin(p.a) * d * 0.8 - R * 0.05 * k); ctx.lineTo(ix + Math.cos(p.a) * (d + R * p.l), iy + Math.sin(p.a) * (d + R * p.l) * 0.8 - R * 0.05 * k); ctx.stroke();
-        }
-      }
-      ctx.restore();
-    } });
+  function blockFx(T, sd, tHit) {                                                    // the mage's Barrier on the blocker, for a moment: the half circle on the side the blow comes from (sd: -1 left, +1 right), the ripple where it lands
+    var mon = T === FIGHTERS.G && monEl, el = mon ? monEl : (T.unit.querySelector(".sheet") || T.unit), er = rectIn(el), w = mon ? er.width : uW.offsetWidth, sc = 1 / speed;
+    var R = w * ((mon && MONSTERS[monKey].block && MONSTERS[monKey].block.r) || 0.5), bodyX = mon ? er.left + er.width * (259 / 512) : er.left + er.width / 2;      // (the Elite's base centre is x 259 of its 512 cell)
+    var L = { t0: tHit, t1: tHit + (BLOCK_HOLD_MS + BLOCK_DROP_MS) * sc + 80, sc: sc, castMs: BLOCK_CAST_MS * sc, dropMs: BLOCK_DROP_MS * sc, endAt: tHit + BLOCK_HOLD_MS * sc, broken: false,
+      rip: [{ t: tHit + 20 * sc, x: sd * 0.992, y: 0.125 }],
+      geo: { sd: sd, r: R, cx: bodyX + sd * R * 0.16, gy: er.top + er.height - er.width * 42 / 512, vis: BLOCK_VIS },
+      draw: function (ctx, now, l) { brDraw(ctx, now, l, false); }, drawBack: function (ctx, now, l) { brDraw(ctx, now, l, true); } };
+    fxAdd(L);
   }
   monPrevLoop($("monPrevBlock"), async function (my) {                               // the Block preview: the guard goes up and a blow lands on the glass (nothing is dealt)
     var sp = blockSpec();
