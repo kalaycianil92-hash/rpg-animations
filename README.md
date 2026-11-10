@@ -11,6 +11,7 @@ Frame-by-frame 2D combat characters for an RPG-style game. Gemini draws the pose
 | `docs/SKILL_BEHAVIOR_LATER.md` | What the skills actually do (damage, statuses, durations): decided later with the game engine; lists what is the user's text and what is only a placeholder in the test page |
 | `docs/MONSTERS.md` | The monsters (started 2026-11-07): the decisions (default animations idle, attack, hit, death, dodge, plus special ones per monster), the slime variations assessment and the plan |
 | `docs/BLOCK.md` | Block, for every character and monster (2026-11-10): the game rule, the decisions (a reaction like Dodge, one glass half-circle look, the Elite first), what the page does and what is not wired yet |
+| `docs/SLIME_KING.md` | The Slime King, the boss of the slimes (2026-11-10): ivory-white, crown, golden staff held by a floating glove, calm and regal, the six skills with all the elements, the animations needed, what the page needs |
 | `docs/STAGES.md` | The stage looks: the Forest Kingdom's five acts of 20 PvE stages (slimes, goblins, wolves, ogres, orcs), the props layer, shared art rules, how the stage changes, the arena (Oakcrown Colosseum) and the dungeon |
 
 ## Where things stand
