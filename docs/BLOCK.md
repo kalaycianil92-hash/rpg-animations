@@ -32,3 +32,7 @@ The sheet (`inbox/warrior_block_sheet.png`, ChatGPT, 1536 x 1024, 3 x 2; copy `A
 2. **Wire the block into every attack path** (the list above) and into a character's own defence (the character is the target: `T === FIGHTERS.W`: play his block pack at the right moment instead of the hit pack).
 3. Other monsters' blocks (which monsters can block is the user's decision; the Elite fits).
 4. Engine questions: the chance to block, whether Block stacks with Dodge or other defences, what weapon is needed (the user's idea: main-hand or off-hand weapon), whether a blocked hit still applies statuses (Burn, Chill...): see `docs/SKILL_BEHAVIOR_LATER.md`.
+
+## NOTE, 2026-11-10 (the user): the other player characters still need a Block animation built
+
+**To do LATER (the user: "take a note, we will do them later"): block sheets and packs for the Mage, the Rogue, the Assassin and the Spellblade** (the Warrior's is done and is the pattern: `Animations/Warrior/block/source/block_prompt.txt` and `make_block_strip.py`; the Mage's block = the staff across the body with her Barrier flaring, the others' = the blades crossed). Not started. The user wanted the Elite's Earthbreaker effects fixed first (painted pieces, `docs/MONSTERS.md`).
