@@ -1,0 +1,59 @@
+{
+ "format": "frame-placement/1",
+ "animation": "death",
+ "file": "elite_death_6frame_strip.png",
+ "frames": 6,
+ "fps": 8,
+ "holds": [
+  1,
+  1.2,
+  1.3,
+  1.3,
+  1.5,
+  3
+ ],
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 147,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 188,
+   "bottom": 470,
+   "baseW": 362.2,
+   "sizeAgainstIdle": 1.035
+  },
+  {
+   "lift": 0.0,
+   "top": 181,
+   "bottom": 475,
+   "baseW": 358.9,
+   "sizeAgainstIdle": 1.026
+  },
+  {
+   "lift": 0.0,
+   "top": 216,
+   "bottom": 489,
+   "baseW": 365.5,
+   "sizeAgainstIdle": 1.044
+  },
+  {
+   "lift": 0.0,
+   "top": 273,
+   "bottom": 497,
+   "baseW": 360.3,
+   "sizeAgainstIdle": 1.03
+  },
+  {
+   "lift": 0.0,
+   "top": 328,
+   "bottom": 502,
+   "baseW": 302.1,
+   "sizeAgainstIdle": 0.863
+  }
+ ]
+}

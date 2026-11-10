@@ -1,0 +1,52 @@
+{
+ "format": "frame-placement/1",
+ "animation": "hit",
+ "file": "elite_hit_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 133,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 124,
+   "bottom": 469,
+   "baseW": 355.8,
+   "sizeAgainstIdle": 1.017
+  },
+  {
+   "lift": 0.0,
+   "top": 179,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 176,
+   "bottom": 470,
+   "baseW": 300.9,
+   "sizeAgainstIdle": 0.86
+  },
+  {
+   "lift": 0.0,
+   "top": 188,
+   "bottom": 469,
+   "baseW": 363.5,
+   "sizeAgainstIdle": 1.039
+  },
+  {
+   "lift": 0.0,
+   "top": 169,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0,
+   "replacedByIdleRest": true
+  }
+ ]
+}

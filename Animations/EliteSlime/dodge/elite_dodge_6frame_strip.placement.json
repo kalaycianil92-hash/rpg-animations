@@ -1,0 +1,72 @@
+{
+ "format": "frame-placement/1",
+ "animation": "dodge",
+ "file": "elite_dodge_6frame_strip.png",
+ "frames": 6,
+ "fps": 14,
+ "evadeFrame": 3,
+ "smooth": true,
+ "xUnit": "character-widths",
+ "x": [
+  0,
+  -0.02,
+  -0.07,
+  -0.1,
+  -0.06,
+  -0.02
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 169,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0,
+   "replacedByIdleRest": true
+  },
+  {
+   "lift": 0.0,
+   "top": 174,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 18.6,
+   "top": 132,
+   "bottom": 451,
+   "baseW": 360.1,
+   "sizeAgainstIdle": 1.029
+  },
+  {
+   "lift": 0.0,
+   "top": 153,
+   "bottom": 470,
+   "baseW": 351.0,
+   "sizeAgainstIdle": 1.003
+  },
+  {
+   "lift": 0.0,
+   "top": 170,
+   "bottom": 469,
+   "baseW": 363.0,
+   "sizeAgainstIdle": 1.037
+  },
+  {
+   "lift": 0.0,
+   "top": 169,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0,
+   "replacedByIdleRest": true
+  }
+ ]
+}

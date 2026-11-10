@@ -5290,7 +5290,8 @@
     MONSTERS.dark_slime.packs = build(DARK_ANIMS, DEFD); MONSTERS.dark_slime.attackPack = MONSTERS.dark_slime.packs.attack;
     // the Elite slime's packs (Animations/EliteSlime/<folder>, 2026-11-10): the Sword Slash (8 frames: gather, lift, top of the wind-up, the chop begins, THE STRIKE = the hit frame 6, follow-through, recover; the holds make the wind-up and
     // the strike last longer). `melee`: the attack is played by slashAct (it steps in toward the target) instead of the spit.
-    var DEFE = { attack: { n: 8, fps: 12, holds: [1, 1.4, 1.1, 1.5, 1.2, 1.6, 1.4, 1] } };
+    // the hit (6 frames: it rocks back, cracks flash across the dome and fade, the fist and sword are jolted up and back), the death (6 frames: cracks, chunks, a heap, a pile of rubble with the shield, the belt and the sword lying on and beside it) and the dodge (6 frames: a heavy hop, the evade frame is 3, the top of the hop)
+    var DEFE = { attack: { n: 8, fps: 12, holds: [1, 1.4, 1.1, 1.5, 1.2, 1.6, 1.4, 1] }, hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 14, holds: null } };
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
