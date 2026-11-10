@@ -5335,10 +5335,10 @@
   var ELITE_ANIMS = __ELITESLIME_ANIMS__;
   MONSTERS.elite_slime = { name: "Elite Slime", anims: ELITE_ANIMS, fps: 8, squash: (ELITE_ANIMS.filter(function (a) { return a.slot === "idle"; })[0] || {}).squash, sizeDef: 100, sqDef: 100 };
   // The SLIME KING (2026-11-11), the boss of the slimes (docs/SLIME_KING.md): an ivory slime with a golden crown and a golden staff held by a floating glove (Animations/SlimeKing, magenta key, cut by cut_king.py at the standard base
-  // of 350 px). Its idle is in (a very slow, heavy breath: 5 fps, the dome moves 3%), the other animations follow. It is drawn about TWICE the size of the other monsters by the Monster size (sizeDef 190, up to 260): the
+  // of 350 px). Its idle is in (a very slow, heavy breath: 5 fps, the dome moves 3%), the other animations follow. It is drawn about 1.5 times the size of the other monsters by the Monster size (sizeDef 150, up to 260): the
   // unit is moved toward the enemy by half of the extra width (--msx) so the staff stays on the stage. Holy and elemental skills: no vfx of its own yet.
   var KING_ANIMS = __SLIMEKING_ANIMS__;
-  MONSTERS.slime_king = { name: "Slime King", anims: KING_ANIMS, fps: 5, sizeDef: 190, sizeMax: 260, sqDef: 100 };
+  MONSTERS.slime_king = { name: "Slime King", anims: KING_ANIMS, fps: 5, sizeDef: 150, sizeMax: 260, sqDef: 100 };   // (190 at first: the user, 2026-11-11: "so big, scale it down": 150 is about 1.4 times the Warrior's height)
   // Candidate idle sheets of the re-looked fire slime (2026-11-07): every Animations/Slime/idle/candidates/<tag>_fire_idle_strip.png gets its own entry in the Monster select, to be compared in a fight.
   var SLIME_CANDIDATES = __SLIME_CANDIDATES__, CAND_LABEL = { gpt: "ChatGPT sheet", gemini: "Gemini v3 sheet (heavy bounce)", gemini2: "Gemini v4 sheet (calm)" }, CAND_SQ = {};   // CAND_SQ: the Squash and stretch default of a candidate (the calm v4 sheet is shown as drawn)
   SLIME_CANDIDATES.forEach(function (c) {
