@@ -5291,7 +5291,8 @@
     // the Elite slime's packs (Animations/EliteSlime/<folder>, 2026-11-10): the Sword Slash (8 frames: gather, lift, top of the wind-up, the chop begins, THE STRIKE = the hit frame 6, follow-through, recover; the holds make the wind-up and
     // the strike last longer). `melee`: the attack is played by slashAct (it steps in toward the target) instead of the spit.
     // the hit (6 frames: it rocks back, cracks flash across the dome and fade, the fist and sword are jolted up and back), the death (6 frames: cracks, chunks, a heap, a pile of rubble with the shield, the belt and the sword lying on and beside it) and the dodge (6 frames: a heavy hop, the evade frame is 3, the top of the hop)
-    var DEFE = { attack: { n: 8, fps: 12, holds: [1, 1.4, 1.1, 1.5, 1.2, 1.6, 1.4, 1] }, hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 14, holds: null } };
+    var DEFE = { attack: { n: 8, fps: 12, holds: [1, 1.4, 1.1, 1.5, 1.2, 1.6, 1.4, 1] }, hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 14, holds: null },
+                  slam: { n: 8, fps: 12, holds: [0.9, 1, 1, 1.2, 1.3, 1.7, 1.4, 1] } };   // slam = the Shield Bash (8 frames, the strike is frame 6)
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
@@ -5313,7 +5314,7 @@
     if (!el || !idle) return;
     var n = m.idleN || 6, i = 0;
     monPose = "idle"; MON.seq++; MON.deathP = null; MON.shS = MON.shO = 1;
-    el.style.opacity = ""; el.style.removeProperty("translate");                     // (the Magma Eruption hides the picture and bounces it with the CSS translate property)
+    el.style.opacity = ""; el.style.removeProperty("translate"); el.style.removeProperty("rotate");                     // (the Magma Eruption hides the picture and bounces it with the CSS translate property)
     if (typeof MFX !== "undefined") { MFX.dieMul = MFX.dieTarget = 1; MFX.smokeUntil = 0; }
     el.style.backgroundImage = 'url("' + idle.src + '")'; el.style.backgroundSize = (n * 100) + "% 100%";
     function show() { el.style.backgroundPosition = (n > 1 ? i / (n - 1) * 100 : 0) + "% 0"; monFrame = i; monApplySq(); }
@@ -6210,7 +6211,11 @@
   // box forces it). A target that dodges lets it land on empty ground ("slams down, but Warrior slips away"). Which attack the monster uses in a fight is the Monster's attack select (alternating by default).
   var SLAM_HIT = 7, SLAM_DMG = 1.6, SLAM_BURN = 0.5;
   function monAttackAct(e, myRun, A, T) {
-    if (MONSTERS[monKey] && MONSTERS[monKey].melee) return slashAct(e, myRun, A, T);       // the Elite: the Sword Slash (its other four skills follow, see docs/MONSTERS.md)
+    if (MONSTERS[monKey] && MONSTERS[monKey].melee) {                                      // the Elite: the Sword Slash and the Shield Bash (its other two skills follow, see docs/MONSTERS.md)
+      var md = $("monAtk").value, nn = MON.atk = (MON.atk || 0) + 1, pk2 = md === "alt" ? ["spit", "slam"][(nn - 1) % 2] : md;
+      if (pk2 === "slam" && monPackOf("slam")) return bashAct(e, myRun, A, T);
+      return slashAct(e, myRun, A, T);
+    }
     var mode = $("monAtk").value, n = MON.atk = (MON.atk || 0) + 1, pick = mode;
     if (mode === "alt") pick = ["spit", "slam", "eruption", "cinder", "bounce"][(n - 1) % 5];   // the spit, the slam and the Eruption set the target ablaze, the Cinder Burst detonates it; the Eruption and the Bounce (2-turn-cooldown skills) come round every fifth turn
     if (pick === "slam" && monPackOf("slam")) return slamAct(e, myRun, A, T);
@@ -6475,6 +6480,108 @@
       else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
     }
   }
+  // ---------------------------------------------------------------- the Elite slime's Shield Bash (2026-11-10)
+  // The Elite's second skill, a heavy charge, physical (the sheet: Animations/EliteSlime/shield_bash, the user's ChatGPT version, 8 frames at 12 fps, the slot `slam`; the strike is the hit frame 6; the base stays on the same spot
+  // in every frame, the page moves the sprite). The sheet has the wind-up (1-4: the sword is lifted high and back out of the way), the lunge with a roar (5), the impact (6: the body hunched low, the shield thrust forward, eyes
+  // shut, teeth gritted) and the recovery (7, 8). It does NOT lean the body as far as a charge needs (neither generator could draw the shield leading in the 3/4 view), so the page adds the lean: the sprite is turned
+  // forward about its base (CSS rotate, BASH_LEAN degrees per frame, a rigid stone may simply be tilted) while it runs at the target (BASH_X: the share of the way reached at the start of each frame). The landing spot puts
+  // the body's front (placement.front, the right-most point of the body on the strike frame) a little in front of the target's middle. At the impact: a grey-white flash, a ring and a cloud of dust along the ground,
+  // stone chips, a hard shake (8 px) and the target is knocked back and flashes white. BASH_DMG x the turn's damage is a placeholder; the stun chance is NOT applied yet (docs/SKILL_BEHAVIOR_LATER.md).
+  var BASH_HIT = 6, BASH_DMG = 1.6, BASH_X = [0, 0, 0, 0.12, 0.55, 1, 1, 1], BASH_LEAN = [0, 0, 0, 0, 7, 14, 7, 0];
+  function bashImpactFx(tHit, x, y, gy, u, dir) {                                    // the charge's impact at (x, y) on the target, the ground line gy
+    var rnd = rngOf((tHit | 0) + 5), dust = [], chips = [], i;
+    for (i = 0; i < 16; i++) dust.push({ a: (i / 16) * 6.2832 + rnd() * 0.3, v: 0.6 + rnd() * 0.6, r: 0.03 + rnd() * 0.05, a0: 0.35 + rnd() * 0.3 });
+    for (i = 0; i < 12; i++) chips.push({ a: -0.1 - rnd() * 2.9, v: 0.5 + rnd() * 1.1, s: 0.006 + rnd() * 0.01 });
+    fxAdd({ t0: tHit, t1: tHit + 900 / speed, draw: function (ctx, now) {
+      var t = clamp01((now - tHit) * speed / 700), f = clamp01((now - tHit) * speed / 140), j, d, px, py, R = u * (0.1 + 0.55 * (1 - Math.pow(1 - t, 3)));
+      glowDot(ctx, x, y, u * (0.1 + 0.28 * f) * (1 - t * 0.6), "235,235,240", 0.7 * (1 - clamp01(t * 1.6)));      // the flash of the blow
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";                          // a ring along the ground
+      ctx.strokeStyle = "rgba(215,215,225," + (0.6 * (1 - t)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.025 * (1 - t) + 1); ctx.beginPath(); ctx.ellipse(x, gy, R, R * 0.2, 0, 0, 6.2832); ctx.stroke();
+      ctx.restore();
+      for (j = 0; j < dust.length; j++) {                                             // dust rolling out along the ground in every direction, rising a little, swelling and fading
+        d = dust[j]; px = x + Math.cos(d.a) * R * d.v; py = gy + Math.sin(d.a) * R * d.v * 0.2 - u * 0.06 * Math.sin(Math.min(1, t * 1.3) * 1.57);
+        ctx.save(); ctx.fillStyle = "rgba(150,140,126," + (d.a0 * (1 - t) * 0.6).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(px, py, u * d.r * (0.8 + 1.2 * t), u * d.r * (0.55 + 0.8 * t), 0, 0, 6.2832); ctx.fill(); ctx.restore();
+      }
+      for (j = 0; j < chips.length; j++) {                                            // stone chips thrown up and falling
+        d = chips[j]; px = x + Math.cos(d.a) * u * 0.34 * d.v * t; py = y + Math.sin(d.a) * u * 0.34 * d.v * t + u * 0.3 * t * t;
+        ctx.save(); ctx.fillStyle = "rgba(120,118,124," + (0.9 * (1 - t)).toFixed(3) + ")"; ctx.fillRect(px - u * d.s / 2, py - u * d.s / 2, u * d.s, u * d.s); ctx.restore();
+      }
+    } });
+  }
+  async function bashAct(e, myRun, A, T) {
+    var pk = monPackOf("slam"), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, pl = pk.placement || {}, hitF = pl.hitFrame || BASH_HIT;
+    for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
+    var t0 = performance.now(), tHit = t0 + starts[hitF - 1] + fm * ((pk.holds && pk.holds[hitF - 1]) || 1) * 0.15;
+    var r0 = rectIn(monEl), front = pl.front ? slashTip(r0, pl.front) : centerOf(A.unit), t = centerOf(T.unit);
+    var reach = (t.x - front.x) - A.dir * u * 0.22, done = false;                     // the landing spot: the body's front a little in front of the target's middle
+    var dodgeRun = null;
+    if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
+      var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
+      dodgeRun = runDodge(myRun, Math.max(0, ((tHit - performance.now()) - preMs / speed) * speed));   // the evade frame is on screen when the Elite crashes in
+    }
+    var played = monPlayPack(pk, myRun).then(function (ok) { done = true; return ok; });
+    function keyAt(tt, arr) {                                                         // an array's value between the frames' keys (the value at the START of each frame)
+      var k = 0, f, x0, x1;
+      while (k + 1 < n && tt >= starts[k + 1]) k++;
+      f = k + 1 < n ? (tt - starts[k]) / (starts[k + 1] - starts[k]) : 1;
+      x0 = arr[k] || 0; x1 = arr[Math.min(n - 1, k + 1)] || 0;
+      return x0 + (x1 - x0) * clamp01(f);
+    }
+    var driver = new Promise(function (resolve) {
+      (function tick() {
+        if (myRun !== run) { resolve(false); return; }
+        var tt = performance.now() - t0;
+        uG.style.transform = "translateX(" + reach * keyAt(tt, BASH_X) + "px)";
+        if (monEl) monEl.style.rotate = (A.dir * keyAt(tt, BASH_LEAN)) + "deg";         // forward = toward the target = counter-clockwise for a monster on the right (dir -1)
+        if (done) resolve(true); else requestAnimationFrame(tick);
+      })();
+    });
+    await bsWait(tHit);
+    if (myRun !== run) return;
+    var tr = rectIn(T.unit), ix = tr.left + tr.width * 0.5 - A.dir * tr.width * 0.12, iy = tr.top + tr.height * 0.6, igy = tr.top + tr.height - tr.width * 0.06;
+    shake(8, 300);
+    bashImpactFx(tHit, ix, iy, igy, u, A.dir);
+    if (e.dodge) {
+      if (!pv) { say(A.name + " charges, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
+      if (dodgeRun) await dodgeRun;
+      else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
+    } else {
+      var amount = Math.round((e.amount || 0) * BASH_DMG);
+      if (!pv) {
+        T.hp -= amount; paintHp(T);
+        if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
+        if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
+      }
+      if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
+      if (!pv) {
+        floatNumber(T, (e.crit ? "CRIT " : "") + amount, e.crit ? "crit" : "");
+        say(A.name + " rams " + T.name + " with its shield for " + amount + (e.crit ? " (crit!)" : "") + " (Shield Bash).", "g");
+      }
+      await Promise.all([
+        anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, 340),
+        anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * 30) + "px)" }, { transform: "translateX(" + (-A.dir * 10) + "px)" }, { transform: "translateX(0)" }], 320),
+        sleep(320)
+      ]);
+    }
+    if (myRun !== run) return;
+    var ok = await driver;                                                           // the pack plays to its end, then the slime slides home and goes back to its idle
+    if (myRun !== run || !ok) return;
+    await anim(uG, [{ transform: uG.style.transform }, { transform: "translateX(0)" }], 340, "ease-in-out");
+    uG.style.transform = ""; clearAnims(uG);
+    if (monEl) monEl.style.removeProperty("rotate");
+    if (myRun !== run) return;
+    monStartIdle();
+    clearAnims(T.unit); clearAnims(stage);
+    T.unit.querySelector(".sprite").getAnimations().forEach(function (x) { x.cancel(); });
+    if (!pv && T.hp <= 0) {
+      clearBurn(T); clearChilled(T);
+      say(T.name + " is defeated.", "sys");
+      if (T === FIGHTERS.W && packs.death && packs.death.keyed && $("still").checked) {
+        keyPose("death", 0); await sleep(150); keyPose("death", 1); await sleep(260); keyPose("death", 2);
+      } else if (T === FIGHTERS.W && packs.death) await playPose("death", false);
+      else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
+    }
+  }
   monPrevLoop($("monPrevCinder"), async function (my) {                               // the warrior burns (two stacks) for a moment, then the Cinder Burst pops them
     if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark") applyWard(FIGHTERS.W, 3); else if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning") applyShocked(FIGHTERS.W, 3); else if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice") applyChilled(FIGHTERS.W, 3); else applyBurn(FIGHTERS.W, 2);
     await sleep(900);
@@ -6485,7 +6592,7 @@
     if (FIGHTERS.W.shocked) clearShocked(FIGHTERS.W);
     if (FIGHTERS.W.magDef) clearWard(FIGHTERS.W);
   });
-  monPrevLoop($("monPrevSlam"), async function (my) { await slamAct({ actor: "G", amount: 0, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
+  monPrevLoop($("monPrevSlam"), async function (my) { await (MONSTERS[monKey].melee ? bashAct : slamAct)({ actor: "G", amount: 0, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
   // ---------------------------------------------------------------- the fire slime's Magma Eruption (2026-11-08)
   // The ground skill, a 2-turn-cooldown one (the user's idea: "the slime shrinks and slides to the opponent, then explodes under him with a great impact"; the sheet: Animations/Slime/magma_eruption, 6 frames).
   // 1. SHRINK: the pack's frames 1 to 4 (gather, squeeze, shrink, the tiny core); the slime's Fire effects die down with it. 2. SLIDE: the core slides along the ground to the middle of the target (eased,

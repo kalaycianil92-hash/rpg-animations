@@ -1,0 +1,70 @@
+{
+ "format": "frame-placement/1",
+ "animation": "shield_bash",
+ "file": "elite_shield_bash_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "hitFrame": 6,
+ "front": {
+  "x": 427,
+  "y": 316
+ },
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 180,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 149,
+   "bottom": 470,
+   "baseW": 348.9,
+   "sizeAgainstIdle": 0.997
+  },
+  {
+   "lift": 0.0,
+   "top": 138,
+   "bottom": 470,
+   "baseW": 345.7,
+   "sizeAgainstIdle": 0.988
+  },
+  {
+   "lift": 0.0,
+   "top": 130,
+   "bottom": 471,
+   "baseW": 348.9,
+   "sizeAgainstIdle": 0.997
+  },
+  {
+   "lift": 0.0,
+   "top": 105,
+   "bottom": 471,
+   "baseW": 347.8,
+   "sizeAgainstIdle": 0.994
+  },
+  {
+   "lift": 0.0,
+   "top": 103,
+   "bottom": 470,
+   "baseW": 344.6,
+   "sizeAgainstIdle": 0.985
+  },
+  {
+   "lift": 0.0,
+   "top": 155,
+   "bottom": 470,
+   "baseW": 353.3,
+   "sizeAgainstIdle": 1.009
+  },
+  {
+   "lift": 0.0,
+   "top": 182,
+   "bottom": 470,
+   "baseW": 350.0,
+   "sizeAgainstIdle": 1.0
+  }
+ ]
+}
