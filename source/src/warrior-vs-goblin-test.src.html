@@ -5298,7 +5298,7 @@
                   slam: { n: 8, fps: 12, holds: [0.9, 1, 1, 1.2, 1.3, 1.7, 1.4, 1] },   // slam = the Granite Ram (8 frames, the strike is frame 6)
                   bounce: { n: 8, fps: 12, holds: null },   // bounce = the Rockfall Drop (8 frames: dropAct shows them one by one, the crash is frame 5)
                   eruption: { n: 6, fps: 12, holds: [1, 1.6, 1.1, 3.4, 1.4, 1.4] },   // eruption = the Earthbreaker
-                  guard: { n: 6, fps: 10, holds: [1, 1.2, 1.5, 2.4, 2.4, 1.3] } };   // guard = the Stone Guard (6 frames: rest, brace, guard rising, held, hold, relax; the page adds the lean, the hunker and the shield's light) (6 frames: gather, raise, the blade into the floor, strain (the hit frame 4), pull, recover)
+                  guard: { n: 6, fps: 10, holds: [1, 1.2, 1.5, 2.4, 2.4, 1.3] } };   // guard = the Stone Guard (6 frames, the ChatGPT sheet: rest, the shield a little higher, across the body, in front of the face (held twice), home; guardAct plays 1, 2, 3, 4, 5, 3, 6 with its own holds) (6 frames: gather, raise, the blade into the floor, strain (the hit frame 4), pull, recover)
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
@@ -7403,34 +7403,38 @@
     }
   }
   // ---------------------------------------------------------------- the Elite slime's Stone Guard (2026-11-10)
-  // The Elite's fifth skill, a SELF BUFF with no target (the sheet: Animations/EliteSlime/stone_guard, the user's Gemini sheet, 6 frames at 10 fps, the slot `guard`). The prompt asked the shield to slide up to the nose, but
-  // the generator drew six almost identical poses: the shield stays at the lower left of the body, the body hunkers a few percent and the brow lowers (frames 2 to 5, 4 and 5 the hardest glare). So the page adds what the
-  // sheet lacks, all rigid-stone motion: the sprite is turned forward about its base (CSS rotate, GUARD_LEAN degrees per frame) and lowered a little (CSS scale, GUARD_SY / GUARD_SX), a puff of dust is pushed out at its feet
-  // (it digs in), and THE SHIELD LIGHTS UP: an outline in cool steel-blue that flares (frame 3), two rings that leave the shield and widen, a bright band that sweeps across it (frames 3 and 4), then a faint pulsing edge that
-  // stays for as long as the buff does (GUARD_TURNS of its own turns; the page only DRAWS the buff, the game applies the numbers: Defense up). The glow is a DOM layer inside the sprite (so it leans and breathes with it)
-  // placed from placement.shield (the shield's box in the 512 cell). A DEFENSE UP number appears at the held frame. Nothing is dealt: no target, no damage.
-  var GUARD_LEAN = [0, 2, 4, 6, 6, 1], GUARD_SY = [1, 0.97, 0.94, 0.92, 0.92, 0.98], GUARD_SX = [1, 1.01, 1.02, 1.03, 1.03, 1.005], GUARD_TURNS = 2;
-  var GUARD_PATH = "M153,300 L249,300 L249,371 Q241,421 201,438 Q161,421 153,371 Z";   // the heater shield in the 512 cell (matched to the idle's rest frame: box 150, 296, 102 x 144)
-  function guardGlowEl() {                                                           // the shield's light: a DOM layer (inside the sprite, so it moves with it), the SVG in the 512 cell's own coordinates
+  // The Elite's fifth skill, a SELF BUFF with no target (the sheet: Animations/EliteSlime/stone_guard, the user's SECOND try, a ChatGPT sheet, 6 frames at 10 fps, the slot `guard`; the first, Gemini's, drew six almost identical
+  // poses and the shield never moved, see old_gemini_version/). In this one THE SHIELD REALLY RISES: it floats up from the lower left of the body (1 rest, 2 a little higher and to the right, 3 across the front of the
+  // body, partly over the left eye) to stand in front of the face in frames 4 and 5 (covering the mouth and the lower cheeks, the eyes glaring over its top edge) and is back at its rest place in frame 6 (the generator drew
+  // it all the way back, not halfway). The page plays 1, 2, 3, 4, 5, 3, 6 (GUARD_ORDER): frame 3 again on the way back, so the shield drifts down instead of snapping. What the page adds is small: a little rigid-stone lean
+  // and hunker (CSS rotate / scale, GUARD_LEAN / GUARD_SY: the sheet's body only lowers about 3 px), dust pushed out at its feet at the brace, and THE SHIELD'S LIGHT, which now follows the shield: a DOM layer inside the sprite
+  // (an SVG in the 512 cell's own coordinates, a unit-square shield path moved and scaled to the shield's box in each frame, GUARD_BOXES, measured by template) with a steel-blue outline that flares when the shield arrives
+  // at the face (frame 4), a bright band sweeping across it, two rings that leave it, then a faint pulsing edge back at the rest place for as long as the buff lasts (GUARD_TURNS of the Elite's own turns; the page only DRAWS
+  // the buff, the game applies the numbers: Defense up). A DEFENSE UP number appears at the held frame. Nothing is dealt: no target, no damage.
+  var GUARD_ORDER = [0, 1, 2, 3, 4, 2, 5], GUARD_HOLDS = [1, 1.2, 1.3, 2.4, 2.4, 1.1, 1.3];
+  var GUARD_LEAN = [0, 1, 2, 3, 3, 2, 0], GUARD_SY = [1, 0.99, 0.98, 0.96, 0.96, 0.98, 1], GUARD_SX = [1, 1.005, 1.01, 1.015, 1.015, 1.01, 1], GUARD_TURNS = 2;
+  var GUARD_BOXES = [[150, 296, 102, 142], [165, 288, 97, 142], [193, 285, 120, 150], [285, 280, 111, 140], [285, 280, 111, 140], [152, 298, 102, 140]];   // the shield's box (x, y, w, h) in the 512 cell, per sheet frame
+  var GUARD_UNIT = "M.03,.03 L.97,.03 L.97,.52 Q.89,.87 .5,.99 Q.11,.87 .03,.52 Z";   // a heater shield in the unit square
+  function guardGlowEl() {                                                           // the shield's light: a DOM layer (inside the sprite, so it moves with it), an SVG in the 512 cell's coordinates
     var d = document.createElement("div"); d.className = "guardglow"; d.style.cssText = "position:absolute;inset:0;pointer-events:none";
-    d.innerHTML = '<svg viewBox="0 0 512 512" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">' +
-      '<defs><clipPath id="gdclip"><path d="' + GUARD_PATH + '"/></clipPath></defs>' +
-      '<path class="gd-fill" d="' + GUARD_PATH + '" fill="rgba(150,200,255,0.5)" style="opacity:0"/>' +
-      '<g clip-path="url(#gdclip)"><g transform="rotate(20 200 370)"><rect class="gd-sweep" x="110" y="250" width="34" height="260" fill="rgba(238,247,255,0.8)" style="opacity:0"/></g></g>' +
-      '<path class="gd-ring" d="' + GUARD_PATH + '" fill="none" stroke="rgba(190,225,255,0.95)" stroke-width="3" style="transform-box:fill-box;transform-origin:50% 50%;opacity:0"/>' +
-      '<path class="gd-edge" d="' + GUARD_PATH + '" fill="none" stroke="rgba(176,216,255,0.95)" stroke-width="3.5" stroke-linejoin="round" style="opacity:0;filter:drop-shadow(0 0 5px rgba(120,185,255,0.95))"/></svg>';
+    d.innerHTML = '<svg viewBox="0 0 512 512" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"><g class="gd-move" transform="translate(152,298) scale(102,140)">' +
+      '<defs><clipPath id="gdclip"><path d="' + GUARD_UNIT + '"/></clipPath></defs>' +
+      '<path class="gd-fill" d="' + GUARD_UNIT + '" fill="rgba(150,200,255,0.5)" style="opacity:0"/>' +
+      '<g clip-path="url(#gdclip)"><g transform="rotate(20 .5 .5)"><rect class="gd-sweep" x="-.2" y="-.4" width=".22" height="1.8" fill="rgba(238,247,255,0.8)" style="opacity:0"/></g></g>' +
+      '<path class="gd-ring" d="' + GUARD_UNIT + '" fill="none" stroke="rgba(190,225,255,0.95)" stroke-width="2" vector-effect="non-scaling-stroke" style="transform-box:fill-box;transform-origin:50% 50%;opacity:0"/>' +
+      '<path class="gd-edge" d="' + GUARD_UNIT + '" fill="none" stroke="rgba(176,216,255,0.95)" stroke-width="2.2" stroke-linejoin="round" vector-effect="non-scaling-stroke" style="opacity:0;filter:drop-shadow(0 0 4px rgba(120,185,255,0.95))"/></g></svg>';
     return d;
   }
   function guardQ(g, c) { return g.querySelector(".gd-" + c); }
+  function guardPlace(g, fi) { var b = GUARD_BOXES[fi]; guardQ(g, "move").setAttribute("transform", "translate(" + b[0] + "," + b[1] + ") scale(" + b[2] + "," + b[3] + ")"); }
   function guardFlare(g, strong) {                                                    // the edge flares and settles, the fill blinks, one ring leaves the shield and widens
     anim(guardQ(g, "edge"), [{ opacity: 0.2 }, { opacity: 1, offset: 0.25 }, { opacity: 0.6 }], 520).catch(function () {});
-    anim(guardQ(g, "fill"), [{ opacity: 0 }, { opacity: strong ? 0.55 : 0.35, offset: 0.2 }, { opacity: 0 }], 520).catch(function () {});
-    anim(guardQ(g, "ring"), [{ opacity: 0.85, transform: "scale(1)" }, { opacity: 0, transform: "scale(" + (strong ? 1.5 : 1.35) + ")" }], 560, "ease-out").catch(function () {});
+    anim(guardQ(g, "fill"), [{ opacity: 0 }, { opacity: strong ? 0.5 : 0.3, offset: 0.2 }, { opacity: 0 }], 520).catch(function () {});
+    anim(guardQ(g, "ring"), [{ opacity: 0.85, transform: "scale(1)" }, { opacity: 0, transform: "scale(" + (strong ? 1.45 : 1.3) + ")" }], 560, "ease-out").catch(function () {});
     guardQ(g, "edge").style.opacity = 0.6;
   }
-  function guardSweep(g, ms) {                                                        // the bright band runs across the shield, clipped to it
-    var r = guardQ(g, "sweep");
-    anim(r, [{ opacity: 0, transform: "translateX(0px)" }, { opacity: 1, transform: "translateX(40px)", offset: 0.25 }, { opacity: 1, transform: "translateX(150px)", offset: 0.75 }, { opacity: 0, transform: "translateX(190px)" }], ms, "ease-in-out").catch(function () {});
+  function guardSweep(g, ms) {                                                        // the bright band runs across the shield (unit square), clipped to it
+    anim(guardQ(g, "sweep"), [{ opacity: 0, transform: "translateX(0px)" }, { opacity: 1, transform: "translateX(0.2px)", offset: 0.25 }, { opacity: 1, transform: "translateX(0.9px)", offset: 0.75 }, { opacity: 0, transform: "translateX(1.2px)" }], ms, "ease-in-out").catch(function () {});
   }
   function guardRest(g) {                                                             // the buff's faint aura: the edge breathes while the status lasts
     var ed = guardQ(g, "edge");
@@ -7450,43 +7454,43 @@
       }
     } });
   }
-  function applyGuard(A, turns, g) {                                                  // Defense up (drawn only): the shield's faint aura and a number; it runs down with the Elite's own turns (tickStatuses)
-    if (A.guard) { A.guard.turns = turns; A.guard.fresh = true; return; }
-    A.guard = { turns: turns, fresh: true, el: g }; guardRest(g);
-  }
+  function clearGuardEl(g) { if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } } }
   function clearGuard(A) {
     if (!A.guard) return;
-    var g = A.guard.el; A.guard = null;
-    if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } }
+    var g = A.guard.el; A.guard = null; clearGuardEl(g);
   }
   async function guardAct(e, myRun, A, T) {
-    var pk = monPackOf("guard"), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, el = monEl;
-    for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
+    var pk = monPackOf("guard"), u = uW.offsetWidth, n = GUARD_ORDER.length, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, el = monEl;
+    for (i = 0; i < n; i++) { starts.push(tot); tot += fm * GUARD_HOLDS[i]; }
     var t0 = performance.now(), r0 = rectIn(el), cx = r0.left + r0.width / 2, gy = r0.top + r0.height - r0.width * 42 / 512;
     var g = A.guard ? A.guard.el : guardGlowEl();
     if (!g.parentNode) el.appendChild(g);
-    var played = monPlayPack(pk, myRun, function (k) {                                // the lean and the hunker, frame by frame
-      el.style.rotate = (A.dir * GUARD_LEAN[k]) + "deg"; el.style.scale = GUARD_SX[k] + " " + GUARD_SY[k];
-    });
+    if (g.getAnimations) g.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });          // (the resting pulse of an earlier cast must not fight the flares)
+    guardPlace(g, 0);
+    var played = monPlayPack(pk, myRun, function (k) {                                // the lean and the hunker, and the light on the shield, step by step
+      el.style.rotate = (A.dir * GUARD_LEAN[k]) + "deg"; el.style.scale = GUARD_SX[k] + " " + GUARD_SY[k]; guardPlace(g, GUARD_ORDER[k]);
+    }, GUARD_HOLDS, GUARD_ORDER);
     await bsWait(t0 + starts[1]);                                                     // 2. brace: it digs in
     if (myRun !== run) return;
     guardDustFx(performance.now(), cx, gy, u); shake(2, 200);
-    await bsWait(t0 + starts[2]);                                                     // 3. the shield wakes
+    await bsWait(t0 + starts[2]);                                                     // 3. the shield crosses the body
     if (myRun !== run) return;
-    guardFlare(g, false); guardSweep(g, 1000 / pk.fps * 4.2);
-    await bsWait(t0 + starts[3]);                                                     // 4. the guard held
+    guardFlare(g, false);
+    await bsWait(t0 + starts[3]);                                                     // 4. the shield arrives at the face: the guard
     if (myRun !== run) return;
-    guardFlare(g, true);
+    guardFlare(g, true); guardSweep(g, 1000 / pk.fps * 4.8);
     await bsWait(t0 + starts[4]);                                                     // 5. hold: the number
     if (myRun !== run) return;
     if (!pv) { floatNumber(A, "DEFENSE UP", "guard"); say(A.name + " hunkers down behind its shield: Defense raised for " + GUARD_TURNS + " turns (Stone Guard).", "g"); }
     await played;
     if (myRun !== run) return;
-    if (pv) { clearGuardEl(g); } else applyGuard(A, GUARD_TURNS, g);
+    guardPlace(g, 5);                                                                 // the shield is home again: the faint aura stays there
+    if (g.getAnimations) g.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
+    if (pv) clearGuardEl(g);
+    else { if (A.guard) { A.guard.turns = GUARD_TURNS; A.guard.fresh = true; } else A.guard = { turns: GUARD_TURNS, fresh: true, el: g }; guardRest(g); }
     uG.style.transform = "";
     monStartIdle();
   }
-  function clearGuardEl(g) { if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } } }
   $("monFx").oninput = function () {
     var v = +this.value; $("monFxV").textContent = v + "%";
     try { localStorage.setItem("wvg-monster-fire-" + monKey, v); } catch (e) {}

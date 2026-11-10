@@ -43,11 +43,12 @@ JOBS = {
     # panel 6's size), so every panel gets its own scale = 0.425 / that factor (0.425 = the shield's scale from the sheet to the idle's rest frame, matched by template); the stone arms in panels 2 and 5 are painted out first (earthbreaker_prep.py)
     "earthbreaker": dict(file="elite_slime_earth_breaker.jpg", folder="earthbreaker", mode="shared", rows=[3, 3], airborne=[], swap=[0, 5], fps=12, mul={}, dx={}, prep="earthbreaker_prep",
                          scales=[0.472, 0.462, 0.457, 0.438, 0.434, 0.425], extra={"hitFrame": 4, "swordFoot": {"x": 420, "y": 460}}),     # swordFoot: where the blade enters the floor (frames 3 to 5)
-    # the Stone Guard (2026-11-10, the user's Gemini sheet, 2752 x 1536, 3 x 2): the six panels are almost the same pose (the generator did NOT slide the shield up: it stays at the lower left of the body in every panel; the body hunkers
-    # only a few percent and the brow lowers), so the shield's rise is not in the sheet. Panels 1 and 6 are replaced by the idle's rest frame (the pack starts and ends on the idle, no pop); the others are scaled by the rigid
-    # shield (0.435 = the shield's scale from the sheet to the idle's rest frame; panel 6 was drawn 6% bigger). extra.shield: the shield's box in the 512 cell (matched to the idle's rest frame) where the page puts its glow.
-    "stone_guard": dict(file="elite_slime_stone_guard.jpg", folder="stone_guard", mode="shared", rows=[3, 3], airborne=[], swap=[0, 5], fps=10, mul={}, dx={},
-                        scales=[0.435, 0.439, 0.426, 0.426, 0.418, 0.410], extra={"shield": {"x": 150, "y": 296, "w": 102, "h": 144}}),
+    # the Stone Guard (2026-11-10). FIRST the user's Gemini sheet (old_gemini_version/): six almost identical poses, the shield never moved (rejected_gemini_sheet.jpg), so the page faked the guard in code.
+    # THEN the user's ChatGPT second try (elite_slime_stone_guard_alternate.jpg, 2528 x 1696, 3 x 2): THE SHIELD REALLY RISES (frames 4 and 5 it floats in front of the face, covering the mouth and lower cheeks). Panel 1 is replaced
+    # by the idle's rest frame; every panel is scaled by 0.46 (the shield's scale from the sheet to the idle's rest frame, matched by template; the shield measures 0.97 to 1.02 of panel 1's in the others: no size drift).
+    "stone_guard": dict(file="elite_slime_stone_guard_alternate.jpg", folder="stone_guard", mode="shared", rows=[3, 3], airborne=[], swap=[0], fps=10, mul={}, dx={},
+                        scales=[0.46, 0.46, 0.46, 0.46, 0.46, 0.46],
+                        extra={"playOrder": [0, 1, 2, 3, 4, 2, 5], "shieldBoxes": [[150, 296, 102, 142], [165, 288, 97, 142], [193, 285, 120, 150], [285, 280, 111, 140], [285, 280, 111, 140], [152, 298, 102, 140]]}),     # shieldBoxes: the shield (x, y, w, h) in the 512 cell per frame (template match + by eye)
     "shield_bash": dict(file="elite_slime_shield_bash_chatgpt.png", folder="shield_bash", mode="shared", rows=[4, 4], airborne=[], swap=[], fps=12, mul={}, dx={}, front=6,
                         extra={"hitFrame": 6}),
 }

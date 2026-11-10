@@ -1,0 +1,59 @@
+{
+ "format": "frame-placement/1",
+ "animation": "stone_guard",
+ "file": "elite_stone_guard_6frame_strip.png",
+ "frames": 6,
+ "fps": 10,
+ "shield": {
+  "x": 150,
+  "y": 296,
+  "w": 102,
+  "h": 144
+ },
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 169,
+   "bottom": 470,
+   "baseW": 355.8,
+   "sizeAgainstIdle": 1.017,
+   "replacedByIdleRest": true
+  },
+  {
+   "lift": 0.0,
+   "top": 179,
+   "bottom": 470,
+   "baseW": 356.4,
+   "sizeAgainstIdle": 1.018
+  },
+  {
+   "lift": 0.0,
+   "top": 187,
+   "bottom": 470,
+   "baseW": 351.5,
+   "sizeAgainstIdle": 1.004
+  },
+  {
+   "lift": 0.0,
+   "top": 173,
+   "bottom": 470,
+   "baseW": 354.1,
+   "sizeAgainstIdle": 1.012
+  },
+  {
+   "lift": 0.0,
+   "top": 185,
+   "bottom": 470,
+   "baseW": 350.1,
+   "sizeAgainstIdle": 1.0
+  },
+  {
+   "lift": 0.0,
+   "top": 169,
+   "bottom": 470,
+   "baseW": 357.2,
+   "sizeAgainstIdle": 1.021,
+   "replacedByIdleRest": true
+  }
+ ]
+}

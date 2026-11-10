@@ -4,56 +4,96 @@
  "file": "elite_stone_guard_6frame_strip.png",
  "frames": 6,
  "fps": 10,
- "shield": {
-  "x": 150,
-  "y": 296,
-  "w": 102,
-  "h": 144
- },
+ "playOrder": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  2,
+  5
+ ],
+ "shieldBoxes": [
+  [
+   150,
+   296,
+   102,
+   142
+  ],
+  [
+   165,
+   288,
+   97,
+   142
+  ],
+  [
+   193,
+   285,
+   120,
+   150
+  ],
+  [
+   285,
+   280,
+   111,
+   140
+  ],
+  [
+   285,
+   280,
+   111,
+   140
+  ],
+  [
+   152,
+   298,
+   102,
+   140
+  ]
+ ],
  "frameInfo": [
   {
    "lift": 0.0,
    "top": 169,
    "bottom": 470,
-   "baseW": 355.8,
-   "sizeAgainstIdle": 1.017,
+   "baseW": 353.7,
+   "sizeAgainstIdle": 1.011,
    "replacedByIdleRest": true
   },
   {
    "lift": 0.0,
-   "top": 179,
+   "top": 172,
    "bottom": 470,
-   "baseW": 356.4,
-   "sizeAgainstIdle": 1.018
-  },
-  {
-   "lift": 0.0,
-   "top": 187,
-   "bottom": 470,
-   "baseW": 351.5,
-   "sizeAgainstIdle": 1.004
-  },
-  {
-   "lift": 0.0,
-   "top": 173,
-   "bottom": 470,
-   "baseW": 354.1,
+   "baseW": 354.2,
    "sizeAgainstIdle": 1.012
   },
   {
    "lift": 0.0,
-   "top": 185,
+   "top": 172,
    "bottom": 470,
-   "baseW": 350.1,
-   "sizeAgainstIdle": 1.0
+   "baseW": 354.7,
+   "sizeAgainstIdle": 1.013
   },
   {
    "lift": 0.0,
-   "top": 169,
-   "bottom": 470,
-   "baseW": 357.2,
-   "sizeAgainstIdle": 1.021,
-   "replacedByIdleRest": true
+   "top": 172,
+   "bottom": 469,
+   "baseW": 355.6,
+   "sizeAgainstIdle": 1.016
+  },
+  {
+   "lift": 0.0,
+   "top": 172,
+   "bottom": 469,
+   "baseW": 354.7,
+   "sizeAgainstIdle": 1.013
+  },
+  {
+   "lift": 0.0,
+   "top": 172,
+   "bottom": 469,
+   "baseW": 355.6,
+   "sizeAgainstIdle": 1.016
   }
  ]
 }
