@@ -5292,7 +5292,7 @@
     // the strike last longer). `melee`: the attack is played by slashAct (it steps in toward the target) instead of the spit.
     // the hit (6 frames: it rocks back, cracks flash across the dome and fade, the fist and sword are jolted up and back), the death (6 frames: cracks, chunks, a heap, a pile of rubble with the shield, the belt and the sword lying on and beside it) and the dodge (6 frames: a heavy hop, the evade frame is 3, the top of the hop)
     var DEFE = { attack: { n: 8, fps: 12, holds: [1, 1.4, 1.1, 1.5, 1.2, 1.6, 1.4, 1] }, hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 14, holds: null },
-                  slam: { n: 8, fps: 12, holds: [0.9, 1, 1, 1.2, 1.3, 1.7, 1.4, 1] } };   // slam = the Shield Bash (8 frames, the strike is frame 6)
+                  slam: { n: 8, fps: 12, holds: [0.9, 1, 1, 1.2, 1.3, 1.7, 1.4, 1] } };   // slam = the Granite Ram (8 frames, the strike is frame 6)
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
@@ -5340,7 +5340,7 @@
     [["monSpitPrev", "attack"], ["monPrevHit", "hit"], ["monPrevDeath", "death"], ["monPrevDodge", "dodge"], ["monPrevSlam", "slam"], ["monPrevCinder", "attack"], ["monPrevEruption", "eruption"], ["monPrevBounce", "bounce"]].forEach(function (b) {
       $(b[0]).style.display = m.packs && m.packs[b[1]] && (!b[2] || m.vfx === b[2]) && !(m.melee && b[0] === "monPrevCinder") ? "" : "none";   // (the Elite has no Cinder Burst preview)
     });
-    var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = m.melee ? { alt: "Alternate all five attacks", spit: "Sword Slash", slam: "Shield Bash", cinder: "Stone Guard", eruption: "Earthbreaker", bounce: "Rockfall Drop" } : DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
+    var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = m.melee ? { alt: "Alternate all five attacks", spit: "Sword Slash", slam: "Granite Ram", cinder: "Stone Guard", eruption: "Earthbreaker", bounce: "Rockfall Drop" } : DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
     Array.prototype.forEach.call($("monAtk").options, function (o) { if (NAMES[o.value]) o.textContent = NAMES[o.value]; });
     $("monSpitPrev").textContent = NAMES.spit + " (loops)"; $("monPrevSlam").textContent = NAMES.slam + " (loops)"; $("monPrevCinder").textContent = NAMES.cinder + " (loops)"; $("monPrevEruption").textContent = NAMES.eruption + " (loops)"; $("monPrevBounce").textContent = NAMES.bounce + " (loops)";
     $("monAtkWrap").style.display = idle && m.packs && m.packs.slam ? "" : "none";
@@ -6211,7 +6211,7 @@
   // box forces it). A target that dodges lets it land on empty ground ("slams down, but Warrior slips away"). Which attack the monster uses in a fight is the Monster's attack select (alternating by default).
   var SLAM_HIT = 7, SLAM_DMG = 1.6, SLAM_BURN = 0.5;
   function monAttackAct(e, myRun, A, T) {
-    if (MONSTERS[monKey] && MONSTERS[monKey].melee) {                                      // the Elite: the Sword Slash and the Shield Bash (its other two skills follow, see docs/MONSTERS.md)
+    if (MONSTERS[monKey] && MONSTERS[monKey].melee) {                                      // the Elite: the Sword Slash and the Granite Ram (its other two skills follow, see docs/MONSTERS.md)
       var md = $("monAtk").value, nn = MON.atk = (MON.atk || 0) + 1, pk2 = md === "alt" ? ["spit", "slam"][(nn - 1) % 2] : md;
       if (pk2 === "slam" && monPackOf("slam")) return bashAct(e, myRun, A, T);
       return slashAct(e, myRun, A, T);
@@ -6480,7 +6480,7 @@
       else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
     }
   }
-  // ---------------------------------------------------------------- the Elite slime's Shield Bash (2026-11-10)
+  // ---------------------------------------------------------------- the Elite slime's Granite Ram (2026-11-10; planned as 'Shield Bash', renamed when the user saw it: the shield does not move, it reads as a headbutt, so the name says what it is, a heavy ram by a lump of stone)
   // The Elite's second skill, a heavy charge, physical (the sheet: Animations/EliteSlime/shield_bash, the user's ChatGPT version, 8 frames at 12 fps, the slot `slam`; the strike is the hit frame 6; the base stays on the same spot
   // in every frame, the page moves the sprite). The sheet has the wind-up (1-4: the sword is lifted high and back out of the way), the lunge with a roar (5), the impact (6: the body hunched low, the shield thrust forward, eyes
   // shut, teeth gritted) and the recovery (7, 8). It does NOT lean the body as far as a charge needs (neither generator could draw the shield leading in the 3/4 view), so the page adds the lean: the sprite is turned
@@ -6555,7 +6555,7 @@
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
       if (!pv) {
         floatNumber(T, (e.crit ? "CRIT " : "") + amount, e.crit ? "crit" : "");
-        say(A.name + " rams " + T.name + " with its shield for " + amount + (e.crit ? " (crit!)" : "") + " (Shield Bash).", "g");
+        say(A.name + " rams " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + " (Granite Ram).", "g");
       }
       await Promise.all([
         anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, 340),
