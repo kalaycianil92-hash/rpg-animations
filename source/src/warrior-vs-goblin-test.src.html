@@ -252,7 +252,7 @@
     <summary>Fight</summary>
     <div class="devbody">
     <div class="fields">
-      <label>Scenario <select id="scn"><option value="win">Warrior wins</option><option value="lose">Warrior loses (plays death)</option><option value="combo">Mage combo: Shatter Lance on a Chilled, then on a Frozen target</option><option value="fire">Mage fire combo: Firebolt twice, then Cinderburst detonates the burns</option><option value="fire2">Mage fire combo: Pyroclasm sets 3 Burns, Cinderburst detonates all of them</option><option value="mdodge">Warrior wins, the monster dodges one strike (and he dodges one)</option><option value="mblock">Warrior wins, the monster blocks two strikes (a blocked hit cannot crit, 20% less damage)</option></select></label>
+      <label>Scenario <select id="scn"><option value="win">Warrior wins</option><option value="lose">Warrior loses (plays death)</option><option value="combo">Mage combo: Shatter Lance on a Chilled, then on a Frozen target</option><option value="fire">Mage fire combo: Firebolt twice, then Cinderburst detonates the burns</option><option value="fire2">Mage fire combo: Pyroclasm sets 3 Burns, Cinderburst detonates all of them</option><option value="mdodge">Warrior wins, the monster dodges one strike (and he dodges one)</option><option value="mblock">Warrior wins, the monster blocks two strikes and he blocks one (a blocked hit cannot crit, 20% less damage)</option></select></label>
       <label id="rogueWrap" style="display:none">Rogue's attack <select id="rogueSkill"><option value="alt">Alternate the six skills</option><option value="shroud">Umbral Shroud</option><option value="abyssal">Abyssal Backstab</option><option value="shiv">Shadow Shiv</option><option value="stiletto">Static Stiletto</option><option value="kiss">Winter's Kiss</option><option value="permafrost">Permafrost Execution</option></select></label>
       <label id="rogueDefWrap" style="display:none"><input type="checkbox" id="rogueDef"> The target suffers Reduce Physical Def (Shadow Shiv then always hits critically)</label>
       <label id="rogueShockWrap" style="display:none"><input type="checkbox" id="rogueShock"> Static Stiletto always applies Shocked (otherwise a 25% chance)</label>
@@ -266,6 +266,7 @@
     <div class="fields">
       <button id="previewAtk">Preview attack (loops)</button>
       <button id="previewDodge">Preview dodge (loops)</button>
+      <button id="previewBlock">Preview block (loops)</button>
       <button id="runPreview">Preview run (loops)</button>
       <button id="stopPrev">Stop</button>
       <label id="spitWrap" style="display:none"><input type="checkbox" id="spitBurn"> The monster's spit and slam always inflict their status, Burn or Chilled (otherwise 25% and 50% of the time; Cinder Burst detonates the burns instead)</label>
@@ -488,6 +489,7 @@
         <div class="slot"><label class="file"><input type="file" accept="image/*,.json" multiple id="p_hit"><span>Hit pack</span></label><small id="i_hit">Not loaded. Plays when the warrior is hit.</small></div>
         <div class="slot"><label class="file"><input type="file" accept="image/*,.json" multiple id="p_death"><span>Death pack</span></label><small id="i_death">Not loaded. Plays once and holds the last frame.</small></div>
         <div class="slot"><label class="file"><input type="file" accept="image/*,.json" multiple id="p_dodge"><span>Dodge pack</span></label><small id="i_dodge">Not loaded. Plays when the warrior dodges.</small></div>
+        <div class="slot"><label class="file"><input type="file" accept="image/*,.json" multiple id="p_block"><span>Block pack</span></label><small id="i_block">Not loaded. Plays when the warrior blocks a blow (the guard is up on the block frame when it lands).</small></div>
         <div class="slot"><label class="file"><input type="file" accept="image/*,.json" multiple id="p_run"><span>Run pack</span></label><small id="i_run">Not loaded. Plays on a loop after an enemy is defeated: the character runs on the spot, like on a treadmill (no path).</small></div>
       </div>
       <div class="fields">
@@ -501,8 +503,10 @@
         <label>Hit fps <input type="number" id="fps_hit" value="12" min="1" max="60"></label>
         <label>Death fps <input type="number" id="fps_death" value="8" min="1" max="60"></label>
         <label>Dodge fps <input type="number" id="fps_dodge" value="14" min="1" max="60"></label>
+        <label>Block fps <input type="number" id="fps_block" value="12" min="1" max="60"></label>
         <label>Run fps <input type="number" id="fps_run" value="8" min="1" max="60"></label>
         <label>Dodge: the strike would land on frame <input type="number" id="evadeFrame" value="3" min="1" max="64" style="width:56px"></label>
+        <label>Block: the blow lands on frame <input type="number" id="blockFrame" value="4" min="1" max="64" style="width:56px"></label>
       </div>
       <small class="lbl">Columns is the number of frames in one row of your image: 6 for a single strip of 6, 3 for a 3 x 2 grid. Frames are read left to right, then top to bottom. Load the idle pack first. To load hand marks with a pack, pick the strip and its .hand-anchors.json together (Ctrl-click both). Change the scenario, then press Play.</small>
       <h2>Weapons and hands</h2>
@@ -797,7 +801,7 @@
     { actor: "W", amount: 18 },
     { actor: "G", amount: 9 },
     { actor: "W", amount: 22, crit: true, block: true },
-    { actor: "G", amount: 9 },
+    { actor: "G", amount: 9, block: true },
     { actor: "W", amount: 20, block: true },
     { actor: "W", amount: 20 }
   ];
@@ -843,7 +847,7 @@
   };
 
   // Warrior animation packs: one image per pose, frames stepped by code at a set fps.
-  var POSES = ["idle", "attack", "hit", "death", "dodge", "run"];
+  var POSES = ["idle", "attack", "hit", "death", "dodge", "run", "block"];
   var packs = {};
   var player = { token: 0 };
   function layout(p) {
@@ -921,6 +925,7 @@
   }
   // Resolves true when the pose played to its end, false if another pose replaced it first. holds: extra ms for some frames (see holdClock).
   function playPose(pose, loop, holds) {
+    if (pose === "hit" && FIGHTERS.W && FIGHTERS.W.blocking) return Promise.resolve(false);                  // (a blocked blow has its own pack: charBlockRun)
     var el = uW.querySelector(".sheet"), p = packs[pose];
     if (!el || !p) return Promise.resolve(false);
     bgRun(pose === "run");                                                       // the forest slides past only while the run plays
@@ -1601,9 +1606,48 @@
     $("previewDodge").classList.remove("on");
     if (my === run) stage.classList.remove("playing");
   }
+  // BLOCK, the character's side (2026-11-10, docs/BLOCK.md): the Warrior's block pack (Animations/Warrior/block, 6 frames: the idle's frame 1, the brace, the guard up, THE BLOW on frame 4, the hold, the idle's frame 1) plays so that its
+  // block frame (#blockFrame, from the placement json) is on screen when a monster's blow lands, 40% into that frame, like the dodge's evade frame. While it plays `FIGHTERS.W.blocking` keeps the hit pose from playing.
+  function charBlockSpec(T) { return T === FIGHTERS.W && packs.block && !packs.block.keyed && nFrames("block") > 0 ? { fps: Math.max(1, +$("fps_block").value || 12), frame: Math.max(1, +$("blockFrame").value || 4) } : null; }
+  function charBlockPre(sp) { return (sp.frame - 1 + 0.4) * 1000 / sp.fps; }       // animation ms from the pack's start to the blow
+  function charBlockRun(myRun, delayMs) {
+    return sleep(delayMs).then(function () {
+      if (myRun !== run) return false;
+      FIGHTERS.W.blocking = true;
+      return playPose("block", false).then(function (done) { FIGHTERS.W.blocking = false; backToIdle(done); return done; });
+    });
+  }
+  // A monster's attack on a fighter that blocks it (`e.block`): returns { blk, run, hp(amount), fx() }: the fighter's block pack starts early, the damage is cut (BLOCK_REDUCE), the glass flashes at the blow.
+  var BLOCK_SHOCK = [{ filter: "brightness(1.3)" }, { filter: "brightness(1)" }];   // (a blocked blow: a faint brighten instead of the white hit flash)
+  function blockOf(e, A, T, tHit, myRun) {
+    var blk = !!e.block && !e.dodge, cs = blk && T === FIGHTERS.W ? charBlockSpec(T) : null, B = { blk: blk, run: null };
+    if (cs) B.run = charBlockRun(myRun, Math.max(0, (tHit - performance.now()) * speed - charBlockPre(cs)));
+    B.hp = function (a) { return blk ? blockAmount(a) : a; };
+    B.fx = function () { if (blk) blockFx(T, -A.dir, performance.now()); };
+    return B;
+  }
+  async function previewBlock() {                                                    // loops the block alone: the guard goes up and a blow lands on the glass from the right
+    if (!packs.block || packs.block.keyed || !nFrames("block")) { msg("Load a block pack first."); return; }
+    resetState();
+    var my = ++run;
+    stage.classList.add("playing");
+    $("previewBlock").classList.add("on");
+    try { while (my === run) {
+      var done = charBlockRun(my, 0);
+      await sleep(charBlockPre(charBlockSpec(FIGHTERS.W)));
+      if (my !== run) break;
+      blockFx(FIGHTERS.W, 1, performance.now()); shake(3, 160);
+      await done;
+      if (my !== run) break;
+      await sleep(700);
+    } } catch (e) { /* Stop or Reset cancelled a running animation: that is the normal way out */ }
+    $("previewBlock").classList.remove("on");
+    if (my === run) stage.classList.remove("playing");
+  }
+  $("previewBlock").onclick = previewBlock;
   $("previewAtk").onclick = previewAttack;
   $("previewDodge").onclick = previewDodge;
-  $("stopPrev").onclick = function () { resetState(); $("previewAtk").classList.remove("on"); $("previewDodge").classList.remove("on"); };
+  $("stopPrev").onclick = function () { resetState(); $("previewAtk").classList.remove("on"); $("previewDodge").classList.remove("on"); $("previewBlock").classList.remove("on"); };
 
   // ---------------------------------------------------------------- skill effect: Thunderclap Guillotine (procedural lightning)
   // Everything is drawn from code on one canvas over the stage: jagged bolts (midpoint displacement with side branches) in three passes
@@ -5165,7 +5209,8 @@
     rgCount = 0; bsMir = false; (function () { var s = uW.querySelector(".sprite"); if (s) { s.style.transform = ""; s.style.opacity = ""; } })();   // (the Rogue's backstab mirrors and fades her sprite)
     uG.style.transform = ""; uG.style.opacity = "";                                // (the next stage's arrival moves it by hand)
     if (typeof monPose === "string" && monPose !== "idle") monStartIdle();         // (a monster that was in the middle of its attack goes back to its idle)
-    if (typeof MON !== "undefined") { MON.atk = 0; MON.blocking = false; }                                   // (the monster's attacks alternate from the start again)
+    if (typeof MON !== "undefined") { MON.atk = 0; MON.blocking = false; }
+    if (typeof FIGHTERS !== "undefined") FIGHTERS.W.blocking = false;                                   // (the monster's attacks alternate from the start again)
     $("stageTag").getAnimations().forEach(function (a) { a.cancel(); });
     stage.classList.remove("playing");
     document.querySelectorAll(".sprite").forEach(function (s) { s.getAnimations().forEach(function (a) { a.cancel(); }); s.style.filter = ""; });   // (the frozen look is a filter set by the freeze effect)
@@ -5230,6 +5275,7 @@
         }
         var L = layout(packs[pose]);
         attachAnchors(pose);
+        if (pose === "block" && PRESETS[fileName || ""]) { if (PRESETS[fileName].fps) $("fps_block").value = PRESETS[fileName].fps; if (PRESETS[fileName].blockFrame) $("blockFrame").value = PRESETS[fileName].blockFrame; }   // (the block's fps and block frame come with the pack's placement json)
         if (pose === "run" && PRESETS[fileName || ""] && PRESETS[fileName].fps) $("fps_run").value = PRESETS[fileName].fps;   // the run's fps comes with the pack (its placement json): the warrior's step is five frames, the mage's stride is five frames
         $("i_" + pose).textContent = "Loaded " + (fileName || "") + ": " + L.frames + " frames, " + Math.round(im.naturalWidth / L.cols) + " x " + Math.round(im.naturalHeight / L.rows) + " px each. " + (anchorSets[pose] ? "Hand marks loaded." : "No hand marks for this file name.");
         if (pose === "idle") refreshWarrior();
@@ -6462,6 +6508,7 @@
       var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
       dodgeRun = runDodge(myRun, Math.max(0, ((tHit - performance.now()) - preMs / speed) * speed));   // the evade frame is on screen when the blade comes down
     }
+    var B = blockOf(e, A, T, tHit, myRun);                                             // (the fighter blocks: his block pack starts early)
     var played = monPlayPack(pk, myRun).then(function (ok) { done = true; return ok; });
     function xAt(tt) {
       var k = 0, f, x0, x1;
@@ -6488,8 +6535,8 @@
       if (dodgeRun) await dodgeRun;
       else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
     } else {
-      var amount = Math.round((e.amount || 0) * SLASH_DMG);
-      slashImpactFx(tHit, ix, iy, igy, u, A.dir);
+      var amount = B.hp(Math.round((e.amount || 0) * SLASH_DMG));
+      slashImpactFx(tHit, ix, iy, igy, u, A.dir); B.fx();
       if (!pv) {
         T.hp -= amount; paintHp(T);
         if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
@@ -6497,11 +6544,11 @@
       }
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
       if (!pv) {
-        floatNumber(T, (e.crit ? "CRIT " : "") + amount, e.crit ? "crit" : "");
-        say(A.name + " slashes " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + " (Sword Slash).", "g");
+        floatNumber(T, (B.blk ? "BLOCK " : e.crit ? "CRIT " : "") + amount, B.blk ? "block" : e.crit ? "crit" : "");
+        say(A.name + " slashes " + T.name + " for " + amount + (B.blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : e.crit ? " (crit!)" : "") + " (Sword Slash).", "g");
       }
       await Promise.all([
-        anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, 320),
+        anim(T.unit.querySelector(".sprite"), B.blk ? BLOCK_SHOCK : PHYS_SHOCK, 320),
         anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * 14) + "px)" }, { transform: "translateX(" + (-A.dir * 8) + "px)" }, { transform: "translateX(0)" }], 260),
         sleep(300)
       ]);
@@ -6564,6 +6611,7 @@
       var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
       dodgeRun = runDodge(myRun, Math.max(0, ((tHit - performance.now()) - preMs / speed) * speed));   // the evade frame is on screen when the Elite crashes in
     }
+    var B = blockOf(e, A, T, tHit, myRun);
     var played = monPlayPack(pk, myRun).then(function (ok) { done = true; return ok; });
     function keyAt(tt, arr) {                                                         // an array's value between the frames' keys (the value at the START of each frame)
       var k = 0, f, x0, x1;
@@ -6585,13 +6633,13 @@
     if (myRun !== run) return;
     var tr = rectIn(T.unit), ix = tr.left + tr.width * 0.5 - A.dir * tr.width * 0.12, iy = tr.top + tr.height * 0.6, igy = tr.top + tr.height - tr.width * 0.06;
     shake(8, 300);
-    bashImpactFx(tHit, ix, iy, igy, u, A.dir);
+    bashImpactFx(tHit, ix, iy, igy, u, A.dir); B.fx();
     if (e.dodge) {
       if (!pv) { say(A.name + " charges, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
       if (dodgeRun) await dodgeRun;
       else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
     } else {
-      var amount = Math.round((e.amount || 0) * BASH_DMG);
+      var amount = B.hp(Math.round((e.amount || 0) * BASH_DMG));
       if (!pv) {
         T.hp -= amount; paintHp(T);
         if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
@@ -6599,11 +6647,11 @@
       }
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
       if (!pv) {
-        floatNumber(T, (e.crit ? "CRIT " : "") + amount, e.crit ? "crit" : "");
-        say(A.name + " rams " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + " (Granite Ram).", "g");
+        floatNumber(T, (B.blk ? "BLOCK " : e.crit ? "CRIT " : "") + amount, B.blk ? "block" : e.crit ? "crit" : "");
+        say(A.name + " rams " + T.name + " for " + amount + (B.blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : e.crit ? " (crit!)" : "") + " (Granite Ram).", "g");
       }
       await Promise.all([
-        anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, 340),
+        anim(T.unit.querySelector(".sprite"), B.blk ? BLOCK_SHOCK : PHYS_SHOCK, 340),
         anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * 30) + "px)" }, { transform: "translateX(" + (-A.dir * 10) + "px)" }, { transform: "translateX(0)" }], 320),
         sleep(320)
       ]);
@@ -7224,7 +7272,7 @@
     } });
   }
   async function dropAct(e, myRun, A, T) {
-    var pk = monPackOf("bounce"), u = uW.offsetWidth, fm = 1000 / pk.fps / speed, pv = !!e.preview, el = monEl, dodgeRun = null, dead = false;
+    var pk = monPackOf("bounce"), u = uW.offsetWidth, fm = 1000 / pk.fps / speed, pv = !!e.preview, el = monEl, dodgeRun = null, dead = false, B = { blk: false, hp: function (a) { return a; }, fx: function () {} };
     var a = centerOf(A.unit), t = centerOf(T.unit), reach = (t.x - a.x) - A.dir * u * BOUNCE_LAND, ur = rectIn(uG), up = ur.top + ur.height + u * 0.7;     // up: how far the unit goes to be out of the stage
     var showF = function (i) { monPlayPack(pk, myRun, null, [0.01], [i]); };
     var setT = function (x, y) { uG.style.transform = "translate(" + x + "px," + y + "px)"; };
@@ -7233,10 +7281,10 @@
         T.hp -= amount; paintHp(T);
         if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
         if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
-        floatNumber(T, (e.crit && big ? "CRIT " : "") + amount, e.crit && big ? "crit" : "");
+        floatNumber(T, (B.blk ? (big ? "BLOCK " : "") : e.crit && big ? "CRIT " : "") + amount, B.blk ? "block" : e.crit && big ? "crit" : "");
       }
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
-      anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, big ? 460 : 300).catch(function () {});
+      anim(T.unit.querySelector(".sprite"), B.blk ? BLOCK_SHOCK : PHYS_SHOCK, big ? 460 : 300).catch(function () {});
       anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * (big ? 30 : 16)) + "px)" }, { transform: "translateX(" + (-A.dir * (big ? 18 : 9)) + "px)" }, { transform: "translateX(0)" }], big ? 340 : 240).catch(function () {});
     };
     try {
@@ -7248,6 +7296,7 @@
       if (!await bnDrive(myRun, 330 / speed, function (s) { setT(0, -up * s * s); })) return;
       var tr0 = rectIn(T.unit), tx = tr0.left + tr0.width / 2, tgy = tr0.top + tr0.height - tr0.height * 0.03;
       var tNow = performance.now(), tImp = tNow + (BOUNCE_AWAY + BOUNCE_DIVE) / speed;                                  // 3. the warning
+      B = blockOf(e, A, T, tImp, myRun);                                                                              // (the fighter blocks: his block pack starts early)
       dropWarnFx(tNow, tImp, tx, tgy, u);
       if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
         var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
@@ -7261,13 +7310,13 @@
       showF(4);                                                                                                       // 5. the crash
       setT(reach, 0);
       var rr = rectIn(el), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512, tI = performance.now();
-      bashImpactFx(tI, lx, lgy - u * 0.08, lgy, u, A.dir, 1.7); shake(18, 620);
-      var first = Math.round((e.amount || 0) * DROP_DMG), second = Math.round((e.amount || 0) * DROP_DMG2);
+      bashImpactFx(tI, lx, lgy - u * 0.08, lgy, u, A.dir, 1.7); shake(18, 620); B.fx();
+      var first = B.hp(Math.round((e.amount || 0) * DROP_DMG)), second = B.hp(Math.round((e.amount || 0) * DROP_DMG2));
       if (e.dodge) {
         if (!pv) { say(A.name + " plummets down, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
       } else {
         hitBy(first, true);
-        if (!pv) say(A.name + " drops onto " + T.name + " for " + first + (e.crit ? " (crit!)" : "") + " (Rockfall Drop).", "g");
+        if (!pv) say(A.name + " drops onto " + T.name + " for " + first + (B.blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : e.crit ? " (crit!)" : "") + " (Rockfall Drop).", "g");
         dead = !pv && T.hp <= 0;
       }
       await bsWait(tI + fm * 1.4);                                                                                    // 6. the rebound
@@ -7387,6 +7436,7 @@
       var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
       dodgeRun = runDodge(myRun, Math.max(0, ((tArr - performance.now()) - preMs / speed) * speed));        // the evade frame is on screen when the spikes burst up
     }
+    var B = blockOf(e, A, T, tArr, myRun);                                              // (the fighter blocks: his block pack starts early)
     var played = monPlayPack(pk, myRun);
     var P = earthPath(foot.x, y0, x1, y1, u, t0 | 0);
     await bsWait(tc0);
@@ -7396,13 +7446,13 @@
     if (myRun !== run) return;
     var iy = tr.top + tr.height * 0.6;
     shake(12, 460);
-    bashImpactFx(tArr, x1, iy, y1, u, A.dir, 1.25);
+    bashImpactFx(tArr, x1, iy, y1, u, A.dir, 1.25); B.fx();
     if (e.dodge) {
       if (!pv) { say(A.name + " drives the sword into the ground, but " + T.name + " slips away from the spikes.", "g"); floatNumber(T, "MISS", "miss"); }
       if (dodgeRun) await dodgeRun;
       else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
     } else {
-      var amount = Math.round((e.amount || 0) * EARTH_DMG);
+      var amount = B.hp(Math.round((e.amount || 0) * EARTH_DMG));
       if (!pv) {
         T.hp -= amount; paintHp(T);
         if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
@@ -7410,11 +7460,11 @@
       }
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
       if (!pv) {
-        floatNumber(T, (e.crit ? "CRIT " : "") + amount, e.crit ? "crit" : "");
-        say(A.name + " drives its sword into the ground: stone spikes burst up under " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + " (Earthbreaker).", "g");
+        floatNumber(T, (B.blk ? "BLOCK " : e.crit ? "CRIT " : "") + amount, B.blk ? "block" : e.crit ? "crit" : "");
+        say(A.name + " drives its sword into the ground: stone spikes burst up under " + T.name + " for " + amount + (B.blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : e.crit ? " (crit!)" : "") + " (Earthbreaker).", "g");
       }
       await Promise.all([
-        anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, 340),
+        anim(T.unit.querySelector(".sprite"), B.blk ? BLOCK_SHOCK : PHYS_SHOCK, 340),
         anim(T.unit, [{ transform: "translateY(0)" }, { transform: "translateY(-26px)" }, { transform: "translateY(0)" }], 440),
         sleep(320)
       ]);
@@ -7558,7 +7608,7 @@
   }
   function blockFx(T, sd, tHit) {                                                    // the mage's Barrier on the blocker, for a moment: the half circle on the side the blow comes from (sd: -1 left, +1 right), the ripple where it lands
     var mon = T === FIGHTERS.G && monEl, el = mon ? monEl : (T.unit.querySelector(".sheet") || T.unit), er = rectIn(el), w = mon ? er.width : uW.offsetWidth, sc = 1 / speed;
-    var R = w * ((mon && MONSTERS[monKey].block && MONSTERS[monKey].block.r) || 0.5), bodyX = mon ? er.left + er.width * (259 / 512) : er.left + er.width / 2;      // (the Elite's base centre is x 259 of its 512 cell)
+    var R = w * ((mon && MONSTERS[monKey].block && MONSTERS[monKey].block.r) || 0.5), bodyX = er.left + er.width * (mon ? 259 / 512 : 0.572);      // (the Elite's base centre is x 259 of its 512 cell, a character's feet middle x 293)
     var L = { t0: tHit, t1: tHit + (BLOCK_HOLD_MS + BLOCK_DROP_MS) * sc + 80, sc: sc, castMs: BLOCK_CAST_MS * sc, dropMs: BLOCK_DROP_MS * sc, endAt: tHit + BLOCK_HOLD_MS * sc, broken: false,
       rip: [{ t: tHit + 20 * sc, x: sd * 0.992, y: 0.125 }],
       geo: { sd: sd, r: R, cx: bodyX + sd * R * 0.16, gy: er.top + er.height - er.width * 42 / 512, vis: BLOCK_VIS },
@@ -7677,6 +7727,7 @@
     list.forEach(function (d) {
       if (d.anchors) { try { importMarks(d.anchors); } catch (e) {} }
       var pl = d.placement;
+      if (pl && pl.blockFrame) PRESETS[d.file] = Object.assign(PRESETS[d.file] || {}, { pack: d.slot, blockFrame: pl.blockFrame, fps: pl.fps });   // a block pack has no path, only its block frame
       if (pl && pl.x && pl.y) {
         var mv = 0; while (mv < pl.x.length - 1 && Math.abs(pl.x[mv] - pl.x[0]) < 0.01) mv++;
         var old = PRESETS[d.file] || {};
@@ -7725,6 +7776,7 @@
   function refreshPreviewButtons() {                                                                // only the previews of animations that are loaded
     $("previewAtk").style.display = packs.attack ? "" : "none";
     $("previewDodge").style.display = packs.dodge ? "" : "none";
+    $("previewBlock").style.display = packs.block ? "" : "none";
     $("runPreview").style.display = packs.run ? "" : "none";
   }
   try { $("devTools").open = localStorage.getItem("wvg-dev-open") === "1"; } catch (e) {}

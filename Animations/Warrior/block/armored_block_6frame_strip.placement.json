@@ -1,0 +1,9 @@
+{
+ "format": "frame-placement/1",
+ "animation": "block",
+ "file": "armored_block_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "blockFrame": 4,
+ "note": "blockFrame: the frame on screen when the blow lands (the page starts the pack early enough); frames 1 and 6 are the idle's frame 1"
+}

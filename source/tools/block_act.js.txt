@@ -32,7 +32,7 @@
   }
   function blockFx(T, sd, tHit) {                                                    // the mage's Barrier on the blocker, for a moment: the half circle on the side the blow comes from (sd: -1 left, +1 right), the ripple where it lands
     var mon = T === FIGHTERS.G && monEl, el = mon ? monEl : (T.unit.querySelector(".sheet") || T.unit), er = rectIn(el), w = mon ? er.width : uW.offsetWidth, sc = 1 / speed;
-    var R = w * ((mon && MONSTERS[monKey].block && MONSTERS[monKey].block.r) || 0.5), bodyX = mon ? er.left + er.width * (259 / 512) : er.left + er.width / 2;      // (the Elite's base centre is x 259 of its 512 cell)
+    var R = w * ((mon && MONSTERS[monKey].block && MONSTERS[monKey].block.r) || 0.5), bodyX = er.left + er.width * (mon ? 259 / 512 : 0.572);      // (the Elite's base centre is x 259 of its 512 cell, a character's feet middle x 293)
     var L = { t0: tHit, t1: tHit + (BLOCK_HOLD_MS + BLOCK_DROP_MS) * sc + 80, sc: sc, castMs: BLOCK_CAST_MS * sc, dropMs: BLOCK_DROP_MS * sc, endAt: tHit + BLOCK_HOLD_MS * sc, broken: false,
       rip: [{ t: tHit + 20 * sc, x: sd * 0.992, y: 0.125 }],
       geo: { sd: sd, r: R, cx: bodyX + sd * R * 0.16, gy: er.top + er.height - er.width * 42 / 512, vis: BLOCK_VIS },
