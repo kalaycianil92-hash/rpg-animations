@@ -27,6 +27,7 @@ ICESLIME_DIR = root.parent / "Animations" / "IceSlime"       # the ice slime (20
 DARKSLIME_DIR = root.parent / "Animations" / "DarkSlime"                  # the dark slime (2026-11-09): violet, horns, a green key
 LIGHTNINGSLIME_DIR = root.parent / "Animations" / "LightningSlime"   # the lightning slime (2026-11-09): yellow with blue-white arcs, same slots
 ELITESLIME_DIR = root.parent / "Animations" / "EliteSlime"           # the Elite slime (2026-11-10): grey stone in armour with a shield and a floating sword fist, physical attacks, no element
+SLIMEKING_DIR = root.parent / "Animations" / "SlimeKing"               # the Slime King (2026-11-11): the boss, an ivory slime with a golden crown and a golden staff held by a floating glove, drawn about twice the size of the others
 SLOTS = {"idle": "idle", "jump_attack": "attack", "cast": "attack", "umbral_shroud": "attack", "abyssal_backstab": "attack", "shadow_shiv": "attack", "static_stiletto": "attack", "dagger_throw": "attack", "permafrost_execution": "attack", "ember_spit": "attack", "sword_slash": "attack", "shield_bash": "slam", "rockfall_drop": "bounce", "earthbreaker": "eruption", "stone_guard": "guard", "block": "block", "magma_slam": "slam", "magma_eruption": "eruption", "inferno_bounce": "bounce", "frost_spit": "attack", "spark_spit": "attack", "gloom_spit": "attack", "umbral_slam": "slam", "nightfall_bounce": "bounce", "abyssal_eruption": "eruption", "thunder_slam": "slam", "voltaic_eruption": "eruption", "skybolt_bounce": "bounce", "glacier_slam": "slam", "permafrost_eruption": "eruption", "blizzard_bounce": "bounce","hit": "hit", "death": "death", "dodge": "dodge", "run": "run"}  # folder -> pack slot in the test page
 
 def inline(text):
@@ -139,6 +140,8 @@ for src in sorted((root / "src").glob("*.src.html")):
         text = text.replace("__LIGHTNINGSLIME_ANIMS__", default_anims(LIGHTNINGSLIME_DIR))
     if "__ELITESLIME_ANIMS__" in text:
         text = text.replace("__ELITESLIME_ANIMS__", default_anims(ELITESLIME_DIR))
+    if "__SLIMEKING_ANIMS__" in text:
+        text = text.replace("__SLIMEKING_ANIMS__", default_anims(SLIMEKING_DIR))
     if "__SLIME_CANDIDATES__" in text:
         text = text.replace("__SLIME_CANDIDATES__", slime_candidates())
     (out / name).write_text(inline(text), encoding="utf-8")

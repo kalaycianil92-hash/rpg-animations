@@ -61,6 +61,7 @@
   /* Monster art (2026-11-07): a strip of 512 px cells (soles on y 470, like the characters') played on the right-hand unit. The unit is 1:1 and the sprite is shifted down by the blank 8.2% under the soles, as for the warrior;
      --ms is the monster's own scale (the Size slider), taken about the soles so it stays on the ground; the mirror (class flip) is applied to the sheet like it is to a picture. */
   #uG.mon .sprite { top: 8.2%; bottom: -8.2%; }
+  #uG.mon { translate: calc(var(--msx, 0) * -100%) 0; }   /* a monster drawn bigger than 100% moves toward the enemy by half of the extra width (--msx) */
   /* Stage blend (2026-11-07): a soft contact shadow on the ground under each fighter (placed by the script, it stays on the ground when the fighter jumps) and soft sunbeams over the fighters;
      the colour grade itself is an SVG filter (#blendW, #blendG) set on the units. */
   .cshadow { position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; opacity: 0; border-radius: 50%;
@@ -236,8 +237,8 @@
     <button class="primary" id="play">Play</button>
     <button id="reset">Reset</button>
     <label class="lbl" id="charWrap" style="display:none">Character <select id="charSel"><option value="warrior">Warrior</option><option value="mage">Elf mage (idle only so far)</option><option value="rogue">Rogue (idle only so far)</option><option value="assassin">Assassin (idle only so far)</option><option value="spellblade">Spellblade (idle only so far)</option></select></label>
-    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime</option><option value="elite_slime">Elite slime (idle only so far)</option></select></label>
-    <label class="lbl" id="monSizeWrap" style="display:none">Monster size <input type="range" id="monSize" min="40" max="140" step="5" value="100" style="width:90px;vertical-align:middle"> <span id="monSizeV">100%</span></label>
+    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime</option><option value="elite_slime">Elite slime (idle only so far)</option><option value="slime_king">Slime King (idle only so far)</option></select></label>
+    <label class="lbl" id="monSizeWrap" style="display:none">Monster size <input type="range" id="monSize" min="40" max="260" step="5" value="100" style="width:90px;vertical-align:middle"> <span id="monSizeV">100%</span></label>
     <label class="lbl" id="monSqWrap" style="display:none">Squash and stretch <input type="range" id="monSq" min="0" max="100" step="5" value="50" style="width:90px;vertical-align:middle"> <span id="monSqV">50%</span></label>
     <label class="lbl" id="monFxWrap" style="display:none"><span id="monFxName">Fire</span> effects <input type="range" id="monFx" min="0" max="150" step="5" value="80" style="width:90px;vertical-align:middle"> <span id="monFxV">80%</span></label>
     <span class="spacer"></span>
@@ -5333,6 +5334,11 @@
   // (the Fx slider and the aura canvases stay hidden); its attacks are physical. Cut at the standard base of 350 px; the idle is a very calm breath (the eyes move 3%) so the Squash slider hardly matters.
   var ELITE_ANIMS = __ELITESLIME_ANIMS__;
   MONSTERS.elite_slime = { name: "Elite Slime", anims: ELITE_ANIMS, fps: 8, squash: (ELITE_ANIMS.filter(function (a) { return a.slot === "idle"; })[0] || {}).squash, sizeDef: 100, sqDef: 100 };
+  // The SLIME KING (2026-11-11), the boss of the slimes (docs/SLIME_KING.md): an ivory slime with a golden crown and a golden staff held by a floating glove (Animations/SlimeKing, magenta key, cut by cut_king.py at the standard base
+  // of 350 px). Its idle is in (a very slow, heavy breath: 5 fps, the dome moves 3%), the other animations follow. It is drawn about TWICE the size of the other monsters by the Monster size (sizeDef 190, up to 260): the
+  // unit is moved toward the enemy by half of the extra width (--msx) so the staff stays on the stage. Holy and elemental skills: no vfx of its own yet.
+  var KING_ANIMS = __SLIMEKING_ANIMS__;
+  MONSTERS.slime_king = { name: "Slime King", anims: KING_ANIMS, fps: 5, sizeDef: 190, sizeMax: 260, sqDef: 100 };
   // Candidate idle sheets of the re-looked fire slime (2026-11-07): every Animations/Slime/idle/candidates/<tag>_fire_idle_strip.png gets its own entry in the Monster select, to be compared in a fight.
   var SLIME_CANDIDATES = __SLIME_CANDIDATES__, CAND_LABEL = { gpt: "ChatGPT sheet", gemini: "Gemini v3 sheet (heavy bounce)", gemini2: "Gemini v4 sheet (calm)" }, CAND_SQ = {};   // CAND_SQ: the Squash and stretch default of a candidate (the calm v4 sheet is shown as drawn)
   SLIME_CANDIDATES.forEach(function (c) {
@@ -5407,7 +5413,8 @@
     if (monTimer) clearInterval(monTimer);
     monTimer = setInterval(function () { i = (i + 1) % n; show(); }, 1000 / m.fps);
   }
-  function monScale(k) { var v = MONSTERS[k] && MONSTERS[k].sizeDef || 100; try { var s = localStorage.getItem("wvg-monster-size-" + k); if (s) v = Math.max(40, Math.min(140, +s || 100)); } catch (e) {} return v; }
+  function monScale(k) { var v = MONSTERS[k] && MONSTERS[k].sizeDef || 100, mx = MONSTERS[k] && MONSTERS[k].sizeMax || 140; try { var s = localStorage.getItem("wvg-monster-size-" + k); if (s) v = Math.max(40, Math.min(mx, +s || 100)); } catch (e) {} return v; }
+  function monSizeApply(v) { uG.style.setProperty("--ms", v / 100); uG.style.setProperty("--msx", Math.max(0, (v / 100 - 1) * 0.5)); }   // (a monster drawn bigger than its unit grows on both sides: the unit moves toward the enemy by half of the extra width, so its back stays on the stage)
   function setMonster(key) {
     if (!MONSTERS[key]) key = "goblin";
     var m = MONSTERS[key], tok = ++monTok;
@@ -5441,7 +5448,7 @@
     var sq = monSqShare(key); $("monSq").value = sq; $("monSqV").textContent = sq + "%";
     var sc = monScale(key);
     $("monSize").value = sc; $("monSizeV").textContent = sc + "%";
-    uG.style.setProperty("--ms", sc / 100);
+    $("monSize").max = (MONSTERS[key] && MONSTERS[key].sizeMax) || 140; monSizeApply(sc);
     uG.classList.add("mon", "big"); uG.style.aspectRatio = "1 / 1";
     var el = document.createElement("div"); el.className = "monsheet"; monEl = el;
     $("sG").innerHTML = ""; $("sG").appendChild(el);
@@ -7715,7 +7722,7 @@
     try { localStorage.setItem("wvg-monster-squash-" + monKey, v); } catch (e) {}
   };
   $("monSize").oninput = function () {
-    var v = +this.value; $("monSizeV").textContent = v + "%"; uG.style.setProperty("--ms", v / 100);
+    var v = +this.value; $("monSizeV").textContent = v + "%"; monSizeApply(v);
     try { localStorage.setItem("wvg-monster-size-" + monKey, v); } catch (e) {}
   };
   (function () { var k = "goblin"; try { k = localStorage.getItem("wvg-monster") || "goblin"; } catch (e) {} if (!MONSTERS[k] && /^fire_slime/.test(k)) k = "fire_slime"; setMonster(k); })();
