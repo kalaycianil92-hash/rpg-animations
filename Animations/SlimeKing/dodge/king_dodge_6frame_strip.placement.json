@@ -1,0 +1,71 @@
+{
+ "format": "frame-placement/1",
+ "animation": "dodge",
+ "file": "king_dodge_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "evadeFrame": 4,
+ "smooth": true,
+ "xUnit": "character-widths",
+ "x": [
+  0,
+  -0.02,
+  -0.06,
+  -0.1,
+  -0.06,
+  -0.02
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "frameInfo": [
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  },
+  {
+   "sheetPanel": 2,
+   "lift": 0.0,
+   "slideLeft": 32,
+   "top": 136,
+   "bottom": 476,
+   "left": 48,
+   "right": 508
+  },
+  {
+   "sheetPanel": 3,
+   "lift": 0.0,
+   "top": 94,
+   "bottom": 470,
+   "left": 69,
+   "right": 473
+  },
+  {
+   "sheetPanel": 4,
+   "lift": 57.8,
+   "top": 59,
+   "bottom": 417,
+   "left": 79,
+   "right": 499
+  },
+  {
+   "sheetPanel": 5,
+   "lift": 0.0,
+   "top": 126,
+   "bottom": 470,
+   "left": 42,
+   "right": 493
+  },
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  }
+ ]
+}

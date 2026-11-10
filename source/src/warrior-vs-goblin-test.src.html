@@ -237,7 +237,7 @@
     <button class="primary" id="play">Play</button>
     <button id="reset">Reset</button>
     <label class="lbl" id="charWrap" style="display:none">Character <select id="charSel"><option value="warrior">Warrior</option><option value="mage">Elf mage (idle only so far)</option><option value="rogue">Rogue (idle only so far)</option><option value="assassin">Assassin (idle only so far)</option><option value="spellblade">Spellblade (idle only so far)</option></select></label>
-    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime</option><option value="elite_slime">Elite slime (idle only so far)</option><option value="slime_king">Slime King (idle only so far)</option></select></label>
+    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime</option><option value="elite_slime">Elite slime (idle only so far)</option><option value="slime_king">Slime King (idle, hit, death, dodge so far)</option></select></label>
     <label class="lbl" id="monSizeWrap" style="display:none">Monster size <input type="range" id="monSize" min="40" max="260" step="5" value="100" style="width:90px;vertical-align:middle"> <span id="monSizeV">100%</span></label>
     <label class="lbl" id="monSqWrap" style="display:none">Squash and stretch <input type="range" id="monSq" min="0" max="100" step="5" value="50" style="width:90px;vertical-align:middle"> <span id="monSqV">50%</span></label>
     <label class="lbl" id="monFxWrap" style="display:none"><span id="monFxName">Fire</span> effects <input type="range" id="monFx" min="0" max="150" step="5" value="80" style="width:90px;vertical-align:middle"> <span id="monFxV">80%</span></label>
@@ -1264,7 +1264,11 @@
   var DODGE_NOTE = "x: frame (character) widths from the home position, positive toward the enemy, negative away from it. y: extra lift in frame widths, up positive, never below 0 (the ground line), added on top of the height already drawn in the frame. A frame is exactly at its x,y in the middle of its time slot; with smooth=true the position is linearly interpolated between frame middles, otherwise it jumps from frame to frame. evadeFrame is the frame on screen when the strike that is being dodged would have landed.";
   function setPlace(p, k) { k = k || editKey; places[k] = p; if (k === editKey) place = p; }
   var EDGE_NOTE = "x: 0 = home position, 1 = strike point (target centre minus 0.8 character widths). y: extra lift in frame widths, up positive, never below 0 (the ground line). A frame is exactly at its x,y in the middle of its time slot; with smooth=true the position is linearly interpolated between frame middles, otherwise it jumps from frame to frame.";
-  function strikeReach() { return uG.offsetLeft + uG.offsetWidth / 2 - (uW.offsetLeft + uW.offsetWidth / 2) - uW.offsetWidth * 0.8; }
+  function strikeReach() {   // how far the warrior walks to strike: to 0.8 of his widths from the monster's middle; a monster drawn bigger than 100% (the Slime King) is moved toward him by half of its extra width (--msx, a CSS translate that offsetLeft does not include) and grows by that much again to each side, so
+    // the whole extra width (ms - 1 of the unit) is taken off the walk: he stands in front of its skirt and staff, not inside them (2026-11-11)
+    var ms = parseFloat(uG.style.getPropertyValue("--ms")) || 1;
+    return uG.offsetLeft + uG.offsetWidth / 2 - (uW.offsetLeft + uW.offsetWidth / 2) - uW.offsetWidth * 0.8 - uG.offsetWidth * Math.max(0, ms - 1);
+  }
   function unitPx(k) { return k === "dodge" ? uW.offsetWidth : strikeReach(); } // pixels for x = 1
   function nFrames(k) { k = k || editKey; return packs[k] && !packs[k].keyed ? layout(packs[k]).frames : 0; }
   function pathKey(k, n) { return k === "attack" ? "wvg-path:" + packFile.attack + ":" + n : "wvg-path:" + k + ":" + packFile[k] + ":" + n; }
@@ -5385,6 +5389,10 @@
                   guard: { n: 6, fps: 10, holds: [1, 1.2, 1.5, 2.4, 2.4, 1.3] } };   // guard = the Stone Guard (6 frames, the ChatGPT sheet: rest, the shield a little higher, across the body, in front of the face (held twice), home; guardAct plays 1, 2, 3, 4, 5, 3, 6 with its own holds) (6 frames: gather, raise, the blade into the floor, strain (the hit frame 4), pull, recover)
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
     MONSTERS.elite_slime.block = { pack: "guard", order: [1, 2, 3, 4, 2, 5], holds: [0.9, 0.9, 1.3, 2.4, 0.9, 1.1], fps: 14, idx: 2, r: 0.36 };   // (r: the glass's radius as a share of its cell: the Elite is low and wide) its Block has no strip of its own: the Stone Guard's frames (the shield floats up in front of the face; the block frame is the face frame, 3rd played)
+    // the Slime King's packs (Animations/SlimeKing/<folder>, 2026-11-11): the hit (6 frames: the first two slide the whole frame back, a recoil, because the generator flung the glove and staff out sideways; a grimace, the smile returns, the idle's rest frame last),
+    // the death (6 frames: it melts into an ivory puddle, the crown slips off and ends at its rim, the glove lets go and the staff lies on the floor) and the dodge (6 frames: a slow hop, the evade frame is 4, the top of the hop). No attack pack yet: the plain lunge.
+    var DEFK = { hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 12, holds: null } };
+    MONSTERS.slime_king.packs = build(KING_ANIMS, DEFK);
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
   var MON = { seq: 0, deathP: null };                                                // seq: which attack/hit/death/dodge pack is current (a new one replaces the one before); deathP: the promise of the death pack once it has started

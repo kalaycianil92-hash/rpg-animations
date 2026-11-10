@@ -1,0 +1,56 @@
+{
+ "format": "frame-placement/1",
+ "animation": "hit",
+ "file": "king_hit_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "frameInfo": [
+  {
+   "sheetPanel": 1,
+   "lift": 0.0,
+   "slideLeft": 32,
+   "top": 106,
+   "bottom": 469,
+   "left": 50,
+   "right": 507
+  },
+  {
+   "sheetPanel": 2,
+   "lift": 0.0,
+   "slideLeft": 58,
+   "top": 146,
+   "bottom": 470,
+   "left": 28,
+   "right": 508
+  },
+  {
+   "sheetPanel": 6,
+   "lift": 0.0,
+   "top": 111,
+   "bottom": 473,
+   "left": 74,
+   "right": 496
+  },
+  {
+   "sheetPanel": 5,
+   "lift": 0.0,
+   "top": 135,
+   "bottom": 470,
+   "left": 47,
+   "right": 486
+  },
+  {
+   "sheetPanel": 4,
+   "lift": 0.0,
+   "top": 113,
+   "bottom": 475,
+   "left": 81,
+   "right": 498
+  },
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  }
+ ]
+}
