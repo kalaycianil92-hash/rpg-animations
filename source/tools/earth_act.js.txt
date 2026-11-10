@@ -1,0 +1,129 @@
+  // ---------------------------------------------------------------- the Elite slime's Earthbreaker (2026-11-10)
+  // The Elite's fourth skill, a ground skill, physical (the sheet: Animations/EliteSlime/earthbreaker, the user's Gemini sheet, 6 frames at 12 fps, the slot `eruption`; the hit frame is 4; the stone arms the generator grew in
+  // frames 2 and 5 are painted out in earthbreaker_prep.py). The Elite stays on its spot: it gathers (1), raises the sword high with the blade turned down (2), drives it into the floor in front of it (3), strains over it (4),
+  // pulls it out (5) and recovers (6). In code: as the blade sinks in (frame 3, placement.swordFoot) a jagged CRACK runs along the ground from the sword to the target (EARTH_RUN ms, a low rumble), stone SPIKES pop up along
+  // it as the head passes (small near the sword, taller and taller) and a cluster of three bursts up under the target at the crack's arrival (the warrior's dodge pack lands its evade frame then): a flash, a ring and dust
+  // along the ground, chips, a hard shake; the target is lifted a little, flashes white and takes EARTH_DMG x the turn's damage as a placeholder (decide with the engine, docs/SKILL_BEHAVIOR_LATER.md). The spikes stand for
+  // about 0.65 s, then crumble into chips; the crack fades after about a second. A dodged blow: the spikes still burst up, but on empty ground ("the ground erupts, but Warrior slips away").
+  var EARTH_HIT = 4, EARTH_DMG = 2.2, EARTH_RUN = 400, EARTH_STAND = 650, EARTH_CRUMBLE = 360;
+  function earthPath(x0, y0, x1, y1, u, seed) {                                       // the crack: a jagged line from the sword to the target, with a few short branches
+    var rnd = rngOf(seed | 0), n = 16, pts = [], br = [], i, k, b, d;
+    for (i = 0; i <= n; i++) { k = i / n; pts.push([x0 + (x1 - x0) * k + (i && i < n ? (rnd() - 0.5) * u * 0.03 : 0), y0 + (y1 - y0) * k + (i && i < n ? (rnd() - 0.5) * u * 0.035 : 0)]); }
+    for (i = 3; i < n - 1; i += 3) { b = pts[i]; d = rnd() < 0.5 ? -1 : 1; br.push({ i: i, pts: [[b[0], b[1]], [b[0] + (rnd() - 0.3) * u * 0.06, b[1] + d * u * (0.02 + rnd() * 0.02)], [b[0] + (rnd() - 0.3) * u * 0.12, b[1] + d * u * (0.04 + rnd() * 0.03)]] }); }
+    return { pts: pts, br: br, n: n };
+  }
+  function earthCrackFx(t0, t1, tEnd, P, u) {                                         // the crack runs from t0 to t1 (the head leaves a little dust), stays and fades by tEnd
+    fxAdd({ t0: t0, t1: tEnd, draw: function (ctx, now) {
+      var p = clamp01((now - t0) / Math.max(1, t1 - t0)), fade = 1 - clamp01((now - t1) / Math.max(1, tEnd - t1)), upto = p * P.n, whole = Math.floor(upto), f = upto - whole, j, q, hd, w, bi, pass;
+      function line(arr) { ctx.beginPath(); ctx.moveTo(arr[0][0], arr[0][1]); for (var m = 1; m < arr.length; m++) ctx.lineTo(arr[m][0], arr[m][1]); }
+      var seg = P.pts.slice(0, Math.min(P.pts.length, whole + 1));
+      if (whole < P.n) { q = P.pts[whole]; hd = P.pts[whole + 1]; seg.push([q[0] + (hd[0] - q[0]) * f, q[1] + (hd[1] - q[1]) * f]); }
+      if (seg.length < 2) return;
+      ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.strokeStyle = "rgba(40,34,30," + (0.35 * fade).toFixed(3) + ")"; ctx.lineWidth = Math.max(3, u * 0.032); line(seg); ctx.stroke();            // a soft dark edge, then the crack itself
+      ctx.strokeStyle = "rgba(8,6,6," + (0.92 * fade).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.4, u * 0.012); line(seg); ctx.stroke();
+      for (bi = 0; bi < P.br.length; bi++) {
+        pass = upto - P.br[bi].i; if (pass <= 0) continue;
+        ctx.strokeStyle = "rgba(8,6,6," + (0.85 * fade * clamp01(pass * 2)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.008); line(P.br[bi].pts); ctx.stroke();
+      }
+      hd = seg[seg.length - 1];                                                                                                                         // dust puffed up at the head of the crack
+      if (p < 1) for (j = 0; j < 3; j++) { w = u * (0.035 + 0.02 * j); ctx.fillStyle = "rgba(150,140,126," + (0.3 * (1 - j * 0.25)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(hd[0] - j * u * 0.03 * (P.pts[P.n][0] > P.pts[0][0] ? 1 : -1), hd[1] - u * 0.02 - j * u * 0.012, w, w * 0.6, 0, 0, 6.2832); ctx.fill(); }
+      ctx.restore();
+    } });
+  }
+  function earthSpikeDraw(ctx, x, y, w, h, lean, g, u, alpha) {                       // one stone spike: a lit left face, a shaded right face, a dark outline, a dark heave of ground at its foot; g: how far it has grown (0..1)
+    var hh = h * g, ax, ay, nl, nr, lw;
+    if (hh < 2 || alpha <= 0.01) return;
+    ax = x + lean * g; ay = y - hh; nl = [x - w * 0.34 + lean * g * 0.5, y - hh * 0.52]; nr = [x + w * 0.3 + lean * g * 0.45, y - hh * 0.64]; lw = Math.max(1.4, u * 0.011);
+    ctx.save(); ctx.globalAlpha = alpha; ctx.lineJoin = "round";
+    ctx.fillStyle = "rgba(34,30,28,0.55)"; ctx.beginPath(); ctx.ellipse(x, y, w * 0.85, w * 0.24, 0, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = "rgb(158,156,162)"; ctx.beginPath(); ctx.moveTo(x - w / 2, y); ctx.lineTo(nl[0], nl[1]); ctx.lineTo(ax, ay); ctx.lineTo(x + lean * g * 0.15, y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgb(98,96,106)"; ctx.beginPath(); ctx.moveTo(x + lean * g * 0.15, y); ctx.lineTo(ax, ay); ctx.lineTo(nr[0], nr[1]); ctx.lineTo(x + w / 2, y); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "rgb(36,32,40)"; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(x - w / 2, y); ctx.lineTo(nl[0], nl[1]); ctx.lineTo(ax, ay); ctx.lineTo(nr[0], nr[1]); ctx.lineTo(x + w / 2, y); ctx.stroke();
+    ctx.strokeStyle = "rgba(36,32,40,0.7)"; ctx.lineWidth = lw * 0.7; ctx.beginPath(); ctx.moveTo(x + lean * g * 0.15, y); ctx.lineTo(ax, ay); ctx.stroke();          // the ridge between the two faces
+    ctx.restore();
+  }
+  function earthSpikesFx(t0, tArr, P, x1, y1, u, dir) {                               // the spikes: small ones along the crack as its head passes, a cluster of three under the target at the arrival
+    var rnd = rngOf((tArr | 0) + 3), items = [], chips = [], i, it, tC = tArr + EARTH_STAND / speed, tEnd = tC + (EARTH_CRUMBLE + 200) / speed, runMs = tArr - t0;
+    [[4, 0.22], [6, 0.29], [8, 0.37], [10, 0.47], [12, 0.58]].forEach(function (a) {
+      var hh = u * a[1] * (0.82 + rnd() * 0.36); items.push({ x: P.pts[a[0]][0] + (rnd() - 0.5) * u * 0.02, y: P.pts[a[0]][1], w: u * 0.04 + hh * 0.46, h: hh, lean: (rnd() - 0.5) * u * 0.1, at: t0 + runMs * a[0] / P.n, big: false });
+    });
+    [[-0.15, 0.7, 0.0], [0.02, 0.95, 40], [0.17, 0.66, 80]].forEach(function (a, k) {
+      items.push({ x: x1 + a[0] * u, y: y1 + (k === 1 ? -u * 0.012 : u * 0.012), w: u * 0.05 + u * a[1] * 0.42, h: u * a[1], lean: (rnd() - 0.5) * u * 0.14 - dir * u * 0.02, at: tArr + a[2] / speed, big: true });
+    });
+    items.sort(function (a, b) { return a.y - b.y; });
+    for (i = 0; i < items.length; i++) { it = items[i]; for (var c = 0; c < (it.big ? 6 : 3); c++) chips.push({ i: i, a: -0.3 - rnd() * 2.5, v: 0.4 + rnd() * 0.9, s: 0.006 + rnd() * 0.01 }); }
+    fxAdd({ t0: t0, t1: tEnd, draw: function (ctx, now) {
+      var j, g, al, tl, lc, ch, px, py, it2, k;
+      for (j = 0; j < items.length; j++) {
+        it2 = items[j]; tl = (now - it2.at) * speed; if (tl < 0) continue;
+        g = 1.1 * Math.sin(Math.min(1, tl / 150) * 1.5708); if (tl > 150) g = 1.1 - 0.1 * clamp01((tl - 150) / 120);          // up in 150 ms with a little overshoot
+        lc = clamp01((now - tC) * speed / EARTH_CRUMBLE); g *= 1 - lc * lc; al = 1 - clamp01((lc - 0.6) / 0.4);
+        earthSpikeDraw(ctx, it2.x, it2.y, it2.w, it2.h, it2.lean, g, u, al);
+      }
+      for (k = 0; k < chips.length; k++) {                                                                                                               // chips thrown off as a spike pops up
+        ch = chips[k]; it2 = items[ch.i]; tl = clamp01((now - it2.at) * speed / 650); if ((now - it2.at) < 0 || tl >= 1) continue;
+        px = it2.x + Math.cos(ch.a) * u * 0.3 * ch.v * tl; py = it2.y - it2.h * 0.6 + Math.sin(ch.a) * u * 0.3 * ch.v * tl + u * 0.32 * tl * tl;
+        ctx.save(); ctx.fillStyle = "rgba(124,122,128," + (0.9 * (1 - tl)).toFixed(3) + ")"; ctx.fillRect(px - u * ch.s / 2, py - u * ch.s / 2, u * ch.s, u * ch.s); ctx.restore();
+      }
+    } });
+  }
+  async function earthAct(e, myRun, A, T) {
+    var pk = monPackOf("eruption"), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, pl = pk.placement || {};
+    for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
+    var t0 = performance.now(), r0 = rectIn(monEl), foot = pl.swordFoot ? slashTip(r0, pl.swordFoot) : centerOf(A.unit);
+    var tc0 = t0 + starts[2] + fm * 0.25, runMs = EARTH_RUN / speed, tArr = tc0 + runMs;                 // the crack leaves the sword as it sinks in (frame 3) and is under the target about 0.4 s later
+    var tr = rectIn(T.unit), x1 = tr.left + tr.width * 0.5, y1 = tr.top + tr.height - tr.width * 0.06, y0 = r0.top + r0.height - r0.width * 42 / 512 - u * 0.005;
+    var dodgeRun = null;
+    if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
+      var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
+      dodgeRun = runDodge(myRun, Math.max(0, ((tArr - performance.now()) - preMs / speed) * speed));        // the evade frame is on screen when the spikes burst up
+    }
+    var played = monPlayPack(pk, myRun);
+    var P = earthPath(foot.x, y0, x1, y1, u, t0 | 0);
+    await bsWait(tc0);
+    if (myRun !== run) return;
+    shake(2.5, runMs); earthCrackFx(tc0, tArr, tArr + 1100 / speed, P, u); earthSpikesFx(tc0, tArr, P, x1, y1, u, A.dir);
+    await bsWait(tArr);
+    if (myRun !== run) return;
+    var iy = tr.top + tr.height * 0.6;
+    shake(12, 460);
+    bashImpactFx(tArr, x1, iy, y1, u, A.dir, 1.25);
+    if (e.dodge) {
+      if (!pv) { say(A.name + " drives the sword into the ground, but " + T.name + " slips away from the spikes.", "g"); floatNumber(T, "MISS", "miss"); }
+      if (dodgeRun) await dodgeRun;
+      else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
+    } else {
+      var amount = Math.round((e.amount || 0) * EARTH_DMG);
+      if (!pv) {
+        T.hp -= amount; paintHp(T);
+        if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
+        if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
+      }
+      if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
+      if (!pv) {
+        floatNumber(T, (e.crit ? "CRIT " : "") + amount, e.crit ? "crit" : "");
+        say(A.name + " drives its sword into the ground: stone spikes burst up under " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + " (Earthbreaker).", "g");
+      }
+      await Promise.all([
+        anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, 340),
+        anim(T.unit, [{ transform: "translateY(0)" }, { transform: "translateY(-26px)" }, { transform: "translateY(0)" }], 440),
+        sleep(320)
+      ]);
+    }
+    if (myRun !== run) return;
+    await played;                                                                      // the pack plays to its end (it does not move), then the idle
+    if (myRun !== run) return;
+    uG.style.transform = "";
+    monStartIdle();
+    clearAnims(T.unit); clearAnims(stage);
+    T.unit.querySelector(".sprite").getAnimations().forEach(function (x) { x.cancel(); });
+    if (!pv && T.hp <= 0) {
+      clearBurn(T); clearChilled(T);
+      say(T.name + " is defeated.", "sys");
+      if (T === FIGHTERS.W && packs.death && packs.death.keyed && $("still").checked) {
+        keyPose("death", 0); await sleep(150); keyPose("death", 1); await sleep(260); keyPose("death", 2);
+      } else if (T === FIGHTERS.W && packs.death) await playPose("death", false);
+      else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
+    }
+  }

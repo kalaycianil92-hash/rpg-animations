@@ -137,6 +137,7 @@
   .num.bolt { color: #e9edff; font-size: 42px; text-shadow: 0 0 8px #5a7dff, 0 0 20px #3b4fff, 0 2px 0 #000; }
   .num.dark { color: #f2eaff; font-size: 42px; text-shadow: 0 0 8px #9a66ff, 0 0 22px #3a1066, 0 2px 0 #000; }   /* Dark Damage (the Rogue's Umbral Shroud): pale with a violet glow on a deep violet halo */
   .num.abyss { color: #fff1f4; font-size: 58px; text-shadow: 0 0 8px #ff2a5a, 0 0 26px #7a3cff, 0 3px 0 #000; }   /* the Rogue's Abyssal Backstab: big, white-hot with a crimson and violet glow (her abyss colours) */
+  .num.guard { color: #eaf4ff; font-size: 24px; letter-spacing: .08em; white-space: nowrap; text-shadow: 0 0 8px #5a9bff, 0 2px 0 #000; }   /* the Elite's Stone Guard (Defense up) */
   .num.elusive { color: #e9defd; font-size: 24px; letter-spacing: .08em; white-space: nowrap; text-shadow: 0 0 8px #8a5cff, 0 2px 0 #000; }   /* the Elusive buff */
   .num.glacier { color: #effcff; font-size: 54px; text-shadow: 0 0 8px #3fd0e0, 0 0 26px #1e6f9f, 0 3px 0 #000; }   /* the Rogue's Permafrost Execution: big, white with a glacial teal glow (her third kind of cold: not the mage's sky blue, not Winter's Kiss's periwinkle) */
   .num.frost { color: #f4f8ff; font-size: 42px; text-shadow: 0 0 8px #a8c4ff, 0 0 20px #c4a8ff, 0 2px 0 #000; }   /* the Rogue's Winter's Kiss: silver-white with a periwinkle and lilac glow (her frost, not the mage's sky blue) */
@@ -726,7 +727,7 @@
     if (act !== actBefore) { var sub = document.createElement("small"); sub.textContent = ACTS[act].name; tag.appendChild(sub); }   // a new act: its name under the number
     tag.animate([{ opacity: 0, transform: "translateY(-10px)" }, { opacity: 1, transform: "none", offset: .25 }, { opacity: 1, transform: "none", offset: .75 }, { opacity: 0, transform: "none" }], { duration: (act !== actBefore ? 3600 : 2800) / speed, easing: "ease-out" });
     clearAnims(uG); uG.style.opacity = 0;                                       // (its death fade holds it at 0 until now)
-    G.hp = G.max; paintHp(G);
+    G.hp = G.max; paintHp(G); clearGuard(G);
     say("Stage " + stageNo + (act !== actBefore ? " (" + ACTS[act].name + ")" : "") + ": a new " + G.name + " appears.", "sys");
     bgSync(true);                                                              // a new act's look fades in over the old one while the run slows
     bgRun(false, tau);
@@ -2857,12 +2858,13 @@
     T.burn.layer.t1 = performance.now(); T.burn = null;
     var s = statusSprite(T); if (s && !T.frozen && !T.chilled) s.style.filter = "";
   }
-  function clearStatuses(T) { clearChilled(T); clearWard(T); clearBurn(T); clearShocked(T); clearElusive(T); if (T.frozen) { T.frozen.clear(); T.frozen = null; } }
+  function clearStatuses(T) { clearChilled(T); clearWard(T); clearBurn(T); clearShocked(T); clearElusive(T); clearGuard(T); if (T.frozen) { T.frozen.clear(); T.frozen = null; } }
   function tickStatuses(A) {                                                         // a fighter's turn is over: its timed statuses run down
     if (A.chilled && --A.chilled.turns <= 0) { clearChilled(A); say(A.name + " is no longer chilled.", "sys"); }
     if (A.magDef && --A.magDef.turns <= 0) { clearWard(A); say(A.name + "'s Magic Defense is back to normal.", "sys"); }
     if (A.burn && --A.burn.turns <= 0) { clearBurn(A); say(A.name + " is no longer burning.", "sys"); }
     if (A.shocked && --A.shocked.turns <= 0) { clearShocked(A); say(A.name + " is no longer shocked.", "sys"); }
+    if (A.guard) { if (A.guard.fresh) A.guard.fresh = false; else if (--A.guard.turns <= 0) { clearGuard(A); say(A.name + "'s Defense is back to normal.", "sys"); } }   // (the Elite's Stone Guard: the turn that applied it does not count, like Elusive)
     if (A.elusive) { if (A.elusive.fresh) A.elusive.fresh = false; else if (--A.elusive.turns <= 0) { clearElusive(A); say(A.name + " is no longer Elusive.", "sys"); } }   // (the turn that applied it does not count: it lasts through the next two)
   }
 
@@ -5135,6 +5137,7 @@
     $("stageTag").getAnimations().forEach(function (a) { a.cancel(); });
     stage.classList.remove("playing");
     document.querySelectorAll(".sprite").forEach(function (s) { s.getAnimations().forEach(function (a) { a.cancel(); }); s.style.filter = ""; });   // (the frozen look is a filter set by the freeze effect)
+    clearGuard(FIGHTERS.G); FIGHTERS.G.guard = null;
     FIGHTERS.W.frozen = null; FIGHTERS.G.frozen = null; FIGHTERS.W.chilled = null; FIGHTERS.G.chilled = null; FIGHTERS.W.magDef = null; FIGHTERS.G.magDef = null; FIGHTERS.W.burn = null; FIGHTERS.G.burn = null; FIGHTERS.W.shocked = null; FIGHTERS.G.shocked = null;
     document.querySelectorAll(".num,.fx,.scorch").forEach(function (n) { n.remove(); });
     fxClear(); brLive = null;                                                      // (the Barrier's layer goes with the rest)
@@ -5293,7 +5296,9 @@
     // the hit (6 frames: it rocks back, cracks flash across the dome and fade, the fist and sword are jolted up and back), the death (6 frames: cracks, chunks, a heap, a pile of rubble with the shield, the belt and the sword lying on and beside it) and the dodge (6 frames: a heavy hop, the evade frame is 3, the top of the hop)
     var DEFE = { attack: { n: 8, fps: 12, holds: [1, 1.4, 1.1, 1.5, 1.2, 1.6, 1.4, 1] }, hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 14, holds: null },
                   slam: { n: 8, fps: 12, holds: [0.9, 1, 1, 1.2, 1.3, 1.7, 1.4, 1] },   // slam = the Granite Ram (8 frames, the strike is frame 6)
-                  bounce: { n: 8, fps: 12, holds: null } };   // bounce = the Rockfall Drop (8 frames: dropAct shows them one by one, the crash is frame 5)
+                  bounce: { n: 8, fps: 12, holds: null },   // bounce = the Rockfall Drop (8 frames: dropAct shows them one by one, the crash is frame 5)
+                  eruption: { n: 6, fps: 12, holds: [1, 1.6, 1.1, 3.4, 1.4, 1.4] },   // eruption = the Earthbreaker
+                  guard: { n: 6, fps: 10, holds: [1, 1.2, 1.5, 2.4, 2.4, 1.3] } };   // guard = the Stone Guard (6 frames: rest, brace, guard rising, held, hold, relax; the page adds the lean, the hunker and the shield's light) (6 frames: gather, raise, the blade into the floor, strain (the hit frame 4), pull, recover)
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
@@ -5315,7 +5320,7 @@
     if (!el || !idle) return;
     var n = m.idleN || 6, i = 0;
     monPose = "idle"; MON.seq++; MON.deathP = null; MON.shS = MON.shO = 1;
-    el.style.opacity = ""; el.style.removeProperty("translate"); el.style.removeProperty("rotate");                     // (the Magma Eruption hides the picture and bounces it with the CSS translate property)
+    el.style.opacity = ""; el.style.removeProperty("translate"); el.style.removeProperty("rotate"); el.style.removeProperty("scale");                     // (the Magma Eruption hides the picture and bounces it with the CSS translate property)
     if (typeof MFX !== "undefined") { MFX.dieMul = MFX.dieTarget = 1; MFX.smokeUntil = 0; }
     el.style.backgroundImage = 'url("' + idle.src + '")'; el.style.backgroundSize = (n * 100) + "% 100%";
     function show() { el.style.backgroundPosition = (n > 1 ? i / (n - 1) * 100 : 0) + "% 0"; monFrame = i; monApplySq(); }
@@ -5339,7 +5344,7 @@
     $("spitWrap").style.display = idle && m.attackPack && !m.melee ? "" : "none";
     $("monPrevRow").style.display = idle && m.packs ? "flex" : "none";
     [["monSpitPrev", "attack"], ["monPrevHit", "hit"], ["monPrevDeath", "death"], ["monPrevDodge", "dodge"], ["monPrevSlam", "slam"], ["monPrevCinder", "attack"], ["monPrevEruption", "eruption"], ["monPrevBounce", "bounce"]].forEach(function (b) {
-      $(b[0]).style.display = m.packs && m.packs[b[1]] && (!b[2] || m.vfx === b[2]) && !(m.melee && b[0] === "monPrevCinder") ? "" : "none";   // (the Elite has no Cinder Burst preview)
+      $(b[0]).style.display = m.packs && m.packs[b[1]] && (!b[2] || m.vfx === b[2]) && (!m.melee || b[0] !== "monPrevCinder" || m.packs.guard) ? "" : "none";   // (the Elite's 'Cinder Burst' button is its Stone Guard, shown once its sheet is there)
     });
     var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = m.melee ? { alt: "Alternate all five attacks", spit: "Sword Slash", slam: "Granite Ram", cinder: "Stone Guard", eruption: "Earthbreaker", bounce: "Rockfall Drop" } : DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
     Array.prototype.forEach.call($("monAtk").options, function (o) { if (NAMES[o.value]) o.textContent = NAMES[o.value]; });
@@ -6140,6 +6145,7 @@
   }
   function monDying(frames) { var l = frames && frames[frames.length - 1]; return !!(l && +l.opacity === 0 && monPackOf("death")); }
   function monDeathSeq() {
+    if (FIGHTERS.G.guard) clearGuard(FIGHTERS.G);                                      // (the Elite's Stone Guard aura goes when it is defeated)
     return monDeathPlay().then(function (ok) {
       if (!ok) return;
       return sleep(700).then(function () { return uG.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 650 / speed, easing: "ease-out", fill: "forwards" }).finished; });
@@ -6212,8 +6218,11 @@
   // box forces it). A target that dodges lets it land on empty ground ("slams down, but Warrior slips away"). Which attack the monster uses in a fight is the Monster's attack select (alternating by default).
   var SLAM_HIT = 7, SLAM_DMG = 1.6, SLAM_BURN = 0.5;
   function monAttackAct(e, myRun, A, T) {
-    if (MONSTERS[monKey] && MONSTERS[monKey].melee) {                                      // the Elite: the Sword Slash, the Granite Ram and the Rockfall Drop (its other two skills follow, see docs/MONSTERS.md)
-      var md = $("monAtk").value, nn = MON.atk = (MON.atk || 0) + 1, pk2 = md === "alt" ? ["spit", "slam", "bounce"][(nn - 1) % 3] : md;
+    if (MONSTERS[monKey] && MONSTERS[monKey].melee) {                                      // the Elite: the Sword Slash, the Granite Ram, the Rockfall Drop, the Earthbreaker and the Stone Guard (all five skills have a sheet, see docs/MONSTERS.md)
+      var md = $("monAtk").value, nn = MON.atk = (MON.atk || 0) + 1;
+      var ord = ["spit", "slam", "eruption", "cinder", "bounce"].filter(function (k) { return k === "spit" || monPackOf(k === "cinder" ? "guard" : k); }), pk2 = md === "alt" ? ord[(nn - 1) % ord.length] : md;   // 'Alternate' cycles the skills that have a sheet
+      if (pk2 === "cinder" && monPackOf("guard")) return guardAct(e, myRun, A, T);
+      if (pk2 === "eruption" && monPackOf("eruption")) return earthAct(e, myRun, A, T);
       if (pk2 === "bounce" && monPackOf("bounce")) return dropAct(e, myRun, A, T);
       if (pk2 === "slam" && monPackOf("slam")) return bashAct(e, myRun, A, T);
       return slashAct(e, myRun, A, T);
@@ -6586,6 +6595,7 @@
     }
   }
   monPrevLoop($("monPrevCinder"), async function (my) {                               // the warrior burns (two stacks) for a moment, then the Cinder Burst pops them
+    if (MONSTERS[monKey] && MONSTERS[monKey].melee) { await guardAct({ actor: "G", amount: 0, preview: true }, my, FIGHTERS.G, FIGHTERS.W); return; }   // (the Elite: its Stone Guard)
     if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark") applyWard(FIGHTERS.W, 3); else if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning") applyShocked(FIGHTERS.W, 3); else if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice") applyChilled(FIGHTERS.W, 3); else applyBurn(FIGHTERS.W, 2);
     await sleep(900);
     if (my !== run) return;
@@ -6870,7 +6880,7 @@
       MON.shS = MON.shO = 1;
     }
   }
-  monPrevLoop($("monPrevEruption"), async function (my) { await eruptAct({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
+  monPrevLoop($("monPrevEruption"), async function (my) { await (MONSTERS[monKey].melee ? earthAct : eruptAct)({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
   // ---------------------------------------------------------------- the fire slime's Inferno Bounce (2026-11-08)
   // The meteor skill, a 2-turn-cooldown one (the user's idea: "the slime jumps into the air, all the way to the top, goes missing out of the stage, then nose-dives / plummets with great speed at the opponent from
   // above"; the sheet: Animations/Slime/inferno_bounce, 8 frames: 1 rest, 2 crouch, 3 launch, 4 plummet, 5 CRASH (the hit frame), 6 bounce, 7 heavy landing, 8 settle). The art is poses; the page moves the unit.
@@ -7263,6 +7273,220 @@
     }
   }
   monPrevLoop($("monPrevBounce"), async function (my) { await (MONSTERS[monKey].melee ? dropAct : bounceAct)({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
+  // ---------------------------------------------------------------- the Elite slime's Earthbreaker (2026-11-10)
+  // The Elite's fourth skill, a ground skill, physical (the sheet: Animations/EliteSlime/earthbreaker, the user's Gemini sheet, 6 frames at 12 fps, the slot `eruption`; the hit frame is 4; the stone arms the generator grew in
+  // frames 2 and 5 are painted out in earthbreaker_prep.py). The Elite stays on its spot: it gathers (1), raises the sword high with the blade turned down (2), drives it into the floor in front of it (3), strains over it (4),
+  // pulls it out (5) and recovers (6). In code: as the blade sinks in (frame 3, placement.swordFoot) a jagged CRACK runs along the ground from the sword to the target (EARTH_RUN ms, a low rumble), stone SPIKES pop up along
+  // it as the head passes (small near the sword, taller and taller) and a cluster of three bursts up under the target at the crack's arrival (the warrior's dodge pack lands its evade frame then): a flash, a ring and dust
+  // along the ground, chips, a hard shake; the target is lifted a little, flashes white and takes EARTH_DMG x the turn's damage as a placeholder (decide with the engine, docs/SKILL_BEHAVIOR_LATER.md). The spikes stand for
+  // about 0.65 s, then crumble into chips; the crack fades after about a second. A dodged blow: the spikes still burst up, but on empty ground ("the ground erupts, but Warrior slips away").
+  var EARTH_HIT = 4, EARTH_DMG = 2.2, EARTH_RUN = 400, EARTH_STAND = 650, EARTH_CRUMBLE = 360;
+  function earthPath(x0, y0, x1, y1, u, seed) {                                       // the crack: a jagged line from the sword to the target, with a few short branches
+    var rnd = rngOf(seed | 0), n = 16, pts = [], br = [], i, k, b, d;
+    for (i = 0; i <= n; i++) { k = i / n; pts.push([x0 + (x1 - x0) * k + (i && i < n ? (rnd() - 0.5) * u * 0.03 : 0), y0 + (y1 - y0) * k + (i && i < n ? (rnd() - 0.5) * u * 0.035 : 0)]); }
+    for (i = 3; i < n - 1; i += 3) { b = pts[i]; d = rnd() < 0.5 ? -1 : 1; br.push({ i: i, pts: [[b[0], b[1]], [b[0] + (rnd() - 0.3) * u * 0.06, b[1] + d * u * (0.02 + rnd() * 0.02)], [b[0] + (rnd() - 0.3) * u * 0.12, b[1] + d * u * (0.04 + rnd() * 0.03)]] }); }
+    return { pts: pts, br: br, n: n };
+  }
+  function earthCrackFx(t0, t1, tEnd, P, u) {                                         // the crack runs from t0 to t1 (the head leaves a little dust), stays and fades by tEnd
+    fxAdd({ t0: t0, t1: tEnd, draw: function (ctx, now) {
+      var p = clamp01((now - t0) / Math.max(1, t1 - t0)), fade = 1 - clamp01((now - t1) / Math.max(1, tEnd - t1)), upto = p * P.n, whole = Math.floor(upto), f = upto - whole, j, q, hd, w, bi, pass;
+      function line(arr) { ctx.beginPath(); ctx.moveTo(arr[0][0], arr[0][1]); for (var m = 1; m < arr.length; m++) ctx.lineTo(arr[m][0], arr[m][1]); }
+      var seg = P.pts.slice(0, Math.min(P.pts.length, whole + 1));
+      if (whole < P.n) { q = P.pts[whole]; hd = P.pts[whole + 1]; seg.push([q[0] + (hd[0] - q[0]) * f, q[1] + (hd[1] - q[1]) * f]); }
+      if (seg.length < 2) return;
+      ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.strokeStyle = "rgba(40,34,30," + (0.35 * fade).toFixed(3) + ")"; ctx.lineWidth = Math.max(3, u * 0.032); line(seg); ctx.stroke();            // a soft dark edge, then the crack itself
+      ctx.strokeStyle = "rgba(8,6,6," + (0.92 * fade).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.4, u * 0.012); line(seg); ctx.stroke();
+      for (bi = 0; bi < P.br.length; bi++) {
+        pass = upto - P.br[bi].i; if (pass <= 0) continue;
+        ctx.strokeStyle = "rgba(8,6,6," + (0.85 * fade * clamp01(pass * 2)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.008); line(P.br[bi].pts); ctx.stroke();
+      }
+      hd = seg[seg.length - 1];                                                                                                                         // dust puffed up at the head of the crack
+      if (p < 1) for (j = 0; j < 3; j++) { w = u * (0.035 + 0.02 * j); ctx.fillStyle = "rgba(150,140,126," + (0.3 * (1 - j * 0.25)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(hd[0] - j * u * 0.03 * (P.pts[P.n][0] > P.pts[0][0] ? 1 : -1), hd[1] - u * 0.02 - j * u * 0.012, w, w * 0.6, 0, 0, 6.2832); ctx.fill(); }
+      ctx.restore();
+    } });
+  }
+  function earthSpikeDraw(ctx, x, y, w, h, lean, g, u, alpha) {                       // one stone spike: a lit left face, a shaded right face, a dark outline, a dark heave of ground at its foot; g: how far it has grown (0..1)
+    var hh = h * g, ax, ay, nl, nr, lw;
+    if (hh < 2 || alpha <= 0.01) return;
+    ax = x + lean * g; ay = y - hh; nl = [x - w * 0.34 + lean * g * 0.5, y - hh * 0.52]; nr = [x + w * 0.3 + lean * g * 0.45, y - hh * 0.64]; lw = Math.max(1.4, u * 0.011);
+    ctx.save(); ctx.globalAlpha = alpha; ctx.lineJoin = "round";
+    ctx.fillStyle = "rgba(34,30,28,0.55)"; ctx.beginPath(); ctx.ellipse(x, y, w * 0.85, w * 0.24, 0, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = "rgb(158,156,162)"; ctx.beginPath(); ctx.moveTo(x - w / 2, y); ctx.lineTo(nl[0], nl[1]); ctx.lineTo(ax, ay); ctx.lineTo(x + lean * g * 0.15, y); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "rgb(98,96,106)"; ctx.beginPath(); ctx.moveTo(x + lean * g * 0.15, y); ctx.lineTo(ax, ay); ctx.lineTo(nr[0], nr[1]); ctx.lineTo(x + w / 2, y); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "rgb(36,32,40)"; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(x - w / 2, y); ctx.lineTo(nl[0], nl[1]); ctx.lineTo(ax, ay); ctx.lineTo(nr[0], nr[1]); ctx.lineTo(x + w / 2, y); ctx.stroke();
+    ctx.strokeStyle = "rgba(36,32,40,0.7)"; ctx.lineWidth = lw * 0.7; ctx.beginPath(); ctx.moveTo(x + lean * g * 0.15, y); ctx.lineTo(ax, ay); ctx.stroke();          // the ridge between the two faces
+    ctx.restore();
+  }
+  function earthSpikesFx(t0, tArr, P, x1, y1, u, dir) {                               // the spikes: small ones along the crack as its head passes, a cluster of three under the target at the arrival
+    var rnd = rngOf((tArr | 0) + 3), items = [], chips = [], i, it, tC = tArr + EARTH_STAND / speed, tEnd = tC + (EARTH_CRUMBLE + 200) / speed, runMs = tArr - t0;
+    [[4, 0.22], [6, 0.29], [8, 0.37], [10, 0.47], [12, 0.58]].forEach(function (a) {
+      var hh = u * a[1] * (0.82 + rnd() * 0.36); items.push({ x: P.pts[a[0]][0] + (rnd() - 0.5) * u * 0.02, y: P.pts[a[0]][1], w: u * 0.04 + hh * 0.46, h: hh, lean: (rnd() - 0.5) * u * 0.1, at: t0 + runMs * a[0] / P.n, big: false });
+    });
+    [[-0.15, 0.7, 0.0], [0.02, 0.95, 40], [0.17, 0.66, 80]].forEach(function (a, k) {
+      items.push({ x: x1 + a[0] * u, y: y1 + (k === 1 ? -u * 0.012 : u * 0.012), w: u * 0.05 + u * a[1] * 0.42, h: u * a[1], lean: (rnd() - 0.5) * u * 0.14 - dir * u * 0.02, at: tArr + a[2] / speed, big: true });
+    });
+    items.sort(function (a, b) { return a.y - b.y; });
+    for (i = 0; i < items.length; i++) { it = items[i]; for (var c = 0; c < (it.big ? 6 : 3); c++) chips.push({ i: i, a: -0.3 - rnd() * 2.5, v: 0.4 + rnd() * 0.9, s: 0.006 + rnd() * 0.01 }); }
+    fxAdd({ t0: t0, t1: tEnd, draw: function (ctx, now) {
+      var j, g, al, tl, lc, ch, px, py, it2, k;
+      for (j = 0; j < items.length; j++) {
+        it2 = items[j]; tl = (now - it2.at) * speed; if (tl < 0) continue;
+        g = 1.1 * Math.sin(Math.min(1, tl / 150) * 1.5708); if (tl > 150) g = 1.1 - 0.1 * clamp01((tl - 150) / 120);          // up in 150 ms with a little overshoot
+        lc = clamp01((now - tC) * speed / EARTH_CRUMBLE); g *= 1 - lc * lc; al = 1 - clamp01((lc - 0.6) / 0.4);
+        earthSpikeDraw(ctx, it2.x, it2.y, it2.w, it2.h, it2.lean, g, u, al);
+      }
+      for (k = 0; k < chips.length; k++) {                                                                                                               // chips thrown off as a spike pops up
+        ch = chips[k]; it2 = items[ch.i]; tl = clamp01((now - it2.at) * speed / 650); if ((now - it2.at) < 0 || tl >= 1) continue;
+        px = it2.x + Math.cos(ch.a) * u * 0.3 * ch.v * tl; py = it2.y - it2.h * 0.6 + Math.sin(ch.a) * u * 0.3 * ch.v * tl + u * 0.32 * tl * tl;
+        ctx.save(); ctx.fillStyle = "rgba(124,122,128," + (0.9 * (1 - tl)).toFixed(3) + ")"; ctx.fillRect(px - u * ch.s / 2, py - u * ch.s / 2, u * ch.s, u * ch.s); ctx.restore();
+      }
+    } });
+  }
+  async function earthAct(e, myRun, A, T) {
+    var pk = monPackOf("eruption"), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, pl = pk.placement || {};
+    for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
+    var t0 = performance.now(), r0 = rectIn(monEl), foot = pl.swordFoot ? slashTip(r0, pl.swordFoot) : centerOf(A.unit);
+    var tc0 = t0 + starts[2] + fm * 0.25, runMs = EARTH_RUN / speed, tArr = tc0 + runMs;                 // the crack leaves the sword as it sinks in (frame 3) and is under the target about 0.4 s later
+    var tr = rectIn(T.unit), x1 = tr.left + tr.width * 0.5, y1 = tr.top + tr.height - tr.width * 0.06, y0 = r0.top + r0.height - r0.width * 42 / 512 - u * 0.005;
+    var dodgeRun = null;
+    if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
+      var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
+      dodgeRun = runDodge(myRun, Math.max(0, ((tArr - performance.now()) - preMs / speed) * speed));        // the evade frame is on screen when the spikes burst up
+    }
+    var played = monPlayPack(pk, myRun);
+    var P = earthPath(foot.x, y0, x1, y1, u, t0 | 0);
+    await bsWait(tc0);
+    if (myRun !== run) return;
+    shake(2.5, runMs); earthCrackFx(tc0, tArr, tArr + 1100 / speed, P, u); earthSpikesFx(tc0, tArr, P, x1, y1, u, A.dir);
+    await bsWait(tArr);
+    if (myRun !== run) return;
+    var iy = tr.top + tr.height * 0.6;
+    shake(12, 460);
+    bashImpactFx(tArr, x1, iy, y1, u, A.dir, 1.25);
+    if (e.dodge) {
+      if (!pv) { say(A.name + " drives the sword into the ground, but " + T.name + " slips away from the spikes.", "g"); floatNumber(T, "MISS", "miss"); }
+      if (dodgeRun) await dodgeRun;
+      else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
+    } else {
+      var amount = Math.round((e.amount || 0) * EARTH_DMG);
+      if (!pv) {
+        T.hp -= amount; paintHp(T);
+        if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
+        if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
+      }
+      if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
+      if (!pv) {
+        floatNumber(T, (e.crit ? "CRIT " : "") + amount, e.crit ? "crit" : "");
+        say(A.name + " drives its sword into the ground: stone spikes burst up under " + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + " (Earthbreaker).", "g");
+      }
+      await Promise.all([
+        anim(T.unit.querySelector(".sprite"), PHYS_SHOCK, 340),
+        anim(T.unit, [{ transform: "translateY(0)" }, { transform: "translateY(-26px)" }, { transform: "translateY(0)" }], 440),
+        sleep(320)
+      ]);
+    }
+    if (myRun !== run) return;
+    await played;                                                                      // the pack plays to its end (it does not move), then the idle
+    if (myRun !== run) return;
+    uG.style.transform = "";
+    monStartIdle();
+    clearAnims(T.unit); clearAnims(stage);
+    T.unit.querySelector(".sprite").getAnimations().forEach(function (x) { x.cancel(); });
+    if (!pv && T.hp <= 0) {
+      clearBurn(T); clearChilled(T);
+      say(T.name + " is defeated.", "sys");
+      if (T === FIGHTERS.W && packs.death && packs.death.keyed && $("still").checked) {
+        keyPose("death", 0); await sleep(150); keyPose("death", 1); await sleep(260); keyPose("death", 2);
+      } else if (T === FIGHTERS.W && packs.death) await playPose("death", false);
+      else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
+    }
+  }
+  // ---------------------------------------------------------------- the Elite slime's Stone Guard (2026-11-10)
+  // The Elite's fifth skill, a SELF BUFF with no target (the sheet: Animations/EliteSlime/stone_guard, the user's Gemini sheet, 6 frames at 10 fps, the slot `guard`). The prompt asked the shield to slide up to the nose, but
+  // the generator drew six almost identical poses: the shield stays at the lower left of the body, the body hunkers a few percent and the brow lowers (frames 2 to 5, 4 and 5 the hardest glare). So the page adds what the
+  // sheet lacks, all rigid-stone motion: the sprite is turned forward about its base (CSS rotate, GUARD_LEAN degrees per frame) and lowered a little (CSS scale, GUARD_SY / GUARD_SX), a puff of dust is pushed out at its feet
+  // (it digs in), and THE SHIELD LIGHTS UP: an outline in cool steel-blue that flares (frame 3), two rings that leave the shield and widen, a bright band that sweeps across it (frames 3 and 4), then a faint pulsing edge that
+  // stays for as long as the buff does (GUARD_TURNS of its own turns; the page only DRAWS the buff, the game applies the numbers: Defense up). The glow is a DOM layer inside the sprite (so it leans and breathes with it)
+  // placed from placement.shield (the shield's box in the 512 cell). A DEFENSE UP number appears at the held frame. Nothing is dealt: no target, no damage.
+  var GUARD_LEAN = [0, 2, 4, 6, 6, 1], GUARD_SY = [1, 0.97, 0.94, 0.92, 0.92, 0.98], GUARD_SX = [1, 1.01, 1.02, 1.03, 1.03, 1.005], GUARD_TURNS = 2;
+  var GUARD_PATH = "M153,300 L249,300 L249,371 Q241,421 201,438 Q161,421 153,371 Z";   // the heater shield in the 512 cell (matched to the idle's rest frame: box 150, 296, 102 x 144)
+  function guardGlowEl() {                                                           // the shield's light: a DOM layer (inside the sprite, so it moves with it), the SVG in the 512 cell's own coordinates
+    var d = document.createElement("div"); d.className = "guardglow"; d.style.cssText = "position:absolute;inset:0;pointer-events:none";
+    d.innerHTML = '<svg viewBox="0 0 512 512" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">' +
+      '<defs><clipPath id="gdclip"><path d="' + GUARD_PATH + '"/></clipPath></defs>' +
+      '<path class="gd-fill" d="' + GUARD_PATH + '" fill="rgba(150,200,255,0.5)" style="opacity:0"/>' +
+      '<g clip-path="url(#gdclip)"><g transform="rotate(20 200 370)"><rect class="gd-sweep" x="110" y="250" width="34" height="260" fill="rgba(238,247,255,0.8)" style="opacity:0"/></g></g>' +
+      '<path class="gd-ring" d="' + GUARD_PATH + '" fill="none" stroke="rgba(190,225,255,0.95)" stroke-width="3" style="transform-box:fill-box;transform-origin:50% 50%;opacity:0"/>' +
+      '<path class="gd-edge" d="' + GUARD_PATH + '" fill="none" stroke="rgba(176,216,255,0.95)" stroke-width="3.5" stroke-linejoin="round" style="opacity:0;filter:drop-shadow(0 0 5px rgba(120,185,255,0.95))"/></svg>';
+    return d;
+  }
+  function guardQ(g, c) { return g.querySelector(".gd-" + c); }
+  function guardFlare(g, strong) {                                                    // the edge flares and settles, the fill blinks, one ring leaves the shield and widens
+    anim(guardQ(g, "edge"), [{ opacity: 0.2 }, { opacity: 1, offset: 0.25 }, { opacity: 0.6 }], 520).catch(function () {});
+    anim(guardQ(g, "fill"), [{ opacity: 0 }, { opacity: strong ? 0.55 : 0.35, offset: 0.2 }, { opacity: 0 }], 520).catch(function () {});
+    anim(guardQ(g, "ring"), [{ opacity: 0.85, transform: "scale(1)" }, { opacity: 0, transform: "scale(" + (strong ? 1.5 : 1.35) + ")" }], 560, "ease-out").catch(function () {});
+    guardQ(g, "edge").style.opacity = 0.6;
+  }
+  function guardSweep(g, ms) {                                                        // the bright band runs across the shield, clipped to it
+    var r = guardQ(g, "sweep");
+    anim(r, [{ opacity: 0, transform: "translateX(0px)" }, { opacity: 1, transform: "translateX(40px)", offset: 0.25 }, { opacity: 1, transform: "translateX(150px)", offset: 0.75 }, { opacity: 0, transform: "translateX(190px)" }], ms, "ease-in-out").catch(function () {});
+  }
+  function guardRest(g) {                                                             // the buff's faint aura: the edge breathes while the status lasts
+    var ed = guardQ(g, "edge");
+    ed.style.opacity = 0.4;
+    if (ed.animate) { try { ed.animate([{ opacity: 0.25 }, { opacity: 0.55 }, { opacity: 0.25 }], { duration: 2600 / speed, iterations: Infinity }); } catch (er) {} }
+  }
+  function guardDustFx(t0, cx, gy, u) {                                              // it digs in: stone dust pushed out at both sides of its feet and a faint ring on the ground
+    var rnd = rngOf(t0 | 0), puffs = [], i;
+    for (i = 0; i < 10; i++) puffs.push({ s: i < 5 ? -1 : 1, x0: u * (0.12 + rnd() * 0.12), r: u * (0.03 + rnd() * 0.035), v: 0.5 + rnd() * 0.7, h: 0.01 + rnd() * 0.035, a: 0.25 + rnd() * 0.25 });
+    fxAdd({ t0: t0, t1: t0 + 700 / speed, draw: function (ctx, now) {
+      var t = clamp01((now - t0) * speed / 520), j, p, px, py;
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(205,212,225," + (0.35 * (1 - t)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.012);
+      ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.2 + 0.4 * t), u * (0.04 + 0.08 * t), 0, 0, 6.2832); ctx.stroke(); ctx.restore();
+      for (j = 0; j < puffs.length; j++) {
+        p = puffs[j]; px = cx + p.s * (p.x0 + u * 0.3 * p.v * t); py = gy - u * p.h * (0.5 + t) - u * 0.01;
+        ctx.save(); ctx.fillStyle = "rgba(150,140,126," + (p.a * (1 - t)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(px, py, p.r * (0.8 + 1.2 * t), p.r * (0.55 + 0.7 * t), 0, 0, 6.2832); ctx.fill(); ctx.restore();
+      }
+    } });
+  }
+  function applyGuard(A, turns, g) {                                                  // Defense up (drawn only): the shield's faint aura and a number; it runs down with the Elite's own turns (tickStatuses)
+    if (A.guard) { A.guard.turns = turns; A.guard.fresh = true; return; }
+    A.guard = { turns: turns, fresh: true, el: g }; guardRest(g);
+  }
+  function clearGuard(A) {
+    if (!A.guard) return;
+    var g = A.guard.el; A.guard = null;
+    if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } }
+  }
+  async function guardAct(e, myRun, A, T) {
+    var pk = monPackOf("guard"), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, el = monEl;
+    for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
+    var t0 = performance.now(), r0 = rectIn(el), cx = r0.left + r0.width / 2, gy = r0.top + r0.height - r0.width * 42 / 512;
+    var g = A.guard ? A.guard.el : guardGlowEl();
+    if (!g.parentNode) el.appendChild(g);
+    var played = monPlayPack(pk, myRun, function (k) {                                // the lean and the hunker, frame by frame
+      el.style.rotate = (A.dir * GUARD_LEAN[k]) + "deg"; el.style.scale = GUARD_SX[k] + " " + GUARD_SY[k];
+    });
+    await bsWait(t0 + starts[1]);                                                     // 2. brace: it digs in
+    if (myRun !== run) return;
+    guardDustFx(performance.now(), cx, gy, u); shake(2, 200);
+    await bsWait(t0 + starts[2]);                                                     // 3. the shield wakes
+    if (myRun !== run) return;
+    guardFlare(g, false); guardSweep(g, 1000 / pk.fps * 4.2);
+    await bsWait(t0 + starts[3]);                                                     // 4. the guard held
+    if (myRun !== run) return;
+    guardFlare(g, true);
+    await bsWait(t0 + starts[4]);                                                     // 5. hold: the number
+    if (myRun !== run) return;
+    if (!pv) { floatNumber(A, "DEFENSE UP", "guard"); say(A.name + " hunkers down behind its shield: Defense raised for " + GUARD_TURNS + " turns (Stone Guard).", "g"); }
+    await played;
+    if (myRun !== run) return;
+    if (pv) { clearGuardEl(g); } else applyGuard(A, GUARD_TURNS, g);
+    uG.style.transform = "";
+    monStartIdle();
+  }
+  function clearGuardEl(g) { if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } } }
   $("monFx").oninput = function () {
     var v = +this.value; $("monFxV").textContent = v + "%";
     try { localStorage.setItem("wvg-monster-fire-" + monKey, v); } catch (e) {}

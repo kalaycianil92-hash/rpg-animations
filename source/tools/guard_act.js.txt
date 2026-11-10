@@ -1,0 +1,85 @@
+  // ---------------------------------------------------------------- the Elite slime's Stone Guard (2026-11-10)
+  // The Elite's fifth skill, a SELF BUFF with no target (the sheet: Animations/EliteSlime/stone_guard, the user's Gemini sheet, 6 frames at 10 fps, the slot `guard`). The prompt asked the shield to slide up to the nose, but
+  // the generator drew six almost identical poses: the shield stays at the lower left of the body, the body hunkers a few percent and the brow lowers (frames 2 to 5, 4 and 5 the hardest glare). So the page adds what the
+  // sheet lacks, all rigid-stone motion: the sprite is turned forward about its base (CSS rotate, GUARD_LEAN degrees per frame) and lowered a little (CSS scale, GUARD_SY / GUARD_SX), a puff of dust is pushed out at its feet
+  // (it digs in), and THE SHIELD LIGHTS UP: an outline in cool steel-blue that flares (frame 3), two rings that leave the shield and widen, a bright band that sweeps across it (frames 3 and 4), then a faint pulsing edge that
+  // stays for as long as the buff does (GUARD_TURNS of its own turns; the page only DRAWS the buff, the game applies the numbers: Defense up). The glow is a DOM layer inside the sprite (so it leans and breathes with it)
+  // placed from placement.shield (the shield's box in the 512 cell). A DEFENSE UP number appears at the held frame. Nothing is dealt: no target, no damage.
+  var GUARD_LEAN = [0, 2, 4, 6, 6, 1], GUARD_SY = [1, 0.97, 0.94, 0.92, 0.92, 0.98], GUARD_SX = [1, 1.01, 1.02, 1.03, 1.03, 1.005], GUARD_TURNS = 2;
+  var GUARD_PATH = "M153,300 L249,300 L249,371 Q241,421 201,438 Q161,421 153,371 Z";   // the heater shield in the 512 cell (matched to the idle's rest frame: box 150, 296, 102 x 144)
+  function guardGlowEl() {                                                           // the shield's light: a DOM layer (inside the sprite, so it moves with it), the SVG in the 512 cell's own coordinates
+    var d = document.createElement("div"); d.className = "guardglow"; d.style.cssText = "position:absolute;inset:0;pointer-events:none";
+    d.innerHTML = '<svg viewBox="0 0 512 512" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">' +
+      '<defs><clipPath id="gdclip"><path d="' + GUARD_PATH + '"/></clipPath></defs>' +
+      '<path class="gd-fill" d="' + GUARD_PATH + '" fill="rgba(150,200,255,0.5)" style="opacity:0"/>' +
+      '<g clip-path="url(#gdclip)"><g transform="rotate(20 200 370)"><rect class="gd-sweep" x="110" y="250" width="34" height="260" fill="rgba(238,247,255,0.8)" style="opacity:0"/></g></g>' +
+      '<path class="gd-ring" d="' + GUARD_PATH + '" fill="none" stroke="rgba(190,225,255,0.95)" stroke-width="3" style="transform-box:fill-box;transform-origin:50% 50%;opacity:0"/>' +
+      '<path class="gd-edge" d="' + GUARD_PATH + '" fill="none" stroke="rgba(176,216,255,0.95)" stroke-width="3.5" stroke-linejoin="round" style="opacity:0;filter:drop-shadow(0 0 5px rgba(120,185,255,0.95))"/></svg>';
+    return d;
+  }
+  function guardQ(g, c) { return g.querySelector(".gd-" + c); }
+  function guardFlare(g, strong) {                                                    // the edge flares and settles, the fill blinks, one ring leaves the shield and widens
+    anim(guardQ(g, "edge"), [{ opacity: 0.2 }, { opacity: 1, offset: 0.25 }, { opacity: 0.6 }], 520).catch(function () {});
+    anim(guardQ(g, "fill"), [{ opacity: 0 }, { opacity: strong ? 0.55 : 0.35, offset: 0.2 }, { opacity: 0 }], 520).catch(function () {});
+    anim(guardQ(g, "ring"), [{ opacity: 0.85, transform: "scale(1)" }, { opacity: 0, transform: "scale(" + (strong ? 1.5 : 1.35) + ")" }], 560, "ease-out").catch(function () {});
+    guardQ(g, "edge").style.opacity = 0.6;
+  }
+  function guardSweep(g, ms) {                                                        // the bright band runs across the shield, clipped to it
+    var r = guardQ(g, "sweep");
+    anim(r, [{ opacity: 0, transform: "translateX(0px)" }, { opacity: 1, transform: "translateX(40px)", offset: 0.25 }, { opacity: 1, transform: "translateX(150px)", offset: 0.75 }, { opacity: 0, transform: "translateX(190px)" }], ms, "ease-in-out").catch(function () {});
+  }
+  function guardRest(g) {                                                             // the buff's faint aura: the edge breathes while the status lasts
+    var ed = guardQ(g, "edge");
+    ed.style.opacity = 0.4;
+    if (ed.animate) { try { ed.animate([{ opacity: 0.25 }, { opacity: 0.55 }, { opacity: 0.25 }], { duration: 2600 / speed, iterations: Infinity }); } catch (er) {} }
+  }
+  function guardDustFx(t0, cx, gy, u) {                                              // it digs in: stone dust pushed out at both sides of its feet and a faint ring on the ground
+    var rnd = rngOf(t0 | 0), puffs = [], i;
+    for (i = 0; i < 10; i++) puffs.push({ s: i < 5 ? -1 : 1, x0: u * (0.12 + rnd() * 0.12), r: u * (0.03 + rnd() * 0.035), v: 0.5 + rnd() * 0.7, h: 0.01 + rnd() * 0.035, a: 0.25 + rnd() * 0.25 });
+    fxAdd({ t0: t0, t1: t0 + 700 / speed, draw: function (ctx, now) {
+      var t = clamp01((now - t0) * speed / 520), j, p, px, py;
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(205,212,225," + (0.35 * (1 - t)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.012);
+      ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.2 + 0.4 * t), u * (0.04 + 0.08 * t), 0, 0, 6.2832); ctx.stroke(); ctx.restore();
+      for (j = 0; j < puffs.length; j++) {
+        p = puffs[j]; px = cx + p.s * (p.x0 + u * 0.3 * p.v * t); py = gy - u * p.h * (0.5 + t) - u * 0.01;
+        ctx.save(); ctx.fillStyle = "rgba(150,140,126," + (p.a * (1 - t)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(px, py, p.r * (0.8 + 1.2 * t), p.r * (0.55 + 0.7 * t), 0, 0, 6.2832); ctx.fill(); ctx.restore();
+      }
+    } });
+  }
+  function applyGuard(A, turns, g) {                                                  // Defense up (drawn only): the shield's faint aura and a number; it runs down with the Elite's own turns (tickStatuses)
+    if (A.guard) { A.guard.turns = turns; A.guard.fresh = true; return; }
+    A.guard = { turns: turns, fresh: true, el: g }; guardRest(g);
+  }
+  function clearGuard(A) {
+    if (!A.guard) return;
+    var g = A.guard.el; A.guard = null;
+    if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } }
+  }
+  async function guardAct(e, myRun, A, T) {
+    var pk = monPackOf("guard"), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, el = monEl;
+    for (i = 0; i < n; i++) { starts.push(tot); tot += fm * ((pk.holds && pk.holds[i]) || 1); }
+    var t0 = performance.now(), r0 = rectIn(el), cx = r0.left + r0.width / 2, gy = r0.top + r0.height - r0.width * 42 / 512;
+    var g = A.guard ? A.guard.el : guardGlowEl();
+    if (!g.parentNode) el.appendChild(g);
+    var played = monPlayPack(pk, myRun, function (k) {                                // the lean and the hunker, frame by frame
+      el.style.rotate = (A.dir * GUARD_LEAN[k]) + "deg"; el.style.scale = GUARD_SX[k] + " " + GUARD_SY[k];
+    });
+    await bsWait(t0 + starts[1]);                                                     // 2. brace: it digs in
+    if (myRun !== run) return;
+    guardDustFx(performance.now(), cx, gy, u); shake(2, 200);
+    await bsWait(t0 + starts[2]);                                                     // 3. the shield wakes
+    if (myRun !== run) return;
+    guardFlare(g, false); guardSweep(g, 1000 / pk.fps * 4.2);
+    await bsWait(t0 + starts[3]);                                                     // 4. the guard held
+    if (myRun !== run) return;
+    guardFlare(g, true);
+    await bsWait(t0 + starts[4]);                                                     // 5. hold: the number
+    if (myRun !== run) return;
+    if (!pv) { floatNumber(A, "DEFENSE UP", "guard"); say(A.name + " hunkers down behind its shield: Defense raised for " + GUARD_TURNS + " turns (Stone Guard).", "g"); }
+    await played;
+    if (myRun !== run) return;
+    if (pv) { clearGuardEl(g); } else applyGuard(A, GUARD_TURNS, g);
+    uG.style.transform = "";
+    monStartIdle();
+  }
+  function clearGuardEl(g) { if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } } }

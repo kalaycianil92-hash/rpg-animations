@@ -1,0 +1,58 @@
+{
+ "format": "frame-placement/1",
+ "animation": "earthbreaker",
+ "file": "elite_earthbreaker_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "hitFrame": 4,
+ "swordFoot": {
+  "x": 420,
+  "y": 460
+ },
+ "frameInfo": [
+  {
+   "lift": 0.0,
+   "top": 169,
+   "bottom": 470,
+   "baseW": 354.5,
+   "sizeAgainstIdle": 1.013,
+   "replacedByIdleRest": true
+  },
+  {
+   "lift": 0.0,
+   "top": 134,
+   "bottom": 470,
+   "baseW": 352.7,
+   "sizeAgainstIdle": 1.008
+  },
+  {
+   "lift": 0.0,
+   "top": 181,
+   "bottom": 470,
+   "baseW": 375.0,
+   "sizeAgainstIdle": 1.071
+  },
+  {
+   "lift": 0.0,
+   "top": 172,
+   "bottom": 469,
+   "baseW": 362.2,
+   "sizeAgainstIdle": 1.035
+  },
+  {
+   "lift": 0.0,
+   "top": 175,
+   "bottom": 469,
+   "baseW": 358.8,
+   "sizeAgainstIdle": 1.025
+  },
+  {
+   "lift": 0.0,
+   "top": 169,
+   "bottom": 470,
+   "baseW": 359.3,
+   "sizeAgainstIdle": 1.027,
+   "replacedByIdleRest": true
+  }
+ ]
+}

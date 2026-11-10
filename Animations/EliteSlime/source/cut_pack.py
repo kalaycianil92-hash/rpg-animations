@@ -39,6 +39,15 @@ JOBS = {
     # mul 0.955 for panels 5 to 8; airborne panels 3 (launch), 4 (plummet, the body tilted), 6 (the rebound hop, 92 sheet px above the floor = 12% of the panel's height, the prompt asked 7% at most) at their real height
     "rockfall_drop": dict(file="elite_slime_rockfall_drop.jpg", folder="rockfall_drop", mode="shared", rows=[4, 4], airborne=[2, 3, 5], swap=[], fps=12, mul={4: 0.955, 5: 0.955, 6: 0.955, 7: 0.955}, dx={},
                           extra={"hitFrame": 5}),
+    # the Earthbreaker (2026-11-10, the user's sheet, 2752 x 1536, 3 x 2): the generator drew the top row 8 to 10% smaller than the bottom row (matched on the rigid shield and the sword: panels 1..6 = 0.90, 0.92, 0.93, 0.97, 0.98, 1.00 of
+    # panel 6's size), so every panel gets its own scale = 0.425 / that factor (0.425 = the shield's scale from the sheet to the idle's rest frame, matched by template); the stone arms in panels 2 and 5 are painted out first (earthbreaker_prep.py)
+    "earthbreaker": dict(file="elite_slime_earth_breaker.jpg", folder="earthbreaker", mode="shared", rows=[3, 3], airborne=[], swap=[0, 5], fps=12, mul={}, dx={}, prep="earthbreaker_prep",
+                         scales=[0.472, 0.462, 0.457, 0.438, 0.434, 0.425], extra={"hitFrame": 4, "swordFoot": {"x": 420, "y": 460}}),     # swordFoot: where the blade enters the floor (frames 3 to 5)
+    # the Stone Guard (2026-11-10, the user's Gemini sheet, 2752 x 1536, 3 x 2): the six panels are almost the same pose (the generator did NOT slide the shield up: it stays at the lower left of the body in every panel; the body hunkers
+    # only a few percent and the brow lowers), so the shield's rise is not in the sheet. Panels 1 and 6 are replaced by the idle's rest frame (the pack starts and ends on the idle, no pop); the others are scaled by the rigid
+    # shield (0.435 = the shield's scale from the sheet to the idle's rest frame; panel 6 was drawn 6% bigger). extra.shield: the shield's box in the 512 cell (matched to the idle's rest frame) where the page puts its glow.
+    "stone_guard": dict(file="elite_slime_stone_guard.jpg", folder="stone_guard", mode="shared", rows=[3, 3], airborne=[], swap=[0, 5], fps=10, mul={}, dx={},
+                        scales=[0.435, 0.439, 0.426, 0.426, 0.418, 0.410], extra={"shield": {"x": 150, "y": 296, "w": 102, "h": 144}}),
     "shield_bash": dict(file="elite_slime_shield_bash_chatgpt.png", folder="shield_bash", mode="shared", rows=[4, 4], airborne=[], swap=[], fps=12, mul={}, dx={}, front=6,
                         extra={"hitFrame": 6}),
 }
@@ -51,7 +60,9 @@ def cut(name):
     if not os.path.isfile(src): shutil.copyfile(os.path.join(INBOX, j["file"]), src)
     stem = "elite_%s_%dframe_strip" % (name, sum(j.get("rows", [3, 3])))
     rows = j.get("rows", [3, 3]); N = sum(rows)
-    P = ep.load_panels(src, rows)["panels"]
+    if j.get("prep"):                                                       # a cleaned copy of the sheet (the Earthbreaker: the arms the generator grew in panels 2 and 5 painted out)
+        sys.path.insert(0, os.path.join(d, "source")); mod = __import__(j["prep"]); clean = os.path.join(d, "source", j["folder"] + "_sheet_clean.png"); src = mod.clean(src, clean)
+    P = ep.load_panels(src, rows, **j.get("load", {}))["panels"]
     c = P[0]["bw"] / float(P[0]["bw_open"])
     print("==", name, "| opening factor %.3f" % c)
     # the floor of a row (sheet y): the median floor of its grounded panels
@@ -66,6 +77,7 @@ def cut(name):
     for k, q in enumerate(P):
         bw = q["bw_open"] * c
         sc = (BASE_W / bw if j["mode"] == "base" else sc0) * j["mul"].get(k, 1.0)
+        if j.get("scales"): sc = j["scales"][k]                                # explicit per-panel scales (measured on the rigid shield)
         wx0, wy0 = q["origin"]
         floor_local = (floor[q["row"]] - wy0) if k in j["airborne"] else q["low_open"]
         lift = (floor[q["row"]] - (wy0 + q["low_open"])) * sc if k in j["airborne"] else 0.0
