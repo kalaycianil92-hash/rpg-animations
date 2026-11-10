@@ -4152,6 +4152,7 @@
     playPose("attack", false, BS.holds);
     var clk = player.clock, at = function (f, fr) { return clkAt(clk, f, fr); };
     var T1 = at(1), T2 = at(2), T3 = at(3), T4 = at(4), tHit = at(hitF, IN), tEnd = clk.t0 + clk.total, f0 = bsFig(), dissolve = (T3 - T2) * 0.6;
+    var blk = !!e.block && !e.dodge && !preview, bSpec = blk && T === FIGHTERS.G ? blockSpec() : null, blockRun = bSpec ? monBlock(myRun, Math.max(0, (tHit - performance.now()) * speed - blockPre(bSpec)), bSpec) : null;   // a BLOCKED backstab (the blow comes from BEHIND: the user, 2026-11-10: it can be blocked; the glass is on the far side)
     // 1. she gathers and dissolves at home
     if (dark) fxAdd(auraLayer(F, w, T1, [{ t: T1, lv: 0.45, rf: 0.6 }, { t: T2, lv: 1, rf: 0.5 }], T3 - 260 / speed, 220, 0.3, "dark_aura"));   // ends before she moves, the aura follows the sprite
     await bsWait(T2 + (T3 - T2) * 0.3); if (myRun !== run) return;
@@ -4169,6 +4170,7 @@
     // 3. the stab
     await bsWait(tHit); if (myRun !== run) return;
     var amount = preview ? 28 : Math.round(e.amount * BS.damage), spr = T.unit.querySelector(".sprite");
+    if (blk) amount = blockAmount(amount);
     if (e.dodge && !preview) {
       say(A.name + " attacks, but " + T.name + " slips away.", "w");
       floatNumber(T, "MISS", "miss");
@@ -4176,9 +4178,11 @@
     } else {
       if (!preview) { T.hp -= amount; paintHp(T); }
       slash(T, -1); umbralImpact(T);
-      floatNumber(T, amount, "dark");
-      if (!preview) say(A.name + " strikes " + T.name + " out of the shadows for " + amount + " (Umbral Shroud, Dark Damage).", "w");
+      if (blk) blockFx(T, -T.dir, performance.now());
+      floatNumber(T, (blk ? "BLOCK " : "") + amount, blk ? "block" : "dark");
+      if (!preview) say(A.name + " strikes " + T.name + " out of the shadows for " + amount + (blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : "") + " (Umbral Shroud, Dark Damage).", "w");
       await Promise.all([
+        blockRun,
         anim(spr, [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], 160),
         anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(-12px)" }, { transform: "translateX(5px)" }, { transform: "translateX(0)" }], 240),
         anim(stage, [{ transform: "translate(0,0)" }, { transform: "translate(5px,-4px)" }, { transform: "translate(-5px,3px)" }, { transform: "translate(3px,-2px)" }, { transform: "translate(0,0)" }], 260),
@@ -4318,7 +4322,9 @@
     dyS = Math.max(dyS, dyAmin);
     G.P = { x: G.tx + dxS, y: G.ty + dyS };                                          // where the blades really meet the target: the effects are drawn there
     var dxA = Math.max(dxS, Math.min(dxS + w * AB.behind, S - 4 - w * AB.artRair - L0)), dyA = Math.max(dyS - w * AB.lift, dyAmin);
-    var T1 = at(1), T2 = at(2), T3 = at(3), T4 = at(4), T5 = at(5), tHit = at(hitF, IN), T7 = at(hitF + 1), tEnd = clk.t0 + clk.total, f0 = bsFig(), dissolve = (T3 - T2) * 0.6, diveStart = at(4, 0.55);    // 1. she gathers and dissolves at home (as in the Umbral Shroud) while the stage dims
+    var T1 = at(1), T2 = at(2), T3 = at(3), T4 = at(4), T5 = at(5), tHit = at(hitF, IN), T7 = at(hitF + 1), tEnd = clk.t0 + clk.total, f0 = bsFig(), dissolve = (T3 - T2) * 0.6, diveStart = at(4, 0.55);
+    var blk = !!e.block && !e.dodge && !preview, bSpec = blk && T === FIGHTERS.G ? blockSpec() : null, blockRun = bSpec ? monBlock(myRun, Math.max(0, (tHit - performance.now()) * speed - blockPre(bSpec)), bSpec) : null;   // a BLOCKED backstab (the blow comes from BEHIND: the user, 2026-11-10: it can be blocked; the glass is on the far side)
+    // 1. she gathers and dissolves at home (as in the Umbral Shroud) while the stage dims
     abDim(T1 + (T2 - T1) * 0.5, T2, T3, tHit, tHit + 500 / speed);                  // the screen goes dark at the end of frame 2 ...
     abRift(h.x + dxA, h.y + dyA + h.h * 0.02, w, T3 - 20 / speed);                     // ... and out of the dark the portal opens where she will step out (frame 3, twice as long)
     if (dark) fxAdd(auraLayer(F, w, T1, [{ t: T1, lv: 0.45, rf: 0.6 }, { t: T2, lv: 1, rf: 0.5 }], T3 - 260 / speed, 220, 0.3, "dark_aura"));
@@ -4344,6 +4350,7 @@
     // 3. the strike: both weapons into the upper back
     await bsWait(tHit); if (myRun !== run) return;
     var bonus = $("rogueBlind").checked || $("rogueDef").checked, amount = Math.round((preview ? 28 : e.amount) * AB.damage * (bonus ? AB.bonus : 1)), spr = T.unit.querySelector(".sprite");
+    if (blk) amount = blockAmount(amount);
     if (e.dodge && !preview) {
       say(A.name + " attacks, but " + T.name + " slips away.", "w");
       floatNumber(T, "MISS", "miss");
@@ -4351,9 +4358,11 @@
     } else {
       if (!preview) { T.hp -= amount; paintHp(T); }
       abImpact(T, G.P);
-      floatNumber(T, amount, "abyss");
-      if (!preview) say(A.name + " plunges onto " + T.name + "'s back from above for " + amount + " (Abyssal Backstab, Dark Damage" + (bonus ? ", bonus damage" : "") + ").", "w");
+      if (blk) blockFx(T, -T.dir, performance.now());
+      floatNumber(T, (blk ? "BLOCK " : "") + amount, blk ? "block" : "abyss");
+      if (!preview) say(A.name + " plunges onto " + T.name + "'s back from above for " + amount + (blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : "") + " (Abyssal Backstab, Dark Damage" + (bonus ? ", bonus damage" : "") + ").", "w");
       await Promise.all([
+        blockRun,
         anim(spr, [{ filter: "brightness(3.6) saturate(0)" }, { filter: "brightness(.3) saturate(1.5)" }, { filter: "brightness(1)" }], 420),
         anim(T.unit, [{ transform: "translateX(0) scale(1)" }, { transform: "translateX(-34px) scale(1.05,.9)" }, { transform: "translateX(-12px) scale(1)" }, { transform: "translateX(0)" }], 460),
         anim(stage, [{ transform: "translate(0,0)" }, { transform: "translate(10px,-8px)" }, { transform: "translate(-9px,6px)" }, { transform: "translate(6px,-4px)" }, { transform: "translate(-3px,2px)" }, { transform: "translate(0,0)" }], 420),
