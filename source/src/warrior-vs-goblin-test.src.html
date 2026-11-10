@@ -138,6 +138,7 @@
   .num.dark { color: #f2eaff; font-size: 42px; text-shadow: 0 0 8px #9a66ff, 0 0 22px #3a1066, 0 2px 0 #000; }   /* Dark Damage (the Rogue's Umbral Shroud): pale with a violet glow on a deep violet halo */
   .num.abyss { color: #fff1f4; font-size: 58px; text-shadow: 0 0 8px #ff2a5a, 0 0 26px #7a3cff, 0 3px 0 #000; }   /* the Rogue's Abyssal Backstab: big, white-hot with a crimson and violet glow (her abyss colours) */
   .num.guard { color: #eaf4ff; font-size: 24px; letter-spacing: .08em; white-space: nowrap; text-shadow: 0 0 8px #5a9bff, 0 2px 0 #000; }   /* the Elite's Stone Guard (Defense up) */
+  .num.block { color: #e2eefc; font-size: 24px; letter-spacing: .06em; white-space: nowrap; text-shadow: 0 0 8px #6aa0ff, 0 2px 0 #000; }   /* a blocked hit (BLOCK 14) */
   .num.elusive { color: #e9defd; font-size: 24px; letter-spacing: .08em; white-space: nowrap; text-shadow: 0 0 8px #8a5cff, 0 2px 0 #000; }   /* the Elusive buff */
   .num.glacier { color: #effcff; font-size: 54px; text-shadow: 0 0 8px #3fd0e0, 0 0 26px #1e6f9f, 0 3px 0 #000; }   /* the Rogue's Permafrost Execution: big, white with a glacial teal glow (her third kind of cold: not the mage's sky blue, not Winter's Kiss's periwinkle) */
   .num.frost { color: #f4f8ff; font-size: 42px; text-shadow: 0 0 8px #a8c4ff, 0 0 20px #c4a8ff, 0 2px 0 #000; }   /* the Rogue's Winter's Kiss: silver-white with a periwinkle and lilac glow (her frost, not the mage's sky blue) */
@@ -251,7 +252,7 @@
     <summary>Fight</summary>
     <div class="devbody">
     <div class="fields">
-      <label>Scenario <select id="scn"><option value="win">Warrior wins</option><option value="lose">Warrior loses (plays death)</option><option value="combo">Mage combo: Shatter Lance on a Chilled, then on a Frozen target</option><option value="fire">Mage fire combo: Firebolt twice, then Cinderburst detonates the burns</option><option value="fire2">Mage fire combo: Pyroclasm sets 3 Burns, Cinderburst detonates all of them</option><option value="mdodge">Warrior wins, the monster dodges one strike (and he dodges one)</option></select></label>
+      <label>Scenario <select id="scn"><option value="win">Warrior wins</option><option value="lose">Warrior loses (plays death)</option><option value="combo">Mage combo: Shatter Lance on a Chilled, then on a Frozen target</option><option value="fire">Mage fire combo: Firebolt twice, then Cinderburst detonates the burns</option><option value="fire2">Mage fire combo: Pyroclasm sets 3 Burns, Cinderburst detonates all of them</option><option value="mdodge">Warrior wins, the monster dodges one strike (and he dodges one)</option><option value="mblock">Warrior wins, the monster blocks two strikes (a blocked hit cannot crit, 20% less damage)</option></select></label>
       <label id="rogueWrap" style="display:none">Rogue's attack <select id="rogueSkill"><option value="alt">Alternate the six skills</option><option value="shroud">Umbral Shroud</option><option value="abyssal">Abyssal Backstab</option><option value="shiv">Shadow Shiv</option><option value="stiletto">Static Stiletto</option><option value="kiss">Winter's Kiss</option><option value="permafrost">Permafrost Execution</option></select></label>
       <label id="rogueDefWrap" style="display:none"><input type="checkbox" id="rogueDef"> The target suffers Reduce Physical Def (Shadow Shiv then always hits critically)</label>
       <label id="rogueShockWrap" style="display:none"><input type="checkbox" id="rogueShock"> Static Stiletto always applies Shocked (otherwise a 25% chance)</label>
@@ -270,7 +271,7 @@
       <label id="spitWrap" style="display:none"><input type="checkbox" id="spitBurn"> The monster's spit and slam always inflict their status, Burn or Chilled (otherwise 25% and 50% of the time; Cinder Burst detonates the burns instead)</label>
       <label id="monAtkWrap" style="display:none">Monster's attack <select id="monAtk"><option value="alt">Alternate all five attacks</option><option value="spit">Ember Spit</option><option value="slam">Magma Slam</option><option value="cinder">Cinder Burst</option><option value="eruption">Magma Eruption</option><option value="bounce">Inferno Bounce</option></select></label>
       <div id="monPrevRow" style="display:none; flex-wrap:wrap; gap:8px; align-items:center; color:var(--dim); font-size:13px">Monster animations:
-        <button id="monSpitPrev">Ember Spit (loops)</button> <button id="monPrevBounce">Inferno Bounce (loops)</button> <button id="monPrevEruption">Magma Eruption (loops)</button> <button id="monPrevCinder">Cinder Burst (loops)</button> <button id="monPrevSlam">Magma Slam (loops)</button> <button id="monPrevHit">Hit (loops)</button> <button id="monPrevDeath">Death (loops)</button> <button id="monPrevDodge">Dodge (loops)</button></div>
+        <button id="monSpitPrev">Ember Spit (loops)</button> <button id="monPrevBounce">Inferno Bounce (loops)</button> <button id="monPrevEruption">Magma Eruption (loops)</button> <button id="monPrevCinder">Cinder Burst (loops)</button> <button id="monPrevSlam">Magma Slam (loops)</button> <button id="monPrevHit">Hit (loops)</button> <button id="monPrevDeath">Death (loops)</button> <button id="monPrevDodge">Dodge (loops)</button> <button id="monPrevBlock">Block (loops)</button></div>
       <label>Fighters' distance from the stage edge <input type="range" id="edge" min="0" max="20" value="3" style="width:110px"> <span id="edgeV">3%</span></label>
       <span class="pathmsg" id="pathMsg"></span>
     </div>
@@ -790,6 +791,14 @@
     { actor: "W", dodge: true },
     { actor: "G", dodge: true },
     { actor: "W", amount: 22, crit: true },
+    { actor: "W", amount: 20 }
+  ];
+  var MBLOCK = [                                                                     // the monster blocks two of the warrior's strikes (2026-11-10): a blocked hit cannot crit and does 20% less (BLOCK_REDUCE)
+    { actor: "W", amount: 18 },
+    { actor: "G", amount: 9 },
+    { actor: "W", amount: 22, crit: true, block: true },
+    { actor: "G", amount: 9 },
+    { actor: "W", amount: 20, block: true },
     { actor: "W", amount: 20 }
   ];
   var COMBO = [                                                                      // the mage acts twice in a row (as when allies act in between), each cast names its skill
@@ -3928,6 +3937,12 @@
       tHit = Math.max(tHit, dpre); wuMs = Math.min(150, tHit * 0.4); luMs = Math.max(60, tHit - wuMs);
       dodgeRun = monDodge(myRun, Math.max(0, tHit - dpre));
     }
+    var blk = !!e.block && !e.dodge, blockRun = null, bSpec = blk && T === FIGHTERS.G ? blockSpec() : null;   // a BLOCKED strike (2026-11-10): the blocker's guard is up when it lands
+    if (bSpec) {
+      var bpre = blockPre(bSpec);
+      tHit = Math.max(tHit, bpre); wuMs = Math.min(150, tHit * 0.4); luMs = Math.max(60, tHit - wuMs);
+      blockRun = monBlock(myRun, Math.max(0, tHit - bpre), bSpec);
+    }
     var clk = null;
     if (packPlays) { playPose("attack", false).then(backToIdle); clk = player.clock; }
     var skill = (A === FIGHTERS.W && packPlays && $("fxOn").checked && !rogueLike()) ? startSkill(clk, hitF, T) : null;   // the lightning skill rides on the attack pack's clock
@@ -3973,24 +3988,26 @@
         sleep(260)
       ]);
     } else {
-      if (!packPlays) await sleep(e.crit ? 110 : 60); // hit-stop (uploaded attack packs time the impact from their own frames instead)
+      var amt = blk ? blockAmount(e.amount) : e.amount, cr = blk ? false : e.crit;       // a blocked hit cannot crit and does BLOCK_REDUCE less
+      if (!packPlays) await sleep(cr ? 110 : 60); // hit-stop (uploaded attack packs time the impact from their own frames instead)
       if (myRun !== run) return;
-      T.hp -= e.amount;
+      T.hp -= amt;
       paintHp(T);
       if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }       // the mage's Barrier ripples, and breaks if she falls
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
       if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
-      if (skill) skill.impact(); else if (!e.noSlash) slash(T, sign);
-      floatNumber(T, (e.crit ? "CRIT " : "") + e.amount, e.numCls || (skill ? "bolt" : (e.crit ? "crit" : "")));
-      say(A.name + " " + (e.verb || "slashes") + " " + T.name + " for " + e.amount + (e.crit ? " (crit!)" : "") + (e.note || "") + ".", e.actor === "W" ? "w" : "g");
+      if (blk) blockFx(T, -sign, performance.now()); else if (skill) skill.impact(); else if (!e.noSlash) slash(T, sign);
+      floatNumber(T, (blk ? "BLOCK " : cr ? "CRIT " : "") + amt, blk ? "block" : e.numCls || (skill ? "bolt" : (cr ? "crit" : "")));
+      say(A.name + " " + (e.verb || "slashes") + " " + T.name + " for " + amt + (blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage" + (e.crit ? ", the critical hit is cancelled" : "") + ")" : cr ? " (crit!)" : "") + (e.note || "") + ".", e.actor === "W" ? "w" : "g");
       var spr = T.unit.querySelector(".sprite");
       var jobs = [
-        (skill || e.shock) ? anim(spr, e.shockAnim || SHOCK, 340) : anim(spr, [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], 160),
-        anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (sign * 10) + "px)" }, { transform: "translateX(" + (-sign * 6) + "px)" }, { transform: "translateX(0)" }], 240),
+        blk ? anim(spr, [{ filter: "brightness(1.35)" }, { filter: "brightness(1)" }], 160) : (skill || e.shock) ? anim(spr, e.shockAnim || SHOCK, 340) : anim(spr, [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], 160),
+        anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (sign * 10 * (blk ? 0.5 : 1)) + "px)" }, { transform: "translateX(" + (-sign * 6 * (blk ? 0.5 : 1)) + "px)" }, { transform: "translateX(0)" }], 240),
         sleep(300)
       ];
-      if (e.crit) jobs.push(anim(stage, [{ transform: "translate(0,0)" }, { transform: "translate(5px,-4px)" }, { transform: "translate(-5px,3px)" }, { transform: "translate(3px,-2px)" }, { transform: "translate(0,0)" }], 260));
+      if (cr) jobs.push(anim(stage, [{ transform: "translate(0,0)" }, { transform: "translate(5px,-4px)" }, { transform: "translate(-5px,3px)" }, { transform: "translate(3px,-2px)" }, { transform: "translate(0,0)" }], 260));
       await Promise.all(jobs);
+      if (blockRun) await blockRun;                                                    // (the blocker's guard goes down again before the attacker steps back)
     }
     if (myRun !== run) return;
 
@@ -5106,7 +5123,7 @@
     say("The fight begins.", "sys");
     var brL = curChar === "mage" ? barrierStart() : null;                            // the mage's passive: the Barrier goes up before the first turn
     await sleep(brL ? BR_CAST_MS : 300);
-    var script = $("scn").value === "lose" ? LOSE : $("scn").value === "combo" ? COMBO : $("scn").value === "fire" ? FIRECOMBO : $("scn").value === "fire2" ? FIRECOMBO2 : $("scn").value === "mdodge" ? MDODGE : LOG;
+    var script = $("scn").value === "lose" ? LOSE : $("scn").value === "combo" ? COMBO : $("scn").value === "fire" ? FIRECOMBO : $("scn").value === "fire2" ? FIRECOMBO2 : $("scn").value === "mdodge" ? MDODGE : $("scn").value === "mblock" ? MBLOCK : LOG;
     for (var i = 0; i < script.length; i++) {
       if (my !== run) return;
       await act(script[i], my);
@@ -5133,7 +5150,7 @@
     rgCount = 0; bsMir = false; (function () { var s = uW.querySelector(".sprite"); if (s) { s.style.transform = ""; s.style.opacity = ""; } })();   // (the Rogue's backstab mirrors and fades her sprite)
     uG.style.transform = ""; uG.style.opacity = "";                                // (the next stage's arrival moves it by hand)
     if (typeof monPose === "string" && monPose !== "idle") monStartIdle();         // (a monster that was in the middle of its attack goes back to its idle)
-    if (typeof MON !== "undefined") MON.atk = 0;                                   // (the monster's attacks alternate from the start again)
+    if (typeof MON !== "undefined") { MON.atk = 0; MON.blocking = false; }                                   // (the monster's attacks alternate from the start again)
     $("stageTag").getAnimations().forEach(function (a) { a.cancel(); });
     stage.classList.remove("playing");
     document.querySelectorAll(".sprite").forEach(function (s) { s.getAnimations().forEach(function (a) { a.cancel(); }); s.style.filter = ""; });   // (the frozen look is a filter set by the freeze effect)
@@ -5300,6 +5317,7 @@
                   eruption: { n: 6, fps: 12, holds: [1, 1.6, 1.1, 3.4, 1.4, 1.4] },   // eruption = the Earthbreaker
                   guard: { n: 6, fps: 10, holds: [1, 1.2, 1.5, 2.4, 2.4, 1.3] } };   // guard = the Stone Guard (6 frames, the ChatGPT sheet: rest, the shield a little higher, across the body, in front of the face (held twice), home; guardAct plays 1, 2, 3, 4, 5, 3, 6 with its own holds) (6 frames: gather, raise, the blade into the floor, strain (the hit frame 4), pull, recover)
     MONSTERS.elite_slime.packs = build(ELITE_ANIMS, DEFE); MONSTERS.elite_slime.attackPack = MONSTERS.elite_slime.packs.attack; MONSTERS.elite_slime.melee = true;
+    MONSTERS.elite_slime.block = { pack: "guard", order: [1, 2, 3, 4, 2, 5], holds: [0.9, 0.9, 1.3, 2.4, 0.9, 1.1], fps: 14, idx: 2 };   // its Block has no strip of its own: the Stone Guard's frames (the shield floats up in front of the face; the block frame is the face frame, 3rd played)
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
   var MON = { seq: 0, deathP: null };                                                // seq: which attack/hit/death/dodge pack is current (a new one replaces the one before); deathP: the promise of the death pack once it has started
@@ -5343,8 +5361,8 @@
     $("monSqWrap").style.display = idle && m.squash ? "" : "none";
     $("spitWrap").style.display = idle && m.attackPack && !m.melee ? "" : "none";
     $("monPrevRow").style.display = idle && m.packs ? "flex" : "none";
-    [["monSpitPrev", "attack"], ["monPrevHit", "hit"], ["monPrevDeath", "death"], ["monPrevDodge", "dodge"], ["monPrevSlam", "slam"], ["monPrevCinder", "attack"], ["monPrevEruption", "eruption"], ["monPrevBounce", "bounce"]].forEach(function (b) {
-      $(b[0]).style.display = m.packs && m.packs[b[1]] && (!b[2] || m.vfx === b[2]) && (!m.melee || b[0] !== "monPrevCinder" || m.packs.guard) ? "" : "none";   // (the Elite's 'Cinder Burst' button is its Stone Guard, shown once its sheet is there)
+    [["monSpitPrev", "attack"], ["monPrevHit", "hit"], ["monPrevDeath", "death"], ["monPrevDodge", "dodge"], ["monPrevSlam", "slam"], ["monPrevCinder", "attack"], ["monPrevEruption", "eruption"], ["monPrevBounce", "bounce"], ["monPrevBlock", "block"]].forEach(function (b) {
+      $(b[0]).style.display = m.packs && (b[0] === "monPrevBlock" ? m.block && m.packs[m.block.pack] : m.packs[b[1]]) && (!b[2] || m.vfx === b[2]) && (!m.melee || b[0] !== "monPrevCinder" || m.packs.guard) ? "" : "none";   // (the Elite's 'Cinder Burst' button is its Stone Guard, shown once its sheet is there)
     });
     var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = m.melee ? { alt: "Alternate all five attacks", spit: "Sword Slash", slam: "Granite Ram", cinder: "Stone Guard", eruption: "Earthbreaker", bounce: "Rockfall Drop" } : DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
     Array.prototype.forEach.call($("monAtk").options, function (o) { if (NAMES[o.value]) o.textContent = NAMES[o.value]; });
@@ -6126,7 +6144,7 @@
     f._lastHp = f.hp;
     if (!monEl) return;
     if (f.hp > prev) { if (monPose !== "idle") monStartIdle(); return; }              // healed or reset: the next monster is back to its idle
-    if (f.hp < prev) { if (f.hp <= 0) monDeathPlay(); else monHitPlay(); }
+    if (f.hp < prev) { if (f.hp <= 0) monDeathPlay(); else if (!MON.blocking) monHitPlay(); }   // (a blocked blow has its own pack)
   }
   function monHitPlay() {
     var pk = monPackOf("hit");
@@ -7491,6 +7509,73 @@
     uG.style.transform = "";
     monStartIdle();
   }
+  // ---------------------------------------------------------------- BLOCK (2026-11-10, the user's design for every character)
+  // "Blocked hit cannot crit and block reduces the damage taken by 20% (may change in the future)." A block is a REACTION like the Dodge (the user, 2026-11-10: it happens when a hit lands, not a stance): the blocker's block
+  // pack plays so that its guard is up when the blow lands (placement idx: the block frame), the damage is cut by BLOCK_REDUCE, a blocked hit is never a critical one, and the blow meets a short, subtle HALF CIRCLE OF GLASS
+  // in front of the blocker (the look of the mage's Barrier, the same for everybody: one look means 'blocked') with a ripple and a few sparks where it lands; no white flash and no hit pose. The page only DRAWS it: the
+  // numbers are the engine's (docs/SKILL_BEHAVIOR_LATER.md). A turn is blocked with `block: true` in the script (the scenario 'the monster blocks one strike'). Wired so far: the warrior's basic attack on a MONSTER with a
+  // block (`MONSTERS[key].block`); every skill act (castAct, rogueAct, the Elite's own attacks on the warrior...) needs the same few lines, and the other characters need their block packs (Warrior, Mage, Rogue, Assassin,
+  // Spellblade). The Elite's block has no strip of its own: it plays the Stone Guard's frames 2, 3, 4, 5, 3, 6 (the shield floats up in front of the face, the block frame is the face frame) at 14 fps.
+  var BLOCK_REDUCE = 0.2;
+  function blockAmount(amount) { return Math.max(1, Math.round(amount * (1 - BLOCK_REDUCE))); }
+  function blockSpec() {                                                             // the monster's block: a pack played in an order (the Elite: the Stone Guard's frames), or its own strip
+    var m = MONSTERS[monKey], b = m && m.block, pk;
+    if (!b || !monEl) return null;
+    pk = monPackOf(b.pack);
+    if (!pk) return null;
+    return { pk: pk, order: b.order || null, holds: b.holds || null, fps: b.fps || pk.fps, idx: b.idx || 0 };
+  }
+  function blockPre(sp) {                                                            // animation ms from the start of the pack to the moment the blow lands (40% into the block frame)
+    var fm = 1000 / sp.fps, i, t = 0;
+    for (i = 0; i < sp.idx; i++) t += fm * ((sp.holds && sp.holds[i]) || 1);
+    return t + fm * 0.4 * ((sp.holds && sp.holds[sp.idx]) || 1);
+  }
+  function monBlock(myRun, delayMs, sp) {                                            // plays the block pack after delayMs (no movement: the guard goes up where it stands), then the idle
+    return sleep(delayMs).then(function () {
+      if (myRun !== run) return false;
+      MON.blocking = true;                                                            // (the hit pack must not play for a blocked blow: monOnHp)
+      var pk2 = Object.assign({}, sp.pk, { fps: sp.fps });
+      return monPlayPack(pk2, myRun, null, sp.holds, sp.order).then(function (ok) { MON.blocking = false; if (ok && myRun === run) monStartIdle(); return ok; });
+    });
+  }
+  function blockFx(T, sd, tHit) {                                                    // the half circle of glass on the side the blow comes from (sd: -1 left, +1 right), a ripple and sparks where it lands
+    var mon = T === FIGHTERS.G && monEl, rr = rectIn(mon ? monEl : T.unit), w = rr.width, gy = rr.top + rr.height - w * 42 / 512, R = w * (mon ? 0.46 : 0.5), cx = rr.left + w * 0.505 + sd * w * 0.03, cy = gy - R * 0.32;
+    var rnd = rngOf(tHit | 0), sp = [], i, P = BR_RGB, ix = cx + sd * R, iy = cy - R * 0.05, ph = sd > 0 ? [-1.5708, 1.5708] : [1.5708, 4.7124];
+    for (i = 0; i < 8; i++) sp.push({ a: (sd > 0 ? 0 : Math.PI) + (rnd() - 0.5) * 2.2, v: 0.3 + rnd() * 0.5, l: 0.04 + rnd() * 0.06 });
+    fxAdd({ t0: tHit - 20, t1: tHit + 650 / speed, draw: function (ctx, now) {
+      var t = (now - tHit) * speed, a = clamp01((t + 20) / 70) * (1 - clamp01((t - 180) / 380)), k = clamp01(t / 420), j, p, d, g;
+      if (a <= 0.01) return;
+      ctx.save(); ctx.globalCompositeOperation = "lighter";
+      ctx.beginPath(); ctx.rect(sd > 0 ? cx : cx - R * 1.2, cy - R * 1.2, R * 1.2, R * 2.4); ctx.clip();                  // the glass: only the half on the attacker's side
+      g = ctx.createRadialGradient(cx, cy, R * 0.55, cx, cy, R);
+      g.addColorStop(0, "rgba(" + P.glow + ",0)"); g.addColorStop(0.8, "rgba(" + P.glow + "," + (0.12 * a).toFixed(3) + ")"); g.addColorStop(1, "rgba(" + P.core + "," + (0.38 * a).toFixed(3) + ")");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, 6.2832); ctx.fill();
+      ctx.restore();
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      ctx.strokeStyle = "rgba(" + P.line + "," + (0.85 * a).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, R * 0.03); ctx.beginPath(); ctx.arc(cx, cy, R, ph[0], ph[1]); ctx.stroke();                 // the rim
+      ctx.strokeStyle = "rgba(" + P.core + "," + (0.5 * a).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, R * 0.012); ctx.beginPath(); ctx.arc(cx, cy, R * 0.96, ph[0] + 0.5, ph[0] + 1.3); ctx.stroke();   // a highlight
+      glowEllipse(ctx, cx, gy, R * 0.95, R * 0.17, P.glow, 0.3 * a);                                                                                                                          // the ground in front of it
+      if (t > 0) {                                                                                                                                                                              // the blow: a flash, a ring spreading on the glass, sparks
+        glowDot(ctx, ix, iy, R * (0.1 + 0.2 * (1 - k)), P.core, 0.8 * (1 - k));
+        ctx.strokeStyle = "rgba(" + P.core + "," + (0.7 * (1 - k)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, R * 0.02 * (1 - k) + 1); ctx.beginPath(); ctx.arc(ix, iy, R * (0.06 + 0.3 * k), 0, 6.2832); ctx.stroke();
+        ctx.lineWidth = Math.max(1, R * 0.012);
+        for (j = 0; j < sp.length; j++) {
+          p = sp[j]; d = R * p.v * k; ctx.strokeStyle = "rgba(255,255,255," + (0.9 * (1 - k)).toFixed(3) + ")";
+          ctx.beginPath(); ctx.moveTo(ix + Math.cos(p.a) * d, iy + Math.sin(p.a) * d * 0.8 - R * 0.05 * k); ctx.lineTo(ix + Math.cos(p.a) * (d + R * p.l), iy + Math.sin(p.a) * (d + R * p.l) * 0.8 - R * 0.05 * k); ctx.stroke();
+        }
+      }
+      ctx.restore();
+    } });
+  }
+  monPrevLoop($("monPrevBlock"), async function (my) {                               // the Block preview: the guard goes up and a blow lands on the glass (nothing is dealt)
+    var sp = blockSpec();
+    if (!sp) return;
+    var b = monBlock(my, 0, sp);
+    await sleep(blockPre(sp));
+    if (my !== run) return;
+    blockFx(FIGHTERS.G, -FIGHTERS.W.dir, performance.now()); shake(3, 160);
+    await b;
+  });
   $("monFx").oninput = function () {
     var v = +this.value; $("monFxV").textContent = v + "%";
     try { localStorage.setItem("wvg-monster-fire-" + monKey, v); } catch (e) {}
@@ -7626,7 +7711,7 @@
     var sc = $("scn"), keep = sc.value, name = (CHARACTERS[curChar] || { name: "Warrior" }).name;
     sc.innerHTML = "";
     SCN_ALL.forEach(function (o) {
-      if (curChar !== "mage" && o.v !== "win" && o.v !== "lose" && o.v !== "mdodge") return;   // the mage's combos belong to the mage (the monster-dodge scenario is for everybody)
+      if (curChar !== "mage" && o.v !== "win" && o.v !== "lose" && o.v !== "mdodge" && o.v !== "mblock") return;   // the mage's combos belong to the mage (the monster-dodge scenario is for everybody)
       var op = document.createElement("option"); op.value = o.v; op.textContent = o.t.replace("Warrior", name); sc.appendChild(op);
     });
     sc.value = [].some.call(sc.options, function (o) { return o.value === keep; }) ? keep : "win";

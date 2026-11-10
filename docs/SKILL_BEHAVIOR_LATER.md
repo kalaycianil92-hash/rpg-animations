@@ -95,3 +95,6 @@ The game design's list: Ember Spit (basic), Molten Drip, Cinder Burst, Magma Sla
 
 The five slots mirror the fire slime's: **Frost Spit** (basic, ranged, 25% Chilled for 2 turns), **Glacial Lance** (the mage's Shatter Lance on the spit animation, x1.7, a guaranteed critical x1.5 more on a Chilled target and that chill is consumed; it does not chill), **Glacier Slam** (melee, x1.6, 50% Chilled), **Permafrost Eruption** (2-turn cooldown, x2.4, always Chilled, no stun, the target is thrown up), **Blizzard Bounce** (2-turn cooldown, x3.0 plus a second hit x0.5, always Chilled; a dodge avoids both). All BUILT in the test page.
 
+### Block (added 2026-11-10, the user's rule; details in docs/BLOCK.md)
+
+"Blocked hit cannot crit and block reduces the damage taken by 20% (may change in the future)." In the test page: `BLOCK_REDUCE = 0.2` (one constant), a blocked hit is never a crit, the number reads BLOCK n, the blocker plays a short block pack and a half circle of glass meets the blow. The page only draws it. Open for the engine: the chance to block (and whether it stacks with Dodge), which weapon or item is needed (main hand, off hand, shield), whether statuses (Burn, Chill, Shock...) still apply through a block, whether a block can be broken, how it works against skills that cannot be blocked (area spells, the Elite's Rockfall Drop and Earthbreaker?).

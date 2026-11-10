@@ -10,6 +10,7 @@ Frame-by-frame 2D combat characters for an RPG-style game. Gemini draws the pose
 | `docs/DEV_NOTES.md` | How the test page works, how to test it, decisions, and what to change for a second character, PvP and the game engine |
 | `docs/SKILL_BEHAVIOR_LATER.md` | What the skills actually do (damage, statuses, durations): decided later with the game engine; lists what is the user's text and what is only a placeholder in the test page |
 | `docs/MONSTERS.md` | The monsters (started 2026-11-07): the decisions (default animations idle, attack, hit, death, dodge, plus special ones per monster), the slime variations assessment and the plan |
+| `docs/BLOCK.md` | Block, for every character and monster (2026-11-10): the game rule, the decisions (a reaction like Dodge, one glass half-circle look, the Elite first), what the page does and what is not wired yet |
 | `docs/STAGES.md` | The stage looks: the Forest Kingdom's five acts of 20 PvE stages (slimes, goblins, wolves, ogres, orcs), the props layer, shared art rules, how the stage changes, the arena (Oakcrown Colosseum) and the dungeon |
 
 ## Where things stand
