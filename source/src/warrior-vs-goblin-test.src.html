@@ -6253,10 +6253,12 @@
     if (MON.deathP) return MON.deathP;
     var pk = monPackOf("death");
     if (!pk) return Promise.resolve(false);
-    MON.deathP = monPlayPack(pk, run, function (i) {
+    var KG = !!MONSTERS[monKey].king;                                                  // the Slime King: a held beat, a flash, slow motion and the treasure (kingDeathStart, kingDeathBeat)
+    MON.deathP = (KG ? kingDeathStart() : Promise.resolve()).then(function () { return monPlayPack(pk, run, function (i) {
       MFX.dieTarget = Math.max(0, 1 - i / 4);                                          // the fire's light and flames fade out over the first five frames
       if (i >= 3 && MONSTERS[monKey].vfx !== "ice") MFX.smokeUntil = performance.now() + 2600 / speed;   // a little faint smoke rises from frame 4 on (not from the ice slime)
-    });
+      if (KG) kingDeathBeat(i);
+    }, KG ? KDEATH_HOLDS : null); });
     return MON.deathP;
   }
   function monDying(frames) { var l = frames && frames[frames.length - 1]; return !!(l && +l.opacity === 0 && monPackOf("death")); }
@@ -7649,6 +7651,7 @@
     if (!m || !m.king || !monEl) { KA.ps.length = 0; return; }
     var dt = MFX.last ? Math.min(60, now - MFX.last) : 16, op = +getComputedStyle(uG).opacity || 0;
     MFX.last = now;
+    kingTreasureDraw(cb, cf, now, dt, op);                                         // (the treasure pile behind him: it stays when he has fallen)
     if (op < 0.02 || monPose === "death") { KA.ps.length = 0; return; }
     var body = kingPt(256, 330), gy = kingPt(256, 470).y, s = body.w, rnd = MFX.rnd, i, p, f, k = op * op, gt, gp, a0;
     glowDot(cb, body.x, body.y, s * 0.55, "255,214,120", 0.11 * k);
@@ -7788,8 +7791,8 @@
       if (myRun === run && uG.style.transform.indexOf("translate(") === 0) uG.style.transform = "";                      // (never leave the unit in the air)
     }
   }
-  function kingBanner() {                                                            // the boss's name across the top of the stage
-    var d = document.createElement("div"); d.className = "bossname"; d.innerHTML = "<small>Boss</small>" + MONSTERS.slime_king.name; stage.appendChild(d);
+  function kingBanner(title, sub) {                                                  // a line across the top of the stage: the boss's name (BOSS / SLIME KING) or 'Treasure unlocked'
+    var d = document.createElement("div"); d.className = "bossname"; d.innerHTML = "<small>" + (sub || "Boss") + "</small>" + (title || MONSTERS.slime_king.name); stage.appendChild(d);
     d.animate([{ opacity: 0, transform: "translateY(-14px) scale(1.08)", letterSpacing: ".5em" }, { opacity: 1, transform: "none", letterSpacing: ".3em", offset: 0.2 }, { opacity: 1, transform: "none", offset: 0.78 }, { opacity: 0, transform: "none" }], { duration: 3000 / speed, easing: "ease-out" }).finished.then(function () { d.remove(); }, function () { d.remove(); });
   }
   async function kingEntrance() {                                                    // picked from the monster select: he drops in from above, lands with a shake, a shockwave and the name
@@ -7808,6 +7811,127 @@
     if (my !== run || !monEl) return;
     var u = uW.offsetWidth, rr = rectIn(monEl), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512, t0 = performance.now();
     kingShockwave(t0, lx, lgy, u * kingK() * 0.7); shake(12, 520); kingBanner();
+  }
+  // ---------------------------------------------------------------- the SLIME KING's TREASURE and his DEATH FLOURISH (2026-11-11, the user: "death flourish: a slow-motion, golden finish when he falls, leading into the treasure pile")
+  // The treasure pile is a PROP of the boss stage: it sits behind him (a little left of his middle, 1.25 of his width) on the monster-effect canvas that is behind the characters, drawn from the picture
+  // fbTex.treasure_pile (Animations/SlimeKing/treasure_pile, cut by cut_treasure.py into source/assets/fx/treasure_pile.png) or, until that picture exists, from a STAND-IN painted by code (kingPileTex: a gold-coin mound with
+  // gems and bars). It glimmers (stars twinkle on it) and stays where he stood after he falls. His DEATH: the last blow holds for 150 ms, then a gold-white flash and the edges close in, motes of gold burst out of him
+  // and drift up, and the death pack plays in SLOW MOTION (KDEATH_HOLDS, 2.2 times the normal holds); when the crown tumbles a star glints on it; as the puddle forms the pile's glow rises; when he is a puddle COINS RAIN
+  // down and bounce on the ground, a soft pillar of light rises from the pile and TREASURE UNLOCKED crosses the stage; the glow relaxes after 6 seconds.
+  var KT = { home: null, glow: 0.28, glowTarget: 0.28, relaxAt: 0, tex: null, on: true }, KDEATH_HOLDS = [2.2, 2.8, 3, 3, 3.4, 5];
+  function kingPileTex() {                                                           // the painted pile when its picture exists, else a stand-in painted by code
+    var im = fbTex.treasure_pile;
+    if (im && im.complete && im.naturalWidth) return im;
+    if (KT.tex) return KT.tex;
+    var c = document.createElement("canvas"), W = 480, H = 200, x = c.getContext("2d"), rnd = rngOf(77), i, t, top, px, py, r, g, items = [];
+    c.width = W; c.height = H;
+    function prof(px2) { var tt = (px2 - 8) / (W - 16); return H - 10 - (H * 0.86) * Math.pow(Math.max(0, Math.sin(Math.PI * tt)), 0.85); }
+    g = x.createLinearGradient(0, H * 0.1, 0, H); g.addColorStop(0, "#f0c448"); g.addColorStop(1, "#8a5a14");
+    x.fillStyle = g; x.beginPath(); x.moveTo(8, H - 8);
+    for (px = 8; px <= W - 8; px += 8) x.lineTo(px, prof(px));
+    x.lineTo(W - 8, H - 8); x.closePath(); x.fill(); x.strokeStyle = "#5a3a0a"; x.lineWidth = 3; x.stroke();
+    for (i = 0; i < 300; i++) { px = 14 + rnd() * (W - 28); top = prof(px); py = top + 4 + rnd() * Math.max(2, H - top - 14); items.push({ k: rnd() < 0.09 ? "gem" : rnd() < 0.05 ? "bar" : "coin", x: px, y: py, r: 9 + rnd() * 8, c: Math.floor(rnd() * 4), rot: (rnd() - 0.5) * 0.7 }); }
+    items.sort(function (a, b) { return a.y - b.y; });
+    items.forEach(function (it) {
+      x.save(); x.translate(it.x, it.y); x.rotate(it.rot);
+      if (it.k === "coin") {
+        x.fillStyle = "#c98a1a"; x.beginPath(); x.ellipse(0, 2, it.r, it.r * 0.58, 0, 0, 6.2832); x.fill();
+        r = x.createRadialGradient(-it.r * 0.3, -it.r * 0.2, 1, 0, 0, it.r); r.addColorStop(0, "#fff2a8"); r.addColorStop(0.55, "#ffd24a"); r.addColorStop(1, "#d9962a");
+        x.fillStyle = r; x.beginPath(); x.ellipse(0, 0, it.r, it.r * 0.58, 0, 0, 6.2832); x.fill(); x.strokeStyle = "#7a4c0c"; x.lineWidth = 1.6; x.stroke();
+        x.strokeStyle = "rgba(255,248,200,0.8)"; x.lineWidth = 1.4; x.beginPath(); x.ellipse(0, 0, it.r * 0.62, it.r * 0.34, 0, 0.2, 2.6); x.stroke();
+      } else if (it.k === "bar") {
+        x.fillStyle = "#e4b232"; x.strokeStyle = "#7a4c0c"; x.lineWidth = 1.8; x.fillRect(-it.r * 1.1, -it.r * 0.5, it.r * 2.2, it.r); x.strokeRect(-it.r * 1.1, -it.r * 0.5, it.r * 2.2, it.r);
+        x.fillStyle = "rgba(255,244,190,0.7)"; x.fillRect(-it.r * 1.0, -it.r * 0.42, it.r * 2.0, it.r * 0.2);
+      } else {
+        var col = ["#d8323a", "#3a6ee0", "#2fbf6a", "#a455e0"][it.c];
+        x.fillStyle = col; x.strokeStyle = "#2a1408"; x.lineWidth = 1.6; x.beginPath(); x.moveTo(0, -it.r * 0.8); x.lineTo(it.r * 0.7, -it.r * 0.1); x.lineTo(0, it.r * 0.8); x.lineTo(-it.r * 0.7, -it.r * 0.1); x.closePath(); x.fill(); x.stroke();
+        x.fillStyle = "rgba(255,255,255,0.75)"; x.beginPath(); x.moveTo(-it.r * 0.2, -it.r * 0.5); x.lineTo(it.r * 0.05, -it.r * 0.1); x.lineTo(-it.r * 0.3, -it.r * 0.1); x.closePath(); x.fill();
+      }
+      x.restore();
+    });
+    KT.tex = c;
+    return c;
+  }
+  var KT_SPARK = [[0.12, 0.62, 0.5], [0.2, 0.42, 1.7], [0.82, 0.5, 2.9], [0.9, 0.7, 4.1], [0.74, 0.3, 5.3], [0.3, 0.78, 6.2], [0.62, 0.22, 7.7]];   // twinkling places on the pile (across, down, phase)
+  function kingPileBox() {                                                           // where the pile is: a box on the stage, behind and a little left of where he stands
+    var h = KT.home; if (!h) return null;
+    var tex = kingPileTex(), w = h.s * 1.25, ph = w * (tex.naturalHeight || tex.height) / (tex.naturalWidth || tex.width);   // (the picture's own shape; the stand-in is 480 x 200)
+    return { x: h.x - h.s * 0.05, gy: h.gy + h.s * 0.015, w: w, h: ph };
+  }
+  function kingTreasureDraw(cb, cf, now, dt, op) {                                   // called by the aura loop: the pile behind him, its glow and its glimmer
+    if (!KT.on) return;
+    if (monPose === "idle" && uG.style.transform === "" && op > 0.9) { var body = kingPt(256, 330); KT.home = { x: body.x, gy: kingPt(256, 470).y, s: body.w }; }   // (his standing place: not while he leaps or rides in)
+    var b = kingPileBox(); if (!b) return;
+    if (KT.relaxAt && now > KT.relaxAt) { KT.glowTarget = 0.28; KT.relaxAt = 0; }
+    KT.glow += (KT.glowTarget - KT.glow) * Math.min(1, dt / 500);
+    var tex = kingPileTex(), i, sp, a;
+    glowDot(cb, b.x, b.gy - b.h * 0.6, b.w * 0.62, "255,214,110", 0.2 * KT.glow);
+    cb.save(); cb.drawImage(tex, b.x - b.w / 2, b.gy - b.h, b.w, b.h); cb.restore();
+    for (i = 0; i < KT_SPARK.length; i++) {
+      sp = KT_SPARK[i]; a = Math.sin(now * 0.0021 * (0.6 + i * 0.11) + sp[2]);
+      if (a > 0.8) starGlint(cf, b.x - b.w / 2 + sp[0] * b.w, b.gy - b.h + sp[1] * b.h, b.w * 0.032 * (0.6 + KT.glow), (a - 0.8) / 0.2 * (0.4 + 0.6 * KT.glow));
+    }
+  }
+  function kingStarFx(x, y, k) {                                                     // a bright star at (x, y) for a moment
+    var t0 = performance.now(), w = (KT.home ? KT.home.s : 276);
+    fxAdd({ t0: t0, t1: t0 + 700 / speed, draw: function (ctx, now) { var f = clamp01((now - t0) * speed / 650); starGlint(ctx, x, y, w * 0.07 * k * (0.5 + Math.sin(f * 3.1416)), Math.sin(f * 3.1416)); } });
+  }
+  function kingDeathStart() {                                                        // the last blow holds for a beat, then: a flash, the edges close in, gold motes burst out of him
+    var my = run;
+    return sleep(150 / speed).then(function () {
+      if (my !== run || !monEl) return;
+      var tN = performance.now(), body = kingPt(256, 330), rnd = rngOf(tN | 0), ps = [], i, a, v;
+      for (i = 0; i < 56; i++) { a = rnd() * 6.2832; v = (0.0002 + rnd() * 0.0006) * body.w; ps.push({ vx: Math.cos(a) * v, vy: Math.sin(a) * v - 0.0002 * body.w, size: body.w * (0.006 + rnd() * 0.01), life: 1800 + rnd() * 1400, big: rnd() < 0.12 }); }
+      kingVignette(tN, tN + 500 / speed, tN + 2400 / speed, tN + 3600 / speed, 0.6); shake(12, 500);
+      fxAdd({ t0: tN, t1: tN + 3600 / speed, draw: function (ctx, now) {
+        var t = (now - tN) * speed, j, p, f, px, py;
+        if (t < 380) { flashAll(ctx, "255,240,200", 0.42 * (1 - t / 380)); glowDot(ctx, body.x, body.y, body.w * (0.4 + 0.9 * t / 380), "255,214,110", 0.6 * (1 - t / 380)); }
+        for (j = 0; j < ps.length; j++) {
+          p = ps[j]; if (t > p.life) continue; f = t / p.life;
+          px = body.x + p.vx * t * (1 - 0.45 * f); py = body.y - body.w * 0.05 + p.vy * t * (1 - 0.45 * f) - 0.00007 * body.w * t * f;
+          glowDot(ctx, px, py, p.size * 2.6, "255,224,130", 0.8 * Math.sin(f * 3.1416));
+          if (p.big) starGlint(ctx, px, py, p.size * 4, 0.8 * Math.sin(f * 3.1416));
+        }
+      } });
+    });
+  }
+  function kingDeathBeat(i) {                                                        // the beats of the death pack (frame index 0 to 5): the crown tumbles (2), the puddle forms (4, 5)
+    if (i === 2) { var cp = kingPt(KING_CROWN[0], KING_CROWN[1]); kingStarFx(cp.x, cp.y, 1.5); }
+    if (i === 4) { KT.glowTarget = 0.7; }
+    if (i === 5) kingTreasureReveal();
+  }
+  function kingCoinShower(tS, ms) {                                                  // coins rain from the top of the stage, spin, bounce on the ground and fade
+    var rnd = rngOf(tS | 0), W = stage.clientWidth, H = stage.clientHeight, b = kingPileBox(), gyW = b ? b.gy : H * 0.9, coins = [], i, n = 44;
+    for (i = 0; i < n; i++) coins.push({ x: W * (0.28 + 0.68 * rnd()), t0: rnd() * ms * 0.8, fall: 750 + rnd() * 450, r: 6 + rnd() * 5, spin: 0.008 + rnd() * 0.012, ph: rnd() * 6.28, gy: gyW + (rnd() - 0.5) * H * 0.05 });
+    fxAdd({ t0: tS, t1: tS + (ms + 2200) / speed, draw: function (ctx, now) {
+      var t = (now - tS) * speed, j, c, tl, y, bn, al, rx;
+      for (j = 0; j < coins.length; j++) {
+        c = coins[j]; tl = t - c.t0; if (tl < 0 || tl > c.fall + 1000) continue;
+        if (tl < c.fall) { y = -20 + (c.gy + 20) * Math.pow(tl / c.fall, 1.8); al = 1; }
+        else { bn = (tl - c.fall) / 1000; y = c.gy - Math.abs(Math.sin(bn * 3.1416 * 1.7)) * 26 * (1 - bn); al = 1 - clamp01((bn - 0.65) / 0.35); }
+        rx = c.r * Math.abs(Math.cos(c.ph + tl * c.spin)) + 1;
+        glowDot(ctx, c.x, y, c.r * 2.6, "255,210,90", 0.28 * al);
+        ctx.save(); ctx.globalAlpha = al; ctx.fillStyle = "#ffd24a"; ctx.strokeStyle = "#8a5a10"; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.ellipse(c.x, y, rx, c.r, 0, 0, 6.2832); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "rgba(255,246,190,0.85)"; ctx.beginPath(); ctx.ellipse(c.x - rx * 0.25, y - c.r * 0.3, rx * 0.35, c.r * 0.25, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+      }
+    } });
+  }
+  function kingPillar(tS, ms) {                                                      // a soft pillar of light rises from the pile, with motes climbing it
+    var b = kingPileBox(); if (!b) return;
+    var rnd = rngOf(tS | 0), sp = [], i;
+    for (i = 0; i < 18; i++) sp.push({ dx: (rnd() - 0.5) * b.w * 0.5, ph: rnd(), sp: 0.4 + rnd() * 0.6, s: 0.01 + rnd() * 0.01 });
+    fxAdd({ t0: tS, t1: tS + ms / speed, draw: function (ctx, now) {
+      var t = clamp01((now - tS) * speed / ms), a = Math.sin(Math.min(1, t * 1.8) * 1.5708) * (1 - clamp01((t - 0.55) / 0.45)), w = b.w * (0.2 + 0.1 * t), top = b.gy - b.h * 0.7, g = ctx.createLinearGradient(b.x - w, 0, b.x + w, 0), j, rk;
+      if (a <= 0.01) return;
+      g.addColorStop(0, "rgba(255,210,100,0)"); g.addColorStop(0.5, "rgba(255,244,200," + (0.5 * a).toFixed(3) + ")"); g.addColorStop(1, "rgba(255,210,100,0)");
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = g; ctx.fillRect(b.x - w, 0, w * 2, top); ctx.restore();
+      glowDot(ctx, b.x, top, b.w * 0.5, "255,214,110", 0.5 * a);
+      for (j = 0; j < sp.length; j++) { rk = (now * 0.0004 * speed * sp[j].sp + sp[j].ph) % 1; glowDot(ctx, b.x + sp[j].dx * (1 - rk * 0.6), top - rk * top * 0.95, b.w * sp[j].s * 1.6, "255,236,170", 0.8 * Math.sin(rk * 3.1416) * a); }
+    } });
+  }
+  function kingTreasureReveal() {                                                    // he is a puddle: the treasure is unlocked (coins, the pillar of light, the banner)
+    var t = performance.now(); KT.glowTarget = 1; KT.relaxAt = t + 6000 / speed;
+    kingCoinShower(t, 2200); kingPillar(t, 2600); shake(8, 400); kingBanner("Treasure unlocked", "Slime King defeated");
   }
   // ---------------------------------------------------------------- the Elite slime's Earthbreaker (2026-11-10)
   // The Elite's fourth skill, a ground skill, physical (the sheet: Animations/EliteSlime/earthbreaker, the user's Gemini sheet, 6 frames at 12 fps, the slot `eruption`; the hit frame is 4; the stone arms the generator grew in
