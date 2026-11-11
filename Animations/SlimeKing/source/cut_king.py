@@ -38,6 +38,14 @@ JOBS = {
     # drawn at liftMul 0.5 here (a heavy King hops, it does not leap); the first and the last panels (grimaces, not the idle's smile) are replaced by the idle's rest frame
     "dodge": dict(file="slime_king_dodge_sheet.jpg", folder="dodge", rows=[3, 3], fps=12, name="dodge", scale=0.585, order=["idle", 1, 2, 3, 4, "idle"], airborne=[3], liftMul=0.5, drop=True, prep="dodge_prep",
                   extra={"evadeFrame": 4, "smooth": True, "xUnit": "character-widths", "x": [0, -0.02, -0.06, -0.1, -0.06, -0.02], "y": [0, 0, 0, 0, 0, 0]}),
+    # THE SKILL SHEETS (2026-11-11, the user's ChatGPT sheets; the scales sit between the rigid parts' reading (the crown and the staff against the idle strip's) and the base's reading, as for the hit; the generator's first and
+    # last panels (a narrowed smirk, not the idle's half-lidded smile) are replaced by the idle's rest frame). staffTip = the staff's top per frame (the crystal's tip, where the page starts a bolt).
+    "radiant_ooze": dict(file="slime_king_radiant_ooze.png", folder="radiant_ooze", rows=[4, 4], fps=12, name="radiant_ooze", scale=1.23, order=["idle", 1, 2, 3, 4, 5, 6, "idle"],
+                         extra={"holds": [1, 1, 1.4, 1.4, 1.1, 1, 1, 1], "releaseFrame": 5}),
+    "royal_decree": dict(file="slime_king_royal_decree.png", folder="royal_decree", rows=[3, 3], fps=12, name="royal_decree", scale=1.26, order=["idle", 1, 2, 3, 4, "idle"], extra={"castFrame": 4}),
+    "staff_raise": dict(file="slime_kind_staff_raise_chatpgt.png", folder="staff_raise", rows=[4, 4], fps=12, name="staff_raise", scale=1.30, order=["idle", 1, 2, 3, 4, 5, 6, "idle"], drop=True,
+                        extra={"holdFrames": [4, 5], "commandFrame": 6}),
+    "heal": dict(file="slime_king_heal_sheet.jpg", folder="heal", rows=[3, 3], fps=10, name="heal", scale=0.485, order=["idle", 1, 2, 3, 4, "idle"], extra={"holdFrames": [4, 5]}),
 }
 
 
@@ -48,13 +56,15 @@ def fit_pieces(q, sc, ox, oy):
     for i in range(1, n + 1):
         ys_, xs_ = np.where(lab == i)
         ext[i] = (ox + xs_.min() * sc, ox + (xs_.max() + 1) * sc, oy + ys_.min() * sc, oy + (ys_.max() + 1) * sc)
-    bad = [i for i, e in ext.items() if e[1] > FRAME - 3 or e[3] > FRAME - 3 or e[0] < 3]
+    bad = [i for i, e in ext.items() if e[1] > FRAME - 3 or e[3] > FRAME - 3 or e[0] < 3 or e[2] < 3]
     if not bad: return None
     dist = ndi.distance_transform_edt(~np.isin(lab, bad))
     group = [i for i in ext if i in bad or dist[lab == i].min() < 40]
     gx1 = max(ext[i][1] for i in group); gy1 = max(ext[i][3] for i in group); gx0 = min(ext[i][0] for i in group)
     dx = -int(np.ceil(max(0, gx1 - (FRAME - 3)))); dy = -int(np.ceil(max(0, gy1 - (FRAME - 3))))
     if gx0 + dx < 3: dx = int(np.ceil(3 - gx0))
+    gy0 = min(ext[i][2] for i in group)
+    if gy0 + dy < 3: dy = int(np.ceil(3 - gy0))                                           # (a raised staff whose crystal would leave the cell at the top: the group moves down)
     gm = ndi.binary_dilation(np.isin(lab, group), iterations=4) & (pa[..., 3] > 0) & ~q["main"]
     rest = pa.copy(); rest[..., 3] = np.where(gm, 0, pa[..., 3]); grp = pa.copy(); grp[..., 3] = np.where(gm, pa[..., 3], 0)
     qr = dict(q); qr["p"] = rest; fr, c0 = ep.place(qr, sc, ox, oy)
@@ -85,12 +95,13 @@ def cut(name):
     print("== %s | opening factor %.3f | base widths (opened) %s | scale %.3f%s" % (name, c, [int(b) for b in bws], sc, "" if "scale" not in j else " (explicit)"))
     print("  strip | sheet | x range | y range | lift | clipped px")
     idle1 = Image.open(IDLE).convert("RGBA").crop((0, 0, FRAME, FRAME))
-    out = Image.new("RGBA", (FRAME * N, FRAME), (0, 0, 0, 0)); info = []
+    out = Image.new("RGBA", (FRAME * N, FRAME), (0, 0, 0, 0)); info = []; tips = []
+    ia = np.array(idle1)[..., 3] > 128; iy, ix = np.where(ia & (np.arange(FRAME)[None, :] > 430)); idle_tip = [int(ix[np.argmin(iy)]), int(iy.min())]   # the idle's staff top: the topmost opaque pixel right of x 430
     for k, s in enumerate(order):
         if s == "idle":
             fr = idle1.copy(); a = np.array(fr)[..., 3] > 128; ys, xs = np.where(a)
             out.alpha_composite(fr, (FRAME * k, 0))
-            info.append({"top": int(ys.min()), "bottom": int(ys.max()), "replacedByIdleRest": True})
+            info.append({"top": int(ys.min()), "bottom": int(ys.max()), "replacedByIdleRest": True}); tips.append(idle_tip)
             print("  %d | idle rest | x %3d..%3d | y %3d..%3d" % (k + 1, xs.min(), xs.max(), ys.min(), ys.max())); continue
         q = P[s]; wx0, wy0 = q["origin"]
         lift = (floor[q["row"]] - (wy0 + q["low_open"])) * sc * lmul if s in air else 0.0
@@ -106,13 +117,18 @@ def cut(name):
             if moved:
                 fr = moved["frame"]; clipped = moved["clipped"]
         a = np.array(fr)[..., 3] > 128; ys, xs = np.where(a)
+        fy, fx = np.where(q["fist"])                                                        # the staff's top (the crystal's tip): the topmost pixel of the detached glove-and-staff piece, in the cell
+        if not len(fy):                                                                     # (the staff touches the body in this panel: the topmost pixel right of the body's middle + 35% of its base)
+            fy, fx = np.where((q["p"][..., 3] > 128) & (np.arange(q["p"].shape[1])[None, :] > q["mid_open"] + 0.35 * q["bw_open"]))
+        jt = int(np.argmin(fy)) if len(fy) else None
+        tips.append([int(round(ox + (moved["dx"] if moved else 0) + fx[jt] * sc)), int(round(oy + (moved["dy"] if moved else 0) + fy[jt] * sc))] if jt is not None else None)
         out.alpha_composite(fr, (FRAME * k, 0))
         info.append({"sheetPanel": s + 1, "lift": round(lift, 1), **({"slideLeft": slide} if slide else {}), "top": int(ys.min()), "bottom": int(ys.max()), "left": int(xs.min()), "right": int(xs.max()), **({"detachedPiecesMoved": {"dx": moved["dx"], "dy": moved["dy"]}} if moved else {})})
         print("  %d | %d | x %3d..%3d | y %3d..%3d | lift %5.1f | clipped %d%s%s" % (k + 1, s + 1, xs.min(), xs.max(), ys.min(), ys.max(), lift, clipped, ("  pieces moved dx %d dy %d" % (moved["dx"], moved["dy"])) if moved else "", ("  slid left %d" % slide) if slide else ""))
     stem = "king_%s_%dframe_strip" % (j["name"], N)
     if j["name"] == "idle": stem = "king_idle_strip"
     path = os.path.join(d, stem + ".png"); out.save(path)
-    pl = {"format": "frame-placement/1", "animation": j["name"], "file": stem + ".png", "frames": N, "fps": j["fps"]}; pl.update(j["extra"]); pl["frameInfo"] = info
+    pl = {"format": "frame-placement/1", "animation": j["name"], "file": stem + ".png", "frames": N, "fps": j["fps"]}; pl.update(j["extra"]); pl["staffTip"] = tips; pl["frameInfo"] = info
     json.dump(pl, open(path.replace(".png", ".placement.json"), "w"), indent=1)
     W, H = out.size; pic = Image.new("RGB", (W, H * 2), (255, 255, 255))
     for i, bg in enumerate([(255, 255, 255, 255), (38, 84, 52, 255)]):

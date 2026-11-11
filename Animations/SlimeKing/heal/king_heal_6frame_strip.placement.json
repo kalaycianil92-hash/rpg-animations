@@ -1,0 +1,81 @@
+{
+ "format": "frame-placement/1",
+ "animation": "heal",
+ "file": "king_heal_6frame_strip.png",
+ "frames": 6,
+ "fps": 10,
+ "holdFrames": [
+  4,
+  5
+ ],
+ "staffTip": [
+  [
+   449,
+   108
+  ],
+  [
+   459,
+   103
+  ],
+  [
+   458,
+   99
+  ],
+  [
+   457,
+   111
+  ],
+  [
+   459,
+   112
+  ],
+  [
+   449,
+   108
+  ]
+ ],
+ "frameInfo": [
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  },
+  {
+   "sheetPanel": 2,
+   "lift": 0.0,
+   "top": 83,
+   "bottom": 470,
+   "left": 91,
+   "right": 487
+  },
+  {
+   "sheetPanel": 3,
+   "lift": 0.0,
+   "top": 93,
+   "bottom": 469,
+   "left": 91,
+   "right": 487
+  },
+  {
+   "sheetPanel": 4,
+   "lift": 0.0,
+   "top": 100,
+   "bottom": 470,
+   "left": 92,
+   "right": 484
+  },
+  {
+   "sheetPanel": 5,
+   "lift": 0.0,
+   "top": 104,
+   "bottom": 469,
+   "left": 92,
+   "right": 486
+  },
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  }
+ ]
+}

@@ -1,0 +1,115 @@
+{
+ "format": "frame-placement/1",
+ "animation": "staff_raise",
+ "file": "king_staff_raise_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "holdFrames": [
+  4,
+  5
+ ],
+ "commandFrame": 6,
+ "staffTip": [
+  [
+   449,
+   108
+  ],
+  [
+   438,
+   88
+  ],
+  [
+   436,
+   49
+  ],
+  [
+   439,
+   3
+  ],
+  [
+   438,
+   3
+  ],
+  [
+   491,
+   121
+  ],
+  [
+   443,
+   117
+  ],
+  [
+   449,
+   108
+  ]
+ ],
+ "frameInfo": [
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  },
+  {
+   "sheetPanel": 2,
+   "lift": 0.0,
+   "top": 88,
+   "bottom": 470,
+   "left": 82,
+   "right": 477
+  },
+  {
+   "sheetPanel": 3,
+   "lift": 0.0,
+   "top": 50,
+   "bottom": 471,
+   "left": 79,
+   "right": 474
+  },
+  {
+   "sheetPanel": 4,
+   "lift": 0.0,
+   "top": 3,
+   "bottom": 471,
+   "left": 81,
+   "right": 478,
+   "detachedPiecesMoved": {
+    "dx": 0,
+    "dy": 6
+   }
+  },
+  {
+   "sheetPanel": 5,
+   "lift": 0.0,
+   "top": 3,
+   "bottom": 471,
+   "left": 80,
+   "right": 477,
+   "detachedPiecesMoved": {
+    "dx": 0,
+    "dy": 13
+   }
+  },
+  {
+   "sheetPanel": 6,
+   "lift": 0.0,
+   "slideLeft": 38,
+   "top": 103,
+   "bottom": 470,
+   "left": 57,
+   "right": 507
+  },
+  {
+   "sheetPanel": 7,
+   "lift": 0.0,
+   "top": 109,
+   "bottom": 472,
+   "left": 81,
+   "right": 481
+  },
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  }
+ ]
+}

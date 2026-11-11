@@ -1,0 +1,79 @@
+{
+ "format": "frame-placement/1",
+ "animation": "royal_decree",
+ "file": "king_royal_decree_6frame_strip.png",
+ "frames": 6,
+ "fps": 12,
+ "castFrame": 4,
+ "staffTip": [
+  [
+   449,
+   108
+  ],
+  [
+   453,
+   108
+  ],
+  [
+   472,
+   95
+  ],
+  [
+   488,
+   88
+  ],
+  [
+   458,
+   107
+  ],
+  [
+   449,
+   108
+  ]
+ ],
+ "frameInfo": [
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  },
+  {
+   "sheetPanel": 2,
+   "lift": 0.0,
+   "top": 94,
+   "bottom": 470,
+   "left": 74,
+   "right": 482
+  },
+  {
+   "sheetPanel": 3,
+   "lift": 0.0,
+   "top": 91,
+   "bottom": 470,
+   "left": 77,
+   "right": 494
+  },
+  {
+   "sheetPanel": 4,
+   "lift": 0.0,
+   "slideLeft": 5,
+   "top": 88,
+   "bottom": 470,
+   "left": 71,
+   "right": 507
+  },
+  {
+   "sheetPanel": 5,
+   "lift": 0.0,
+   "top": 92,
+   "bottom": 470,
+   "left": 75,
+   "right": 486
+  },
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  }
+ ]
+}

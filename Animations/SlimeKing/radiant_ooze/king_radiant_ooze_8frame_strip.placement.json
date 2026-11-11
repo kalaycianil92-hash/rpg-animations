@@ -1,0 +1,114 @@
+{
+ "format": "frame-placement/1",
+ "animation": "radiant_ooze",
+ "file": "king_radiant_ooze_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "holds": [
+  1,
+  1,
+  1.4,
+  1.4,
+  1.1,
+  1,
+  1,
+  1
+ ],
+ "releaseFrame": 5,
+ "staffTip": [
+  [
+   449,
+   108
+  ],
+  [
+   455,
+   86
+  ],
+  [
+   472,
+   79
+  ],
+  [
+   470,
+   84
+  ],
+  [
+   483,
+   89
+  ],
+  [
+   488,
+   98
+  ],
+  [
+   469,
+   96
+  ],
+  [
+   449,
+   108
+  ]
+ ],
+ "frameInfo": [
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  },
+  {
+   "sheetPanel": 2,
+   "lift": 0.0,
+   "top": 82,
+   "bottom": 470,
+   "left": 82,
+   "right": 487
+  },
+  {
+   "sheetPanel": 3,
+   "lift": 0.0,
+   "top": 73,
+   "bottom": 471,
+   "left": 83,
+   "right": 498
+  },
+  {
+   "sheetPanel": 4,
+   "lift": 0.0,
+   "top": 79,
+   "bottom": 470,
+   "left": 82,
+   "right": 497
+  },
+  {
+   "sheetPanel": 5,
+   "lift": 0.0,
+   "slideLeft": 2,
+   "top": 84,
+   "bottom": 471,
+   "left": 77,
+   "right": 508
+  },
+  {
+   "sheetPanel": 6,
+   "lift": 0.0,
+   "slideLeft": 9,
+   "top": 97,
+   "bottom": 470,
+   "left": 72,
+   "right": 508
+  },
+  {
+   "sheetPanel": 7,
+   "lift": 0.0,
+   "top": 91,
+   "bottom": 470,
+   "left": 79,
+   "right": 499
+  },
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  }
+ ]
+}
