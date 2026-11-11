@@ -139,6 +139,8 @@
   .num.dark { color: #f2eaff; font-size: 42px; text-shadow: 0 0 8px #9a66ff, 0 0 22px #3a1066, 0 2px 0 #000; }   /* Dark Damage (the Rogue's Umbral Shroud): pale with a violet glow on a deep violet halo */
   .num.abyss { color: #fff1f4; font-size: 58px; text-shadow: 0 0 8px #ff2a5a, 0 0 26px #7a3cff, 0 3px 0 #000; }   /* the Rogue's Abyssal Backstab: big, white-hot with a crimson and violet glow (her abyss colours) */
   .num.guard { color: #eaf4ff; font-size: 24px; letter-spacing: .08em; white-space: nowrap; text-shadow: 0 0 8px #5a9bff, 0 2px 0 #000; }   /* the Elite's Stone Guard (Defense up) */
+  .num.holy { color: #fff8dc; font-size: 42px; text-shadow: 0 0 8px #ffc24a, 0 0 20px #e89a1c, 0 2px 0 #000; }   /* the Slime King's holy damage */
+  .num.heal { color: #eaffd9; font-size: 42px; text-shadow: 0 0 8px #6be86b, 0 0 20px #2fb52f, 0 2px 0 #000; }   /* a heal (+N) */
   .num.block { color: #e2eefc; font-size: 24px; letter-spacing: .06em; white-space: nowrap; text-shadow: 0 0 8px #6aa0ff, 0 2px 0 #000; }   /* a blocked hit (BLOCK 14) */
   .num.elusive { color: #e9defd; font-size: 24px; letter-spacing: .08em; white-space: nowrap; text-shadow: 0 0 8px #8a5cff, 0 2px 0 #000; }   /* the Elusive buff */
   .num.glacier { color: #effcff; font-size: 54px; text-shadow: 0 0 8px #3fd0e0, 0 0 26px #1e6f9f, 0 3px 0 #000; }   /* the Rogue's Permafrost Execution: big, white with a glacial teal glow (her third kind of cold: not the mage's sky blue, not Winter's Kiss's periwinkle) */
@@ -237,7 +239,7 @@
     <button class="primary" id="play">Play</button>
     <button id="reset">Reset</button>
     <label class="lbl" id="charWrap" style="display:none">Character <select id="charSel"><option value="warrior">Warrior</option><option value="mage">Elf mage (idle only so far)</option><option value="rogue">Rogue (idle only so far)</option><option value="assassin">Assassin (idle only so far)</option><option value="spellblade">Spellblade (idle only so far)</option></select></label>
-    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime</option><option value="elite_slime">Elite slime (idle only so far)</option><option value="slime_king">Slime King (idle, hit, death, dodge so far)</option></select></label>
+    <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime</option><option value="elite_slime">Elite slime (idle only so far)</option><option value="slime_king">Slime King (all skills)</option></select></label>
     <label class="lbl" id="monSizeWrap" style="display:none">Monster size <input type="range" id="monSize" min="40" max="260" step="5" value="100" style="width:90px;vertical-align:middle"> <span id="monSizeV">100%</span></label>
     <label class="lbl" id="monSqWrap" style="display:none">Squash and stretch <input type="range" id="monSq" min="0" max="100" step="5" value="50" style="width:90px;vertical-align:middle"> <span id="monSqV">50%</span></label>
     <label class="lbl" id="monFxWrap" style="display:none"><span id="monFxName">Fire</span> effects <input type="range" id="monFx" min="0" max="150" step="5" value="80" style="width:90px;vertical-align:middle"> <span id="monFxV">80%</span></label>
@@ -271,9 +273,9 @@
       <button id="runPreview">Preview run (loops)</button>
       <button id="stopPrev">Stop</button>
       <label id="spitWrap" style="display:none"><input type="checkbox" id="spitBurn"> The monster's spit and slam always inflict their status, Burn or Chilled (otherwise 25% and 50% of the time; Cinder Burst detonates the burns instead)</label>
-      <label id="monAtkWrap" style="display:none">Monster's attack <select id="monAtk"><option value="alt">Alternate all five attacks</option><option value="spit">Ember Spit</option><option value="slam">Magma Slam</option><option value="cinder">Cinder Burst</option><option value="eruption">Magma Eruption</option><option value="bounce">Inferno Bounce</option></select></label>
+      <label id="monAtkWrap" style="display:none">Monster's attack <select id="monAtk"><option value="alt">Alternate all five attacks</option><option value="spit">Ember Spit</option><option value="slam">Magma Slam</option><option value="cinder">Cinder Burst</option><option value="eruption">Magma Eruption</option><option value="bounce">Inferno Bounce</option><option value="decree">Royal Decree</option><option value="heal">Royal Restoration</option><option value="wrath">Kingdom's Wrath</option><option value="judgment">Absolute Judgment</option></select></label>
       <div id="monPrevRow" style="display:none; flex-wrap:wrap; gap:8px; align-items:center; color:var(--dim); font-size:13px">Monster animations:
-        <button id="monSpitPrev">Ember Spit (loops)</button> <button id="monPrevBounce">Inferno Bounce (loops)</button> <button id="monPrevEruption">Magma Eruption (loops)</button> <button id="monPrevCinder">Cinder Burst (loops)</button> <button id="monPrevSlam">Magma Slam (loops)</button> <button id="monPrevHit">Hit (loops)</button> <button id="monPrevDeath">Death (loops)</button> <button id="monPrevDodge">Dodge (loops)</button> <button id="monPrevBlock">Block (loops)</button></div>
+        <button id="monSpitPrev">Ember Spit (loops)</button> <button id="monPrevBounce">Inferno Bounce (loops)</button> <button id="monPrevEruption">Magma Eruption (loops)</button> <button id="monPrevCinder">Cinder Burst (loops)</button> <button id="monPrevSlam">Magma Slam (loops)</button> <button id="monPrevHit">Hit (loops)</button> <button id="monPrevDeath">Death (loops)</button> <button id="monPrevDodge">Dodge (loops)</button> <button id="monPrevBlock">Block (loops)</button> <button id="monPrevDecree" style="display:none">Royal Decree (loops)</button> <button id="monPrevWrath" style="display:none">Kingdom's Wrath (loops)</button> <button id="monPrevJudg" style="display:none">Absolute Judgment (loops)</button> <button id="monPrevHeal" style="display:none">Royal Restoration (loops)</button></div>
       <label>Fighters' distance from the stage edge <input type="range" id="edge" min="0" max="20" value="3" style="width:110px"> <span id="edgeV">3%</span></label>
       <span class="pathmsg" id="pathMsg"></span>
     </div>
@@ -5391,8 +5393,14 @@
     MONSTERS.elite_slime.block = { pack: "guard", order: [1, 2, 3, 4, 2, 5], holds: [0.9, 0.9, 1.3, 2.4, 0.9, 1.1], fps: 14, idx: 2, r: 0.36 };   // (r: the glass's radius as a share of its cell: the Elite is low and wide) its Block has no strip of its own: the Stone Guard's frames (the shield floats up in front of the face; the block frame is the face frame, 3rd played)
     // the Slime King's packs (Animations/SlimeKing/<folder>, 2026-11-11): the hit (6 frames: the first two slide the whole frame back, a recoil, because the generator flung the glove and staff out sideways; a grimace, the smile returns, the idle's rest frame last),
     // the death (6 frames: it melts into an ivory puddle, the crown slips off and ends at its rim, the glove lets go and the staff lies on the floor) and the dodge (6 frames: a slow hop, the evade frame is 4, the top of the hop). No attack pack yet: the plain lunge.
-    var DEFK = { hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 12, holds: null } };
+    var DEFK = { hit: { n: 6, fps: 12, holds: null }, death: { n: 6, fps: 8, holds: [1, 1.2, 1.3, 1.3, 1.5, 3] }, dodge: { n: 6, fps: 12, holds: null },
+                 attack: { n: 8, fps: 12, holds: [1, 1, 1.4, 1.4, 1.1, 1, 1, 1] },   // attack = Radiant Ooze (the spit: the release is frame 5, the mouth marks in the strip's mouth.json)
+                 decree: { n: 6, fps: 12, holds: [1, 1, 1.2, 1.6, 1, 1] },           // decree = Royal Decree (the staff points, the cast is frame 4, the crystal's place per frame in the placement's staffTip)
+                 raise: { n: 8, fps: 12, holds: null },                               // raise = the staff raised for Kingdom's Wrath and Absolute Judgment (raiseAct gives the holds: frames 4 and 5 are held while the sky answers)
+                 bounce: { n: 8, fps: 12, holds: null },                              // bounce = Crown Slam (the Rockfall Drop's eight beats, the crash is frame 5: dropAct)
+                 heal: { n: 6, fps: 10, holds: null } };                              // heal = Royal Restoration (healAct gives the holds)
     MONSTERS.slime_king.packs = build(KING_ANIMS, DEFK);
+    MONSTERS.slime_king.attackPack = MONSTERS.slime_king.packs.attack; MONSTERS.slime_king.king = true; MONSTERS.slime_king.dropDmg = 1.6; MONSTERS.slime_king.dropDmg2 = 0.3; MONSTERS.slime_king.dropName = "Crown Slam";
   })();
   var GOBLIN_PH = '<div class="ph goblin" style="--c:#8bcf5e"><div class="head"></div><div class="torso"></div><div class="tag">GOBLIN</div></div>';
   var MON = { seq: 0, deathP: null };                                                // seq: which attack/hit/death/dodge pack is current (a new one replaces the one before); deathP: the promise of the death pack once it has started
@@ -5437,13 +5445,15 @@
     $("monSqWrap").style.display = idle && m.squash ? "" : "none";
     $("spitWrap").style.display = idle && m.attackPack && !m.melee ? "" : "none";
     $("monPrevRow").style.display = idle && m.packs ? "flex" : "none";
-    [["monSpitPrev", "attack"], ["monPrevHit", "hit"], ["monPrevDeath", "death"], ["monPrevDodge", "dodge"], ["monPrevSlam", "slam"], ["monPrevCinder", "attack"], ["monPrevEruption", "eruption"], ["monPrevBounce", "bounce"], ["monPrevBlock", "block"]].forEach(function (b) {
-      $(b[0]).style.display = m.packs && (b[0] === "monPrevBlock" ? m.block && m.packs[m.block.pack] : m.packs[b[1]]) && (!b[2] || m.vfx === b[2]) && (!m.melee || b[0] !== "monPrevCinder" || m.packs.guard) ? "" : "none";   // (the Elite's 'Cinder Burst' button is its Stone Guard, shown once its sheet is there)
+    [["monSpitPrev", "attack"], ["monPrevHit", "hit"], ["monPrevDeath", "death"], ["monPrevDodge", "dodge"], ["monPrevSlam", "slam"], ["monPrevCinder", "attack"], ["monPrevEruption", "eruption"], ["monPrevBounce", "bounce"], ["monPrevBlock", "block"], ["monPrevDecree", "decree"], ["monPrevWrath", "raise"], ["monPrevJudg", "raise"], ["monPrevHeal", "heal"]].forEach(function (b) {
+      $(b[0]).style.display = m.packs && (b[0] === "monPrevBlock" ? m.block && m.packs[m.block.pack] : m.packs[b[1]]) && (!b[2] || m.vfx === b[2]) && (!m.melee || b[0] !== "monPrevCinder" || m.packs.guard) && !(m.king && b[0] === "monPrevCinder") ? "" : "none";   // (the Elite's 'Cinder Burst' button is its Stone Guard, shown once its sheet is there)
     });
-    var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = m.melee ? { alt: "Alternate all five attacks", spit: "Sword Slash", slam: "Granite Ram", cinder: "Stone Guard", eruption: "Earthbreaker", bounce: "Rockfall Drop" } : DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
-    Array.prototype.forEach.call($("monAtk").options, function (o) { if (NAMES[o.value]) o.textContent = NAMES[o.value]; });
+    var ICE = m.vfx === "ice", LT = m.vfx === "lightning", DK = m.vfx === "dark", NAMES = m.king ? { alt: "Alternate the skills", spit: "Radiant Ooze", decree: "Royal Decree", slam: "Crown Slam", heal: "Royal Restoration", wrath: "Kingdom's Wrath", judgment: "Absolute Judgment" } : m.melee ? { alt: "Alternate all five attacks", spit: "Sword Slash", slam: "Granite Ram", cinder: "Stone Guard", eruption: "Earthbreaker", bounce: "Rockfall Drop" } : DK ? { alt: "Alternate all five attacks", spit: "Gloom Spit", slam: "Umbral Slam", cinder: "Void Bolt", eruption: "Abyssal Eruption", bounce: "Nightfall Bounce" } : LT ? { alt: "Alternate all five attacks", spit: "Spark Spit", slam: "Thunder Slam", cinder: "Chain Bolt", eruption: "Voltaic Eruption", bounce: "Skybolt Bounce" } : ICE ? { alt: "Alternate all five attacks", spit: "Frost Spit", slam: "Glacier Slam", cinder: "Glacial Lance", eruption: "Permafrost Eruption", bounce: "Blizzard Bounce" } : { alt: "Alternate all five attacks", spit: "Ember Spit", slam: "Magma Slam", cinder: "Cinder Burst", eruption: "Magma Eruption", bounce: "Inferno Bounce" };
+    Array.prototype.forEach.call($("monAtk").options, function (o) { if (NAMES[o.value]) o.textContent = NAMES[o.value]; o.hidden = o.disabled = !NAMES[o.value]; });   // (an option the monster has no skill for is hidden)
+    $("monAtk").value = "alt";
     $("monSpitPrev").textContent = NAMES.spit + " (loops)"; $("monPrevSlam").textContent = NAMES.slam + " (loops)"; $("monPrevCinder").textContent = NAMES.cinder + " (loops)"; $("monPrevEruption").textContent = NAMES.eruption + " (loops)"; $("monPrevBounce").textContent = NAMES.bounce + " (loops)";
-    $("monAtkWrap").style.display = idle && m.packs && m.packs.slam ? "" : "none";
+    if (m.king) { $("monSpitPrev").textContent = "Radiant Ooze (loops)"; $("monPrevBounce").textContent = "Crown Slam (loops)"; }
+    $("monAtkWrap").style.display = idle && m.packs && (m.packs.slam || m.king) ? "" : "none";
     monEl = null; monFrame = 0;
     $("monFxWrap").style.display = idle && m.vfx ? "" : "none";
     if (idle && m.vfx) { var fxv = monFxShare(key); $("monFx").value = fxv; $("monFxV").textContent = fxv + "%"; $("monFxName").textContent = m.vfx === "ice" ? "Ice" : m.vfx === "lightning" ? "Lightning" : m.vfx === "dark" ? "Dark" : "Fire"; }
@@ -6066,6 +6076,7 @@
   }
   function monFxBurst(mp) {                                                          // the slime's fire flares and throws embers toward the target (the spit's release)
     var r = rectIn(uG), s = r.width * (+uG.style.getPropertyValue("--ms") || 1), rnd = MFX.rnd, x = mp ? mp.x : r.left + r.width * 0.4, y = mp ? mp.y : r.top + r.height * 0.6, n;
+    if (MONSTERS[monKey] && MONSTERS[monKey].king) return;                                  // (the King has no aura to flare)
     MFX.flare = 1;
     if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning") { lightBurst(s, x, y + 0.25 * s, rnd); return; }
     if (MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark") { darkBurst(s, x, y + 0.25 * s, rnd); return; }
@@ -6079,7 +6090,7 @@
   function spitChargeDraw(ctx, now, L, F, u) {
     var c = clamp01((now - L.t0) / Math.max(1, L.tRel - L.t0)), rel = now > L.tRel ? clamp01((now - L.tRel) * speed / 200) : 0, dt = L.last ? Math.min(60, now - L.last) * speed : 0, rnd = L.rnd, n, k = 1 - rel;
     L.last = now;
-    var mp = monMouth(Math.max(4, Math.min(6, monFrame + 1)));
+    var mp = L.mouthFn ? L.mouthFn() : monMouth(Math.max(4, Math.min(6, monFrame + 1)));
     if (!mp) return;
     var fl = 0.88 + 0.12 * Math.sin(now * 0.045) + (rnd() - 0.5) * 0.1, mz = F.mul || 1, ga = F.ga || 1;      // mz: the Cinder Burst's charge glow is bigger than the Ember Spit's
     glowDot(ctx, mp.x, mp.y, u * (0.06 + 0.08 * c) * fl * mz, F.pal.glow, (0.2 + 0.4 * c) * k * ga);
@@ -6097,10 +6108,10 @@
     fbParticles(ctx, L.ps, dt, F, u);
   }
   async function spitAct(e, myRun, A, T) {
-    var dark = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "dark"), elec = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "lightning"), ice = !!(MONSTERS[monKey] && MONSTERS[monKey].vfx === "ice"), cin = !!e.cinder, pk = monSpitPack(), F = cin && dark ? darkChainParams() : dark ? darkSpitParams() : cin && elec ? lightChainParams() : cin ? (ice ? lanceSpitParams() : cinderParams()) : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, i, starts = [], tot = 0, pv = !!e.preview;
+    var vf = e.elem || (MONSTERS[monKey] && MONSTERS[monKey].vfx), holy = vf === "holy", dark = vf === "dark", elec = vf === "lightning", ice = vf === "ice", cin = !!e.cinder, pk = e.pack || monSpitPack(), REL = e.rel || SPIT_REL, F = holy ? holySpitParams() : cin && dark ? darkChainParams() : dark ? darkSpitParams() : cin && elec ? lightChainParams() : cin ? (ice ? lanceSpitParams() : cinderParams()) : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, i, starts = [], tot = 0, pv = !!e.preview;
     var holds = cin ? CIN_HOLDS : pk.holds;
     for (i = 0; i < n; i++) { starts.push(tot); tot += fm * (holds[i] || 1); }
-    var t0 = performance.now(), tRel = t0 + starts[SPIT_REL - 1] + fm * (holds[SPIT_REL - 1] || 1) * (cin ? CIN_REL : 0.2), seed = t0 | 0;
+    var t0 = performance.now(), tRel = t0 + starts[REL - 1] + fm * (holds[REL - 1] || 1) * (cin ? CIN_REL : 0.2), seed = t0 | 0;
     var tr0 = rectIn(T.unit), to = { x: tr0.left + tr0.width * 0.5, y: tr0.top + tr0.height * 0.42 }, a = centerOf(A.unit), t = centerOf(T.unit);
     var dist = Math.sqrt((t.x - a.x) * (t.x - a.x) + (t.y - a.y) * (t.y - a.y)) || 1, beyond = e.dodge ? u * 1.2 : 0, total = dist + beyond;
     if (e.dodge) to = { x: to.x + A.dir * beyond, y: to.y - u * 0.05 };                // a dodged spit flies on past the target
@@ -6112,14 +6123,14 @@
       dodgeRun = runDodge(myRun, Math.max(0, ((tImp - performance.now()) - preMs / speed) * speed));   // the evade frame is on screen when the ball arrives
     }
     var ready = monPlayPack(pk, myRun, null, cin ? CIN_HOLDS : null);
-    fxAdd({ t0: t0 + starts[2], t1: tRel + 260 / speed, tRel: tRel, rnd: rngOf(seed + 3), ps: [], draw: function (ctx, now, L) { spitChargeDraw(ctx, now, L, F, u); } });
+    fxAdd({ t0: t0 + starts[2], t1: tRel + 260 / speed, tRel: tRel, rnd: rngOf(seed + 3), ps: [], mouthFn: e.point, draw: function (ctx, now, L) { spitChargeDraw(ctx, now, L, F, u); } });
     fxAdd({ t0: tRel, t1: tRel + flight2, T: T, rnd: rngOf(seed + 7), to: to, head: cin && !ice ? cbCore : undefined, headDraw: cin && ice ? lanceHeadDraw(F, u) : undefined, pw: ice || elec || dark ? 1.3 : undefined,
-      from: function () { var mp = monMouth(SPIT_REL), r = rectIn(uG); monFxBurst(mp); return mp || { x: r.left + r.width * 0.35, y: r.top + r.height * 0.6 }; },
-      draw: function (ctx, now, L) { if (dark) dkBoltDraw(ctx, now, L, F, u); else if (elec) ltBoltDraw(ctx, now, L, F, u); else if (ice) icBoltDraw(ctx, now, L, F, u); else fbBoltDraw(ctx, now, L, F, u); } });
+      from: function () { var mp = e.point ? e.point() : monMouth(REL), r = rectIn(uG); monFxBurst(mp); return mp || { x: r.left + r.width * 0.35, y: r.top + r.height * 0.6 }; },
+      draw: function (ctx, now, L) { if (holy) hlBoltDraw(ctx, now, L, F, u); else if (dark) dkBoltDraw(ctx, now, L, F, u); else if (elec) ltBoltDraw(ctx, now, L, F, u); else if (ice) icBoltDraw(ctx, now, L, F, u); else fbBoltDraw(ctx, now, L, F, u); } });
     await bsWait(tImp);
     if (myRun !== run) return;
     if (e.dodge) {
-      if (!pv) { say(A.name + (cin ? (dark ? " hurls a Void Bolt, but " : elec ? " hurls a Chain Bolt, but " : ice ? " hurls a Glacial Lance, but " : " hurls a Cinder Burst, but ") : dark ? " spits a ball of gloom, but " : elec ? " spits a spark ball, but " : ice ? " spits an ice shard, but " : " spits an ember, but ") + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
+      if (!pv) { say(A.name + (e.verbMiss ? e.verbMiss : cin ? (dark ? " hurls a Void Bolt, but " : elec ? " hurls a Chain Bolt, but " : ice ? " hurls a Glacial Lance, but " : " hurls a Cinder Burst, but ") : dark ? " spits a ball of gloom, but " : elec ? " spits a spark ball, but " : ice ? " spits an ice shard, but " : " spits an ember, but ") + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
       if (dodgeRun) await dodgeRun;
       else await Promise.all([anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * -34) + "px)", opacity: .55 }, { transform: "translateX(0)", opacity: 1 }], 380), sleep(260)]);
     } else {
@@ -6143,10 +6154,10 @@
         if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
       }
       if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
-      if (dark) dkImpact(T, F); else if (elec) ltImpact(T, F); else if (cin && ice) slImpact(T, F, lanceState, null); else if (cin) cbImpact(T, F, burnN); else if (ice) icImpact(T, F); else fbImpact(T, F);
+      if (holy) hlImpact(T, F); else if (dark) dkImpact(T, F); else if (elec) ltImpact(T, F); else if (cin && ice) slImpact(T, F, lanceState, null); else if (cin) cbImpact(T, F, burnN); else if (ice) icImpact(T, F); else fbImpact(T, F);
       if (!pv) {
-        floatNumber(T, (e.crit ? "CRIT " : "") + amount, dark ? "dark" : elec ? "bolt" : ice ? "ice" : "fire");
-        say(A.name + (cin ? (dark ? " hurls a Void Bolt at " : elec ? " hurls a Chain Bolt at " : ice ? " hurls a Glacial Lance at " : " hurls a Cinder Burst at ") : dark ? " spits a ball of gloom at " : elec ? " spits a spark ball at " : ice ? " spits an ice shard at " : " spits an ember at ") + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + bonus + ".", "g");
+        floatNumber(T, (e.crit ? "CRIT " : "") + amount, holy ? "holy" : dark ? "dark" : elec ? "bolt" : ice ? "ice" : "fire");
+        say(A.name + (e.verb ? e.verb : cin ? (dark ? " hurls a Void Bolt at " : elec ? " hurls a Chain Bolt at " : ice ? " hurls a Glacial Lance at " : " hurls a Cinder Burst at ") : dark ? " spits a ball of gloom at " : elec ? " spits a spark ball at " : ice ? " spits an ice shard at " : " spits an ember at ") + T.name + " for " + amount + (e.crit ? " (crit!)" : "") + bonus + ".", "g");
       }
       if (cin && ice) {
         if (lanceState === "chilled") { clearChilled(T); if (!pv) say("The chill on " + T.name + " shatters.", "sys"); }
@@ -6165,12 +6176,13 @@
       } else if (ice) {
         var chill = T.hp > 0 && ($("spitBurn").checked || (!pv && Math.random() < ICE_CHILL));
         if (chill) { applyChilled(T, 2); if (!pv) say(T.name + " is chilled for 2 turns.", "sys"); }
+      } else if (holy) {                                                                 // (the holy ooze sets no status)
       } else {
         var burn = T.hp > 0 && ($("spitBurn").checked || (!pv && Math.random() < SPIT_BURN));
         if (burn) { applyBurn(T, (T.burn ? T.burn.stacks : 0) + 1); if (!pv) say(T.name + " is set ablaze (Burn x" + T.burn.stacks + ", " + BURN_TURNS + " turns).", "sys"); }
       }
       await Promise.all([
-        anim(T.unit.querySelector(".sprite"), dark ? DARK_SHOCK : elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, cin ? 460 : 340),
+        anim(T.unit.querySelector(".sprite"), holy ? HOLY_SHOCK : dark ? DARK_SHOCK : elec ? BOLT_SHOCK : ice ? ICE_SHOCK : FIRE_SHOCK, cin ? 460 : 340),
         anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * (cin ? 18 : 10)) + "px)" }, { transform: "translateX(" + (-A.dir * (cin ? 11 : 6)) + "px)" }, { transform: "translateX(0)" }], 240),
         sleep(cin ? 420 : 300)
       ]);
@@ -6197,7 +6209,7 @@
     stage.classList.add("playing"); btn.classList.add("on");
     try {
       while (my === run) {
-        await (MONSTERS[monKey].melee ? slashAct : spitAct)({ actor: "G", amount: 0, preview: true }, my, FIGHTERS.G, FIGHTERS.W);
+        await (MONSTERS[monKey].king ? oozeAct : MONSTERS[monKey].melee ? slashAct : spitAct)({ actor: "G", amount: 0, preview: true }, my, FIGHTERS.G, FIGHTERS.W);
         if (my !== run) break;
         if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W);
         if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W);
@@ -6312,6 +6324,7 @@
   // box forces it). A target that dodges lets it land on empty ground ("slams down, but Warrior slips away"). Which attack the monster uses in a fight is the Monster's attack select (alternating by default).
   var SLAM_HIT = 7, SLAM_DMG = 1.6, SLAM_BURN = 0.5;
   function monAttackAct(e, myRun, A, T) {
+    if (MONSTERS[monKey] && MONSTERS[monKey].king) return kingAttackAct(e, myRun, A, T);                 // the Slime King: six skills (docs/SLIME_KING.md)
     if (MONSTERS[monKey] && MONSTERS[monKey].melee) {                                      // the Elite: the Sword Slash, the Granite Ram, the Rockfall Drop, the Earthbreaker and the Stone Guard (all five skills have a sheet, see docs/MONSTERS.md)
       var md = $("monAtk").value, nn = MON.atk = (MON.atk || 0) + 1;
       var ord = ["spit", "slam", "eruption", "cinder", "bounce"].filter(function (k) { return k === "spit" || monPackOf(k === "cinder" ? "guard" : k); }), pk2 = md === "alt" ? ord[(nn - 1) % ord.length] : md;   // 'Alternate' cycles the skills that have a sheet
@@ -7288,7 +7301,7 @@
   }
   async function dropAct(e, myRun, A, T) {
     var pk = monPackOf("bounce"), u = uW.offsetWidth, fm = 1000 / pk.fps / speed, pv = !!e.preview, el = monEl, dodgeRun = null, dead = false, B = { blk: false, hp: function (a) { return a; }, fx: function () {} };
-    var a = centerOf(A.unit), t = centerOf(T.unit), reach = (t.x - a.x) - A.dir * u * BOUNCE_LAND, ur = rectIn(uG), up = ur.top + ur.height + u * 0.7;     // up: how far the unit goes to be out of the stage
+    var a = centerOf(A.unit), t = centerOf(T.unit), reach = (t.x - a.x) - A.dir * u * (BOUNCE_LAND + Math.max(0, (parseFloat(uG.style.getPropertyValue("--ms")) || 1) - 1) * 1.0), ur = rectIn(uG), up = ur.top + ur.height + u * 0.7;     // up: how far the unit goes to be out of the stage
     var showF = function (i) { monPlayPack(pk, myRun, null, [0.01], [i]); };
     var setT = function (x, y) { uG.style.transform = "translate(" + x + "px," + y + "px)"; };
     var hitBy = function (amount, big) {                                                // one hit on the target: the damage, the numbers, the shove
@@ -7325,13 +7338,13 @@
       showF(4);                                                                                                       // 5. the crash
       setT(reach, 0);
       var rr = rectIn(el), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512, tI = performance.now();
-      bashImpactFx(tI, lx, lgy - u * 0.08, lgy, u, A.dir, 1.7); shake(18, 620); B.fx();
-      var first = B.hp(Math.round((e.amount || 0) * DROP_DMG)), second = B.hp(Math.round((e.amount || 0) * DROP_DMG2));
+      bashImpactFx(tI, lx, lgy - u * 0.08, lgy, u, A.dir, MONSTERS[monKey].king ? 2.3 : 1.7); shake(18, 620); B.fx();
+      var first = B.hp(Math.round((e.amount || 0) * (MONSTERS[monKey].dropDmg || DROP_DMG))), second = B.hp(Math.round((e.amount || 0) * (MONSTERS[monKey].dropDmg2 || DROP_DMG2)));
       if (e.dodge) {
         if (!pv) { say(A.name + " plummets down, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
       } else {
         hitBy(first, true);
-        if (!pv) say(A.name + " drops onto " + T.name + " for " + first + (B.blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : e.crit ? " (crit!)" : "") + " (Rockfall Drop).", "g");
+        if (!pv) say(A.name + " drops onto " + T.name + " for " + first + (B.blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : e.crit ? " (crit!)" : "") + " (" + (MONSTERS[monKey].dropName || "Rockfall Drop") + ").", "g");
         dead = !pv && T.hp <= 0;
       }
       await bsWait(tI + fm * 1.4);                                                                                    // 6. the rebound
@@ -7369,7 +7382,232 @@
       if (myRun === run && uG.style.transform.indexOf("translate(") === 0) uG.style.transform = "";                      // (never leave the unit in the air)
     }
   }
-  monPrevLoop($("monPrevBounce"), async function (my) { await (MONSTERS[monKey].melee ? dropAct : bounceAct)({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
+  monPrevLoop($("monPrevBounce"), async function (my) { await (MONSTERS[monKey].melee || MONSTERS[monKey].king ? dropAct : bounceAct)({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
+  // ---------------------------------------------------------------- the SLIME KING's skills (2026-11-11, docs/SLIME_KING.md)
+  // The King (MONSTERS.slime_king, king: true) fights with six skills on five sheets (Animations/SlimeKing/<folder>, the user's ChatGPT sheets; slots attack, decree, raise, bounce, heal):
+  //   RADIANT OOZE (holy, 44%): the spit (slot attack, release frame 5, the mouth marks in the strip's mouth.json) with a HOLY ooze (code: a golden-white blob with a glow and sparkles, hlBoltDraw / hlImpact);
+  //   ROYAL DECREE (elemental, 52%): the staff points (slot decree, cast frame 4) and a bolt of FIRE, ICE, LIGHTNING or DARK in turn leaves the crystal (the placement's staffTip): the spit's own code with the
+  //     element's own parameters, drawing and impact (spitAct takes e.elem, e.pack, e.rel, e.point);
+  //   CROWN SLAM (physical, 84%): the Rockfall Drop's act (dropAct) on the King's dive sheet (slot bounce, crash frame 5), two hits;
+  //   ROYAL RESTORATION (heal): healAct, the golden light, rising sparkles and a green +N, the HP bar goes up;
+  //   KINGDOM'S WRATH (140%) and ABSOLUTE JUDGMENT (156%): raiseAct on the staff-raise sheet (slot raise): the staff is held high (frames 4 and 5 held) while the sky answers: fire, ice, lightning and dark strike
+  //     in turn (comets from the top of the stage, each element's own impact) or a pillar of light and a judgment ring (the holy finale); the command frame 6 follows.
+  // The effects are code (glows, particles) until the painted HOLY sheet arrives. The damage numbers are placeholders (KING_POW, relative to the turn's damage: docs/SKILL_BEHAVIOR_LATER.md); the statuses of the elements are
+  // applied only by the Royal Decree (the spit's own chances); the Wrath and the Judgment deal damage only.
+  var KING_POW = { spit: 1, decree: 1.18, slam: 1.91, wrath: 3.18, judgment: 3.55 }, KING_HEAL = 0.2, KING_ELEMS = ["fire", "ice", "lightning", "dark"], WRATH_HOLD = 1500, JUDG_HOLD = 1000;
+  var ELEM_RGB = { fire: "255,150,50", ice: "130,210,255", lightning: "200,210,255", dark: "170,100,255", holy: "255,226,140" };
+  var HOLY_PAL = { core: "255,253,240", mid: "255,232,150", glow: "255,196,84", deep: "196,142,52", flash: "255,246,210" };
+  var HOLY_SHOCK = [{ filter: "brightness(2.6) sepia(.8) saturate(2.2)", offset: 0 }, { filter: "brightness(1.5) sepia(.5) saturate(1.5)", offset: 0.4 }, { filter: "brightness(1)", offset: 1 }];
+  function holySpitParams() { return { painted: false, pal: HOLY_PAL, palName: "holy", k: 1, size: 0.7, w: 1, speed: 1, trail: 0.9, shake: 0.4, imp: 0.7, stages: 1, chance: 0, charge: 3, release: SPIT_REL }; }
+  function kingTipAt(pk, fi) {                                                       // the crystal of the staff on frame fi (0-based) of a King pack, in stage px (null when the strip has no staffTip)
+    var tp = pk && pk.placement && pk.placement.staffTip && pk.placement.staffTip[fi];
+    if (!tp || !monEl) return null;
+    var r = rectIn(monEl), flip = uG.classList.contains("flip");
+    return { x: r.left + (flip ? 1 - tp[0] / 512 : tp[0] / 512) * r.width, y: r.top + (tp[1] + 28) / 512 * r.height };   // (the placement's point is the topmost pixel: the crystal's middle is about 28 px of the cell below it)
+  }
+  function hlHead(ctx, now, x, y, dir, F, u, grow, rnd) {                            // the ooze: a golden-white blob (a cream drop drawn normally, stretched along its flight) in a glow
+    var r = u * 0.055 * F.size * (0.3 + 0.7 * grow), fl = 0.92 + 0.08 * Math.sin(now * 0.05) + (rnd() - 0.5) * 0.1;
+    glowDot(ctx, x, y, r * 3.4 * fl, HOLY_PAL.glow, 0.4 * grow);
+    ctx.save(); ctx.translate(x, y); ctx.rotate(dir); ctx.globalAlpha = Math.min(1, grow);
+    ctx.fillStyle = "rgba(255,246,214,0.96)"; ctx.strokeStyle = "rgba(214,160,60,0.9)"; ctx.lineWidth = Math.max(1, r * 0.18);
+    ctx.beginPath(); ctx.ellipse(0, 0, r * 1.5 * fl, r * 1.05, 0, 0, 6.2832); ctx.fill(); ctx.stroke(); ctx.restore();
+    glowDot(ctx, x, y, r * 1.5 * fl, HOLY_PAL.mid, 0.7 * grow); glowDot(ctx, x - Math.cos(dir) * r * 0.2, y - Math.sin(dir) * r * 0.2, r * 0.7, HOLY_PAL.core, grow);
+  }
+  function hlBoltDraw(ctx, now, L, F, u) {                                           // the ooze's flight: the spit's path (a slight arc from the mouth to the target), a golden trail, the blob, sparkles shed behind it
+    var rnd = L.rnd, j, tip, tr;
+    if (!L.p0) {
+      tip = (L.from && L.from()) || bodyPoint(); tr = rectIn(L.T.unit);
+      L.p0 = { x: tip.x, y: tip.y }; L.p1 = L.to || { x: tr.left + tr.width * 0.5, y: tr.top + tr.height * 0.42 };
+      var dx = L.p1.x - L.p0.x, dy = L.p1.y - L.p0.y; L.len = Math.sqrt(dx * dx + dy * dy) || 1;
+      L.c = { x: (L.p0.x + L.p1.x) / 2, y: Math.min(L.p0.y, L.p1.y) - L.len * 0.09 };
+      L.last = now; L.ps = []; L.acc = 0;
+    }
+    var dt = Math.min(60, now - L.last) * speed; L.last = now;
+    var s = clamp01((now - L.t0) / Math.max(1, L.t1 - L.t0)), e = Math.pow(s, L.pw || 1.3), pos = bez(L.p0, L.c, L.p1, e), ahead = bez(L.p0, L.c, L.p1, Math.min(1, e + 0.02));
+    var dir = Math.atan2(ahead.y - pos.y, ahead.x - pos.x), r = u * 0.06 * F.size, N = 16, span = (u * F.trail) / L.len, q, f, tp, col;
+    for (q = N; q >= 1 && span > 0; q--) {
+      f = q / N; tp = bez(L.p0, L.c, L.p1, Math.max(0, e - f * span)); col = f < 0.15 ? HOLY_PAL.core : f < 0.5 ? HOLY_PAL.mid : HOLY_PAL.glow;
+      glowDot(ctx, tp.x, tp.y, r * (1.5 * (1 - f) + 0.25), col, Math.pow(1 - f, 1.3) * 0.85);
+    }
+    hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
+    for (j = fbRate(L, 0.05, dt); j > 0; j--) fbParticle(L.ps, pos.x + (rnd() - 0.5) * r, pos.y + (rnd() - 0.5) * r, (rnd() - 0.5) * 0.15 * u / 1000 - Math.cos(dir) * 0.1 * u / 1000, -(0.05 + rnd() * 0.15) * u / 1000, 320 + rnd() * 300, r * 0.45 * (0.6 + rnd() * 0.6), "ember");
+    fbParticles(ctx, L.ps, dt, F, u);
+  }
+  function hlImpact(T, F) {                                                          // the ooze lands: a golden flash and ring, cream drops thrown out and falling, sparkles, a glow on the ground
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width / 2, cy = r.top + r.height * 0.42, gy = r.top + r.height - r.height * 0.03, rnd = rngOf(now | 0), ps = [], drops = [], s = F.imp, i, n;
+    shake(4 * (0.6 + 0.4 * s), 260);
+    for (i = 0, n = Math.round(26 * s); i < n; i++) { var a1 = -Math.PI * (0.05 + rnd() * 0.9), sp1 = u * (0.4 + rnd() * 1.1) / 1000; fbParticle(ps, cx + (rnd() - 0.5) * u * 0.1, cy, Math.cos(a1) * sp1, Math.sin(a1) * sp1 - 0.1 * u / 1000, 420 + rnd() * 500, u * 0.012, "ember"); }
+    for (i = 0; i < 10; i++) drops.push({ a: -Math.PI * (0.1 + rnd() * 0.8), v: 0.5 + rnd() * 0.9, s: 0.012 + rnd() * 0.014 });
+    fxAdd({ t0: now, t1: now + 1300 / speed, draw: function (ctx, now2, L) {
+      var t = (now2 - now) * speed, dt = L.last ? Math.min(60, now2 - L.last) * speed : 0, k, j, d, px, py, rk = clamp01(t / 700);
+      L.last = now2;
+      if (t < 420) { k = 1 - Math.pow(1 - t / 420, 2.2); glowDot(ctx, cx, cy, u * (0.1 + 0.55 * s * k), HOLY_PAL.glow, 0.7 * (1 - t / 420)); glowDot(ctx, cx, cy, u * (0.07 + 0.4 * s * k), HOLY_PAL.mid, 0.9 * (1 - t / 420)); glowDot(ctx, cx, cy, u * (0.03 + 0.15 * s * k), HOLY_PAL.core, 0.95 * (1 - t / 420)); }
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + HOLY_PAL.mid + "," + (0.7 * (1 - rk)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.014 * (1 - rk));
+      ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.1 + 0.6 * rk), u * (0.1 + 0.6 * rk) * 0.22, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
+      glowEllipse(ctx, cx, gy, u * (0.3 + 0.35 * rk), u * 0.08, HOLY_PAL.glow, 0.35 * (1 - rk));
+      for (j = 0; j < drops.length; j++) {
+        d = drops[j]; k = clamp01(t / 620); if (k >= 1) continue;
+        px = cx + Math.cos(d.a) * u * 0.4 * d.v * k; py = cy + Math.sin(d.a) * u * 0.4 * d.v * k + u * 0.42 * k * k;
+        ctx.save(); ctx.fillStyle = "rgba(255,243,208," + (0.95 * (1 - k * k)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(px, py, u * d.s, u * d.s * 1.15, 0, 0, 6.2832); ctx.fill(); ctx.restore();
+        glowDot(ctx, px, py, u * d.s * 2.4, HOLY_PAL.glow, 0.35 * (1 - k));
+      }
+      fbParticles(ctx, ps, dt, F, u);
+    } });
+  }
+  function kingHit(T, amount, cls, e, big) {                                         // one hit of a King skill on the target: the damage and the number, the hit pose, the colour flash and the shove
+    var pv = !!e.preview, A = FIGHTERS.G;
+    if (!pv) {
+      T.hp -= amount; paintHp(T);
+      if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
+      if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
+      floatNumber(T, (e.crit && big ? "CRIT " : "") + amount, cls);
+    }
+    if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
+    anim(T.unit.querySelector(".sprite"), cls === "holy" ? HOLY_SHOCK : cls === "dark" ? DARK_SHOCK : cls === "bolt" ? BOLT_SHOCK : cls === "ice" ? ICE_SHOCK : FIRE_SHOCK, big ? 460 : 320).catch(function () {});
+    anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * (big ? 18 : 10)) + "px)" }, { transform: "translateX(" + (-A.dir * (big ? 11 : 6)) + "px)" }, { transform: "translateX(0)" }], 240).catch(function () {});
+  }
+  async function kingFinish(e, myRun, T, ready, dodgeRun) {                          // the end of a King skill: the pack ends, the idle again, the target's death when it fell
+    if (dodgeRun) await dodgeRun;
+    if (myRun !== run) return;
+    var packOk = await ready;
+    if (myRun !== run) return;
+    if (packOk) monStartIdle();
+    clearAnims(T.unit); clearAnims(stage);
+    T.unit.querySelector(".sprite").getAnimations().forEach(function (x) { x.cancel(); });
+    if (!e.preview && T.hp <= 0) {
+      clearBurn(T); clearChilled(T);
+      say(T.name + " is defeated.", "sys");
+      if (T === FIGHTERS.W && packs.death && packs.death.keyed && $("still").checked) {
+        keyPose("death", 0); await sleep(150); keyPose("death", 1); await sleep(260); keyPose("death", 2);
+      } else if (T === FIGHTERS.W && packs.death) await playPose("death", false);
+      else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
+    }
+  }
+  function oozeAct(e, myRun, A, T) {                                                 // RADIANT OOZE: the spit with the holy ooze
+    return spitAct(Object.assign({}, e, { elem: "holy", amount: Math.round((e.amount || 0) * KING_POW.spit), verb: " spits Radiant Ooze at ", verbMiss: " spits Radiant Ooze, but " }), myRun, A, T);
+  }
+  function decreeAct(e, myRun, A, T) {                                               // ROYAL DECREE: the staff points and a bolt of the next element leaves the crystal (fire, ice, lightning, dark in turn)
+    var pk = monPackOf("decree"), n = MON.dec = (MON.dec || 0) + 1, el = KING_ELEMS[(n - 1) % 4], nm = { fire: "fire", ice: "ice", lightning: "lightning", dark: "darkness" }[el];
+    return spitAct(Object.assign({}, e, { elem: el, pack: pk, rel: (pk.placement && pk.placement.castFrame) || 4, amount: Math.round((e.amount || 0) * KING_POW.decree),
+      point: function () { return kingTipAt(pk, monFrame); }, verb: " commands a bolt of " + nm + " at ", verbMiss: " commands a bolt of " + nm + ", but " }), myRun, A, T);
+  }
+  function skyStreak(tPre, tHit, x, ty, el) {                                        // a comet (or a jagged bolt for lightning) falling from the top of the stage onto (x, ty), arriving at tHit
+    var rgb = ELEM_RGB[el], rnd = rngOf(tHit | 0), pts = el === "lightning" ? boltPts(x + (rnd() - 0.5) * 24, -10, x, ty, 0.14, 5, rnd, 3) : null;
+    fxAdd({ t0: tPre, t1: tHit + 220 / speed, draw: function (ctx, now) {
+      var k = clamp01((now - tPre) / Math.max(1, tHit - tPre)), y = -20 + (ty + 20) * k * k, j, a = now > tHit ? 1 - clamp01((now - tHit) * speed / 200) : 1;
+      if (pts) { drawBolt(ctx, pts, PALS.blue, 3, a * (now > tHit ? 1 : clamp01(k * 3))); return; }
+      for (j = 10; j >= 1; j--) glowDot(ctx, x, y - j * 16, 6 + 9 * (1 - j / 10), rgb, 0.45 * (1 - j / 10) * a);
+      glowDot(ctx, x, y, 22, rgb, 0.9 * a); glowDot(ctx, x, y, 9, "255,255,255", a);
+    } });
+  }
+  function judgmentFx(tPre, tHit, x, gy, u) {                                        // ABSOLUTE JUDGMENT: a pillar of light descends from the sky, flares at tHit and fades; two rings run out along the ground; sparkles climb it
+    var rnd = rngOf(tHit | 0), sp = [], i;
+    for (i = 0; i < 20; i++) sp.push({ dx: (rnd() - 0.5) * u * 0.5, ph: rnd(), sp: 0.5 + rnd() * 0.8, s: 0.01 + rnd() * 0.01 });
+    fxAdd({ t0: tPre, t1: tHit + 1100 / speed, draw: function (ctx, now) {
+      var pre = clamp01((now - tPre) / Math.max(1, tHit - tPre)), post = now >= tHit ? clamp01((now - tHit) * speed / 950) : 0, bot = now < tHit ? gy * Math.pow(pre, 1.6) : gy, w = u * (0.14 + (now < tHit ? 0.14 * pre : 0.3 * Math.sin(Math.min(1, post * 3) * 1.5708))) * (1 - post * 0.55),
+        a = now < tHit ? 0.2 + 0.55 * pre : 0.95 * (1 - post * post), g = ctx.createLinearGradient(x - w, 0, x + w, 0), j, rk, p;
+      g.addColorStop(0, "rgba(255,200,90,0)"); g.addColorStop(0.32, "rgba(255,214,120," + (0.5 * a).toFixed(3) + ")"); g.addColorStop(0.5, "rgba(255,253,240," + Math.min(1, a).toFixed(3) + ")"); g.addColorStop(0.68, "rgba(255,214,120," + (0.5 * a).toFixed(3) + ")"); g.addColorStop(1, "rgba(255,200,90,0)");
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = g; ctx.fillRect(x - w, -4, w * 2, bot + 4); ctx.restore();
+      glowDot(ctx, x, bot, u * (0.2 + 0.25 * (now < tHit ? pre : 1 - post)), HOLY_PAL.mid, 0.8 * a);
+      if (now >= tHit) {
+        glowDot(ctx, x, gy - u * 0.2, u * (0.4 + 0.5 * post), HOLY_PAL.glow, 0.5 * (1 - post)); glowDot(ctx, x, gy - u * 0.2, u * 0.25, HOLY_PAL.core, 0.9 * (1 - post * 2 > 0 ? 1 - post * 2 : 0));
+        for (j = 0; j < 2; j++) {                                                    // the judgment rings
+          rk = clamp01(post * 1.4 - j * 0.25); if (rk <= 0 || rk >= 1) continue;
+          ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + HOLY_PAL.mid + "," + (0.8 * (1 - rk)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.018 * (1 - rk));
+          ctx.beginPath(); ctx.ellipse(x, gy, u * (0.15 + 0.9 * rk), u * (0.15 + 0.9 * rk) * 0.22, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
+        }
+      }
+      for (j = 0; j < sp.length; j++) {                                              // sparkles climbing the pillar
+        p = sp[j]; rk = (now * 0.0004 * speed * p.sp + p.ph) % 1;
+        if (now < tPre + 80) continue;
+        glowDot(ctx, x + p.dx * (0.4 + w / u), bot - rk * bot * 0.9, u * p.s * 2.2, HOLY_PAL.core, 0.7 * Math.sin(rk * 3.1416) * a);
+      }
+    } });
+  }
+  async function raiseAct(e, myRun, A, T, kind) {                                    // KINGDOM'S WRATH (kind "wrath") and ABSOLUTE JUDGMENT ("judgment"): the staff held high, the sky answers
+    var pk = monPackOf("raise"), u = uW.offsetWidth, pv = !!e.preview, unit = 1000 / pk.fps, fm = unit / speed, wrath = kind === "wrath", H = (wrath ? WRATH_HOLD : JUDG_HOLD) / unit;
+    var holds = [1, 1, 1.3, H * 0.5, H * 0.5, 1.4, 1.2, 1], starts = [], tot = 0, i, k, dodgeRun = null;
+    for (i = 0; i < pk.n; i++) { starts.push(tot); tot += fm * holds[i]; }
+    var t0 = performance.now(), tr = rectIn(T.unit), tx = tr.left + tr.width * 0.5, ty = tr.top + tr.height * 0.42, tgy = tr.top + tr.height * 0.97;
+    var total = Math.round((e.amount || 0) * (wrath ? KING_POW.wrath : KING_POW.judgment)), tH = wrath ? [0, 1, 2, 3].map(function (q) { return t0 + starts[3] + fm * H * (0.2 + 0.2 * q); }) : [t0 + starts[5] + fm * 0.3];
+    var ready = monPlayPack(pk, myRun, null, holds);
+    fxAdd({ t0: t0 + starts[1], t1: tH[tH.length - 1] + 500 / speed, draw: function (ctx, now) {   // the crystal gathers light while the staff rises and is held (the elements in turn for the Wrath, gold for the Judgment)
+      var tp = kingTipAt(pk, monFrame); if (!tp) return;
+      var c = clamp01((now - t0 - starts[1]) / Math.max(1, starts[3] - starts[1])), q = Math.min(3, Math.floor(Math.max(0, now - tH[0] + fm * H * 0.2) / (fm * H * 0.2))), rgb = wrath ? ELEM_RGB[KING_ELEMS[q]] : ELEM_RGB.holy, fl = 0.85 + 0.15 * Math.sin(now * 0.05);
+      glowDot(ctx, tp.x, tp.y, u * (0.06 + 0.1 * c) * fl, rgb, 0.7 * c); glowDot(ctx, tp.x, tp.y, u * (0.03 + 0.04 * c), "255,255,255", 0.8 * c);
+    } });
+    if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
+      var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
+      dodgeRun = runDodge(myRun, Math.max(0, ((tH[0] - performance.now()) - preMs / speed) * speed));
+    }
+    if (wrath) {
+      var part = Math.round(total / 4);
+      for (k = 0; k < 4; k++) {
+        var el = KING_ELEMS[k], cls = { fire: "fire", ice: "ice", lightning: "bolt", dark: "dark" }[el], amt = k < 3 ? part : total - 3 * part;
+        skyStreak(tH[k] - 240 / speed, tH[k], tx, e.dodge ? tgy : ty, el);
+        await bsWait(tH[k]);
+        if (myRun !== run) return;
+        if (e.dodge) { if (k === 0 && !pv) { say(A.name + " raises its staff and the sky strikes, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); } continue; }
+        kingHit(T, amt, cls, e, k === 3);
+        if (el === "fire") fbImpact(T, spitParams()); else if (el === "ice") icImpact(T, iceSpitParams()); else if (el === "lightning") ltImpact(T, lightSpitParams()); else dkImpact(T, darkSpitParams());
+        if (k === 3 && !pv) say(A.name + " calls Kingdom's Wrath: fire, ice, lightning and darkness strike " + T.name + " for " + total + (e.crit ? " (crit!)" : "") + ".", "g");
+        if (T.hp <= 0 && !pv) break;
+      }
+    } else {
+      judgmentFx(tH[0] - 320 / speed, tH[0], tx, tgy, u);
+      await bsWait(tH[0]);
+      if (myRun !== run) return;
+      if (e.dodge) { if (!pv) { say(A.name + " passes Absolute Judgment, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); } }
+      else {
+        kingHit(T, total, "holy", e, true); hlImpact(T, Object.assign(holySpitParams(), { imp: 1.4 }));
+        if (!pv) say(A.name + " passes Absolute Judgment on " + T.name + " for " + total + (e.crit ? " (crit!)" : "") + ".", "g");
+      }
+      await bsWait(tH[0] + 700 / speed);
+    }
+    await kingFinish(e, myRun, T, ready, dodgeRun);
+  }
+  function healBar(f) { f.hpEl.querySelector(".fill").style.width = Math.max(0, f.hp / f.max * 100) + "%"; f.hpEl.querySelector(".v").textContent = Math.max(0, f.hp) + " / " + f.max; f._lastHp = f.hp; }   // (paintHp without the monster's hit/idle reaction: a heal must not interrupt its own pack)
+  async function healAct(e, myRun, A) {                                              // ROYAL RESTORATION: the King heals itself: a golden light round the body, sparkles rising, a green +N, the HP bar goes up
+    var pk = monPackOf("heal"), pv = !!e.preview, unit = 1000 / pk.fps, fm = unit / speed, holds = [1, 1, 1.2, 2.6, 2.6, 1.3], starts = [], tot = 0, i;
+    for (i = 0; i < pk.n; i++) { starts.push(tot); tot += fm * holds[i]; }
+    var t0 = performance.now(), ready = monPlayPack(pk, myRun, null, holds), r0 = rectIn(monEl), u = uW.offsetWidth, rnd = rngOf(t0 | 0), sp = [], j;
+    var cx = r0.left + r0.width * 0.5, gy = r0.top + r0.height * 470 / 512, domeH = r0.height * 0.6, bodyW = r0.width * 0.68;
+    for (j = 0; j < 26; j++) sp.push({ dx: (rnd() - 0.5) * bodyW * 0.95, ph: rnd(), sp: 0.5 + rnd() * 0.7, s: 0.012 + rnd() * 0.012 });
+    fxAdd({ t0: t0 + starts[1], t1: t0 + tot + 900 / speed, draw: function (ctx, now) {
+      var tt = now - t0, a = clamp01((tt - starts[1]) / Math.max(1, starts[3] - starts[1])) * (1 - clamp01((tt - starts[5]) / Math.max(1, tot - starts[5] + 700 / speed))), q, p, rk, y;
+      glowDot(ctx, cx, gy - domeH * 0.5, domeH * 1.15, HOLY_PAL.glow, 0.32 * a); glowDot(ctx, cx, gy - domeH * 0.5, domeH * 0.7, HOLY_PAL.mid, 0.3 * a);
+      glowEllipse(ctx, cx, gy, bodyW * 0.75 * (0.9 + 0.1 * Math.sin(now * 0.006)), bodyW * 0.18, HOLY_PAL.mid, 0.4 * a);
+      for (q = 0; q < sp.length; q++) {                                              // sparkles: a bright point with a small cross, rising along the body
+        p = sp[q]; rk = (now * 0.00035 * speed * p.sp + p.ph) % 1; y = gy - rk * domeH * 1.25;
+        glowDot(ctx, cx + p.dx, y, u * p.s * 2.6, HOLY_PAL.core, 0.8 * Math.sin(rk * 3.1416) * a);
+        ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + HOLY_PAL.core + "," + (0.7 * Math.sin(rk * 3.1416) * a).toFixed(3) + ")"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cx + p.dx - u * p.s * 2.4, y); ctx.lineTo(cx + p.dx + u * p.s * 2.4, y); ctx.moveTo(cx + p.dx, y - u * p.s * 2.4); ctx.lineTo(cx + p.dx, y + u * p.s * 2.4); ctx.stroke(); ctx.restore();
+      }
+    } });
+    await bsWait(t0 + starts[3] + fm * 0.4);
+    if (myRun !== run) return;
+    var amt = Math.max(0, Math.min(A.max - A.hp, Math.round(A.max * KING_HEAL)));
+    if (!pv) { A.hp += amt; healBar(A); say(A.name + " restores itself for " + amt + " (Royal Restoration).", "g"); }
+    floatNumber(A, "+" + (pv ? Math.round(A.max * KING_HEAL) : amt), "heal");
+    var ok = await ready;
+    if (myRun !== run) return;
+    if (ok) monStartIdle();
+  }
+  function kingSkill(k) {
+    return k === "decree" ? decreeAct : k === "slam" ? dropAct : k === "wrath" ? function (e, m, A, T) { return raiseAct(e, m, A, T, "wrath"); } : k === "judgment" ? function (e, m, A, T) { return raiseAct(e, m, A, T, "judgment"); } : k === "heal" ? healAct : oozeAct;
+  }
+  function kingAttackAct(e, myRun, A, T) {                                           // the skill select: one skill, or 'alternate' (ooze, decree, crown slam, ooze, decree, wrath, heal (only below 70% HP), judgment: placeholders for the engine's cooldowns)
+    var md = $("monAtk").value, n = MON.atk = (MON.atk || 0) + 1, order = ["spit", "decree", "slam", "spit", "decree", "wrath", "heal", "judgment"], pick = md, guard = 0;
+    if (md === "alt") {
+      pick = order[(n - 1) % order.length];
+      while (pick === "heal" && A.hp > A.max * 0.7 && guard++ < 4) { n = MON.atk = MON.atk + 1; pick = order[(n - 1) % order.length]; }
+    }
+    return kingSkill(pick)(e, myRun, A, T);
+  }
+  monPrevLoop($("monPrevDecree"), async function (my) { await decreeAct({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); if (FIGHTERS.W.shocked) clearShocked(FIGHTERS.W); if (FIGHTERS.W.magDef) clearWard(FIGHTERS.W); });
+  monPrevLoop($("monPrevWrath"), async function (my) { await raiseAct({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W, "wrath"); });
+  monPrevLoop($("monPrevJudg"), async function (my) { await raiseAct({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W, "judgment"); });
+  monPrevLoop($("monPrevHeal"), async function (my) { await healAct({ actor: "G", preview: true }, my, FIGHTERS.G); });
   // ---------------------------------------------------------------- the Elite slime's Earthbreaker (2026-11-10)
   // The Elite's fourth skill, a ground skill, physical (the sheet: Animations/EliteSlime/earthbreaker, the user's Gemini sheet, 6 frames at 12 fps, the slot `eruption`; the hit frame is 4; the stone arms the generator grew in
   // frames 2 and 5 are painted out in earthbreaker_prep.py). The Elite stays on its spot: it gathers (1), raises the sword high with the blade turned down (2), drives it into the floor in front of it (3), strains over it (4),

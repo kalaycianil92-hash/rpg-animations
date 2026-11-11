@@ -98,3 +98,7 @@ The five slots mirror the fire slime's: **Frost Spit** (basic, ranged, 25% Chill
 ### Block (added 2026-11-10, the user's rule; details in docs/BLOCK.md)
 
 "Blocked hit cannot crit and block reduces the damage taken by 20% (may change in the future)." In the test page: `BLOCK_REDUCE = 0.2` (one constant), a blocked hit is never a crit, the number reads BLOCK n, the blocker plays a short block pack and a half circle of glass meets the blow. The page only draws it. Open for the engine: the chance to block (and whether it stacks with Dodge), which weapon or item is needed (main hand, off hand, shield), whether statuses (Burn, Chill, Shock...) still apply through a block, whether a block can be broken, how it works against skills that cannot be blocked (area spells, the Elite's Rockfall Drop and Earthbreaker?).
+
+## The Slime King's numbers (2026-11-11, placeholders in the page: KING_POW, KING_HEAL)
+
+Damage is relative to the turn's damage: Radiant Ooze x1.0, Royal Decree x1.18 (the element's own status chances), Crown Slam x1.6 then x0.3, Kingdom's Wrath x3.18 split in four hits (fire, ice, lightning, dark, no statuses yet), Absolute Judgment x3.55 (one holy hit); Royal Restoration heals 20% of the maximum HP; the 'alternate' order (ooze, decree, crown slam, ooze, decree, wrath, heal below 70% HP, judgment) stands in for the cooldowns (0, 0, 1, 2, 2). The engine decides all of it.

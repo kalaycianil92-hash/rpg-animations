@@ -1,0 +1,33 @@
+{
+ "note": "the open mouth's inside per frame (centre and size in the 512 cell, before the page mirrors the sprite): the Radiant Ooze leaves the mouth at the release frame 5",
+ "mouth": {
+  "4": {
+   "area": 306,
+   "x": 339.0,
+   "y": 310.0,
+   "w": 21,
+   "h": 20
+  },
+  "5": {
+   "area": 2190,
+   "x": 362.0,
+   "y": 329.2,
+   "w": 47,
+   "h": 65
+  },
+  "6": {
+   "area": 1293,
+   "x": 354.0,
+   "y": 331.7,
+   "w": 40,
+   "h": 44
+  },
+  "7": {
+   "area": 489,
+   "x": 352.1,
+   "y": 340.1,
+   "w": 24,
+   "h": 27
+  }
+ }
+}
