@@ -165,6 +165,13 @@
     text-shadow: 0 2px 0 #0b0914, 0 0 6px #0b0914, 0 0 20px #0b0914cc; }
   .stagetag small { display: block; margin-top: .25em; font: 600 clamp(14px, 3.4vw, 22px) var(--display); letter-spacing: .3em; text-indent: .3em; color: #ece2c8; }
 
+  .hp.boss .name { font-size: 17px; color: var(--gold); text-shadow: 0 0 8px #c9962c88; }                                   /* the boss's bar: heavier, gold-framed, a crown before the name */
+  .hp.boss .name span:first-child::before { content: "\265B  "; }
+  .hp.boss .track { height: 19px; border-color: #c9962c; box-shadow: 0 0 10px #c9962c66, inset 0 0 6px #000; }
+  #hpG.boss .fill { background: linear-gradient(90deg, #8a2a24, #d8473f 55%, #f3a14a); }
+  .bossname { position: absolute; left: 0; right: 0; top: 14%; z-index: 6; pointer-events: none; text-align: center; font: 700 clamp(30px, 7vw, 54px) var(--display); letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; color: var(--gold);
+    text-shadow: 0 2px 0 #0b0914, 0 0 8px #0b0914, 0 0 24px #c9962ccc; }
+  .bossname small { display: block; margin-bottom: .2em; font: 600 clamp(13px, 3vw, 20px) var(--display); letter-spacing: .5em; text-indent: .5em; color: #ece2c8; }
   .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   button, .file span {
     font: 600 14px var(--display); letter-spacing: .08em; text-transform: uppercase;
@@ -748,6 +755,7 @@
       if (bgV) requestAnimationFrame(arrive);
     })();
     if (await slowed && my === run) playPose("idle", true);
+    if (my === run && MONSTERS[monKey] && MONSTERS[monKey].king) kingArrive(my);          // (the boss: a footfall, a pulse and his name)
   }
 
   // ---------------------------------------------------------------- the dungeon's entrance (Rootgate)
@@ -5440,6 +5448,7 @@
     var idle = (m.anims || []).filter(function (a) { return a.slot === "idle"; })[0];
     FIGHTERS.G.name = m.name;
     var nm = $("hpG").querySelector(".name span"); if (nm) nm.textContent = m.name;
+    $("hpG").classList.toggle("boss", !!m.king);                                      // (the boss has a heavier, gold-framed bar)
     $("monSel").value = idle ? key : "goblin";
     $("monSizeWrap").style.display = idle ? "" : "none";
     $("monSqWrap").style.display = idle && m.squash ? "" : "none";
@@ -5490,7 +5499,8 @@
   function monFxClear() { ["mfxB", "mfxF"].forEach(function (id) { fxCtx(id).clearRect(0, 0, stage.clientWidth, stage.clientHeight); }); MFX.ps.length = 0; }
   function monFxEnsure() {
     var m = MONSTERS[monKey];
-    if (m && (m.vfx === "fire" || m.vfx === "ice" || m.vfx === "lightning" || m.vfx === "dark")) { if (!MFX.raf) { MFX.last = 0; MFX.raf = requestAnimationFrame(monFxLoop); } }
+    if (m && m.king) { if (MFX.raf) cancelAnimationFrame(MFX.raf); MFX.last = 0; MFX.raf = requestAnimationFrame(kingAuraLoop); return; }   // the Slime King: golden motes, a halo, a glint on the ruby (kingAuraLoop)
+    if (m && (m.vfx === "fire" || m.vfx === "ice" || m.vfx === "lightning" || m.vfx === "dark")) { if (MFX.raf) cancelAnimationFrame(MFX.raf); MFX.last = 0; MFX.raf = requestAnimationFrame(monFxLoop); }
     else { if (MFX.raf) { cancelAnimationFrame(MFX.raf); MFX.raf = 0; } monFxClear(); }
   }
   function mfxTex(ctx, im, x, y, w, h, a, flip) {                                       // a painted picture (or the masked canvas made from it), additive, its bottom edge centred on x and standing on y
@@ -6108,14 +6118,14 @@
     fbParticles(ctx, L.ps, dt, F, u);
   }
   async function spitAct(e, myRun, A, T) {
-    var vf = e.elem || (MONSTERS[monKey] && MONSTERS[monKey].vfx), holy = vf === "holy", dark = vf === "dark", elec = vf === "lightning", ice = vf === "ice", cin = !!e.cinder, pk = e.pack || monSpitPack(), REL = e.rel || SPIT_REL, F = holy ? holySpitParams() : cin && dark ? darkChainParams() : dark ? darkSpitParams() : cin && elec ? lightChainParams() : cin ? (ice ? lanceSpitParams() : cinderParams()) : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth, n = pk.n, fm = 1000 / pk.fps / speed, i, starts = [], tot = 0, pv = !!e.preview;
+    var vf = e.elem || (MONSTERS[monKey] && MONSTERS[monKey].vfx), holy = vf === "holy", dark = vf === "dark", elec = vf === "lightning", ice = vf === "ice", cin = !!e.cinder, pk = e.pack || monSpitPack(), REL = e.rel || SPIT_REL, F = holy ? holySpitParams() : cin && dark ? darkChainParams() : dark ? darkSpitParams() : cin && elec ? lightChainParams() : cin ? (ice ? lanceSpitParams() : cinderParams()) : elec ? lightSpitParams() : ice ? iceSpitParams() : spitParams(), u = uW.offsetWidth * (e.fxScale || 1), n = pk.n, fm = 1000 / pk.fps / speed, i, starts = [], tot = 0, pv = !!e.preview;
     var holds = cin ? CIN_HOLDS : pk.holds;
     for (i = 0; i < n; i++) { starts.push(tot); tot += fm * (holds[i] || 1); }
     var t0 = performance.now(), tRel = t0 + starts[REL - 1] + fm * (holds[REL - 1] || 1) * (cin ? CIN_REL : 0.2), seed = t0 | 0;
     var tr0 = rectIn(T.unit), to = { x: tr0.left + tr0.width * 0.5, y: tr0.top + tr0.height * 0.42 }, a = centerOf(A.unit), t = centerOf(T.unit);
     var dist = Math.sqrt((t.x - a.x) * (t.x - a.x) + (t.y - a.y) * (t.y - a.y)) || 1, beyond = e.dodge ? u * 1.2 : 0, total = dist + beyond;
     if (e.dodge) to = { x: to.x + A.dir * beyond, y: to.y - u * 0.05 };                // a dodged spit flies on past the target
-    var flight = Math.max(260, dist / (u * 5.5 * SPEED_K / 1000)) / speed, flight2 = flight * total / dist;
+    var flight = Math.max(260, dist / (uW.offsetWidth * 5.5 * SPEED_K / 1000)) / speed, flight2 = flight * total / dist;
     var tImp = e.dodge ? tRel + flight2 * Math.pow(dist / total, 1 / 1.3) : tRel + flight2;   // the moment the ball reaches (or passes) the target (the ball's path is eased with the power 1.3)
     var dodgeRun = null;
     if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
@@ -7382,7 +7392,7 @@
       if (myRun === run && uG.style.transform.indexOf("translate(") === 0) uG.style.transform = "";                      // (never leave the unit in the air)
     }
   }
-  monPrevLoop($("monPrevBounce"), async function (my) { await (MONSTERS[monKey].melee || MONSTERS[monKey].king ? dropAct : bounceAct)({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
+  monPrevLoop($("monPrevBounce"), async function (my) { await (MONSTERS[monKey].king ? kingSlamAct : MONSTERS[monKey].melee ? dropAct : bounceAct)({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W); if (FIGHTERS.W.burn) clearBurn(FIGHTERS.W); if (FIGHTERS.W.chilled) clearChilled(FIGHTERS.W); });
   // ---------------------------------------------------------------- the SLIME KING's skills (2026-11-11, docs/SLIME_KING.md)
   // The King (MONSTERS.slime_king, king: true) fights with six skills on five sheets (Animations/SlimeKing/<folder>, the user's ChatGPT sheets; slots attack, decree, raise, bounce, heal):
   //   RADIANT OOZE (holy, 44%): the spit (slot attack, release frame 5, the mouth marks in the strip's mouth.json) with a HOLY ooze (code: a golden-white blob with a glow and sparkles, hlBoltDraw / hlImpact);
@@ -7398,7 +7408,7 @@
   var ELEM_RGB = { fire: "255,150,50", ice: "130,210,255", lightning: "200,210,255", dark: "170,100,255", holy: "255,226,140" };
   var HOLY_PAL = { core: "255,253,240", mid: "255,232,150", glow: "255,196,84", deep: "196,142,52", flash: "255,246,210" };
   var HOLY_SHOCK = [{ filter: "brightness(2.6) sepia(.8) saturate(2.2)", offset: 0 }, { filter: "brightness(1.5) sepia(.5) saturate(1.5)", offset: 0.4 }, { filter: "brightness(1)", offset: 1 }];
-  function holySpitParams() { return { painted: false, pal: HOLY_PAL, palName: "holy", k: 1, size: 0.7, w: 1, speed: 1, trail: 0.9, shake: 0.4, imp: 0.7, stages: 1, chance: 0, charge: 3, release: SPIT_REL }; }
+  function holySpitParams() { return { painted: false, pal: HOLY_PAL, palName: "holy", k: 1, size: 0.7, w: 1, speed: 1, trail: 0.9, shake: 0.4, imp: 0.7, stages: 1, chance: 0, charge: 3, release: SPIT_REL, sc: kingK() }; }
   function kingTipAt(pk, fi) {                                                       // the crystal of the staff on frame fi (0-based) of a King pack, in stage px (null when the strip has no staffTip)
     var tp = pk && pk.placement && pk.placement.staffTip && pk.placement.staffTip[fi];
     if (!tp || !monEl) return null;
@@ -7434,7 +7444,7 @@
     fbParticles(ctx, L.ps, dt, F, u);
   }
   function hlImpact(T, F) {                                                          // the ooze lands: a golden flash and ring, cream drops thrown out and falling, sparkles, a glow on the ground
-    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width / 2, cy = r.top + r.height * 0.42, gy = r.top + r.height - r.height * 0.03, rnd = rngOf(now | 0), ps = [], drops = [], s = F.imp, i, n;
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth * (F.sc || 1), cx = r.left + r.width / 2, cy = r.top + r.height * 0.42, gy = r.top + r.height - r.height * 0.03, rnd = rngOf(now | 0), ps = [], drops = [], s = F.imp, i, n;
     shake(4 * (0.6 + 0.4 * s), 260);
     for (i = 0, n = Math.round(26 * s); i < n; i++) { var a1 = -Math.PI * (0.05 + rnd() * 0.9), sp1 = u * (0.4 + rnd() * 1.1) / 1000; fbParticle(ps, cx + (rnd() - 0.5) * u * 0.1, cy, Math.cos(a1) * sp1, Math.sin(a1) * sp1 - 0.1 * u / 1000, 420 + rnd() * 500, u * 0.012, "ember"); }
     for (i = 0; i < 10; i++) drops.push({ a: -Math.PI * (0.1 + rnd() * 0.8), v: 0.5 + rnd() * 0.9, s: 0.012 + rnd() * 0.014 });
@@ -7484,11 +7494,11 @@
     }
   }
   function oozeAct(e, myRun, A, T) {                                                 // RADIANT OOZE: the spit with the holy ooze
-    return spitAct(Object.assign({}, e, { elem: "holy", amount: Math.round((e.amount || 0) * KING_POW.spit), verb: " spits Radiant Ooze at ", verbMiss: " spits Radiant Ooze, but " }), myRun, A, T);
+    return spitAct(Object.assign({}, e, { elem: "holy", fxScale: kingK(), amount: Math.round((e.amount || 0) * KING_POW.spit), verb: " spits Radiant Ooze at ", verbMiss: " spits Radiant Ooze, but " }), myRun, A, T);
   }
   function decreeAct(e, myRun, A, T) {                                               // ROYAL DECREE: the staff points and a bolt of the next element leaves the crystal (fire, ice, lightning, dark in turn)
     var pk = monPackOf("decree"), n = MON.dec = (MON.dec || 0) + 1, el = KING_ELEMS[(n - 1) % 4], nm = { fire: "fire", ice: "ice", lightning: "lightning", dark: "darkness" }[el];
-    return spitAct(Object.assign({}, e, { elem: el, pack: pk, rel: (pk.placement && pk.placement.castFrame) || 4, amount: Math.round((e.amount || 0) * KING_POW.decree),
+    return spitAct(Object.assign({}, e, { elem: el, fxScale: kingK(), pack: pk, rel: (pk.placement && pk.placement.castFrame) || 4, amount: Math.round((e.amount || 0) * KING_POW.decree),
       point: function () { return kingTipAt(pk, monFrame); }, verb: " commands a bolt of " + nm + " at ", verbMiss: " commands a bolt of " + nm + ", but " }), myRun, A, T);
   }
   function skyStreak(tPre, tHit, x, ty, el) {                                        // a comet (or a jagged bolt for lightning) falling from the top of the stage onto (x, ty), arriving at tHit
@@ -7525,12 +7535,13 @@
     } });
   }
   async function raiseAct(e, myRun, A, T, kind) {                                    // KINGDOM'S WRATH (kind "wrath") and ABSOLUTE JUDGMENT ("judgment"): the staff held high, the sky answers
-    var pk = monPackOf("raise"), u = uW.offsetWidth, pv = !!e.preview, unit = 1000 / pk.fps, fm = unit / speed, wrath = kind === "wrath", H = (wrath ? WRATH_HOLD : JUDG_HOLD) / unit;
+    var pk = monPackOf("raise"), u = uW.offsetWidth * kingK(), pv = !!e.preview, unit = 1000 / pk.fps, fm = unit / speed, wrath = kind === "wrath", H = (wrath ? WRATH_HOLD : JUDG_HOLD) / unit;
     var holds = [1, 1, 1.3, H * 0.5, H * 0.5, 1.4, 1.2, 1], starts = [], tot = 0, i, k, dodgeRun = null;
     for (i = 0; i < pk.n; i++) { starts.push(tot); tot += fm * holds[i]; }
     var t0 = performance.now(), tr = rectIn(T.unit), tx = tr.left + tr.width * 0.5, ty = tr.top + tr.height * 0.42, tgy = tr.top + tr.height * 0.97;
     var total = Math.round((e.amount || 0) * (wrath ? KING_POW.wrath : KING_POW.judgment)), tH = wrath ? [0, 1, 2, 3].map(function (q) { return t0 + starts[3] + fm * H * (0.2 + 0.2 * q); }) : [t0 + starts[5] + fm * 0.3];
-    var ready = monPlayPack(pk, myRun, null, holds);
+    var ready = monPlayPack(pk, myRun, null, holds), tEnd = tH[tH.length - 1] + 600 / speed;
+    kingVignette(t0, t0 + 600 / speed, tEnd - 500 / speed, tEnd, wrath ? 0.55 : 0.6); kingRumble(t0 + 100 / speed, tEnd - t0 - 600 / speed, 1.8); kingCrownGlow(t0 + starts[1], tEnd, 0.8);   // the warning: the edges darken, the stage rumbles, the crown glows
     fxAdd({ t0: t0 + starts[1], t1: tH[tH.length - 1] + 500 / speed, draw: function (ctx, now) {   // the crystal gathers light while the staff rises and is held (the elements in turn for the Wrath, gold for the Judgment)
       var tp = kingTipAt(pk, monFrame); if (!tp) return;
       var c = clamp01((now - t0 - starts[1]) / Math.max(1, starts[3] - starts[1])), q = Math.min(3, Math.floor(Math.max(0, now - tH[0] + fm * H * 0.2) / (fm * H * 0.2))), rgb = wrath ? ELEM_RGB[KING_ELEMS[q]] : ELEM_RGB.holy, fl = 0.85 + 0.15 * Math.sin(now * 0.05);
@@ -7549,7 +7560,7 @@
         if (myRun !== run) return;
         if (e.dodge) { if (k === 0 && !pv) { say(A.name + " raises its staff and the sky strikes, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); } continue; }
         kingHit(T, amt, cls, e, k === 3);
-        if (el === "fire") fbImpact(T, spitParams()); else if (el === "ice") icImpact(T, iceSpitParams()); else if (el === "lightning") ltImpact(T, lightSpitParams()); else dkImpact(T, darkSpitParams());
+        { var Fi = el === "fire" ? spitParams() : el === "ice" ? iceSpitParams() : el === "lightning" ? lightSpitParams() : darkSpitParams(); Fi.imp = (Fi.imp || 0.6) * 1.5; if (el === "fire") fbImpact(T, Fi); else if (el === "ice") icImpact(T, Fi); else if (el === "lightning") ltImpact(T, Fi); else dkImpact(T, Fi); }
         if (k === 3 && !pv) say(A.name + " calls Kingdom's Wrath: fire, ice, lightning and darkness strike " + T.name + " for " + total + (e.crit ? " (crit!)" : "") + ".", "g");
         if (T.hp <= 0 && !pv) break;
       }
@@ -7570,7 +7581,7 @@
   async function healAct(e, myRun, A) {                                              // ROYAL RESTORATION: the King heals itself: a golden light round the body, sparkles rising, a green +N, the HP bar goes up
     var pk = monPackOf("heal"), pv = !!e.preview, unit = 1000 / pk.fps, fm = unit / speed, holds = [1, 1, 1.2, 2.6, 2.6, 1.3], starts = [], tot = 0, i;
     for (i = 0; i < pk.n; i++) { starts.push(tot); tot += fm * holds[i]; }
-    var t0 = performance.now(), ready = monPlayPack(pk, myRun, null, holds), r0 = rectIn(monEl), u = uW.offsetWidth, rnd = rngOf(t0 | 0), sp = [], j;
+    var t0 = performance.now(), ready = monPlayPack(pk, myRun, null, holds), r0 = rectIn(monEl), u = uW.offsetWidth * kingK(), rnd = rngOf(t0 | 0), sp = [], j;
     var cx = r0.left + r0.width * 0.5, gy = r0.top + r0.height * 470 / 512, domeH = r0.height * 0.6, bodyW = r0.width * 0.68;
     for (j = 0; j < 26; j++) sp.push({ dx: (rnd() - 0.5) * bodyW * 0.95, ph: rnd(), sp: 0.5 + rnd() * 0.7, s: 0.012 + rnd() * 0.012 });
     fxAdd({ t0: t0 + starts[1], t1: t0 + tot + 900 / speed, draw: function (ctx, now) {
@@ -7594,7 +7605,7 @@
     if (ok) monStartIdle();
   }
   function kingSkill(k) {
-    return k === "decree" ? decreeAct : k === "slam" ? dropAct : k === "wrath" ? function (e, m, A, T) { return raiseAct(e, m, A, T, "wrath"); } : k === "judgment" ? function (e, m, A, T) { return raiseAct(e, m, A, T, "judgment"); } : k === "heal" ? healAct : oozeAct;
+    return k === "decree" ? decreeAct : k === "slam" ? kingSlamAct : k === "wrath" ? function (e, m, A, T) { return raiseAct(e, m, A, T, "wrath"); } : k === "judgment" ? function (e, m, A, T) { return raiseAct(e, m, A, T, "judgment"); } : k === "heal" ? healAct : oozeAct;
   }
   function kingAttackAct(e, myRun, A, T) {                                           // the skill select: one skill, or 'alternate' (ooze, decree, crown slam, ooze, decree, wrath, heal (only below 70% HP), judgment: placeholders for the engine's cooldowns)
     var md = $("monAtk").value, n = MON.atk = (MON.atk || 0) + 1, order = ["spit", "decree", "slam", "spit", "decree", "wrath", "heal", "judgment"], pick = md, guard = 0;
@@ -7608,6 +7619,196 @@
   monPrevLoop($("monPrevWrath"), async function (my) { await raiseAct({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W, "wrath"); });
   monPrevLoop($("monPrevJudg"), async function (my) { await raiseAct({ actor: "G", amount: 40, preview: true }, my, FIGHTERS.G, FIGHTERS.W, "judgment"); });
   monPrevLoop($("monPrevHeal"), async function (my) { await healAct({ actor: "G", preview: true }, my, FIGHTERS.G); });
+  // ---------------------------------------------------------------- the SLIME KING's BOSS WEIGHT AND PRESENCE (2026-11-11, the user: "it feels like a bigger slime, the animations do not feel bossy, especially the Crown Slam")
+  // The sheets stay; what changes is tempo and how the world reacts to him (docs/SLIME_KING.md):
+  //   WEIGHT: the Crown Slam is rebuilt (kingSlamAct): no leap out of the stage, no fast bounce. He rears up with the staff raised and the crown glowing (a second of wind-up on the staff-raise frames), squats, rises in a heavy
+  //     arc (slowing at the top), plunges crown first and lands: a 110 ms HIT-STOP (everything holds), then the shake, a flash, a golden shockwave sweeping the whole ground, cracks running out of the landing, a huge cloud of dust
+  //     and chips, the target thrown back; the crash pose is held, the second small thud follows, then he settles and walks home.
+  //   WARNINGS: before the Crown Slam, the Kingdom's Wrath and the Absolute Judgment the stage's edges darken (kingVignette), a low rumble shakes the stage (kingRumble) and the crown glows with glints (kingCrownGlow).
+  //   PRESENCE: golden motes rise round him and a glint crosses the ruby every few seconds (kingAuraLoop, on the monster-effect canvases); a heavier, gold-framed HP bar (.hp.boss); a name banner (kingBanner); an entrance
+  //     (kingEntrance: he drops in from above when picked) and an arrival (kingArrive: the footfall, the pulse and the banner when a new stage brings him in).
+  //   SIZE: his effects scale with his size (kingK: 1 + 0.8 x the extra size, 1.4 at 150%).
+  function kingK() { var ms = parseFloat(uG.style.getPropertyValue("--ms")) || 1; return 1 + (ms - 1) * 0.8; }
+  function kingPt(cx, cy) {                                                          // a point of the King's 512 cell (the sprite is mirrored on the stage) in stage px
+    var r = rectIn(monEl), flip = uG.classList.contains("flip");
+    return { x: r.left + (flip ? 1 - cx / 512 : cx / 512) * r.width, y: r.top + cy / 512 * r.height, w: r.width, h: r.height };
+  }
+  var KING_RUBY = [280, 176], KING_CROWN = [240, 150];
+  function starGlint(ctx, x, y, r, a) {                                              // a four-point star of light
+    if (a <= 0.01) return;
+    glowDot(ctx, x, y, r * 1.2, "255,236,170", 0.6 * a);
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round"; ctx.strokeStyle = "rgba(255,248,220," + (0.9 * a).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, r * 0.09);
+    ctx.beginPath(); ctx.moveTo(x - r, y); ctx.lineTo(x + r, y); ctx.moveTo(x, y - r * 1.25); ctx.lineTo(x, y + r * 1.25); ctx.stroke();
+    ctx.lineWidth = Math.max(1, r * 0.05); ctx.beginPath(); ctx.moveTo(x - r * 0.55, y - r * 0.55); ctx.lineTo(x + r * 0.55, y + r * 0.55); ctx.moveTo(x - r * 0.55, y + r * 0.55); ctx.lineTo(x + r * 0.55, y - r * 0.55); ctx.stroke(); ctx.restore();
+  }
+  var KA = { ps: [], acc: 0, glint: 0, nextGlint: 0 };
+  function kingAuraLoop(now) {                                                       // always on while the King is the monster: a faint golden halo and light on the ground, motes rising, a glint on the ruby every 4 to 6 s
+    MFX.raf = requestAnimationFrame(kingAuraLoop);
+    var m = MONSTERS[monKey], cb = fxCtx("mfxB"), cf = fxCtx("mfxF"), W = stage.clientWidth, H = stage.clientHeight;
+    cb.clearRect(0, 0, W, H); cf.clearRect(0, 0, W, H);
+    if (!m || !m.king || !monEl) { KA.ps.length = 0; return; }
+    var dt = MFX.last ? Math.min(60, now - MFX.last) : 16, op = +getComputedStyle(uG).opacity || 0;
+    MFX.last = now;
+    if (op < 0.02 || monPose === "death") { KA.ps.length = 0; return; }
+    var body = kingPt(256, 330), gy = kingPt(256, 470).y, s = body.w, rnd = MFX.rnd, i, p, f, k = op * op, gt, gp, a0;
+    glowDot(cb, body.x, body.y, s * 0.55, "255,214,120", 0.11 * k);
+    glowEllipse(cb, body.x, gy, s * 0.42, s * 0.07, "255,196,84", 0.22 * k);
+    KA.acc += 0.0045 * dt;
+    while (KA.acc >= 1) { KA.acc -= 1; a0 = rnd() * 6.2832; KA.ps.push({ x: body.x + Math.cos(a0) * s * (0.1 + rnd() * 0.2) * 1.2, y: kingPt(0, 150 + rnd() * 240).y, vx: (rnd() - 0.5) * 0.00006 * s, vy: -(0.00007 + rnd() * 0.0001) * s, age: 0, life: 1800 + rnd() * 1600, size: s * (0.006 + rnd() * 0.006) }); }
+    if (KA.ps.length > 40) KA.ps.splice(0, KA.ps.length - 40);
+    for (i = KA.ps.length - 1; i >= 0; i--) {
+      p = KA.ps[i]; p.age += dt; if (p.age >= p.life) { KA.ps.splice(i, 1); continue; }
+      p.x += p.vx * dt + Math.sin(now * 0.0015 + i) * 0.006 * dt; p.y += p.vy * dt; f = p.age / p.life;
+      glowDot(cf, p.x, p.y, p.size * 2.4, "255,226,140", 0.65 * Math.sin(f * 3.1416) * k);
+    }
+    if (now > KA.nextGlint) { KA.glint = now; KA.nextGlint = now + 4200 + rnd() * 2200; }
+    gt = (now - KA.glint) / 420;
+    if (gt >= 0 && gt < 1) { gp = kingPt(KING_RUBY[0], KING_RUBY[1]); starGlint(cf, gp.x, gp.y, s * 0.045 * (0.5 + Math.sin(gt * 3.1416)), Math.sin(gt * 3.1416) * k); }
+  }
+  function kingVignette(tS, tF, tF0, tE, aMax) {                                     // the stage's edges darken: from tS to full at tF, held until tF0, gone at tE (absolute times)
+    fxAdd({ t0: tS, t1: tE, draw: function (ctx, now) {
+      var a = aMax * clamp01((now - tS) / Math.max(1, tF - tS)) * (1 - clamp01((now - tF0) / Math.max(1, tE - tF0))), W = stage.clientWidth, H = stage.clientHeight, g;
+      if (a <= 0.01) return;
+      g = ctx.createRadialGradient(W * 0.5, H * 0.62, Math.min(W, H) * 0.25, W * 0.5, H * 0.62, Math.max(W, H) * 0.75);
+      g.addColorStop(0, "rgba(12,8,0,0)"); g.addColorStop(1, "rgba(12,8,0," + a.toFixed(3) + ")");
+      ctx.save(); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.restore();
+    } });
+  }
+  function kingRumble(tS, ms, px) {                                                  // a low rumble: small shakes of the stage repeated for ms
+    var n = Math.max(1, Math.round(ms * speed / 170)), i, my = run;
+    for (i = 0; i < n; i++) setTimeout(function () { if (my === run) shake(px, 160); }, Math.max(0, tS - performance.now()) + i * 170 / speed);
+  }
+  function kingCrownGlow(tS, tE, str) {                                              // the crown gathers light (a golden glow and glints on the ruby) between tS and tE
+    var rnd = rngOf(tS | 0);
+    fxAdd({ t0: tS, t1: tE, draw: function (ctx, now) {
+      var c = clamp01((now - tS) / Math.max(1, (tE - tS) * 0.7)) * (1 - clamp01((now - (tE - 200 / speed)) / (200 / speed))), cp, rp, fl = 0.85 + 0.15 * Math.sin(now * 0.05), s;
+      if (!monEl || c <= 0.01) return;
+      cp = kingPt(KING_CROWN[0], KING_CROWN[1]); rp = kingPt(KING_RUBY[0], KING_RUBY[1]); s = cp.w;
+      glowDot(ctx, cp.x, cp.y, s * (0.12 + 0.16 * c) * fl, "255,206,100", 0.8 * c * str); glowDot(ctx, cp.x, cp.y, s * (0.06 + 0.07 * c), "255,246,210", 0.7 * c * str);
+      starGlint(ctx, rp.x, rp.y, s * 0.05 * (0.6 + 0.6 * Math.abs(Math.sin(now * 0.012 + rnd()))), c * str);
+    } });
+  }
+  function kingShockwave(tHit, x, gy, u) {                                           // the landing's shockwave: a flash, two golden rings sweeping across the whole ground, a glow along it
+    var W = stage.clientWidth;
+    fxAdd({ t0: tHit, t1: tHit + 1100 / speed, draw: function (ctx, now) {
+      var t = (now - tHit) * speed / 1000, j, k, R, a;
+      if (t < 0.14) flashAll(ctx, "255,244,214", 0.3 * (1 - t / 0.14));
+      for (j = 0; j < 2; j++) {
+        k = clamp01(t * 1.5 - j * 0.12); if (k <= 0 || k >= 1) continue;
+        R = W * 0.9 * (1 - Math.pow(1 - k, 2.4)); a = 0.8 * (1 - k);
+        ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(255,226,150," + a.toFixed(3) + ")"; ctx.lineWidth = Math.max(2, u * 0.05 * (1 - k)); ctx.beginPath(); ctx.ellipse(x, gy, R, R * 0.16, 0, 0, 6.2832); ctx.stroke();
+        ctx.strokeStyle = "rgba(255,252,236," + (a * 0.6).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.02 * (1 - k)); ctx.stroke(); ctx.restore();
+      }
+      glowEllipse(ctx, x, gy, u * (0.5 + 1.4 * clamp01(t)), u * 0.14, "255,200,90", 0.4 * (1 - clamp01(t * 1.1)));
+    } });
+  }
+  var SLAM = { crouchMs: 170, upMs: 300, downMs: 190, stopMs: 110, crashMs: 450, windHolds: [1.2, 1.6, 4.5, 5] };
+  async function kingSlamAct(e, myRun, A, T) {                                       // CROWN SLAM, the heavy version: wind-up, squat, a heavy arc, a crown-first plunge, the hit-stop, the shockwave
+    var pkR = monPackOf("raise"), pkS = monPackOf("bounce"), u = uW.offsetWidth, K = kingK(), pv = !!e.preview, el = monEl, dodgeRun = null, dead = false, B = { blk: false, hp: function (a) { return a; }, fx: function () {} };
+    var a = centerOf(A.unit), t = centerOf(T.unit), ms = parseFloat(uG.style.getPropertyValue("--ms")) || 1, reach = (t.x - a.x) - A.dir * u * (BOUNCE_LAND + Math.max(0, ms - 1) * 1.7), H = u * 0.9, fmR = 1000 / pkR.fps / speed;
+    var windMs = SLAM.windHolds.reduce(function (s0, h) { return s0 + h; }, 0) * fmR, t0 = performance.now(), tLeap = t0 + windMs, tImp = tLeap + (SLAM.crouchMs + SLAM.upMs + SLAM.downMs) / speed;
+    var showS = function (i) { monPlayPack(pkS, myRun, null, [0.01], [i]); };
+    var setT = function (x, y) { uG.style.transform = "translate(" + x + "px," + y + "px)"; };
+    var slamHit = function (amount, big) {                                          // one hit on the target: the damage and the number, the hit pose, a shove (a heavy one for the first)
+      if (!pv) {
+        T.hp -= amount; paintHp(T);
+        if (T === FIGHTERS.W) { barrierHit(); if (T.hp <= 0) barrierDrop(true); }
+        if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
+        floatNumber(T, (B.blk ? (big ? "BLOCK " : "") : e.crit && big ? "CRIT " : "") + amount, B.blk ? "block" : e.crit && big ? "crit" : "");
+      }
+      if (T === FIGHTERS.W && packs.hit && T.hp > 0) playPose("hit", false).then(backToIdle);
+      anim(T.unit.querySelector(".sprite"), B.blk ? BLOCK_SHOCK : PHYS_SHOCK, big ? 520 : 300).catch(function () {});
+      anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (A.dir * (big ? 56 : 18)) + "px)" }, { transform: "translateX(" + (-A.dir * (big ? 20 : 8)) + "px)" }, { transform: "translateX(0)" }], big ? 460 : 260).catch(function () {});
+    };
+    try {
+      B = blockOf(e, A, T, tImp, myRun);                                             // (the fighter blocks: his block pack starts early)
+      if (e.dodge && T === FIGHTERS.W && packs.dodge && !packs.dodge.keyed && nFrames("dodge") > 0) {
+        var preMs = (Math.max(1, +$("evadeFrame").value || 3) - 1 + 0.4) * 1000 / Math.max(1, +$("fps_dodge").value || 14);
+        dodgeRun = runDodge(myRun, Math.max(0, ((tImp + SLAM.stopMs / speed - performance.now()) - preMs / speed) * speed));
+      }
+      kingVignette(t0, t0 + 700 / speed, tImp + SLAM.stopMs / speed, tImp + (SLAM.stopMs + 800) / speed, 0.62);   // the warning: the edges darken, the stage rumbles, the crown glows
+      kingRumble(t0 + 150 / speed, windMs - 150 / speed, 2.2); kingCrownGlow(t0 + fmR, tImp, 1);
+      monPlayPack(pkR, myRun, null, SLAM.windHolds, [1, 2, 3, 4]);                   // 1. the wind-up: he rears up, the staff goes high, the eyes open wide
+      await bsWait(tLeap);
+      if (myRun !== run) return;
+      showS(1);                                                                       // 2. the squat
+      await bsWait(tLeap + SLAM.crouchMs / speed);
+      if (myRun !== run) return;
+      showS(2);                                                                       // 3. the rise: a heavy arc that slows at the top
+      if (!await bnDrive(myRun, SLAM.upMs / speed, function (s) { var q = 1 - (1 - s) * (1 - s); setT(reach * 0.5 * q, -H * q); })) return;
+      showS(3);                                                                       // 4. the plunge, crown first
+      if (!await bnDrive(myRun, SLAM.downMs / speed, function (s) { var q = s * s; setT(reach * (0.5 + 0.5 * q), -H * (1 - q)); })) return;
+      showS(4); setT(reach, 0);                                                       // 5. THE CRASH, and everything holds for a moment
+      await sleep(SLAM.stopMs / speed);
+      if (myRun !== run) return;
+      var rr = rectIn(el), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512, tI = performance.now(), tg = centerOf(T.unit);
+      bashImpactFx(tI, lx, lgy - u * 0.1, lgy, u, A.dir, 2.6); kingShockwave(tI, lx, lgy, u * K); shake(26 * Math.min(1.4, K), 900); B.fx();
+      earthCrackFx(tI, tI + 380 / speed, tI + 1500 / speed, earthPath(lx, lgy, tg.x, lgy + u * 0.01, u, tI), u);                // cracks run out of the landing, toward the target and away
+      earthCrackFx(tI, tI + 300 / speed, tI + 1300 / speed, earthPath(lx, lgy, lx - A.dir * u * 1.3, lgy, u, tI + 7), u * 0.8);
+      var first = B.hp(Math.round((e.amount || 0) * (MONSTERS[monKey].dropDmg || 1.6))), second = B.hp(Math.round((e.amount || 0) * (MONSTERS[monKey].dropDmg2 || 0.3)));
+      if (e.dodge) {
+        if (!pv) { say(A.name + " slams down, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); }
+      } else {
+        slamHit(first, true);
+        if (!pv) say(A.name + " slams down on " + T.name + " for " + first + (B.blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage)" : e.crit ? " (crit!)" : "") + " (" + (MONSTERS[monKey].dropName || "Crown Slam") + ").", "g");
+        dead = !pv && T.hp <= 0;
+      }
+      await bsWait(tI + SLAM.crashMs / speed);                                       // 6. the crash is held: he does not bounce
+      if (myRun !== run) return;
+      showS(5);                                                                       // 7. a startled blink, then the landing's second thud
+      await bsWait(performance.now() + 170 / speed);
+      if (myRun !== run) return;
+      showS(6);
+      var tI2 = performance.now(), r2 = rectIn(el), lgy2 = r2.top + r2.height - r2.width * 42 / 512;
+      bashImpactFx(tI2, lx, lgy2 - u * 0.05, lgy2, u, A.dir, 1.2); shake(9, 360);
+      if (!e.dodge && !dead) {
+        slamHit(second, false);
+        if (!pv) say("The landing hits " + T.name + " again for " + second + ".", "g");
+        dead = !pv && T.hp <= 0;
+      }
+      await bsWait(tI2 + 300 / speed);
+      if (myRun !== run) return;
+      showS(7);                                                                       // 8. settle, then he walks home
+      await bsWait(performance.now() + 320 / speed);
+      if (myRun !== run) return;
+      if (!await bnDrive(myRun, 460 / speed, function (s) { var ez = s < 0.5 ? 2 * s * s : 1 - Math.pow(-2 * s + 2, 2) / 2; setT(reach * (1 - ez), 0); })) return;
+      uG.style.transform = "";
+      if (dodgeRun) await dodgeRun;
+      monStartIdle();
+      clearAnims(T.unit); clearAnims(stage);
+      T.unit.querySelector(".sprite").getAnimations().forEach(function (x) { x.cancel(); });
+      if (dead) {
+        say(T.name + " is defeated.", "sys");
+        if (T === FIGHTERS.W && packs.death && packs.death.keyed && $("still").checked) {
+          keyPose("death", 0); await sleep(150); keyPose("death", 1); await sleep(260); keyPose("death", 2);
+        } else if (T === FIGHTERS.W && packs.death) await playPose("death", false);
+        else await anim(T.unit, [{ opacity: 1, transform: "translateY(0)", filter: "grayscale(0)" }, { opacity: 0, transform: "translateY(22px)", filter: "grayscale(1)" }], 520);
+      }
+    } finally {
+      if (myRun === run && uG.style.transform.indexOf("translate(") === 0) uG.style.transform = "";                      // (never leave the unit in the air)
+    }
+  }
+  function kingBanner() {                                                            // the boss's name across the top of the stage
+    var d = document.createElement("div"); d.className = "bossname"; d.innerHTML = "<small>Boss</small>" + MONSTERS.slime_king.name; stage.appendChild(d);
+    d.animate([{ opacity: 0, transform: "translateY(-14px) scale(1.08)", letterSpacing: ".5em" }, { opacity: 1, transform: "none", letterSpacing: ".3em", offset: 0.2 }, { opacity: 1, transform: "none", offset: 0.78 }, { opacity: 0, transform: "none" }], { duration: 3000 / speed, easing: "ease-out" }).finished.then(function () { d.remove(); }, function () { d.remove(); });
+  }
+  async function kingEntrance() {                                                    // picked from the monster select: he drops in from above, lands with a shake, a shockwave and the name
+    var my = ++run, tries = 0, u = uW.offsetWidth, r, up;
+    while (!monEl && tries++ < 40) await sleep(50);
+    if (my !== run || !monEl) return;
+    await sleep(120 / speed);
+    r = rectIn(uG); up = r.top + r.height + u * 0.9;
+    uG.style.transform = "translate(0px," + (-up) + "px)";
+    if (!await bnDrive(my, 560 / speed, function (s) { uG.style.transform = "translate(0px," + (-up * (1 - s * s)) + "px)"; })) return;
+    uG.style.transform = "";
+    var rr = rectIn(monEl), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512, t0 = performance.now();
+    bashImpactFx(t0, lx, lgy - u * 0.1, lgy, u, -1, 2.6); kingShockwave(t0, lx, lgy, u * kingK()); shake(22, 800); kingBanner();
+  }
+  function kingArrive(my) {                                                          // he rides in with a new stage: when the ground stops a heavy footfall, a pulse along the ground and the name
+    if (my !== run || !monEl) return;
+    var u = uW.offsetWidth, rr = rectIn(monEl), lx = rr.left + rr.width / 2, lgy = rr.top + rr.height - rr.width * 42 / 512, t0 = performance.now();
+    kingShockwave(t0, lx, lgy, u * kingK() * 0.7); shake(12, 520); kingBanner();
+  }
   // ---------------------------------------------------------------- the Elite slime's Earthbreaker (2026-11-10)
   // The Elite's fourth skill, a ground skill, physical (the sheet: Animations/EliteSlime/earthbreaker, the user's Gemini sheet, 6 frames at 12 fps, the slot `eruption`; the hit frame is 4; the stone arms the generator grew in
   // frames 2 and 5 are painted out in earthbreaker_prep.py). The Elite stays on its spot: it gathers (1), raises the sword high with the blade turned down (2), drives it into the floor in front of it (3), strains over it (4),
@@ -7962,7 +8163,7 @@
     var v = +this.value; $("monFxV").textContent = v + "%";
     try { localStorage.setItem("wvg-monster-fire-" + monKey, v); } catch (e) {}
   };
-  $("monSel").onchange = function () { setMonster(this.value); try { localStorage.setItem("wvg-monster", this.value); } catch (e) {} };
+  $("monSel").onchange = function () { setMonster(this.value); try { localStorage.setItem("wvg-monster", this.value); } catch (e) {} if (MONSTERS[this.value] && MONSTERS[this.value].king) kingEntrance(); };
   $("monSq").oninput = function () {
     var v = +this.value; $("monSqV").textContent = v + "%"; monApplySq();
     try { localStorage.setItem("wvg-monster-squash-" + monKey, v); } catch (e) {}
