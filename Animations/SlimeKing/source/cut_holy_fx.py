@@ -5,14 +5,14 @@ its own light):
 
   python Animations/SlimeKing/source/cut_holy_fx.py inbox/holy_fx_glow_sheet.png
 
-Names (panel order, left to right, top row first): hl_orb, hl_burst, hl_pillar, hl_ring, hl_halo, hl_rise, hl_star, hl_motes, hl_rays. A copy of the sheet is kept in Animations/SlimeKing/holy_fx/source/.
+Names (panel order, left to right, top row first): hl_orb, (panel 2, the splash, is SKIPPED: the user did not like it, 2026-11-12), hl_pillar, hl_ring, hl_halo, hl_rise, hl_star, hl_motes, hl_rays. A copy of the sheet is kept in Animations/SlimeKing/holy_fx/source/.
 """
 import os, shutil, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 KING = os.path.abspath(os.path.join(HERE, ".."))
 ROOT = os.path.abspath(os.path.join(KING, "..", ".."))
-NAMES = "hl_orb,hl_burst,hl_pillar,hl_ring,hl_halo,hl_rise,hl_star,hl_motes,hl_rays"
+NAMES = "hl_orb,-,hl_pillar,hl_ring,hl_halo,hl_rise,hl_star,hl_motes,hl_rays"
 
 src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, "inbox", "holy_fx_glow_sheet.png")
 if not os.path.isabs(src): src = os.path.join(ROOT, src)

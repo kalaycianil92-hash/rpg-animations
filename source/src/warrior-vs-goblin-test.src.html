@@ -7455,11 +7455,10 @@
       var t = (now2 - now) * speed, dt = L.last ? Math.min(60, now2 - L.last) * speed : 0, k, j, d, px, py, rk = clamp01(t / 700);
       L.last = now2;
       if (t < 420) { k = 1 - Math.pow(1 - t / 420, 2.2); glowDot(ctx, cx, cy, u * (0.1 + 0.55 * s * k), HOLY_PAL.glow, 0.7 * (1 - t / 420)); glowDot(ctx, cx, cy, u * (0.07 + 0.4 * s * k), HOLY_PAL.mid, 0.9 * (1 - t / 420)); glowDot(ctx, cx, cy, u * (0.03 + 0.15 * s * k), HOLY_PAL.core, 0.95 * (1 - t / 420)); }
-      if (hlT("hl_burst")) hlTexA(ctx, "hl_burst", cx, cy, u * (0.5 + 0.55 * clamp01(t / 220)) * (0.8 + 0.5 * s), fbEnv(t, 0, 640, 140), rot0, 0.5, 0.5);   // (the painted splash)
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + HOLY_PAL.mid + "," + (0.7 * (1 - rk)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.014 * (1 - rk));
       ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.1 + 0.6 * rk), u * (0.1 + 0.6 * rk) * 0.22, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
       glowEllipse(ctx, cx, gy, u * (0.3 + 0.35 * rk), u * 0.08, HOLY_PAL.glow, 0.35 * (1 - rk));
-      for (j = 0; j < drops.length && !hlT("hl_burst"); j++) {
+      for (j = 0; j < drops.length; j++) {
         d = drops[j]; k = clamp01(t / 620); if (k >= 1) continue;
         px = cx + Math.cos(d.a) * u * 0.4 * d.v * k; py = cy + Math.sin(d.a) * u * 0.4 * d.v * k + u * 0.42 * k * k;
         ctx.save(); ctx.fillStyle = "rgba(255,243,208," + (0.95 * (1 - k * k)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(px, py, u * d.s, u * d.s * 1.15, 0, 0, 6.2832); ctx.fill(); ctx.restore();
@@ -7948,7 +7947,7 @@
   }
   // ---------------------------------------------------------------- the PAINTED HOLY pieces (2026-11-12, the user's Gemini sheet inbox/holy_fx_glow_sheet.jpg cut by cut_holy_fx.py into source/assets/fx/hl_*.png)
   // Nine golden-light textures drawn ADDITIVELY (black = transparent). Each effect below draws its picture when it has loaded and keeps its CODE look otherwise (hlT returns null), so nothing breaks while a picture is missing:
-  //   hl_orb the ooze's flight (head at the right), hl_burst the ooze's hit, hl_pillar the Judgment's and the treasure's column of light, hl_ring the Judgment's rings on the ground and the heal's circle, hl_halo and hl_rise
+  //   hl_orb the ooze's flight (head at the right), (hl_burst, the splash, was REMOVED at the user's request 2026-11-12: the ooze's hit is the code look) hl_pillar the Judgment's and the treasure's column of light, hl_ring the Judgment's rings on the ground and the heal's circle, hl_halo and hl_rise
   //   the heal, hl_star every glint (starGlint), hl_motes the aura's drifting gold and the death's burst, hl_rays the flashes (the Judgment's, the death's, the treasure's).
   function hlT(nm) { var im = fbTex[nm]; return im && im.complete && im.naturalWidth ? im : null; }
   function hlTex(ctx, nm, cx, cy, w, h, a, rot) {                                    // a painted piece stretched to w x h, centred on (cx, cy), added as light

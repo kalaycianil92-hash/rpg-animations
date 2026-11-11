@@ -1,6 +1,6 @@
   // ---------------------------------------------------------------- the PAINTED HOLY pieces (2026-11-12, the user's Gemini sheet inbox/holy_fx_glow_sheet.jpg cut by cut_holy_fx.py into source/assets/fx/hl_*.png)
   // Nine golden-light textures drawn ADDITIVELY (black = transparent). Each effect below draws its picture when it has loaded and keeps its CODE look otherwise (hlT returns null), so nothing breaks while a picture is missing:
-  //   hl_orb the ooze's flight (head at the right), hl_burst the ooze's hit, hl_pillar the Judgment's and the treasure's column of light, hl_ring the Judgment's rings on the ground and the heal's circle, hl_halo and hl_rise
+  //   hl_orb the ooze's flight (head at the right), (hl_burst, the splash, was REMOVED at the user's request 2026-11-12: the ooze's hit is the code look) hl_pillar the Judgment's and the treasure's column of light, hl_ring the Judgment's rings on the ground and the heal's circle, hl_halo and hl_rise
   //   the heal, hl_star every glint (starGlint), hl_motes the aura's drifting gold and the death's burst, hl_rays the flashes (the Judgment's, the death's, the treasure's).
   function hlT(nm) { var im = fbTex[nm]; return im && im.complete && im.naturalWidth ? im : null; }
   function hlTex(ctx, nm, cx, cy, w, h, a, rot) {                                    // a painted piece stretched to w x h, centred on (cx, cy), added as light
