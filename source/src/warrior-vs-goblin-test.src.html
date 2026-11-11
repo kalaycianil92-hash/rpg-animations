@@ -7594,7 +7594,7 @@
       var tt = now - t0, a = clamp01((tt - starts[1]) / Math.max(1, starts[3] - starts[1])) * (1 - clamp01((tt - starts[5]) / Math.max(1, tot - starts[5] + 700 / speed))), q, p, rk, y;
       glowDot(ctx, cx, gy - domeH * 0.5, domeH * 1.15, HOLY_PAL.glow, 0.32 * a * (hlT("hl_halo") ? 0.5 : 1)); glowDot(ctx, cx, gy - domeH * 0.5, domeH * 0.7, HOLY_PAL.mid, 0.3 * a * (hlT("hl_halo") ? 0.35 : 1));
       glowEllipse(ctx, cx, gy, bodyW * 0.75 * (0.9 + 0.1 * Math.sin(now * 0.006)), bodyW * 0.18, HOLY_PAL.mid, 0.4 * a);
-      hlTex(ctx, "hl_halo", cx, gy - domeH * 0.55, bodyW * 1.3, domeH * 2.1, 0.5 * a, 0);                                            // (the painted aura, the circle on the ground and the rising ribbons)
+      hlTex(ctx, "hl_halo", cx, gy - domeH * 0.55, bodyW * 1.3, domeH * 2.1, 0.36 * a, 0);                                            // (the painted aura, the circle on the ground and the rising ribbons)
       hlTex(ctx, "hl_ring", cx, gy, bodyW * 1.5 * (0.95 + 0.05 * Math.sin(now * 0.006)), bodyW * 1.5 * 0.27, 0.55 * a, 0);
       hlTex(ctx, "hl_rise", cx - bodyW * 0.1, gy - domeH * 0.55, bodyW * 0.9, domeH * 1.25, 0.14 * a * (0.7 + 0.3 * Math.sin(now * 0.004)), 0);
       for (q = 0; q < sp.length; q++) {                                              // sparkles: a bright point with a small cross, rising along the body
