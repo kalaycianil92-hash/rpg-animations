@@ -7856,7 +7856,7 @@
   function kingPileBox() {                                                           // where the pile is: a box on the stage, behind and a little left of where he stands
     var h = KT.home; if (!h) return null;
     var tex = kingPileTex(), w = h.s * 1.25, ph = w * (tex.naturalHeight || tex.height) / (tex.naturalWidth || tex.width);   // (the picture's own shape; the stand-in is 480 x 200)
-    return { x: h.x - h.s * 0.05, gy: h.gy + h.s * 0.015, w: w, h: ph };
+    return { x: h.x - h.s * 0.1, gy: h.gy + h.s * 0.015, w: w, h: ph };      // (a little left of his middle: the pile's right end stays inside the stage)
   }
   function kingTreasureDraw(cb, cf, now, dt, op) {                                   // called by the aura loop: the pile behind him, its glow and its glimmer
     if (!KT.on) return;
