@@ -1,0 +1,21 @@
+  // ---------------------------------------------------------------- the PAINTED HOLY pieces (2026-11-12, the user's Gemini sheet inbox/holy_fx_glow_sheet.jpg cut by cut_holy_fx.py into source/assets/fx/hl_*.png)
+  // Nine golden-light textures drawn ADDITIVELY (black = transparent). Each effect below draws its picture when it has loaded and keeps its CODE look otherwise (hlT returns null), so nothing breaks while a picture is missing:
+  //   hl_orb the ooze's flight (head at the right), hl_burst the ooze's hit, hl_pillar the Judgment's and the treasure's column of light, hl_ring the Judgment's rings on the ground and the heal's circle, hl_halo and hl_rise
+  //   the heal, hl_star every glint (starGlint), hl_motes the aura's drifting gold and the death's burst, hl_rays the flashes (the Judgment's, the death's, the treasure's).
+  function hlT(nm) { var im = fbTex[nm]; return im && im.complete && im.naturalWidth ? im : null; }
+  function hlTex(ctx, nm, cx, cy, w, h, a, rot) {                                    // a painted piece stretched to w x h, centred on (cx, cy), added as light
+    var im = hlT(nm); if (!im || a <= 0.01) return;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(cx, cy); if (rot) ctx.rotate(rot); ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore();
+  }
+  function hlTexA(ctx, nm, x, y, w, a, rot, ax, ay) {                                // a painted piece w px wide in its own shape, its point (ax, ay) (0..1) at (x, y), turned by rot, added as light
+    var im = hlT(nm); if (!im || a <= 0.01) return;
+    var h = w * im.naturalHeight / im.naturalWidth;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.drawImage(im, -w * ax, -h * ay, w, h); ctx.restore();
+  }
+  function kingRays(tS, ms) {                                                        // a sunburst behind the pile, turning slowly: the treasure's reveal
+    var b = kingPileBox(); if (!b || !hlT("hl_rays")) return;
+    fxAdd({ t0: tS, t1: tS + ms / speed, draw: function (ctx, now) {
+      var t = clamp01((now - tS) * speed / ms), a = Math.sin(Math.min(1, t * 2.2) * 1.5708) * (1 - clamp01((t - 0.5) / 0.5));
+      hlTexA(ctx, "hl_rays", b.x, b.gy - b.h * 0.55, b.w * (1.1 + 0.5 * t), 0.75 * a, t * 0.5, 0.5, 0.5);
+    } });
+  }

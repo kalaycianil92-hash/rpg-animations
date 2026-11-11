@@ -7437,16 +7437,17 @@
     var dt = Math.min(60, now - L.last) * speed; L.last = now;
     var s = clamp01((now - L.t0) / Math.max(1, L.t1 - L.t0)), e = Math.pow(s, L.pw || 1.3), pos = bez(L.p0, L.c, L.p1, e), ahead = bez(L.p0, L.c, L.p1, Math.min(1, e + 0.02));
     var dir = Math.atan2(ahead.y - pos.y, ahead.x - pos.x), r = u * 0.06 * F.size, N = 16, span = (u * F.trail) / L.len, q, f, tp, col;
-    for (q = N; q >= 1 && span > 0; q--) {
+    for (q = N; q >= 1 && span > 0 && !hlT("hl_orb"); q--) {
       f = q / N; tp = bez(L.p0, L.c, L.p1, Math.max(0, e - f * span)); col = f < 0.15 ? HOLY_PAL.core : f < 0.5 ? HOLY_PAL.mid : HOLY_PAL.glow;
       glowDot(ctx, tp.x, tp.y, r * (1.5 * (1 - f) + 0.25), col, Math.pow(1 - f, 1.3) * 0.85);
     }
-    hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
+    if (hlT("hl_orb")) hlTexA(ctx, "hl_orb", pos.x, pos.y, u * 0.66, 1, dir, 0.9, 0.5); else hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);   // (the painted orb, its tail included: no code trail then)
     for (j = fbRate(L, 0.05, dt); j > 0; j--) fbParticle(L.ps, pos.x + (rnd() - 0.5) * r, pos.y + (rnd() - 0.5) * r, (rnd() - 0.5) * 0.15 * u / 1000 - Math.cos(dir) * 0.1 * u / 1000, -(0.05 + rnd() * 0.15) * u / 1000, 320 + rnd() * 300, r * 0.45 * (0.6 + rnd() * 0.6), "ember");
     fbParticles(ctx, L.ps, dt, F, u);
   }
   function hlImpact(T, F) {                                                          // the ooze lands: a golden flash and ring, cream drops thrown out and falling, sparkles, a glow on the ground
     var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth * (F.sc || 1), cx = r.left + r.width / 2, cy = r.top + r.height * 0.42, gy = r.top + r.height - r.height * 0.03, rnd = rngOf(now | 0), ps = [], drops = [], s = F.imp, i, n;
+    var rot0 = (rnd() - 0.5) * 0.6;
     shake(4 * (0.6 + 0.4 * s), 260);
     for (i = 0, n = Math.round(26 * s); i < n; i++) { var a1 = -Math.PI * (0.05 + rnd() * 0.9), sp1 = u * (0.4 + rnd() * 1.1) / 1000; fbParticle(ps, cx + (rnd() - 0.5) * u * 0.1, cy, Math.cos(a1) * sp1, Math.sin(a1) * sp1 - 0.1 * u / 1000, 420 + rnd() * 500, u * 0.012, "ember"); }
     for (i = 0; i < 10; i++) drops.push({ a: -Math.PI * (0.1 + rnd() * 0.8), v: 0.5 + rnd() * 0.9, s: 0.012 + rnd() * 0.014 });
@@ -7454,10 +7455,11 @@
       var t = (now2 - now) * speed, dt = L.last ? Math.min(60, now2 - L.last) * speed : 0, k, j, d, px, py, rk = clamp01(t / 700);
       L.last = now2;
       if (t < 420) { k = 1 - Math.pow(1 - t / 420, 2.2); glowDot(ctx, cx, cy, u * (0.1 + 0.55 * s * k), HOLY_PAL.glow, 0.7 * (1 - t / 420)); glowDot(ctx, cx, cy, u * (0.07 + 0.4 * s * k), HOLY_PAL.mid, 0.9 * (1 - t / 420)); glowDot(ctx, cx, cy, u * (0.03 + 0.15 * s * k), HOLY_PAL.core, 0.95 * (1 - t / 420)); }
+      if (hlT("hl_burst")) hlTexA(ctx, "hl_burst", cx, cy, u * (0.5 + 0.55 * clamp01(t / 220)) * (0.8 + 0.5 * s), fbEnv(t, 0, 640, 140), rot0, 0.5, 0.5);   // (the painted splash)
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + HOLY_PAL.mid + "," + (0.7 * (1 - rk)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.014 * (1 - rk));
       ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.1 + 0.6 * rk), u * (0.1 + 0.6 * rk) * 0.22, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
       glowEllipse(ctx, cx, gy, u * (0.3 + 0.35 * rk), u * 0.08, HOLY_PAL.glow, 0.35 * (1 - rk));
-      for (j = 0; j < drops.length; j++) {
+      for (j = 0; j < drops.length && !hlT("hl_burst"); j++) {
         d = drops[j]; k = clamp01(t / 620); if (k >= 1) continue;
         px = cx + Math.cos(d.a) * u * 0.4 * d.v * k; py = cy + Math.sin(d.a) * u * 0.4 * d.v * k + u * 0.42 * k * k;
         ctx.save(); ctx.fillStyle = "rgba(255,243,208," + (0.95 * (1 - k * k)).toFixed(3) + ")"; ctx.beginPath(); ctx.ellipse(px, py, u * d.s, u * d.s * 1.15, 0, 0, 6.2832); ctx.fill(); ctx.restore();
@@ -7517,14 +7519,17 @@
     for (i = 0; i < 20; i++) sp.push({ dx: (rnd() - 0.5) * u * 0.5, ph: rnd(), sp: 0.5 + rnd() * 0.8, s: 0.01 + rnd() * 0.01 });
     fxAdd({ t0: tPre, t1: tHit + 1100 / speed, draw: function (ctx, now) {
       var pre = clamp01((now - tPre) / Math.max(1, tHit - tPre)), post = now >= tHit ? clamp01((now - tHit) * speed / 950) : 0, bot = now < tHit ? gy * Math.pow(pre, 1.6) : gy, w = u * (0.14 + (now < tHit ? 0.14 * pre : 0.3 * Math.sin(Math.min(1, post * 3) * 1.5708))) * (1 - post * 0.55),
-        a = now < tHit ? 0.2 + 0.55 * pre : 0.95 * (1 - post * post), g = ctx.createLinearGradient(x - w, 0, x + w, 0), j, rk, p;
-      g.addColorStop(0, "rgba(255,200,90,0)"); g.addColorStop(0.32, "rgba(255,214,120," + (0.5 * a).toFixed(3) + ")"); g.addColorStop(0.5, "rgba(255,253,240," + Math.min(1, a).toFixed(3) + ")"); g.addColorStop(0.68, "rgba(255,214,120," + (0.5 * a).toFixed(3) + ")"); g.addColorStop(1, "rgba(255,200,90,0)");
+        a = now < tHit ? 0.2 + 0.55 * pre : 0.95 * (1 - post * post), g = ctx.createLinearGradient(x - w, 0, x + w, 0), j, rk, p, ac = hlT("hl_pillar") ? 0.4 : 1;   // (ac: the code column is fainter under the painted one)
+      g.addColorStop(0, "rgba(255,200,90,0)"); g.addColorStop(0.32, "rgba(255,214,120," + (0.5 * a * ac).toFixed(3) + ")"); g.addColorStop(0.5, "rgba(255,253,240," + Math.min(1, a * ac).toFixed(3) + ")"); g.addColorStop(0.68, "rgba(255,214,120," + (0.5 * a * ac).toFixed(3) + ")"); g.addColorStop(1, "rgba(255,200,90,0)");
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = g; ctx.fillRect(x - w, -4, w * 2, bot + 4); ctx.restore();
+      if (hlT("hl_pillar")) hlTexRevealed(ctx, "hl_pillar", x, 0, u * (0.95 + (now < tHit ? 0.25 * pre : 0.5 * Math.sin(Math.min(1, post * 3) * 1.5708))) * (1 - post * 0.5), gy, Math.min(1, a * 0.85), bot, gy * 0.22);   // (the painted column, revealed from the top as it descends, its lower end fading)
       glowDot(ctx, x, bot, u * (0.2 + 0.25 * (now < tHit ? pre : 1 - post)), HOLY_PAL.mid, 0.8 * a);
       if (now >= tHit) {
         glowDot(ctx, x, gy - u * 0.2, u * (0.4 + 0.5 * post), HOLY_PAL.glow, 0.5 * (1 - post)); glowDot(ctx, x, gy - u * 0.2, u * 0.25, HOLY_PAL.core, 0.9 * (1 - post * 2 > 0 ? 1 - post * 2 : 0));
+        hlTexA(ctx, "hl_rays", x, gy - u * 0.45, u * (1.1 + 1.6 * post), 0.5 * Math.pow(1 - post, 1.5), post * 0.4, 0.5, 0.5);   // (a painted sunburst at the blow)
         for (j = 0; j < 2; j++) {                                                    // the judgment rings
           rk = clamp01(post * 1.4 - j * 0.25); if (rk <= 0 || rk >= 1) continue;
+          if (hlT("hl_ring")) { hlTex(ctx, "hl_ring", x, gy, u * (0.3 + 2.0 * rk), u * (0.3 + 2.0 * rk) * 0.27, 0.9 * (1 - rk), 0); continue; }   // (the painted ring, laid flat on the ground)
           ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + HOLY_PAL.mid + "," + (0.8 * (1 - rk)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.018 * (1 - rk));
           ctx.beginPath(); ctx.ellipse(x, gy, u * (0.15 + 0.9 * rk), u * (0.15 + 0.9 * rk) * 0.22, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
         }
@@ -7588,8 +7593,11 @@
     for (j = 0; j < 26; j++) sp.push({ dx: (rnd() - 0.5) * bodyW * 0.95, ph: rnd(), sp: 0.5 + rnd() * 0.7, s: 0.012 + rnd() * 0.012 });
     fxAdd({ t0: t0 + starts[1], t1: t0 + tot + 900 / speed, draw: function (ctx, now) {
       var tt = now - t0, a = clamp01((tt - starts[1]) / Math.max(1, starts[3] - starts[1])) * (1 - clamp01((tt - starts[5]) / Math.max(1, tot - starts[5] + 700 / speed))), q, p, rk, y;
-      glowDot(ctx, cx, gy - domeH * 0.5, domeH * 1.15, HOLY_PAL.glow, 0.32 * a); glowDot(ctx, cx, gy - domeH * 0.5, domeH * 0.7, HOLY_PAL.mid, 0.3 * a);
+      glowDot(ctx, cx, gy - domeH * 0.5, domeH * 1.15, HOLY_PAL.glow, 0.32 * a * (hlT("hl_halo") ? 0.5 : 1)); glowDot(ctx, cx, gy - domeH * 0.5, domeH * 0.7, HOLY_PAL.mid, 0.3 * a * (hlT("hl_halo") ? 0.35 : 1));
       glowEllipse(ctx, cx, gy, bodyW * 0.75 * (0.9 + 0.1 * Math.sin(now * 0.006)), bodyW * 0.18, HOLY_PAL.mid, 0.4 * a);
+      hlTex(ctx, "hl_halo", cx, gy - domeH * 0.55, bodyW * 1.3, domeH * 2.1, 0.5 * a, 0);                                            // (the painted aura, the circle on the ground and the rising ribbons)
+      hlTex(ctx, "hl_ring", cx, gy, bodyW * 1.5 * (0.95 + 0.05 * Math.sin(now * 0.006)), bodyW * 1.5 * 0.27, 0.55 * a, 0);
+      hlTex(ctx, "hl_rise", cx - bodyW * 0.1, gy - domeH * 0.55, bodyW * 0.9, domeH * 1.25, 0.14 * a * (0.7 + 0.3 * Math.sin(now * 0.004)), 0);
       for (q = 0; q < sp.length; q++) {                                              // sparkles: a bright point with a small cross, rising along the body
         p = sp[q]; rk = (now * 0.00035 * speed * p.sp + p.ph) % 1; y = gy - rk * domeH * 1.25;
         glowDot(ctx, cx + p.dx, y, u * p.s * 2.6, HOLY_PAL.core, 0.8 * Math.sin(rk * 3.1416) * a);
@@ -7638,6 +7646,7 @@
   var KING_RUBY = [280, 176], KING_CROWN = [240, 150];
   function starGlint(ctx, x, y, r, a) {                                              // a four-point star of light
     if (a <= 0.01) return;
+    if (hlT("hl_star")) { hlTexA(ctx, "hl_star", x, y, r * 2.7, Math.min(1, a), 0, 0.5, 0.5); return; }         // (the painted star)
     glowDot(ctx, x, y, r * 1.2, "255,236,170", 0.6 * a);
     ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round"; ctx.strokeStyle = "rgba(255,248,220," + (0.9 * a).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, r * 0.09);
     ctx.beginPath(); ctx.moveTo(x - r, y); ctx.lineTo(x + r, y); ctx.moveTo(x, y - r * 1.25); ctx.lineTo(x, y + r * 1.25); ctx.stroke();
@@ -7664,6 +7673,7 @@
       p.x += p.vx * dt + Math.sin(now * 0.0015 + i) * 0.006 * dt; p.y += p.vy * dt; f = p.age / p.life;
       glowDot(cf, p.x, p.y, p.size * 2.4, "255,226,140", 0.65 * Math.sin(f * 3.1416) * k);
     }
+    hlTexA(cf, "hl_motes", body.x, body.y - s * 0.12, s * 1.15, 0.2 * k, now * 0.00004, 0.5, 0.5);                       // (the painted motes, turning slowly)
     if (now > KA.nextGlint) { KA.glint = now; KA.nextGlint = now + 4200 + rnd() * 2200; }
     gt = (now - KA.glint) / 420;
     if (gt >= 0 && gt < 1) { gp = kingPt(KING_RUBY[0], KING_RUBY[1]); starGlint(cf, gp.x, gp.y, s * 0.045 * (0.5 + Math.sin(gt * 3.1416)), Math.sin(gt * 3.1416) * k); }
@@ -7886,6 +7896,8 @@
       fxAdd({ t0: tN, t1: tN + 3600 / speed, draw: function (ctx, now) {
         var t = (now - tN) * speed, j, p, f, px, py;
         if (t < 380) { flashAll(ctx, "255,240,200", 0.42 * (1 - t / 380)); glowDot(ctx, body.x, body.y, body.w * (0.4 + 0.9 * t / 380), "255,214,110", 0.6 * (1 - t / 380)); }
+        if (t < 900) hlTexA(ctx, "hl_rays", body.x, body.y, body.w * (0.7 + 1.1 * clamp01(t / 700)), 0.9 * (1 - clamp01(t / 900)), t * 0.0002, 0.5, 0.5);                  // (the painted sunburst and a burst of motes)
+        if (t < 2600) hlTexA(ctx, "hl_motes", body.x, body.y - body.w * 0.05, body.w * (0.5 + 1.3 * clamp01(t / 2600)), 0.8 * (1 - clamp01(t / 2600)), t * 0.0001, 0.5, 0.5);
         for (j = 0; j < ps.length; j++) {
           p = ps[j]; if (t > p.life) continue; f = t / p.life;
           px = body.x + p.vx * t * (1 - 0.45 * f); py = body.y - body.w * 0.05 + p.vy * t * (1 - 0.45 * f) - 0.00007 * body.w * t * f;
@@ -7925,13 +7937,47 @@
       if (a <= 0.01) return;
       g.addColorStop(0, "rgba(255,210,100,0)"); g.addColorStop(0.5, "rgba(255,244,200," + (0.5 * a).toFixed(3) + ")"); g.addColorStop(1, "rgba(255,210,100,0)");
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = g; ctx.fillRect(b.x - w, 0, w * 2, top); ctx.restore();
+      hlTex(ctx, "hl_pillar", b.x, top / 2, b.w * 0.55, top, a, 0);                  // (the painted column over it)
       glowDot(ctx, b.x, top, b.w * 0.5, "255,214,110", 0.5 * a);
       for (j = 0; j < sp.length; j++) { rk = (now * 0.0004 * speed * sp[j].sp + sp[j].ph) % 1; glowDot(ctx, b.x + sp[j].dx * (1 - rk * 0.6), top - rk * top * 0.95, b.w * sp[j].s * 1.6, "255,236,170", 0.8 * Math.sin(rk * 3.1416) * a); }
     } });
   }
   function kingTreasureReveal() {                                                    // he is a puddle: the treasure is unlocked (coins, the pillar of light, the banner)
     var t = performance.now(); KT.glowTarget = 1; KT.relaxAt = t + 6000 / speed;
-    kingCoinShower(t, 2200); kingPillar(t, 2600); shake(8, 400); kingBanner("Treasure unlocked", "Slime King defeated");
+    kingCoinShower(t, 2200); kingPillar(t, 2600); kingRays(t, 2400); shake(8, 400); kingBanner("Treasure unlocked", "Slime King defeated");
+  }
+  // ---------------------------------------------------------------- the PAINTED HOLY pieces (2026-11-12, the user's Gemini sheet inbox/holy_fx_glow_sheet.jpg cut by cut_holy_fx.py into source/assets/fx/hl_*.png)
+  // Nine golden-light textures drawn ADDITIVELY (black = transparent). Each effect below draws its picture when it has loaded and keeps its CODE look otherwise (hlT returns null), so nothing breaks while a picture is missing:
+  //   hl_orb the ooze's flight (head at the right), hl_burst the ooze's hit, hl_pillar the Judgment's and the treasure's column of light, hl_ring the Judgment's rings on the ground and the heal's circle, hl_halo and hl_rise
+  //   the heal, hl_star every glint (starGlint), hl_motes the aura's drifting gold and the death's burst, hl_rays the flashes (the Judgment's, the death's, the treasure's).
+  function hlT(nm) { var im = fbTex[nm]; return im && im.complete && im.naturalWidth ? im : null; }
+  function hlTex(ctx, nm, cx, cy, w, h, a, rot) {                                    // a painted piece stretched to w x h, centred on (cx, cy), added as light
+    var im = hlT(nm); if (!im || a <= 0.01) return;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(cx, cy); if (rot) ctx.rotate(rot); ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore();
+  }
+  function hlTexA(ctx, nm, x, y, w, a, rot, ax, ay) {                                // a painted piece w px wide in its own shape, its point (ax, ay) (0..1) at (x, y), turned by rot, added as light
+    var im = hlT(nm); if (!im || a <= 0.01) return;
+    var h = w * im.naturalHeight / im.naturalWidth;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(x, y); if (rot) ctx.rotate(rot); ctx.drawImage(im, -w * ax, -h * ay, w, h); ctx.restore();
+  }
+  function hlTexRevealed(ctx, nm, cx, top, w, h, a, upto, fade) {                  // the picture drawn only down to y = upto, its lower end fading over `fade` px: a beam that descends (a flat clip would show a hard edge)
+    var im = hlT(nm); if (!im || a <= 0.01) return;
+    var N = 16, i, y0, y1;
+    ctx.save(); ctx.globalCompositeOperation = "lighter";
+    for (i = 0; i < N; i++) {
+      y0 = Math.round(top + h * i / N); y1 = Math.round(top + h * (i + 1) / N);
+      if (y0 >= upto) break;
+      ctx.globalAlpha = Math.min(1, a) * clamp01((upto - y0) / Math.max(1, fade));
+      ctx.drawImage(im, 0, im.naturalHeight * i / N, im.naturalWidth, im.naturalHeight / N, cx - w / 2, y0, w, y1 - y0);
+    }
+    ctx.restore();
+  }
+  function kingRays(tS, ms) {                                                        // a sunburst behind the pile, turning slowly: the treasure's reveal
+    var b = kingPileBox(); if (!b || !hlT("hl_rays")) return;
+    fxAdd({ t0: tS, t1: tS + ms / speed, draw: function (ctx, now) {
+      var t = clamp01((now - tS) * speed / ms), a = Math.sin(Math.min(1, t * 2.2) * 1.5708) * (1 - clamp01((t - 0.5) / 0.5));
+      hlTexA(ctx, "hl_rays", b.x, b.gy - b.h * 0.55, b.w * (1.1 + 0.5 * t), 0.75 * a, t * 0.5, 0.5, 0.5);
+    } });
   }
   // ---------------------------------------------------------------- the Elite slime's Earthbreaker (2026-11-10)
   // The Elite's fourth skill, a ground skill, physical (the sheet: Animations/EliteSlime/earthbreaker, the user's Gemini sheet, 6 frames at 12 fps, the slot `eruption`; the hit frame is 4; the stone arms the generator grew in
