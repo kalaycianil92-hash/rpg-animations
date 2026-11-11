@@ -45,6 +45,10 @@ JOBS = {
     "royal_decree": dict(file="slime_king_royal_decree.png", folder="royal_decree", rows=[3, 3], fps=12, name="royal_decree", scale=1.26, order=["idle", 1, 2, 3, 4, "idle"], extra={"castFrame": 4}),
     "staff_raise": dict(file="slime_kind_staff_raise_chatpgt.png", folder="staff_raise", rows=[4, 4], fps=12, name="staff_raise", scale=1.30, order=["idle", 1, 2, 3, 4, 5, 6, "idle"], drop=True,
                         extra={"holdFrames": [4, 5], "commandFrame": 6}),
+    # CROWN SLAM (the user's second try, ChatGPT 1774 x 887, 4 x 2; the first, a Gemini sheet with violet shadows and a rolled-over body, is in crown_slam/source/rejected_gemini_sheet.jpg): panel 1 is a lower dome than the idle's, so
+    # the scale sits between the gold area (1.356) and the base width (1.435); airborne panels 3, 4 and 6 (lifted 5 to 7% of the panel's height, as asked) at their real height; the first and the last frames = the idle's rest frame
+    "crown_slam": dict(file="slime_king_crown_slam.png", folder="crown_slam", rows=[4, 4], fps=12, name="crown_slam", scale=1.38, order=["idle", 1, 2, 3, 4, 5, 6, "idle"], airborne=[2, 3, 5], drop=True,
+                       extra={"hitFrame": 5}),
     "heal": dict(file="slime_king_heal_sheet.jpg", folder="heal", rows=[3, 3], fps=10, name="heal", scale=0.485, order=["idle", 1, 2, 3, 4, "idle"], extra={"holdFrames": [4, 5]}),
 }
 

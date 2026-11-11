@@ -1,0 +1,103 @@
+{
+ "format": "frame-placement/1",
+ "animation": "crown_slam",
+ "file": "king_crown_slam_8frame_strip.png",
+ "frames": 8,
+ "fps": 12,
+ "hitFrame": 5,
+ "staffTip": [
+  [
+   449,
+   108
+  ],
+  [
+   453,
+   119
+  ],
+  [
+   431,
+   16
+  ],
+  [
+   482,
+   57
+  ],
+  [
+   453,
+   119
+  ],
+  [
+   452,
+   60
+  ],
+  [
+   455,
+   118
+  ],
+  [
+   449,
+   108
+  ]
+ ],
+ "frameInfo": [
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  },
+  {
+   "sheetPanel": 2,
+   "lift": 0.0,
+   "top": 120,
+   "bottom": 470,
+   "left": 72,
+   "right": 492
+  },
+  {
+   "sheetPanel": 3,
+   "lift": 40.7,
+   "top": 16,
+   "bottom": 430,
+   "left": 87,
+   "right": 473
+  },
+  {
+   "sheetPanel": 4,
+   "lift": 29.7,
+   "slideLeft": 17,
+   "top": 57,
+   "bottom": 441,
+   "left": 57,
+   "right": 508
+  },
+  {
+   "sheetPanel": 5,
+   "lift": 0.0,
+   "top": 120,
+   "bottom": 471,
+   "left": 48,
+   "right": 502
+  },
+  {
+   "sheetPanel": 6,
+   "lift": 35.9,
+   "top": 61,
+   "bottom": 434,
+   "left": 79,
+   "right": 491
+  },
+  {
+   "sheetPanel": 7,
+   "lift": 0.0,
+   "top": 119,
+   "bottom": 470,
+   "left": 71,
+   "right": 496
+  },
+  {
+   "top": 96,
+   "bottom": 469,
+   "replacedByIdleRest": true
+  }
+ ]
+}
