@@ -2,7 +2,15 @@
   // Nine golden-light textures drawn ADDITIVELY (black = transparent). Each effect below draws its picture when it has loaded and keeps its CODE look otherwise (hlT returns null), so nothing breaks while a picture is missing:
   //   hl_orb the ooze's flight (head at the right), (hl_burst, the splash, was REMOVED at the user's request 2026-11-12: the ooze's hit is the code look) hl_pillar the Judgment's and the treasure's column of light, hl_ring the Judgment's rings on the ground and the heal's circle, hl_halo and hl_rise
   //   the heal, hl_star every glint (starGlint), hl_motes the aura's drifting gold and the death's burst, hl_rays the flashes (the Judgment's, the death's, the treasure's).
-  function hlT(nm) { var im = fbTex[nm]; return im && im.complete && im.naturalWidth ? im : null; }
+  // THE LOOK (the user, 2026-11-12: 'the Gemini version, the ChatGPT version and your code version separately, I want to test'): the 'Holy effects' select (shown for the King) picks where hlT gets its pictures:
+  //   "gemini" = the hlg_* pieces (the Gemini sheet), "chatgpt" = the hlc_* pieces (the ChatGPT sheet), "mix" = my pick after comparing them (the Gemini orb and the ChatGPT rest), "code" = no pictures at all:
+  //   hlT answers null for every piece, so every effect is its own code look (the glows, particles, drawn shapes, with the code layers at full strength). The choice is remembered (localStorage wvg-holy-look).
+  var HL_LOOK = "mix";
+  try { var hlS = localStorage.getItem("wvg-holy-look"); if (hlS === "code" || hlS === "gemini" || hlS === "chatgpt" || hlS === "mix") HL_LOOK = hlS; } catch (e) {}
+  function hlPre(piece) { return HL_LOOK === "gemini" ? "hlg_" : HL_LOOK === "chatgpt" ? "hlc_" : HL_LOOK === "mix" ? (piece === "orb" ? "hlg_" : "hlc_") : null; }
+  function hlT(nm) { var pre = hlPre(nm.slice(3)); if (!pre) return null; var im = fbTex[pre + nm.slice(3)]; return im && im.complete && im.naturalWidth ? im : null; }   // nm: "hl_orb" and so on
+  $("monHl").value = HL_LOOK;
+  $("monHl").onchange = function () { HL_LOOK = this.value; try { localStorage.setItem("wvg-holy-look", HL_LOOK); } catch (e) {} };
   function hlTex(ctx, nm, cx, cy, w, h, a, rot) {                                    // a painted piece stretched to w x h, centred on (cx, cy), added as light
     var im = hlT(nm); if (!im || a <= 0.01) return;
     ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(cx, cy); if (rot) ctx.rotate(rot); ctx.drawImage(im, -w / 2, -h / 2, w, h); ctx.restore();
