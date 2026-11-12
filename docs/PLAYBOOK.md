@@ -71,7 +71,7 @@ The sample pictures in the tool are a sword and a shield. "Other picture" swaps 
 
 ## Paths and timing (only for animations that travel)
 
-In the test page, panel "Frame paths": pick "Attack pack" or "Dodge pack" under "Path for", tick "Edit on stage", pick a frame with the numbers, drag it (arrow keys nudge 1 px, with Shift 10 px; `,` and `.` change frame) or type X and Lift. "Fill line" and "Fill arc" fill a range. "Download .json" saves `<strip name>.placement.json`. The attack's x is a share of the distance to the target, the dodge's x is in character widths (format in `FORMATS.md`). The hit frame (attack) and the evade frame (dodge) mark the moment of impact.
+In the test page, the section "Frame positions" right under the stage controls (since 2026-11-13; it used to be folded away in the developer tools; the Thunderclap Guillotine's skill panel has a button that opens it), panel "Frame paths": pick "Attack pack" or "Dodge pack" under "Path for", tick "Edit on stage", pick a frame with the numbers, drag it (arrow keys nudge 1 px, with Shift 10 px; `,` and `.` change frame) or type X and Lift. "Fill line" and "Fill arc" fill a range. "Download .json" saves `<strip name>.placement.json`. The attack's x is a share of the distance to the target, the dodge's x is in character widths (format in `FORMATS.md`). The hit frame (attack) and the evade frame (dodge) mark the moment of impact.
 
 ## A run animation (in place, one stride of two steps)
 

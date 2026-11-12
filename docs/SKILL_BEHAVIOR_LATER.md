@@ -16,7 +16,7 @@ This file lists, skill by skill, what is drawn, what the user has actually said 
 
 | Skill | Drawn | User's text | Placeholder in the test page | Open |
 |---|---|---|---|---|
-| Thunderclap Guillotine (the jump attack) | Done: blade crackle, a sky strike at the apex, a trail, the impact on frame 7, shake, a shock on the target. Settings: the `skill-fx/1` example in `docs/FORMATS.md` (skill "Thunderclap Guillotine"). | Lightning damage (the name and the element). | The damage is whatever the fight scenario gives (`e.amount`); no status, no cost. | Damage formula, lightning vs other resistances, chain or area, a stun or a shock status, cost and cooldown. |
+| Thunderclap Guillotine (the jump attack) | The first version is in the page (blade crackle, a sky strike at the apex, a trail, the impact on frame 7, shake, a shock on the target; settings: the `skill-fx/1` example in `docs/FORMATS.md`). **2026-11-12: being rebuilt** with new art (the first jump looked like a monkey); the plan is in `docs/WARRIOR_SKILLS.md`. | "Jumps and crashes down with full force, dealing heavy Lightning Damage and 50% chance to apply Shocked for 3 turns." (2026-11-12) | The damage is whatever the fight scenario gives (`e.amount`); the 50% Shocked for 3 turns is drawn as the existing Shocked status (the page does not apply the numbers). | Damage formula (heavy: one of the strongest skills), lightning vs other resistances, what Shocked does, cost and cooldown. |
 
 ### Mage
 

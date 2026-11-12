@@ -1,0 +1,217 @@
+{
+ "format": "hand-anchors/3",
+ "characters": [
+  {
+   "name": "Warrior",
+   "fist": 0.09,
+   "items": {
+    "main": {
+     "length": 0.42,
+     "pivot": 0.81,
+     "overlay": true
+    },
+    "off": {
+     "length": 0.42,
+     "pivot": 0.81,
+     "overlay": true
+    }
+   },
+   "animations": [
+    {
+     "name": "armored_thunderclap_guillotine_11frame",
+     "frames": 11,
+     "columns": 11,
+     "fps": 14,
+     "offItem": {
+      "kind": "other",
+      "length": 0.42,
+      "pivot": 0.81,
+      "overlay": true
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.697,
+        "y": 0.669,
+        "a": 20,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.697,
+        "y": 0.669,
+        "a": 20,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.709,
+        "y": 0.448,
+        "a": 12,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.611,
+        "y": 0.372,
+        "a": 14,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.465,
+        "y": 0.448,
+        "a": 8,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.596,
+        "y": 0.277,
+        "a": 12,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.816,
+        "y": 0.677,
+        "a": 112,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.893,
+        "y": 0.739,
+        "a": 120,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.846,
+        "y": 0.773,
+        "a": 112,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.762,
+        "y": 0.591,
+        "a": -40,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.781,
+        "y": 0.48,
+        "a": -42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.43,
+        "y": 0.68,
+        "a": -25,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.43,
+        "y": 0.68,
+        "a": -25,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.469,
+        "y": 0.433,
+        "a": -12,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.498,
+        "y": 0.386,
+        "a": -18,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.404,
+        "y": 0.477,
+        "a": -20,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.512,
+        "y": 0.27,
+        "a": -14,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.768,
+        "y": 0.683,
+        "a": 118,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.846,
+        "y": 0.747,
+        "a": 125,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.654,
+        "y": 0.777,
+        "a": 115,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.66,
+        "y": 0.586,
+        "a": 0,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.545,
+        "y": 0.505,
+        "a": 0,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

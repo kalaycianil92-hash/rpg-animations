@@ -331,6 +331,44 @@
     <button data-speed="4">4x</button>
   </div>
 
+  <details class="dev" id="pathDetails">
+    <summary>Frame positions: drag each frame of the attack to where it stands on the stage (frame paths)</summary>
+    <div class="devbody">
+    <div class="panel" id="pathPanel">
+      <h2>Frame paths: where each frame stands</h2>
+      <small class="lbl">The steps: 1. tick "Edit on stage" (and "Use the paths in the fight"), 2. pick a frame with the numbers below (or the , and . keys), 3. drag it on the stage above, or type its numbers. "Preview attack" then plays the new positions. Your changes are remembered in this browser; "Download .json" saves them for the project.</small>
+      <div class="fields">
+        <label>Path for <select id="pathPack"><option value="attack">Attack pack</option><option value="dodge">Dodge pack</option></select></label>
+        <label><input type="checkbox" id="editPath"> Edit on stage (drag the frame you picked)</label>
+        <label><input type="checkbox" id="usePath"> Use the paths in the fight</label>
+        <label><input type="checkbox" id="smoothPath" checked> Smooth movement between frames</label>
+      </div>
+      <div class="fields">
+        <span class="pathmsg" id="pathHint">Load an attack pack to edit its path.</span>
+      </div>
+      <div class="ftabs" id="ftabs"></div>
+      <div class="fields">
+        <label>Frame <b id="selNo">-</b></label>
+        <label><span id="pxLbl">X, % of the way to the target</span> <input type="number" id="px" step="1" style="width:78px"></label>
+        <label>Lift, % of character width <input type="number" id="py" step="1" min="0" style="width:78px"></label>
+        <button id="pCopyPrev">Copy previous frame</button>
+        <label>Straight line from frame <input type="number" id="lineA" value="3" min="1" max="64" style="width:50px"> to <input type="number" id="lineB" value="7" min="1" max="64" style="width:50px"></label>
+        <button id="pLine">Fill line</button>
+        <label>Arc: peak lift <input type="number" id="arcH" value="45" min="0" max="300" style="width:60px">%</label>
+        <button id="pArc">Fill arc</button>
+        <button id="pReset">Reset path</button>
+      </div>
+      <textarea class="marks" id="pathJson" spellcheck="false" style="height:120px"></textarea>
+      <div class="fields">
+        <button id="pathCopy">Copy</button>
+        <button id="pathDownload">Download .json</button>
+        <button id="pathApply">Apply pasted path</button>
+      </div>
+      <small class="lbl">Pick a frame with the numbers, then drag it on the stage (arrow keys nudge 1 px, with Shift 10 px; , and . switch frames). X 0 is the home position, 100 is the strike point in front of the target; go past 100 or below 0 if you want. Lift is how far the whole frame is raised, on top of the height already drawn in it (100 = one character width). Nothing can go below the ground line, shown as a dashed gold line while editing. The red-edged frame is the hit frame (for the dodge pack: the frame where the strike would have landed). For the dodge pack X is in character widths from the home position, negative = away from the enemy. The box above holds the numbers for the game: copy it or download it.</small>
+    </div>
+    </div>
+  </details>
+
   <details class="dev" id="stPanel" open>
     <summary>Status icons: try them on the stage</summary>
     <div class="devbody">
@@ -415,13 +453,18 @@
       <label>Bolt thickness <input type="range" id="fxThick" min="50" max="200" value="60" style="width:100px"> <span id="fxThickV">60%</span></label>
       <label>Shake <input type="range" id="fxShake" min="0" max="250" value="150" style="width:100px"> <span id="fxShakeV">150%</span></label>
       <label>Impact strength <input type="range" id="fxImpact" min="20" max="150" value="80" style="width:100px"> <span id="fxImpactV">80%</span></label>
+      <label><input type="checkbox" id="fxDark" checked> The screen goes dark at the jump's peak (only the two fighters stay lit)</label>
+      <label>Darkness <input type="range" id="fxDarkAmt" min="20" max="100" value="90" style="width:100px"> <span id="fxDarkAmtV">90%</span></label>
+      <label>Painted lightning <input type="range" id="fxPaint" min="0" max="100" value="45" style="width:100px"> <span id="fxPaintV">45%</span></label>
+      <label>Aura in the crouch <input type="range" id="fxAura" min="0" max="100" value="70" style="width:100px"> <span id="fxAuraV">70%</span></label>
     </div>
     <div class="fields">
-      <label>Crackle on the blades from frame <input type="number" id="fxCharge" value="2" min="1" max="64" style="width:56px"></label>
+      <label>Crackle on the blades from frame <input type="number" id="fxCharge" value="1" min="1" max="64" style="width:56px"></label>
       <label>Sky strike on frame <input type="number" id="fxStrike" value="5" min="1" max="64" style="width:56px"></label>
       <label class="lbl">The impact lands on the attack's hit frame (set under the packs).</label>
       <button id="fxPreview">Preview skill (loops)</button>
       <button id="stopFx">Stop</button>
+      <button id="fxEditPath" title="Opens the frame positions section under the stage and switches Edit on stage on">Edit frame positions on the stage</button>
     </div>
     <details class="about"><summary>Numbers for the game (JSON)</summary>
     <textarea class="marks" id="fxJson" spellcheck="false" style="height:120px"></textarea>
@@ -560,39 +603,8 @@
   </div>
 
   <details id="devTools" class="dev">
-    <summary>Developer tools: frame paths, your own images, animation packs and fps, hand marks (folded away: the animations load on their own)</summary>
+    <summary>Developer tools: your own images, animation packs and fps, hand marks (folded away: the animations load on their own; the frame paths are under the stage now)</summary>
     <div class="devbody">
-    <div class="panel" id="pathPanel">
-      <h2>Frame paths: where each frame stands</h2>
-      <div class="fields">
-        <label>Path for <select id="pathPack"><option value="attack">Attack pack</option><option value="dodge">Dodge pack</option></select></label>
-        <label><input type="checkbox" id="editPath"> Edit on stage (drag the frame you picked)</label>
-        <label><input type="checkbox" id="usePath"> Use the paths in the fight</label>
-        <label><input type="checkbox" id="smoothPath" checked> Smooth movement between frames</label>
-      </div>
-      <div class="fields">
-        <span class="pathmsg" id="pathHint">Load an attack pack to edit its path.</span>
-      </div>
-      <div class="ftabs" id="ftabs"></div>
-      <div class="fields">
-        <label>Frame <b id="selNo">-</b></label>
-        <label><span id="pxLbl">X, % of the way to the target</span> <input type="number" id="px" step="1" style="width:78px"></label>
-        <label>Lift, % of character width <input type="number" id="py" step="1" min="0" style="width:78px"></label>
-        <button id="pCopyPrev">Copy previous frame</button>
-        <label>Straight line from frame <input type="number" id="lineA" value="3" min="1" max="64" style="width:50px"> to <input type="number" id="lineB" value="7" min="1" max="64" style="width:50px"></label>
-        <button id="pLine">Fill line</button>
-        <label>Arc: peak lift <input type="number" id="arcH" value="45" min="0" max="300" style="width:60px">%</label>
-        <button id="pArc">Fill arc</button>
-        <button id="pReset">Reset path</button>
-      </div>
-      <textarea class="marks" id="pathJson" spellcheck="false" style="height:120px"></textarea>
-      <div class="fields">
-        <button id="pathCopy">Copy</button>
-        <button id="pathDownload">Download .json</button>
-        <button id="pathApply">Apply pasted path</button>
-      </div>
-      <small class="lbl">Pick a frame with the numbers, then drag it on the stage (arrow keys nudge 1 px, with Shift 10 px; , and . switch frames). X 0 is the home position, 100 is the strike point in front of the target; go past 100 or below 0 if you want. Lift is how far the whole frame is raised, on top of the height already drawn in it (100 = one character width). Nothing can go below the ground line, shown as a dashed gold line while editing. The red-edged frame is the hit frame (for the dodge pack: the frame where the strike would have landed). For the dodge pack X is in character widths from the home position, negative = away from the enemy. The box above holds the numbers for the game: copy it or download it.</small>
-    </div>
   
     <div class="panel">
       <h2>Your images</h2>
@@ -1052,6 +1064,18 @@
     var k = f - 1; if (!clk.starts) return clk.t0 + (k + (fr || 0)) * clk.frameMs;
     var s = k < clk.starts.length ? clk.starts[k] : clk.total, d = (k + 1 < clk.starts.length ? clk.starts[k + 1] : clk.total) - s;
     return clk.t0 + s + (fr || 0) * d;
+  }
+  // The attack pack's own holds (extra ms per frame at 100% speed, from its placement json: the Warrior's Thunderclap Guillotine holds its crouch and its apex), or null.
+  function atkHolds() { var pre = PRESETS[packFile.attack]; return pre && pre.holds && pre.holds.some(function (h) { return h > 0; }) ? pre.holds : null; }
+  // Where a pose's clock stands at time now, as a position in frames (0 = the start of frame 1, 1.5 = the middle of frame 2), holds included; past the end it keeps counting in normal frames.
+  function clkFrames(clk, now) {
+    var t = now - clk.t0;
+    if (!clk.starts) return t / clk.frameMs;
+    var s = clk.starts, n = s.length, k = 0;
+    if (t >= clk.total) return n + (t - clk.total) / clk.frameMs;
+    while (k + 1 < n && s[k + 1] <= t) k++;
+    var end = k + 1 < n ? s[k + 1] : clk.total;
+    return k + Math.max(0, t - s[k]) / Math.max(1, end - s[k]);
   }
   // Resolves true when the pose played to its end, false if another pose replaced it first. holds: extra ms for some frames (see holdClock).
   function playPose(pose, loop, holds) {
@@ -1571,7 +1595,7 @@
     return new Promise(function (res) {
       (function tick() {
         if (myRun !== run) { res(false); return; }
-        var tt = (performance.now() - clk.t0) / clk.frameMs;
+        var tt = clkFrames(clk, performance.now());
         uW.style.transform = tr(pathAt(P, Math.min(tt, n - 1e-6)), k);
         if (fxLayers.length) fxDraw(performance.now());
         if (tt >= n) { res(true); return; }
@@ -1588,7 +1612,7 @@
       ? '{"format":"frame-placement/1","animation":"dodge","file":' + JSON.stringify(packFile.dodge) + ',"frames":' + n + ',"fps":' + (+$("fps_dodge").value || 14) +
         ',"evadeFrame":' + (+$("evadeFrame").value || 3) + ',"xUnit":"frame-widths","smooth":' + !!place.smooth
       : '{"format":"frame-placement/1","animation":"attack","file":' + JSON.stringify(packFile.attack) + ',"frames":' + n +
-        ',"fps":' + (+$("fps_attack").value || 14) + ',"hitFrame":' + (+$("hitFrame").value || 5) + ',"smooth":' + !!place.smooth;
+        ',"fps":' + (+$("fps_attack").value || 14) + ',"hitFrame":' + (+$("hitFrame").value || 5) + ',"smooth":' + !!place.smooth + (atkHolds() ? ',"holds":' + JSON.stringify(atkHolds()) : "");   // (the holds of the Thunderclap Guillotine travel with its path)
     $("pathJson").value = head + ',\n"x":' + JSON.stringify(r3(place.x)) + ',\n"y":' + JSON.stringify(r3(place.y)) + ',\n"note":' + JSON.stringify(k === "dodge" ? DODGE_NOTE : EDGE_NOTE) + '}';
   }
   function fillInputs() {
@@ -1661,13 +1685,13 @@
   }
   // Recommended paths shipped with the packs in this folder. They apply when a file of that exact name is loaded and nothing of yours is saved for it.
   var PRESETS = {
-    "armored_jump_attack_8frame_strip.png": { pack: "attack", hitFrame: 7, moveFrom: 3, x: [-0.03, 0, 0.124, 0.414, 0.798, 1.176, 1.497, 1.584], y: [0, 0, 0.197, 0.522, 0.811, 0.526, 0, 0], smooth: true },
     "armored_dodge_6frame_strip.png": { pack: "dodge", evadeFrame: 3, x: [0, -0.05, -0.15, -0.22, -0.14, -0.03], y: [0, 0, 0, 0, 0, 0], smooth: true }
   };
   function onPathPackLoaded(k, name) {
     packFile[k] = name || packFile[k];
     var n = nFrames(k), pre = PRESETS[packFile[k]];
     if (pre && (pre.pack || "attack") !== k) pre = null;
+    if (n && pre && pre.x && pre.x.length === n && k === "attack") { $("hitFrame").value = pre.hitFrame; $("moveFrom").value = pre.moveFrom; if (pre.fps) $("fps_attack").value = pre.fps; }   // (also when a path of yours is saved: the hit frame and the fps belong to the pack)
     if (!n) setPlace({ x: [], y: [], smooth: true }, k);
     else if (loadPath(k, n)) { /* your saved path */ }
     else if (pre && pre.x.length === n) {
@@ -1683,7 +1707,7 @@
     }
     fitStage();
   }
-  function resetPath() { setPlace(defaultPlace(nFrames(), editKey)); selF = 0; savePath(); renderTabs(); fillInputs(); syncJson(); renderGhosts(); fitStage(); }
+  function resetPath() { var pre = PRESETS[packFile[editKey]], n = nFrames(); setPlace(pre && (pre.pack || "attack") === editKey && pre.x && pre.x.length === n ? { x: pre.x.slice(), y: pre.y.slice(), smooth: pre.smooth !== false, touched: false } : defaultPlace(n, editKey), editKey); selF = 0; savePath(); renderTabs(); fillInputs(); syncJson(); renderGhosts(); fitStage(); }
   $("pathPack").onchange = function () {
     editKey = $("pathPack").value; place = places[editKey]; selF = 0;
     if (!place.x.length && nFrames()) setPlace(defaultPlace(nFrames()));
@@ -1808,12 +1832,12 @@
     $("previewAtk").classList.add("on");
     var hitF = Math.max(1, +$("hitFrame").value || 5), IN = 0.4;
     try { while (my === run) {
-      playPose("attack", false).then(backToIdle);
+      playPose("attack", false, atkHolds()).then(backToIdle);
       var clk = player.clock;
       var drive = startPath(my, clk);
       if (rogueLike()) { if (rKey === "stiletto") ssFx(FIGHTERS.G, hitF, { myRun: my }); else if (rKey === "kiss") kissFx(FIGHTERS.G, hitF, { myRun: my }); else if (rKey === "permafrost") pfFx(FIGHTERS.G, hitF, { myRun: my, preview: true }); else shivFx(FIGHTERS.G, hitF); }   // (the Shadow Shiv's violet streak, the Static Stiletto's lightning, Winter's Kiss's frost, Permafrost Execution's glacier ice)
       var skill = $("fxOn").checked && !rogueLike() ? startSkill(clk, hitF, FIGHTERS.G) : null;
-      var wait = clk.t0 + (hitF - 1 + IN) * clk.frameMs - performance.now();
+      var wait = clkAt(clk, hitF, IN) - performance.now();
       if (wait > 0) await new Promise(function (r) { setTimeout(r, wait); });
       if (my !== run) break;
       if (skill) skill.impact(); else if (!(rogueLike() && (rKey === "kiss" || rKey === "permafrost"))) slash(FIGHTERS.G, 1);   // (the frozen dagger's own ice burst, and the glacier X, replace the slash)
@@ -1923,7 +1947,7 @@
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
   function fxParams() {
     return { pal: PALS[$("fxPal").value] || PALS.blue, palName: $("fxPal").value, k: (+$("fxInt").value || 100) / 100, w: (+$("fxThick").value || 100) / 100,
-      shake: (+$("fxShake").value || 0) / 100, imp: (+$("fxImpact").value || 80) / 100, charge: Math.max(1, +$("fxCharge").value || 2), strike: Math.max(1, +$("fxStrike").value || 5) };
+      shake: (+$("fxShake").value || 0) / 100, imp: (+$("fxImpact").value || 80) / 100, dark: $("fxDark").checked ? (+$("fxDarkAmt").value || 90) / 100 : 0, paint: (+$("fxPaint").value || 0) / 100, aura: (+$("fxAura").value || 0) / 100, charge: Math.max(1, +$("fxCharge").value || 2), strike: Math.max(1, +$("fxStrike").value || 5) };
   }
   function rectIn(el) { var s = stage.getBoundingClientRect(), r = el.getBoundingClientRect(); return { left: r.left - s.left, top: r.top - s.top, width: r.width, height: r.height, bottom: r.bottom - s.top }; }
   function fxCtx(id) {
@@ -2009,15 +2033,34 @@
       var an = set.tracks[tk] && set.tracks[tk][cf.i], cfg = tk === "main" ? set.main : set.off;
       if (!an || an.hide || (tk === "off" && cfg.kind === "none")) return;
       var a = an.a * Math.PI / 180, dx = Math.sin(a), dy = -Math.cos(a), len = cfg.length * Wn * cfg.pivot, gx = an.x * Wn, gy = an.y * Hn;
-      segs.push({ x0: r.left + (gx + dx * len * 0.12) * k, y0: r.top + (gy + dy * len * 0.12) * k, x1: r.left + (gx + dx * len) * k, y1: r.top + (gy + dy * len) * k });
+      var sg = { x0: r.left + (gx + dx * len * 0.12) * k, y0: r.top + (gy + dy * len * 0.12) * k, x1: r.left + (gx + dx * len) * k, y1: r.top + (gy + dy * len) * k };
+      var hl = cfg.length * Wn * (1 - cfg.pivot), px = r.left + (gx - dx * hl) * k, py = r.top + (gy - dy * hl) * k;        // the hilt's end behind the grip
+      sg.xt = sg.y1 <= py ? sg.x1 : px; sg.yt = sg.y1 <= py ? sg.y1 : py;                                                  // the highest point of the sword (the tip, or the pommel when the blade points down: the thunder strikes the top of the sword)
+      segs.push(sg);
     });
     return segs;
   }
   function bodyPoint() { var r = rectIn(uW.querySelector(".sheet") || uW); return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.55 }; }
 
+  // THE PAINTED LIGHTNING of the Thunderclap Guillotine (2026-11-13): the user's ChatGPT sheet (Animations/Warrior/jump_attack/source/thunderclap_fx_prompt.txt), TONED DOWN (the user found it a bit cartoonish and
+  // liked the code effects: tone_tc_sheet.py gave it the game's one lightning blue, thinner glows and a light blur, and the page draws it only at the "Painted lightning" strength, 45%, ON TOP of the code
+  // effects, which stay): tc_bolt_a / tc_bolt_b (the sky strike at the apex flickers between them), tc_bolt_heavy (the bolt on the target), tc_blade (a sleeve along each sword, bright end on the tip),
+  // tc_burst and tc_ground (the impact). Without the pictures (or at 0%) nothing changes.
+  function tcBolt(ctx, im, x, yTip, H, w, a, flip) {                                  // a tall bolt standing on (x, yTip), H px high (the top may leave the stage: it is cut off), w px wide
+    if (!im || !im.naturalWidth || a <= 0.01) return;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(x, 0); if (flip) ctx.scale(-1, 1);
+    ctx.drawImage(im, -w / 2, yTip - H, w, H); ctx.restore();
+  }
+  function tcSleeve(ctx, sg, a) {                                                    // the electric sleeve along a sword: the picture's bright end on the tip, turned along the blade, as long as the blade
+    var im = fbTex.tc_blade;
+    if (!im || !im.naturalWidth || a <= 0.01) return;
+    var dx = sg.x1 - sg.x0, dy = sg.y1 - sg.y0, len = Math.sqrt(dx * dx + dy * dy) * 1.15;
+    fbTexDraw(ctx, im, sg.x1, sg.y1, Math.atan2(dy, dx), len, a, 1, false);
+  }
   function crackleDraw(ctx, now, F, k) {
     var segs = bladeSegs(), seed = Math.floor(now / 55), u = uW.offsetWidth;
     segs.forEach(function (sg, si) {
+      if (F.paint > 0) tcSleeve(ctx, sg, F.paint * (0.3 + 0.7 * k) * 0.8 * (0.75 + 0.25 * ((seed + si) % 2)));
       var rnd = rngOf(seed * 31 + si * 7 + 1), n = 2 + Math.round(k * 2 * F.k), a = Math.min(1, (0.4 + 0.6 * k) * F.k);
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
       ctx.strokeStyle = "rgba(" + F.pal.mid + "," + (0.1 + 0.22 * k) + ")"; ctx.lineWidth = u * 0.045 * F.w;
@@ -2033,6 +2076,7 @@
   function glowDraw(ctx, g, F) { // the blades burn white-hot after the sky strike, then cool
     var u = uW.offsetWidth;
     bladeSegs().forEach(function (sg) {
+      if (F.paint > 0) tcSleeve(ctx, sg, F.paint * g * 1.1);
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
       [[0.07, F.pal.glow, 0.28], [0.03, F.pal.mid, 0.5], [0.011, F.pal.core, 0.95]].forEach(function (ps) {
         ctx.strokeStyle = "rgba(" + ps[1] + "," + Math.min(1, ps[2] * g * F.k) + ")"; ctx.lineWidth = u * ps[0] * F.w;
@@ -2044,12 +2088,13 @@
   }
   function skyDraw(ctx, now, L, F) { // a bolt from the top of the stage onto the swords, flickering and fading, with a flash
     var t = (now - L.t0) / (L.t1 - L.t0), u = uW.offsetWidth, tips = bladeSegs(), tx, ty;
-    if (tips.length) { tx = 0; ty = 0; tips.forEach(function (sg) { tx += sg.x1; ty += sg.y1; }); tx /= tips.length; ty /= tips.length; }
+    if (tips.length) { tx = 0; ty = 0; tips.forEach(function (sg) { tx += sg.xt; ty += sg.yt; }); tx /= tips.length; ty /= tips.length; }   // (the TOP of the swords: with the blades held back and down at the apex that is the hilt end, not the tip)
     else { var b = bodyPoint(); tx = b.x; ty = b.y - u * 0.5; }
     var step = Math.floor((now - L.t0) * speed / 55), rnd = rngOf(L.seed + step * 97), a = Math.pow(1 - t, 1.4) * (step % 2 ? 0.85 : 1);
     drawBolt(ctx, boltPts(tx + (rnd() - 0.5) * u * 0.5, -10, tx, ty, 0.15, 6, rnd, 8), F.pal, u * 0.024 * F.w, a * Math.min(1, F.k));
+    if (F.paint > 0 && fbTex.tc_bolt_a) tcBolt(ctx, fbTex[step % 2 ? "tc_bolt_b" : "tc_bolt_a"], tx, ty, Math.max(ty + 20, u * 1.3), u * 0.5, a * F.paint * 1.3, Math.floor(step / 2) % 2 === 0);   // the painted bolt on top of the code one
     glowDot(ctx, tx, ty, u * 0.55, F.pal.flash, 0.55 * (1 - t) * F.k);
-    flashAll(ctx, F.pal.flash, 0.28 * Math.pow(1 - t, 2.4) * F.k);
+    flashAll(ctx, F.pal.flash, 0.28 * Math.pow(1 - t, 2.4) * F.k * (1 - 0.55 * F.dark));      // (on the darkened stage the full-screen flash only washes it grey: it is halved)
   }
   function trailDraw(ctx, now, L, F) { // jagged streaks behind the warrior as he comes down
     var u = uW.offsetWidth, b = bodyPoint();
@@ -2062,6 +2107,47 @@
       var len = u * (0.45 + rnd() * 0.6), sp = (rnd() - 0.5) * 0.9, c = Math.cos(sp), sn = Math.sin(sp), ex = b.x + (vx * c - vy * sn) * len, ey = b.y + (vx * sn + vy * c) * len;
       drawBolt(ctx, boltPts(b.x + (rnd() - 0.5) * u * 0.2, b.y + (rnd() - 0.5) * u * 0.3, ex, ey, 0.3, 4, rnd, 1), F.pal, u * 0.008 * F.w, 0.85 * fade * Math.min(1, F.k));
     }
+  }
+
+  // THE SCREEN GOES DARK AT THE PEAK (2026-11-13, the user's idea for the Thunderclap Guillotine): the stage darkens BEHIND the two fighters (the part of an effect that is drawn on the canvas behind the characters,
+  // like the Rogue's abDim), so only the warrior and the enemy stay lit, and the sky bolt and the blades blaze in the dark. It comes in from the middle of the launch frame to full when the apex frame starts, holds
+  // through the apex, eases down to a third of it by the impact (the second bolt strikes in a mostly dark stage) and is gone 450 ms later. amt: how dark (0..1; 0.8 at most lets a hint of the forest through).
+  function tcDim(tIn0, tIn1, tOut0, tImpact, tEnd, amt) {
+    fxAdd({ t0: tIn0, t1: tEnd + 30, draw: function () {}, drawBack: function (ctx, now) {
+      var a, s;
+      if (now < tIn1) { s = clamp01((now - tIn0) / Math.max(1, tIn1 - tIn0)); a = s * s * (3 - 2 * s); }
+      else if (now < tOut0) a = 1;
+      else if (now < tImpact) { s = clamp01((now - tOut0) / Math.max(1, tImpact - tOut0)); a = 1 - (1 - 0.35) * s * s * (3 - 2 * s); }
+      else { s = clamp01((now - tImpact) / Math.max(1, tEnd - tImpact)); a = 0.35 * (1 - s); }
+      a *= amt;
+      if (a <= 0.01) return;
+      ctx.fillStyle = "rgba(3,6,20," + a + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight);
+    } });
+  }
+  // THE SWORDS' STROKE (2026-11-12, the Thunderclap Guillotine: "the swords should make the hit"): a bright crescent from where the blade tips were during the plunge (above his head) over the top and
+  // down to where they are on the strike frame (the swords on the target). The start is sampled live from the tips while the plunge frame is on screen, the end follows the tips of the strike frame; the
+  // crescent grows over 45 ms, holds until the impact and fades in about 250 ms. Violet edge, blue glow and white core, added together like the bolts.
+  function slashDraw(ctx, now, L, F) {
+    var u = uW.offsetWidth, segs = bladeSegs(), n = segs.length, c = { x: 0, y: 0 };
+    if (!n) return;
+    segs.forEach(function (sg) { c.x += sg.x1 / n; c.y += sg.y1 / n; });
+    if (now < L.tStrike) { L.from = c; return; }                                     // the plunge frame: remember where the tips are
+    if (!L.from) return;
+    var trg = rectIn(L.T.unit), dir = trg.left + trg.width / 2 >= c.x ? 1 : -1;
+    var grow = clamp01((now - L.tStrike) * speed / 45), fade = now < L.tImpact ? 1 : clamp01(1 - (now - L.tImpact) * speed / 260);
+    if (fade <= 0) return;
+    var A = L.from, B = { x: (A.x + c.x) / 2 + dir * u * 0.34, y: (A.y + c.y) / 2 - u * 0.12 }, N = 26, i, pts = [];
+    for (i = 0; i <= N; i++) { var t = i / N * grow, m = 1 - t; pts.push({ x: m * m * A.x + 2 * m * t * B.x + t * t * c.x, y: m * m * A.y + 2 * m * t * B.y + t * t * c.y }); }
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+    var wk = Math.max(0.9, F.w);                                                        // (the blade stroke is the hit, so the bolt-thickness slider may not make it thinner than 90%)
+    [[0.15, F.pal.glow, 0.36], [0.08, F.pal.mid, 0.6], [0.028, F.pal.core, 0.95]].forEach(function (ps) {
+      for (i = 1; i <= N; i++) {
+        var q = i / N, w = Math.sin(Math.PI * Math.min(1, 0.12 + q * 0.95)) * ps[0] * u * wk, a = Math.pow(q, 1.3) * ps[2] * fade * Math.min(1, F.k);   // thin and faint at the start, fat and bright toward the target
+        ctx.strokeStyle = "rgba(" + ps[1] + "," + a + ")"; ctx.lineWidth = Math.max(0.8, w);
+        ctx.beginPath(); ctx.moveTo(pts[i - 1].x, pts[i - 1].y); ctx.lineTo(pts[i].x, pts[i].y); ctx.stroke();
+      }
+    });
+    ctx.restore();
   }
 
   function scorch(cx, gy, u, cls) {
@@ -2082,6 +2168,11 @@
       var t = (now2 - now) * speed, rr = rngOf(seed + Math.floor(t / 55) * 131), a;
       var colMs = 260 * (0.7 + 0.3 * s);
       if (t < colMs) { a = 1 - t / colMs; drawBolt(ctx, boltPts(cx + (rr() - 0.5) * u * 0.25, -10, cx, ty, 0.14, 6, rr, Math.round(9 * (0.4 + 0.6 * s))), F.pal, u * 0.042 * (0.5 + 0.5 * s) * F.w, a * (Math.floor(t / 55) % 2 ? 0.85 : 1) * Math.min(1, F.k)); }
+      if (F.paint > 0) {                                                // the painted lightning (toned down): the heavy bolt on the target, the burst and the crackle on the ground
+        if (t < colMs) tcBolt(ctx, fbTex.tc_bolt_heavy, cx, ty, Math.max(ty + 20, u * 1.2), u * 0.55 * (0.7 + 0.3 * s), (1 - t / colMs) * F.paint * 1.2, false);
+        if (t < 320) fbTexDraw(ctx, fbTex.tc_burst, cx, ty + r.height * 0.12, 0, u * (0.5 + 0.35 * clamp01(t / 160)) * (0.6 + 0.4 * s), (1 - t / 320) * F.paint * 1.1, 0.5, Math.floor(t / 80) % 2 === 0);
+        if (t < 600) fbTexDraw(ctx, fbTex.tc_ground, cx, gy, 0, u * (0.9 + 0.5 * s * clamp01(t / 200)), (1 - t / 600) * F.paint * 1.2, 0.5, Math.floor(t / 110) % 2 === 0);
+      }
       if (t < 240) glowDot(ctx, cx, ty + r.height * 0.12, u * (0.5 + 0.35 * (t / 240)) * (0.6 + 0.4 * s), F.pal.flash, 0.8 * s * Math.pow(1 - t / 240, 1.6) * F.k);
       if (t < 150) flashAll(ctx, F.pal.flash, 0.2 * s * (1 - t / 150) * F.k);
       [0, 90].forEach(function (delay, ri) {                           // shock ring along the ground (a second one only above 100% strength)
@@ -2122,7 +2213,7 @@
 
   // One run of the skill, tied to the attack pack's clock. Returns an object whose impact() is called at the hit moment.
   function startSkill(clk, hitF, T) {
-    var F = fxParams(), fm = clk.frameMs, at = function (f, fr) { return clk.t0 + (f - 1 + (fr || 0)) * fm; };
+    var F = fxParams(), at = function (f, fr) { return clkAt(clk, f, fr); };   // (clkAt follows the pack's holds: the Thunderclap Guillotine's crouch and apex last longer)
     var tImpact = at(hitF, 0.4), strikeF = Math.max(1, Math.min(F.strike, hitF)), chargeF = Math.min(F.charge, strikeF), seed = (clk.t0 | 0) + 7;
     fxAdd({ t0: at(chargeF), t1: tImpact + 80, draw: function (ctx, now, L) { crackleDraw(ctx, now, F, clamp01((now - L.t0) / Math.max(1, tImpact - L.t0))); } });
     fxAdd({ t0: at(strikeF, 0.1), t1: tImpact + 520, draw: function (ctx, now, L) { glowDraw(ctx, now < tImpact ? clamp01((now - L.t0) / 160) : clamp01(1 - (now - tImpact) / 500), F); } });
@@ -2131,6 +2222,12 @@
     var myRun = run;
     setTimeout(function () { if (myRun === run) shake(7 * F.shake, 300); }, Math.max(0, sky.t0 - performance.now()));
     if (strikeF < hitF) fxAdd({ t0: at(Math.min(strikeF + 1, hitF)), t1: tImpact, seed: seed + 11, draw: function (ctx, now, L) { trailDraw(ctx, now, L, F); } });
+    if (hitF > 1) fxAdd({ t0: at(hitF - 1, 0.5), t1: tImpact + 340, tStrike: at(hitF, 0), tImpact: tImpact, T: T, draw: function (ctx, now, L) { slashDraw(ctx, now, L, F); } });   // the swords' stroke onto the target
+    if (F.aura > 0 && auraReady("lightning_aura")) {                                // a lightning aura forms round him while he crouches (the painted aura already in the page: 35% then 70%), and bursts outward as he leaves the ground
+      var launchF = Math.min(strikeF, Math.max(2, hitF > 3 ? 3 : hitF)), uA = uW.offsetWidth;
+      fxAdd(auraLayer(F, uA, at(chargeF), [{ t: at(chargeF), lv: 0.35 * F.aura, rf: 0.6 }, { t: at(Math.min(chargeF + 1, launchF)), lv: 0.85 * F.aura, rf: 0.7 }], at(launchF), 280, 0.35, "lightning_aura"));
+    }
+    if (F.dark > 0 && strikeF > 2) tcDim(at(strikeF - 2, 0.3), at(strikeF, 0), at(Math.min(strikeF + 1, hitF), 0), tImpact, tImpact + 450 / speed, F.dark);   // the screen goes dark for the peak of the jump
     return { impact: function () { impactFx(T, F); } };
   }
   function fxSync() {
@@ -2153,10 +2250,15 @@
     $("fxJson").value = JSON.stringify(d, null, 1);
   }
   ["fxPal", "fxCharge", "fxStrike", "hitFrame", "fps_attack"].forEach(function (id) { $(id).addEventListener("input", fxSync); $(id).addEventListener("change", fxSync); });
-  [["fxInt", "fxIntV"], ["fxThick", "fxThickV"], ["fxShake", "fxShakeV"], ["fxImpact", "fxImpactV"]].forEach(function (p) {
+  [["fxInt", "fxIntV"], ["fxThick", "fxThickV"], ["fxShake", "fxShakeV"], ["fxImpact", "fxImpactV"], ["fxDarkAmt", "fxDarkAmtV"], ["fxPaint", "fxPaintV"], ["fxAura", "fxAuraV"]].forEach(function (p) {
     $(p[0]).oninput = function () { $(p[1]).textContent = $(p[0]).value + "%"; fxSync(); };
   });
   $("fxPreview").onclick = function () { previewAttack(); };
+  $("fxEditPath").onclick = function () {                                       // opens the frame positions section under the stage, picks the attack pack and switches the editing on
+    $("pathDetails").open = true; $("pathPack").value = "attack"; $("pathPack").onchange();
+    $("editPath").checked = true; $("editPath").onchange(); $("usePath").checked = true; $("usePath").onchange();
+    $("pathDetails").scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   $("stopFx").onclick = function () { resetState(); $("previewAtk").classList.remove("on"); $("previewDodge").classList.remove("on"); };
   $("fxCopy").onclick = function () {
     var t = $("fxJson"); t.select();
@@ -4272,7 +4374,8 @@
     var fpsA = Math.max(1, +$("fps_attack").value || 14), hitF = Math.max(1, +$("hitFrame").value || 5);
     var moveF = Math.max(1, Math.min(hitF, +$("moveFrom").value || 1));
     var IMPACT_IN_FRAME = 0.4; // the impact fires 40% into the hit frame, so timer slop cannot push it onto a neighbouring frame
-    var tHit = packPlays ? Math.max(120, (hitF - 1 + IMPACT_IN_FRAME) * 1000 / fpsA) : 250;
+    var aHolds = packPlays ? atkHolds() : null, hMs = function (f) { return aHolds ? Math.max(0, aHolds[f - 1] || 0) : 0; };   // the pack's holds: its hit comes later than frames x fps say
+    var tHit = packPlays ? Math.max(120, (hitF - 1 + IMPACT_IN_FRAME) * 1000 / fpsA + (function () { var s = 0, q; for (q = 1; q < hitF; q++) s += hMs(q); return s + IMPACT_IN_FRAME * hMs(hitF); })()) : 250;
     var jumpStyle = packPlays && moveF > 1;
     var wuMs = jumpStyle ? (moveF - 1) * 1000 / fpsA : Math.min(150, tHit * 0.4), luMs = Math.max(60, tHit - wuMs);
     // The warrior dodges with an uploaded dodge pack: it starts early enough for its evade frame to be on screen when the strike lands.
@@ -4294,7 +4397,7 @@
       blockRun = monBlock(myRun, Math.max(0, tHit - bpre), bSpec);
     }
     var clk = null;
-    if (packPlays) { playPose("attack", false).then(backToIdle); clk = player.clock; }
+    if (packPlays) { playPose("attack", false, aHolds).then(backToIdle); clk = player.clock; }
     var skill = (A === FIGHTERS.W && packPlays && $("fxOn").checked && !rogueLike()) ? startSkill(clk, hitF, T) : null;   // the lightning skill rides on the attack pack's clock
     var viaPath = packPlays && pathOn(), drive = null;
     if (viaPath) drive = startPath(myRun, clk);
@@ -4304,7 +4407,7 @@
     // Time left until the impact moment on the pack's own clock: if the wind-up ran late, the lunge is shortened to make up for it.
     function lungeLeft(planned) {
       if (!packPlays) return planned;
-      return Math.max(60, (clk.t0 + (hitF - 1 + IMPACT_IN_FRAME) * clk.frameMs - performance.now()) * speed);
+      return Math.max(60, (clkAt(clk, hitF, IMPACT_IN_FRAME) - performance.now()) * speed);
     }
     if (viaPath) {
       // the path drives the movement; nothing to do until the impact moment
@@ -4322,7 +4425,7 @@
     }
     if (myRun !== run) return;
     if (packPlays) { // line the impact up with the pack's own clock
-      var wait = clk.t0 + (hitF - 1 + IMPACT_IN_FRAME) * clk.frameMs - performance.now();
+      var wait = clkAt(clk, hitF, IMPACT_IN_FRAME) - performance.now();
       if (wait > 0) await new Promise(function (r) { setTimeout(r, wait); });
       if (myRun !== run) return;
     }
@@ -8738,7 +8841,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
       if (pl && pl.x && pl.y) {
         var mv = 0; while (mv < pl.x.length - 1 && Math.abs(pl.x[mv] - pl.x[0]) < 0.01) mv++;
         var old = PRESETS[d.file] || {};
-        PRESETS[d.file] = { pack: d.slot, hitFrame: pl.hitFrame, evadeFrame: pl.evadeFrame, moveFrom: old.moveFrom || mv + 1, fps: pl.fps, x: pl.x, y: pl.y, smooth: pl.smooth !== false };
+        PRESETS[d.file] = { pack: d.slot, hitFrame: pl.hitFrame, evadeFrame: pl.evadeFrame, moveFrom: old.moveFrom || mv + 1, fps: pl.fps, x: pl.x, y: pl.y, smooth: pl.smooth !== false, holds: pl.holds };   // holds: extra ms per frame (the Warrior's Thunderclap Guillotine holds its crouch and its apex)
       }
     });
   }
@@ -8788,7 +8891,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   }
   try { $("devTools").open = localStorage.getItem("wvg-dev-open") === "1"; } catch (e) {}
   $("devTools").addEventListener("toggle", function () { try { localStorage.setItem("wvg-dev-open", this.open ? "1" : "0"); } catch (e) {} });
-  ["fightPanel", "bgPanel", "blPanel", "ktPanel", "stPanel"].forEach(function (id) {                        // the Fight, Background and Stage blend menus fold like the developer tools (open by default; the choice is remembered)
+  ["fightPanel", "bgPanel", "blPanel", "ktPanel", "stPanel", "pathDetails"].forEach(function (id) {                        // the Fight, Background and Stage blend menus fold like the developer tools (open by default; the choice is remembered)
     var d = $(id);
     try { var v = localStorage.getItem("wvg-open-" + id); if (v !== null) d.open = v === "1"; } catch (e) {}
     d.addEventListener("toggle", function () { try { localStorage.setItem("wvg-open-" + id, this.open ? "1" : "0"); } catch (e) {} });

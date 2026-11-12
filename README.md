@@ -13,11 +13,12 @@ Frame-by-frame 2D combat characters for an RPG-style game. Gemini draws the pose
 | `docs/BLOCK.md` | Block, for every character and monster (2026-11-10): the game rule, the decisions (a reaction like Dodge, one glass half-circle look, the Elite first), what the page does and what is not wired yet |
 | `docs/SLIME_KING.md` | The Slime King, the boss of the slimes (2026-11-10): ivory-white, crown, golden staff held by a floating glove, calm and regal, the six skills with all the elements, the animations needed, what the page needs |
 | `docs/HUD.md` | The in-stage HUD (2026-11-12): a round portrait at each end, the HP bars running in to a VS (the user's reference picture), names, ghost bar, hit / heal / low states, the boss frame, and the empty row under each bar kept for the buff and debuff icons (the design of those icons is in the file, not built yet). |
+| `docs/WARRIOR_SKILLS.md` | The Warrior's six attack skills (2026-11-12): the plan, the skill list as the user sends it, and for each skill the choreography, timing, the prompt and what the page needs. Skill 1 = Thunderclap Guillotine, rebuilt from scratch (the first jump looked like a monkey). |
 | `docs/STAGES.md` | The stage looks: the Forest Kingdom's five acts of 20 PvE stages (slimes, goblins, wolves, ogres, orcs), the props layer, shared art rules, how the stage changes, the arena (Oakcrown Colosseum) and the dungeon |
 
 ## Where things stand
 
-**Warrior** (armored, two swords) is done for now. Five animations, each with its hand marks:
+**Warrior** (armored, two swords): the base animations are done (and a Block since 2026-11-10); since 2026-11-12 he is getting six attack skills and the first, Thunderclap Guillotine (the folder is still `jump_attack`), has been redrawn and is in the page as an 11-frame strip with per-frame holds and the user's own hand marks and path (the table below still describes the OLD jump, kept in `Animations/Warrior/jump_attack/old_monkey_jump/`; the plan and what was built are in `docs/WARRIOR_SKILLS.md`). Five animations, each with its hand marks:
 
 | Animation | Folder | Frames | Frame size | fps | Path | Notes |
 |---|---|---|---|---|---|---|

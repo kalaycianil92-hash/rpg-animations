@@ -1,0 +1,4 @@
+{"format":"frame-placement/1","animation":"attack","file":"armored_thunderclap_guillotine_11frame_strip.png","frames":11,"fps":14,"hitFrame":7,"smooth":true,"holds":[129,129,29,59,229,19,19,39,79,29,0],
+"x":[-0.014,-0.006,0.079,0.229,0.485,0.801,1.053,1.127,1.145,1.182,1.25],
+"y":[0,0,0.45,0.966,1.377,0.943,0.619,0,0,0,0],
+"note":"x: 0 = home position, 1 = strike point (target centre minus 0.8 character widths). y: extra lift in frame widths, up positive, never below 0 (the ground line). A frame is exactly at its x,y in the middle of its time slot; with smooth=true the position is linearly interpolated between frame middles, otherwise it jumps from frame to frame."}
