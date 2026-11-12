@@ -31,15 +31,69 @@
   h1 { font: 700 28px/1 var(--display); letter-spacing: .02em; margin: 0; text-wrap: balance; }
   .sub { color: var(--dim); margin: 4px 0 0; }
 
-  .hud { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .hp { min-width: 0; }
-  .hp .name { display: flex; justify-content: space-between; font: 600 14px var(--display); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
-  .hp .track { height: 12px; background: #0b0914; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
-  .hp .fill { height: 100%; width: 100%; transition: width .35s ease-out; }
-  #hpW .fill { background: var(--hero); }
-  #hpG .fill { background: var(--foe); }
-  .hp.right .name { flex-direction: row-reverse; }
-  .hp.right .track { direction: rtl; }
+  /* ---- THE IN-STAGE HUD (2026-11-12; the user's reference: a versus screen with a round portrait at each end, the bars running in to a VS in the middle, a name above each bar and room under it for the status icons) ----
+     Everything is sized from --hw, the stage's width in px (set by the script: a ResizeObserver), so it scales from a phone to the 760 px page. The fill of each bar is anchored at the CENTRE and drains toward its
+     portrait (as in the reference); a pale ghost bar lags behind a hit; the bar flashes on a hit, pulses green on a heal and below 25% pulses; a defeated fighter's portrait goes grey. The bar's number sits at the portrait end.
+     The row under each bar (.hp-fx) is kept for the buff and debuff icons (the next part). Classes are .hp (the ids hpW and hpG, kept: the code finds .fill, .v and the first span of .name in them), .hp-pt, .hp-body. */
+  .hud2 { --hw: 760px; --pt: clamp(38px, calc(var(--hw) * .092), 70px); --bh: clamp(12px, calc(var(--hw) * .025), 19px);
+    position: absolute; left: 0; right: 0; top: 0; z-index: 7; pointer-events: none;      /* (above the Victory / Defeat banner: the bars stay bright and readable under its dimming) */
+    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; column-gap: calc(var(--hw) * .008);
+    padding: calc(var(--hw) * .011) calc(var(--hw) * .014) 0; }
+  .hud2 .hp { min-width: 0; display: flex; align-items: flex-start; }
+  .hud2 .hp.right { flex-direction: row-reverse; }
+  .hud2 .hp.boss { --pt: clamp(44px, calc(var(--hw) * .106), 80px); --bh: clamp(14px, calc(var(--hw) * .03), 23px); }
+  .hud2 .hp-pt { position: relative; flex: none; z-index: 2; width: var(--pt); height: var(--pt); border-radius: 50%;
+    background: radial-gradient(circle at 50% 30%, #3b4c72, #111727 78%);
+    box-shadow: 0 0 0 calc(var(--pt) * .05) #e9c660, 0 0 0 calc(var(--pt) * .09) #2a1c06, 0 4px 10px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }
+  .hud2 .hp.right .hp-pt { background: radial-gradient(circle at 50% 30%, #6e3c3c, #1d0f11 78%); box-shadow: 0 0 0 calc(var(--pt) * .05) #e2a650, 0 0 0 calc(var(--pt) * .09) #2a1406, 0 4px 10px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }
+  .hud2 .hp.boss .hp-pt { box-shadow: 0 0 0 calc(var(--pt) * .065) #f7d466, 0 0 0 calc(var(--pt) * .115) #4a3208, 0 0 16px 2px #f2c14ea0, 0 4px 10px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }
+  .hud2 .hp-pt canvas { display: block; width: 100%; height: 100%; border-radius: 50%; }
+  .hud2 .hp-body { flex: 1; min-width: 0; margin-top: calc(var(--pt) * .08); }
+  .hud2 .hp.left .hp-body { margin-left: calc(var(--pt) * -.28); }
+  .hud2 .hp.right .hp-body { margin-right: calc(var(--pt) * -.28); }
+  .hud2 .name { display: flex; align-items: baseline; gap: .55em; margin: 0 0 calc(var(--bh) * .16); white-space: nowrap; overflow: hidden;
+    font: 700 clamp(11px, calc(var(--hw) * .0195), 15px)/1.1 var(--display); letter-spacing: .06em; text-transform: uppercase; color: #f4f1e4; text-shadow: 0 1px 0 #000, 0 0 5px #000c; }
+  .hud2 .name > span { overflow: hidden; text-overflow: ellipsis; }
+  .hud2 .hp.left .name { flex-direction: row-reverse; justify-content: flex-start; padding-left: calc(var(--pt) * .32); }
+  .hud2 .hp.right .name { justify-content: flex-start; padding-right: calc(var(--pt) * .32); }
+  .hud2 .hp-tag { flex: none; font-style: normal; font-weight: 600; font-size: .74em; letter-spacing: .14em; color: #dcc387; padding: .05em .45em; border: 1px solid #dcc38799; border-radius: 3px; background: #0009; }
+  .hud2 .hp.boss .name { color: var(--gold); text-shadow: 0 1px 0 #000, 0 0 8px #c9962caa; font-size: clamp(12px, calc(var(--hw) * .022), 17px); }
+  .hud2 .hp.boss .name > span:first-child::before { content: "\265B\00a0"; }
+  .hud2 .hp.boss .hp-tag { background: #f2c14e; color: #2a1c06; border-color: #f2c14e; }
+  .hud2 .track { position: relative; box-sizing: border-box; height: var(--bh); border-radius: 999px; overflow: hidden; direction: rtl;
+    background: #0a1006; border: 2px solid #d9dfcf; box-shadow: 0 0 0 1px #000, 0 2px 4px #000a, inset 0 2px 4px #000c; }
+  .hud2 .hp.right .track { direction: ltr; }
+  .hud2 .hp.boss .track { border-color: #eecb68; box-shadow: 0 0 0 1px #000, 0 0 10px #c9962c88, 0 2px 4px #000a, inset 0 2px 4px #000c; }
+  .hud2 .fill { position: relative; z-index: 1; height: 100%; width: 100%; border-radius: 999px; transition: width .3s ease-out; }
+  .hud2 #hpW .fill { background: linear-gradient(#c3f562, #78c425 52%, #4a8d11); }
+  .hud2 #hpG .fill { background: linear-gradient(#ffa27e, #e2503f 52%, #a52921); }
+  .hud2 #hpG.boss .fill { background: linear-gradient(#ffbd6e, #e0452e 50%, #8f1f18); }
+  .hud2 .hp-ghost { position: absolute; z-index: 0; top: 0; bottom: 0; right: 0; width: 100%; border-radius: 999px; background: linear-gradient(#fff3bd, #e9c45c); transition: width .6s ease-out .45s; }
+  .hud2 .hp.right .hp-ghost { right: auto; left: 0; }
+  .hud2 .track::before { content: ""; position: absolute; z-index: 2; left: 0; right: 0; top: 0; height: 52%; background: linear-gradient(rgba(255,255,255,.34), rgba(255,255,255,0)); pointer-events: none; }
+  .hud2 .track::after { content: ""; position: absolute; z-index: 3; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), rgba(0,0,0,.4) calc(10% - 1px), rgba(0,0,0,.4) 10%); }
+  .hud2 .v { position: absolute; z-index: 4; top: 50%; transform: translateY(-50%); font: 700 calc(var(--bh) * .66)/1 var(--display); letter-spacing: .05em; color: #fff; text-shadow: 0 1px 1px #000, 0 0 3px #000; direction: ltr; }
+  .hud2 .hp.left .v { left: calc(var(--pt) * .28 + 6px); }
+  .hud2 .hp.right .v { right: calc(var(--pt) * .28 + 6px); }
+  .hud2 .hp-fx { display: flex; flex-wrap: wrap; gap: 3px; min-height: calc(var(--bh) * 1.3); margin-top: calc(var(--bh) * .24); }
+  .hud2 .hp.left .hp-fx { justify-content: flex-start; padding-left: calc(var(--pt) * .32); }
+  .hud2 .hp.right .hp-fx { justify-content: flex-end; padding-right: calc(var(--pt) * .32); }
+  .hud2 .hud-vs { align-self: center; text-align: center; padding-top: calc(var(--pt) * .12); line-height: 1; user-select: none; }
+  .hud2 .hud-vs b { display: block; font: italic 900 clamp(22px, calc(var(--hw) * .062), 46px)/1 var(--display); letter-spacing: -.01em; transform: skewX(-8deg);
+    background: linear-gradient(#fff6b0 0%, #ffbe3a 42%, #ee5d1c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: calc(var(--hw) * .0026) #3b1006;
+    filter: drop-shadow(0 2px 0 #3b1006) drop-shadow(0 0 10px #ff8a2a99); }
+  .hud2 .hud-vs small { display: block; margin-top: 3px; font: 600 clamp(8px, calc(var(--hw) * .0125), 11px) var(--display); letter-spacing: .28em; text-indent: .28em; text-transform: uppercase; color: #e6d7a6; text-shadow: 0 1px 1px #000; }
+  .hud2 .hp.low .fill { animation: hpLow .7s ease-in-out infinite alternate; }
+  .hud2 .hp.hit .hp-pt { animation: hpShake .38s ease-out; }
+  .hud2 .hp.hit .track { animation: hpFlash .38s ease-out; }
+  .hud2 .hp.heal .track { animation: hpHeal .7s ease-out; }
+  .hud2 .hp.dead .hp-pt canvas { filter: grayscale(1) brightness(.55); }
+  @keyframes hpLow { from { filter: brightness(1); } to { filter: brightness(1.6) saturate(1.3); } }
+  @keyframes hpShake { 0% { transform: translate(0, 0); } 20% { transform: translate(-3px, 1px); } 40% { transform: translate(3px, -1px); } 60% { transform: translate(-2px, 0); } 100% { transform: none; } }
+  @keyframes hpFlash { from { filter: brightness(2.3); } to { filter: none; } }
+  @keyframes hpHeal { from { box-shadow: 0 0 0 1px #000, 0 0 16px 3px #7dff6a, inset 0 2px 4px #000c; } to { box-shadow: 0 0 0 1px #000, 0 2px 4px #000a, inset 0 2px 4px #000c; } }
+  @media (prefers-reduced-motion: reduce) { .hud2 .hp.low .fill, .hud2 .hp.hit .hp-pt, .hud2 .hp.hit .track, .hud2 .hp.heal .track { animation: none; } .hud2 .fill, .hud2 .hp-ghost { transition: none; } }
 
   .stage {
     --sh: clamp(220px, 52vw, 340px); /* base stage height; --extra adds headroom above it for tall (jump) frames (the same for every character: see HEADROOM in the script) */
@@ -160,16 +214,12 @@
   .banner { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; z-index: 6;
     font: 700 48px var(--display); letter-spacing: .12em; text-transform: uppercase; background: #0b0914aa; }
   .banner.show { display: flex; }
-  .stagetag { position: absolute; left: 0; right: 0; top: 16%; z-index: 6; pointer-events: none; opacity: 0; text-align: center;
+  .stagetag { position: absolute; left: 0; right: 0; top: 24%; z-index: 6; pointer-events: none; opacity: 0; text-align: center;
     font: 700 clamp(30px, 7vw, 52px) var(--display); letter-spacing: .24em; text-indent: .24em; text-transform: uppercase; color: var(--gold);
     text-shadow: 0 2px 0 #0b0914, 0 0 6px #0b0914, 0 0 20px #0b0914cc; }
   .stagetag small { display: block; margin-top: .25em; font: 600 clamp(14px, 3.4vw, 22px) var(--display); letter-spacing: .3em; text-indent: .3em; color: #ece2c8; }
 
-  .hp.boss .name { font-size: 17px; color: var(--gold); text-shadow: 0 0 8px #c9962c88; }                                   /* the boss's bar: heavier, gold-framed, a crown before the name */
-  .hp.boss .name span:first-child::before { content: "\265B  "; }
-  .hp.boss .track { height: 19px; border-color: #c9962c; box-shadow: 0 0 10px #c9962c66, inset 0 0 6px #000; }
-  #hpG.boss .fill { background: linear-gradient(90deg, #8a2a24, #d8473f 55%, #f3a14a); }
-  .bossname { position: absolute; left: 0; right: 0; top: 14%; z-index: 6; pointer-events: none; text-align: center; font: 700 clamp(30px, 7vw, 54px) var(--display); letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; color: var(--gold);
+  .bossname { position: absolute; left: 0; right: 0; top: 22%; z-index: 6; pointer-events: none; text-align: center; font: 700 clamp(30px, 7vw, 54px) var(--display); letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; color: var(--gold);
     text-shadow: 0 2px 0 #0b0914, 0 0 8px #0b0914, 0 0 24px #c9962ccc; }
   .bossname small { display: block; margin-bottom: .2em; font: 600 clamp(13px, 3vw, 20px) var(--display); letter-spacing: .5em; text-indent: .5em; color: #ece2c8; }
   .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -208,7 +258,6 @@
   #log li.w { color: #bfe6f7; }
   #log li.g { color: #f2c4c0; }
   #log li.sys { color: var(--dim); font-style: italic; }
-  @media (prefers-reduced-motion: reduce) { .hp .fill { transition: none; } }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -220,11 +269,6 @@
   <div>
     <h1>Warrior vs Goblin Test</h1>
     <p class="sub">Pick a character, press Play. Only what that character needs is shown; the tools you rarely use are folded away at the bottom.</p>
-  </div>
-
-  <div class="hud">
-    <div class="hp" id="hpW"><div class="name"><span>Warrior</span><span class="v">120 / 120</span></div><div class="track"><div class="fill"></div></div></div>
-    <div class="hp right" id="hpG"><div class="name"><span>Goblin</span><span class="v">60 / 60</span></div><div class="track"><div class="fill"></div></div></div>
   </div>
 
   <div class="stage" id="stage">
@@ -240,6 +284,11 @@
     <canvas id="fx"></canvas>
     <div class="banner" id="banner">Victory</div>
     <div class="stagetag" id="stageTag"></div>
+    <div class="hud2" id="hud2">
+      <div class="hp left" id="hpW"><div class="hp-pt"><canvas id="ptW" width="160" height="160"></canvas></div><div class="hp-body"><div class="name"><span>Warrior</span><em class="hp-tag">Hero</em></div><div class="track"><i class="hp-ghost"></i><div class="fill"></div><span class="v">120 / 120</span></div><div class="hp-fx" id="fxW"></div></div></div>
+      <div class="hud-vs"><b>VS</b><small id="hudStage">Stage 1</small></div>
+      <div class="hp right" id="hpG"><div class="hp-pt"><canvas id="ptG" width="160" height="160"></canvas></div><div class="hp-body"><div class="name"><span>Goblin</span><em class="hp-tag">Foe</em></div><div class="track"><i class="hp-ghost"></i><div class="fill"></div><span class="v">60 / 60</span></div><div class="hp-fx" id="fxG"></div></div></div>
+    </div>
   </div>
 
   <div class="bar">
@@ -1208,11 +1257,63 @@
     $("log").appendChild(li);
     $("log").scrollTop = 1e6;
   }
+  function hudPaint(f) {                                                              // one fighter's bar in the HUD: the fill and the ghost, the number, and the states (hit flash, heal pulse, low, defeated)
+    var el = f.hpEl, pct = Math.max(0, f.hp / f.max * 100), g = el.querySelector(".hp-ghost"), prev = f._hudPct, hs = $("hudStage");
+    el.querySelector(".fill").style.width = pct + "%";
+    if (g) g.style.width = pct + "%";
+    el.querySelector(".v").textContent = Math.max(0, f.hp) + " / " + f.max;
+    if (hs) hs.textContent = "Stage " + (typeof stageNo !== "undefined" ? stageNo : 1);
+    f._hudPct = pct;
+    el.classList.toggle("low", pct > 0 && pct <= 25); el.classList.toggle("dead", pct <= 0);
+    if (prev !== undefined && pct < prev - 0.01) hudFlash(el, "hit"); else if (prev !== undefined && pct > prev + 0.01) hudFlash(el, "heal");
+  }
+  function hudFlash(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); clearTimeout(el["_t" + cls]); el["_t" + cls] = setTimeout(function () { el.classList.remove(cls); }, 700); }
   function paintHp(f) {
-    f.hpEl.querySelector(".fill").style.width = Math.max(0, f.hp / f.max * 100) + "%";
-    f.hpEl.querySelector(".v").textContent = Math.max(0, f.hp) + " / " + f.max;
+    hudPaint(f);
     if (f === FIGHTERS.G && typeof monEl !== "undefined") monOnHp(f);                  // the monster's own hit and death animations follow its hit points
   }
+  // The portraits (2026-11-12): a round picture of each fighter drawn from FRAME 1 OF ITS IDLE STRIP: a square crop of the head (the five heroes) or of the whole face and body (the slimes, the Elite, the King with his crown), HUD_CROP =
+  // [x, y, side] in the 512 px cell, measured on the strips (docs/HUD.md). The hero faces right (toward the VS) as drawn; the enemy is mirrored to face left, toward the VS. The goblin placeholder has no picture: a green face is drawn.
+  var HUD_CROP = { warrior: [238, 51, 124], mage: [228, 54, 124], rogue: [243, 53, 124], assassin: [253, 39, 124], spellblade: [255, 44, 124],
+    fire_slime: [60, 100, 380], ice_slime: [85, 160, 350], lightning_slime: [60, 120, 385], dark_slime: [55, 95, 380], elite_slime: [110, 160, 290], slime_king: [90, 100, 310] };
+  var hudCache = {};
+  function hudPlaceholder(x, W, H, kind) {                                            // a stand-in face: the goblin (green, pointed ears, a grin), or a plain disc
+    x.fillStyle = kind === "goblin" ? "#8bcf5e" : "#4a5878"; x.beginPath(); x.arc(W / 2, H / 2 + 6, W * 0.34, 0, 6.2832); x.fill();
+    if (kind !== "goblin") return;
+    x.beginPath(); x.moveTo(W * 0.2, H * 0.52); x.lineTo(W * 0.04, H * 0.36); x.lineTo(W * 0.24, H * 0.36); x.fill(); x.beginPath(); x.moveTo(W * 0.8, H * 0.52); x.lineTo(W * 0.96, H * 0.36); x.lineTo(W * 0.76, H * 0.36); x.fill();
+    x.fillStyle = "#fff"; x.beginPath(); x.arc(W * 0.38, H * 0.5, W * 0.07, 0, 6.2832); x.arc(W * 0.62, H * 0.5, W * 0.07, 0, 6.2832); x.fill();
+    x.fillStyle = "#1c1c1c"; x.beginPath(); x.arc(W * 0.4, H * 0.5, W * 0.03, 0, 6.2832); x.arc(W * 0.6, H * 0.5, W * 0.03, 0, 6.2832); x.fill();
+    x.strokeStyle = "#1c1c1c"; x.lineWidth = 3; x.beginPath(); x.moveTo(W * 0.35, H * 0.7); x.quadraticCurveTo(W * 0.5, H * 0.82, W * 0.65, H * 0.7); x.stroke();
+  }
+  function hudFace(cv, ck, src, box, flip, ph) {                                      // draws a portrait on canvas cv: the crop `box` of the first cell of the strip `src` (cached per ck), mirrored when `flip`
+    var W = cv.width, H = cv.height, x = cv.getContext("2d"), c = hudCache[ck];
+    cv.dataset.ck = ck;
+    function paint(im) {
+      if (cv.dataset.ck !== ck) return;                                               // (the fighter changed while the picture loaded)
+      x.clearRect(0, 0, W, H); x.save(); if (flip) { x.translate(W, 0); x.scale(-1, 1); }
+      if (im && box) x.drawImage(im, box[0], box[1], box[2], box[2], 0, 0, W, H); else hudPlaceholder(x, W, H, ph);
+      x.restore();
+    }
+    if (!src || !box) { paint(null); return; }
+    if (c && c.src === src && c.img.complete) { paint(c.img); return; }
+    var im = new Image(); hudCache[ck] = { src: src, img: im }; im.onload = function () { paint(im); }; im.src = src;
+  }
+  function hudCropKey(key) { return HUD_CROP[key] ? key : /^fire_slime/.test(key) ? "fire_slime" : key; }
+  function hudMonster() {                                                             // the enemy's portrait, name tag and boss frame (called by setMonster)
+    var key = monKey, m = MONSTERS[key], idle = m && (m.anims || []).filter(function (a) { return a.slot === "idle"; })[0];
+    $("hpG").classList.toggle("boss", !!(m && m.king));
+    $("hpG").querySelector(".hp-tag").textContent = m && m.king ? "Boss" : "Foe";
+    hudFace($("ptG"), "G:" + key, idle && idle.src, HUD_CROP[hudCropKey(key)], true, "goblin");
+  }
+  function hudHero() {                                                                // the hero's portrait (called when the character changes)
+    var key = typeof curChar !== "undefined" ? curChar : "warrior", ch = typeof CHARACTERS !== "undefined" && CHARACTERS[key], idle = ch && (ch.anims || []).filter(function (a) { return a.slot === "idle"; })[0];
+    hudFace($("ptW"), "W:" + key, idle && idle.src, HUD_CROP[key], false, "hero");
+  }
+  (function () {                                                                      // the HUD is sized from the stage's width
+    var st = $("stage"), h = $("hud2");
+    function size() { h.style.setProperty("--hw", st.clientWidth + "px"); }
+    size(); if (window.ResizeObserver) new ResizeObserver(size).observe(st); else window.addEventListener("resize", size);
+  })();
   function centerOf(el) {
     var s = stage.getBoundingClientRect(), r = el.getBoundingClientRect();
     return { x: r.left - s.left + r.width / 2, y: r.top - s.top + r.height / 2, w: r.width, h: r.height };
@@ -5448,7 +5549,7 @@
     var idle = (m.anims || []).filter(function (a) { return a.slot === "idle"; })[0];
     FIGHTERS.G.name = m.name;
     var nm = $("hpG").querySelector(".name span"); if (nm) nm.textContent = m.name;
-    $("hpG").classList.toggle("boss", !!m.king);                                      // (the boss has a heavier, gold-framed bar)
+    hudMonster();                                                                     // (the HUD: the portrait, the Foe / Boss tag and the boss's gold frame)
     $("monSel").value = idle ? key : "goblin";
     $("monSizeWrap").style.display = idle ? "" : "none";
     $("monSqWrap").style.display = idle && m.squash ? "" : "none";
@@ -7579,7 +7680,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     }
     await kingFinish(e, myRun, T, ready, dodgeRun);
   }
-  function healBar(f) { f.hpEl.querySelector(".fill").style.width = Math.max(0, f.hp / f.max * 100) + "%"; f.hpEl.querySelector(".v").textContent = Math.max(0, f.hp) + " / " + f.max; f._lastHp = f.hp; }   // (paintHp without the monster's hit/idle reaction: a heal must not interrupt its own pack)
+  function healBar(f) { hudPaint(f); f._lastHp = f.hp; }   // (paintHp without the monster's hit/idle reaction: a heal must not interrupt its own pack)
   async function healAct(e, myRun, A) {                                              // ROYAL RESTORATION: the King heals itself: a golden light round the body, sparkles rising, a green +N, the HP bar goes up
     var pk = monPackOf("heal"), pv = !!e.preview, unit = 1000 / pk.fps, fm = unit / speed, holds = [1, 1, 1.2, 2.6, 2.6, 1.3], starts = [], tot = 0, i;
     for (i = 0; i < pk.n; i++) { starts.push(tot); tot += fm * holds[i]; }
@@ -8463,6 +8564,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     POSES.forEach(function (pose) { $("i_" + pose).textContent = "Not loaded."; });
     FIGHTERS.W.name = ch.name;
     $("hpW").querySelector(".name span").textContent = ch.name;
+    hudHero();
     return loadAnims(ch.anims).then(function () { renderMarksInfo(); applyCharUi(); });
   }
   if (MAGE_ANIMS.length || ROGUE_ANIMS.length || ASSASSIN_ANIMS.length || SPELLBLADE_ANIMS.length) {
@@ -8477,6 +8579,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     $("charSel").onchange = function () { switchCharacter(this.value); };
   }
   applyCharUi();
+  hudHero();
   loadAnims(DEFAULT_ANIMS).then(function () { applyCharUi(); });
   paintHp(FIGHTERS.W); paintHp(FIGHTERS.G);
 })();
