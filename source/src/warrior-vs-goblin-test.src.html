@@ -1002,6 +1002,7 @@
     el.style.backgroundPosition = x + "% " + y + "%";
   }
   function showFrame(el, p, i, pose) {
+    if (heldFrozen(FIGHTERS.W) && el === uW.querySelector(".sheet")) return;                 // (a frozen hero stands still: see heldFrozen)
     var L = layout(p);
     // Frames taller than the idle's (jump animations have extra headroom above the same ground line) grow upward from the unit's bottom.
     var base = packs.idle ? (packs.idle.nh / layout(packs.idle).rows) / (packs.idle.nw / layout(packs.idle).cols) : 1;
@@ -2761,9 +2762,46 @@
   }
   var FZ_BUILD_MS = 1300, FZ_FAIL_AT = 0.62;                                           // the build-up at 100% speed; where it stops when the target resists
   function fzLevel(p) { return clamp01((p - 0.12) / 0.88); }                          // how high the ice has climbed (0..1) when the build-up is p of the way
+  // WHERE A STATUS GOES (2026-11-12, the user: 'the Frozen animation has a fixed size, built for the placeholder goblin; make it follow the player's or the enemy's size; for the characters the size is fine but it is not
+  // centred'). The block, the aura and the other statuses used the target's unit box (the same size for every monster, centred on the unit, but a character's figure stands 7% right of the unit's centre and a slime
+  // can be low and wide or, like the King, twice as big). Now they use the FIGURE: the opaque bounding box of the fighter's idle frame (fzFig, measured once from the picture), placed on the stage by the frame's rectangle
+  // on screen (it follows the monster's Size slider and its mirror). FZ_FIT is how much bigger than the figure the block is (1.27 wide, 1.36 tall: exactly what the hero's block was, so the characters keep their size).
+  // `uEq` is the width of the hero's unit that would have the same size as this figure: the effects' sizes (rings, glints, mist) are shares of it, so they scale with the target too.
+  var FZ_FIT = { w: 1.27, h: 1.36 };
+  function figFrac(img, cw, ch) {                                                    // the opaque bounding box of the first frame (cw x ch px of the picture) as fractions of the frame
+    if (img._fb) return img._fb;
+    var c = document.createElement("canvas"), W = Math.max(8, Math.min(256, Math.round(cw))), H = Math.max(8, Math.min(256, Math.round(ch))), x = c.getContext("2d"), d, i, j, x0 = W, x1 = -1, y0 = H, y1 = -1;
+    c.width = W; c.height = H; x.drawImage(img, 0, 0, cw, ch, 0, 0, W, H);
+    d = x.getImageData(0, 0, W, H).data;
+    for (j = 0; j < H; j++) for (i = 0; i < W; i++) if (d[(j * W + i) * 4 + 3] > 128) { if (i < x0) x0 = i; if (i > x1) x1 = i; if (j < y0) y0 = j; if (j > y1) y1 = j; }
+    if (x1 < 0) return null;
+    return (img._fb = { l: x0 / W, r: (x1 + 1) / W, t: y0 / H, b: (y1 + 1) / H });
+  }
+  function fzFig(T) {                                                                // the fighter's figure on the stage: { cx, gy, left, top, w, h, uEq } in stage px, or null when its picture is not ready (the goblin placeholder has none)
+    var el = T.unit.querySelector(".sheet") || T.unit.querySelector(".monsheet"), fb = null, er, flip, l, r, top, gy, w, h, p, Lo, c, m, idle, im;
+    if (!el) return null;
+    try {
+      if (T === FIGHTERS.W) { p = packs.idle; if (p && p.img && p.img.complete && p.nw) { Lo = layout(p); fb = figFrac(p.img, p.nw / Lo.cols, p.nh / Lo.rows); } }
+      else {
+        c = hudCache["G:" + monKey]; im = c && c.img;
+        if (!(im && im.complete && im.naturalWidth)) { m = MONSTERS[monKey]; idle = m && (m.anims || []).filter(function (a) { return a.slot === "idle"; })[0]; if (idle) { if (!idle._im) { idle._im = new Image(); idle._im.src = idle.src; } im = idle._im; } }
+        if (im && im.complete && im.naturalWidth) fb = figFrac(im, im.naturalHeight, im.naturalHeight);
+      }
+    } catch (e) { fb = null; }
+    if (!fb) return null;
+    er = rectIn(el); flip = T !== FIGHTERS.W && T.unit.classList.contains("flip");
+    l = er.left + (flip ? 1 - fb.r : fb.l) * er.width; r = er.left + (flip ? 1 - fb.l : fb.r) * er.width; top = er.top + fb.t * er.height; gy = er.top + er.height * 470 / 512; w = r - l; h = Math.max(8, gy - top);
+    return { cx: (l + r) / 2, gy: gy, left: l, top: top, w: w, h: h, uEq: Math.sqrt(w * h) / 0.6433 };
+  }
   function fzGeom(T, F, u) {
-    var r = rectIn(T.unit), gy = r.top + r.height * 0.97;
-    return { r: r, cx: r.left + r.width / 2, gy: gy, y0: gy + r.height * 0.02, W: u * 0.66 * F.size, H: r.height * 1.08, cyb: r.top + r.height * 0.55 };
+    var fg = fzFig(T), r, gy;
+    if (fg) {
+      var eqH = fg.h * 1.255;                                                        // (the height of the hero's unit box that would match this figure: the effects that use g.r.height keep their proportions)
+      r = { left: fg.cx - eqH / 2, top: fg.gy - 0.97 * eqH, width: eqH, height: eqH, bottom: fg.gy + 0.03 * eqH };
+      return { r: r, cx: fg.cx, gy: fg.gy, y0: fg.gy + fg.h * 0.02, W: fg.w * FZ_FIT.w * F.size, H: fg.h * FZ_FIT.h, cyb: fg.top + fg.h * 0.5, uEq: fg.uEq };
+    }
+    r = rectIn(T.unit); gy = r.top + r.height * 0.97;
+    return { r: r, cx: r.left + r.width / 2, gy: gy, y0: gy + r.height * 0.02, W: u * 0.66 * F.size, H: r.height * 1.08, cyb: r.top + r.height * 0.55, uEq: u };
   }
   function fzPath(ctx, pts) { ctx.beginPath(); for (var i = 0; i < pts.length; i++) { if (i) ctx.lineTo(pts[i][0], pts[i][1]); else ctx.moveTo(pts[i][0], pts[i][1]); } ctx.closePath(); }
   // The ragged front of the climbing ice: points from the left to the right of the block.
@@ -2994,10 +3032,10 @@
     if (dodge) { x1 = g.cx + (T.dir < 0 ? 1 : -1) * u * 1.2; freeze = false; }                                                      // a dodged Deep Freeze: the frost creeps on past the target, no aura closes in on him
     var crawl = Math.max(200, Math.abs(x1 - x0) / (u * 8 * SPEED_K * F.speed / 1000)) / speed, tArr = (opts && opts.arriveAt) || (tRel + crawl), D = FZ_BUILD_MS / F.speed / speed, tLock = tArr + D, tEnd = freeze ? tLock : tArr + D * FZ_FAIL_AT;
     var tPass = dodge ? tRel + crawl * Math.min(1, Math.abs(xT - x0) / Math.max(1, Math.abs(x1 - x0))) : tEnd;
-    var rnd = rngOf(seed + 9), sp = [], i;
+    var uT = g.uEq || u, rnd = rngOf(seed + 9), sp = [], i;                         // uT: the target's own scale (the caster's crawl keeps the hero's u)
     for (i = 0; i < 20; i++) { var at2 = (i + rnd()) / 20; sp.push({ at: at2, x: x0 + (x1 - x0) * at2, y: y0 + (y1 - y0) * at2 + (rnd() - 0.5) * u * 0.02, len: u * (0.035 + 0.07 * rnd()) * F.size, tilt: (rnd() - 0.5) * 0.5, w: u * (0.12 + 0.1 * rnd()) * F.size, flip: rnd() < 0.5, big: i % 2 === 0 }); }
     var main = { t0: tArr, t1: freeze ? Infinity : tEnd, tLock: tLock, freeze: freeze, pCap: freeze ? 1 : FZ_FAIL_AT, g: g, rnd: rngOf(seed + 3), ps: [], decor: fzDecor(seed), spr: T.unit.querySelector(".sprite"),
-      draw: function (ctx, now, L) { fzAuraDraw(ctx, now, L, F, u); } };
+      draw: function (ctx, now, L) { fzAuraDraw(ctx, now, L, F, uT); } };
     if (!(opts && opts.arriveAt)) {                                                  // (opts.arriveAt: the Rogue's Permafrost Execution starts the ice on the target at that moment, no caster's cast: none of these four)
       fxAdd({ t0: at(chg), t1: tRel + 500 / speed, tRel: tRel, tHit: tRel, T: T, draw: function (ctx, now, L) { fbLightDraw(ctx, now, L, F, u); } });       // the pool of cold light under the caster
       fxAdd({ t0: at(chg), t1: tRel + 190 / speed, tRel: tRel, rnd: rngOf(seed), ps: [], T: T, noShard: true, draw: function (ctx, now, L) { icChargeDraw(ctx, now, L, F, u); } });
@@ -3005,10 +3043,10 @@
       fxAdd({ t0: tRel, t1: tArr + 900 / speed, dur: crawl, sp: sp, x0: x0, y0: y0, x1: x1, y1: y1, draw: function (ctx, now, L) { fzCrawlDraw(ctx, now, L, F, u); } });
     }
     if (!dodge) fxAdd(main);
-    if (!freeze && !dodge) fxAdd(fzShatterLayer(T, F, u, g, tEnd, 0.6, fzLevel(FZ_FAIL_AT)));
-    return { tHit: dodge ? tPass : tEnd, frozen: freeze,
-      impact: function () { if (freeze) { shake(5 * F.shake * (0.6 + 0.4 * F.imp), 280); scorch(g.cx, g.gy, u * 1.2, "frost"); } },
-      thaw: function (o) { if (!freeze) return; var now = performance.now(), d = F.painted ? (o && o.fast ? 90 : 260) / speed : 0; main.crackAt = d ? now : 0; main.t1 = now + d; fxAdd(fzShatterLayer(T, F, u, g, now + d, (o && o.power) || 1, 1)); },
+    if (!freeze && !dodge) fxAdd(fzShatterLayer(T, F, uT, g, tEnd, 0.6, fzLevel(FZ_FAIL_AT)));
+    return { tHit: dodge ? tPass : tEnd, frozen: freeze, holdAt: tArr + D * 0.55,                                  // holdAt: from here the frozen fighter stands STILL (heldFrozen)
+      impact: function () { if (freeze) { shake(5 * F.shake * (0.6 + 0.4 * F.imp), 280); scorch(g.cx, g.gy, uT * 1.2, "frost"); } },
+      thaw: function (o) { if (!freeze) return; var now = performance.now(), d = F.painted ? (o && o.fast ? 90 : 260) / speed : 0; main.crackAt = d ? now : 0; main.t1 = now + d; fxAdd(fzShatterLayer(T, F, uT, g, now + d, (o && o.power) || 1, 1)); },
       clear: function () { main.t1 = performance.now(); if (main.spr) main.spr.style.filter = ""; } };
   }
   function freezeJson(F) {
@@ -3039,6 +3077,10 @@
   // Chilled: a thin version of Deep Freeze's look (frost on the ground, a faint aura, a cool tint, a few glints and a little mist). Magic Def reduced: a cracked magic ward round the
   // target that flashes and breaks when applied and then stays faint for the turns it lasts.
   function statusSprite(T) { return T.unit.querySelector(".sprite"); }
+  // FROZEN = STILL (the user, 2026-11-12: 'any character during the frozen state should stop animating until the effect passes, not even the idle animation'). From the moment the ice has closed over most of the body (holdAt)
+  // until the block breaks (the callers set T.frozen = null), the fighter's picture is not redrawn: the hero's showFrame and the monster's idle and pack frames return at once, so it stays on the frame it was on.
+  // (A fighter whose hit points are 0 is not held: its death pack starts at the impact, before the block is thawed.)
+  function heldFrozen(T) { var z = T && T.frozen; return !!(z && z.frozen !== false && performance.now() >= (z.holdAt || 0) && !(T.hp <= 0)); }
   function chillDraw(ctx, now, L, F, u) {
     var g = L.g, k = Math.min(1, F.k), a = clamp01((now - L.t0) * speed / 500), dt = L.last ? Math.min(60, now - L.last) * speed : 0, rnd = L.rnd, n, im;
     L.last = now;
@@ -4397,7 +4439,8 @@
   // this skill (the name Backstab now belongs to the Abyssal Backstab, a new animation). The test page only DRAWS the buff (the game applies the numbers): Elusive = {turns, fresh, layer}: a faint dark mist and
   // wisps round her, a shadow on the ground under her and a slightly darker sprite, for the next two turns of hers; an ELUSIVE number appears when she steps back home (applyElusive, clearElusive, tickStatuses).
   function elusiveDraw(ctx, now, L, back) {
-    var f = bsFig(), r = rectIn(uW.querySelector(".sheet") || uW), u = f.u, a = clamp01((now - L.t0) * speed / 450), i, ph, x, y, k, rr, g;
+    var A = L.A, fg = A && A !== FIGHTERS.W ? fzFig(A) : null;                       // (2026-11-12: it was always drawn round the HERO, whoever had it: a monster's Elusive appeared on the player. A monster's figure comes from fzFig.)
+    var f = fg ? { x: fg.cx, gy: fg.gy, u: fg.uEq } : bsFig(), r = fg ? { height: fg.h * 1.255 } : rectIn(uW.querySelector(".sheet") || uW), u = f.u, a = clamp01((now - L.t0) * speed / 450), i, ph, x, y, k, rr, g;
     if (back) {                                                                       // behind her: a dark pool on the ground and a soft dark mist
       ctx.globalCompositeOperation = "source-over";
       g = ctx.createRadialGradient(f.x, f.gy, 0, f.x, f.gy, u * 0.34); g.addColorStop(0, "rgba(24,8,44," + 0.5 * a + ")"); g.addColorStop(1, "rgba(60,24,100,0)");
@@ -4418,7 +4461,7 @@
   }
   function applyElusive(A, turns) {
     if (A.elusive) { A.elusive.turns = turns; A.elusive.fresh = true; return; }
-    var L = { t0: performance.now(), t1: Infinity, spr: statusSprite(A), draw: function (ctx, now, L2) { elusiveDraw(ctx, now, L2, false); }, drawBack: function (ctx, now, L2) { elusiveDraw(ctx, now, L2, true); } };
+    var L = { t0: performance.now(), t1: Infinity, A: A, spr: statusSprite(A), draw: function (ctx, now, L2) { elusiveDraw(ctx, now, L2, false); }, drawBack: function (ctx, now, L2) { elusiveDraw(ctx, now, L2, true); } };
     fxAdd(L); A.elusive = { turns: turns, fresh: true, layer: L };
     setTimeout(function () { if (A.elusive) floatNumber(A, "ELUSIVE", "elusive"); }, 250 / speed);
   }
@@ -5676,7 +5719,7 @@
     el.style.opacity = ""; el.style.removeProperty("translate"); el.style.removeProperty("rotate"); el.style.removeProperty("scale");                     // (the Magma Eruption hides the picture and bounces it with the CSS translate property)
     if (typeof MFX !== "undefined") { MFX.dieMul = MFX.dieTarget = 1; MFX.smokeUntil = 0; }
     el.style.backgroundImage = 'url("' + idle.src + '")'; el.style.backgroundSize = (n * 100) + "% 100%";
-    function show() { el.style.backgroundPosition = (n > 1 ? i / (n - 1) * 100 : 0) + "% 0"; monFrame = i; monApplySq(); }
+    function show() { if (heldFrozen(FIGHTERS.G)) return; el.style.backgroundPosition = (n > 1 ? i / (n - 1) * 100 : 0) + "% 0"; monFrame = i; monApplySq(); }   // (a frozen monster stands still)
     show();
     if (monTimer) clearInterval(monTimer);
     monTimer = setInterval(function () { i = (i + 1) % n; show(); }, 1000 / m.fps);
@@ -6320,7 +6363,7 @@
       (function step() {
         if (!alive()) { resolve(false); return; }
         var fi = order ? order[i] : i;
-        el.style.backgroundPosition = (n > 1 ? fi / (n - 1) * 100 : 0) + "% 0"; monFrame = fi;
+        if (!heldFrozen(FIGHTERS.G)) { el.style.backgroundPosition = (n > 1 ? fi / (n - 1) * 100 : 0) + "% 0"; monFrame = fi; }
         if (onFrame) onFrame(i);
         var hs = holds || pk.holds, d = fm * ((hs && hs[i]) || 1);                       // (holds: a pack's own holds can be replaced for one play, the Cinder Burst's longer charge)
         i++;

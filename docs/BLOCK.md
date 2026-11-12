@@ -36,3 +36,5 @@ The sheet (`inbox/warrior_block_sheet.png`, ChatGPT, 1536 x 1024, 3 x 2; copy `A
 ## NOTE, 2026-11-10 (the user): the other player characters still need a Block animation built
 
 **To do LATER (the user: "take a note, we will do them later"): block sheets and packs for the Mage, the Rogue, the Assassin and the Spellblade** (the Warrior's is done and is the pattern: `Animations/Warrior/block/source/block_prompt.txt` and `make_block_strip.py`; the Mage's block = the staff across the body with her Barrier flaring, the others' = the blades crossed). Not started. The user wanted the Elite's Earthbreaker effects fixed first (painted pieces, `docs/MONSTERS.md`).
+
+**2026-11-12 (the user, again "take note"): the Slime King needs a Block too** (a boss: heavier and calmer than the Elite's, with the same Barrier glass as the other blocks; he has none yet). So the list is now: Mage, Rogue, Assassin, Spellblade, Slime King.
