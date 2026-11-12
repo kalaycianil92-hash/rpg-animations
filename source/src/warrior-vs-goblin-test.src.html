@@ -7856,11 +7856,11 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   // THE PILE'S PLACE (the user, 2026-11-12: 'the treasure prop is so big and does not look right: much smaller; the look I want is the Slime King GUARDING the treasures, not sitting on top of them'): a SMALL hoard
   // (0.48 of his width) behind his right shoulder, standing a little further back than he does (its base 0.05 of his width higher on the screen), so he stands in front of it with the staff beside it and about half of
   // the pile shows past his skirt; the stage had only about 60 px to the right of his body, so the King now stands 0.3 of a unit width further toward the enemy (MONSTERS.slime_king.shiftX) and the pile fits to his right. A soft contact shadow grounds it.
-  var KT_PILE = { w: 0.85, dx: 0.42, dy: 0.1 };   // (2026-11-12: 0.48 was too small; this is the interim size for the first picture while the user draws three new variations)
+  var KT_PILE = { w: 0.8, dx: 0.8, dy: 0.08 };   // (2026-11-12: 0.48 was too small; this is the interim size for the first picture while the user draws three new variations)
   function kingPileBox() {                                                           // where the pile is: a box on the stage, behind and to the right of where he stands
     var h = KT.home; if (!h) return null;
     var tex = kingPileTex(), w = h.s * KT_PILE.w, ph = w * (tex.naturalHeight || tex.height) / (tex.naturalWidth || tex.width);   // (the picture's own shape; the stand-in is 480 x 200)
-    return { x: h.x + h.s * KT_PILE.dx, gy: h.gy - h.s * KT_PILE.dy, w: w, h: ph };
+    return { x: Math.min(h.x + h.s * KT_PILE.dx, stage.clientWidth - 10 - w / 2), gy: h.gy - h.s * KT_PILE.dy, w: w, h: ph };      // (dx is the farthest it may stand to his right; it never leaves the stage: its right end stops 10 px from the edge)
   }
   function kingTreasureDraw(cb, cf, now, dt, op) {                                   // called by the aura loop: the pile behind him, its glow and its glimmer
     if (!KT.on) return;
