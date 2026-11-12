@@ -8000,7 +8000,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   // The painted picture is saturated, crisp and outlined in near-black, the forest's own props are soft, a little desaturated and hazy. So the picture is processed ONCE for its size (cached): a small blur (the crisp
   // outlines), less saturation, the forest's tint, a lower brightness, the blacks lifted toward the forest's shadow green (the dark outline stops being black), a veil of the far forest's green over everything (it recedes
   // like the background) and the bottom rows fade out so the coins melt into the ground (no hard base line). Its numbers are KT_BLEND (set by eye in the 'Treasure look' panel, remembered in localStorage wvg-treasure-look).
-  var KT_BLEND_DEF = { on: true, sat: 0.9, bright: 0.97, lift: 0.06, tint: 0.7, haze: 0.03, blur: 0.3, baseFade: 0.12 }, KT_PILE_DEF = { w: 1.15, dy: 0.1 }, KT_KEY = "wvg-treasure-look", KT_FOREST = [88, 138, 100];
+  var KT_BLEND_DEF = { on: true, sat: 0.9, bright: 0.94, lift: 0.06, tint: 0.9, haze: 0, blur: 0, baseFade: 0.08 }, KT_PILE_DEF = { w: 1.1, dy: 0.17 },   /* the user's own values, set with the Treasure look panel (2026-11-12): no blur, no haze */ KT_KEY = "wvg-treasure-look", KT_FOREST = [88, 138, 100];
   var KT_BLEND = {};   // (2026-11-12, the user: the haze and the blur were too strong: the defaults are lower, and the 'Treasure look' panel sets every number by eye; the settings are remembered in localStorage)
   (function () {
     var sv = null, k; try { sv = JSON.parse(localStorage.getItem(KT_KEY)); } catch (e) {}
