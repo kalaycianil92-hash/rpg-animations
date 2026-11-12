@@ -2899,13 +2899,13 @@
     }
     ctx.restore(); ctx.restore();
   }
-  // The painted aura: frost on the ground and crystals at the feet that grow with the build-up, and the column of swirling frost round the target (two copies, one mirrored, cross-fading).
+  // The painted aura: frost on the ground and the column of swirling frost round the target (two copies, one mirrored, cross-fading).
+  // (2026-11-12, the user: the 5th picture of the ice sheet, the cluster of crystals, was drawn over the target's feet for the whole freeze and hid its legs: removed here so the whole character shows inside the block.
+  //  fz_crystals is still used by the frost line's clusters (fzCrawlDraw) and by the lance's burst at the feet, which are not the frozen state.)
   function fzPaintedAura(ctx, now, L, F, u, p, lk, hold) {
     var g = L.g, k = Math.min(1, F.k), im;
     im = fbTex.fz_ground; var gw = u * (0.45 + 0.9 * p) * F.size;
     fzTex(ctx, im, g.cx, g.gy + u * 0.02, gw, gw * im.naturalHeight / im.naturalWidth, (0.25 + 0.6 * p) * k, 0.5);
-    im = fbTex.fz_crystals; var ce = Math.min(1, p / 0.6), cw = g.W * 1.04;
-    if (ce > 0.01) fzTex(ctx, im, g.cx, g.gy + u * 0.03, cw, cw * im.naturalHeight / im.naturalWidth * (0.15 + 0.85 * (1 - Math.pow(1 - ce, 2))), 0.88 * k, 1);
     im = fbTex.fz_aura; var ah = g.H * (0.6 + 0.5 * p), aw = ah * im.naturalWidth / im.naturalHeight, f2 = 0.5 + 0.5 * Math.sin(now * 0.0018 * speed), al = (0.1 + 0.75 * p) * k * hold;
     fzTex(ctx, im, g.cx, g.gy + u * 0.02, aw * (0.95 + 0.1 * f2), ah, al * (0.35 + 0.65 * f2), 1);
     fzTex(ctx, im, g.cx, g.gy + u * 0.02, aw * (1.05 - 0.1 * f2), ah, al * (0.35 + 0.65 * (1 - f2)), 1, true);
