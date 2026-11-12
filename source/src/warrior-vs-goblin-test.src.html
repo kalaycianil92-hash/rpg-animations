@@ -308,6 +308,36 @@
     <button data-speed="4">4x</button>
   </div>
 
+  <details class="dev" id="ktPanel" open style="display:none">
+    <summary>Treasure look: the Slime King's hoard in the stage</summary>
+    <div class="devbody">
+    <div class="fields">
+      <label><input type="checkbox" id="ktOn" checked> Blend the hoard into the stage (untick to see the picture as painted)</label>
+      <button id="ktReset">Reset to defaults</button>
+      <button id="ktCopy">Copy my values</button>
+      <input id="ktOut" readonly style="width:100%;min-width:260px;flex:1 1 100%;font:12px monospace;background:#0b0914;color:var(--fg);border:1px solid var(--line);border-radius:3px;padding:4px 6px" title="the values to send back">
+    </div>
+    <div class="fields">
+      <label>Blur <input type="range" id="ktBlur" min="0" max="30" value="3" style="width:120px"> <span id="ktBlurV"></span></label>
+      <label>Haze <input type="range" id="ktHaze" min="0" max="40" value="3" style="width:120px"> <span id="ktHazeV"></span></label>
+      <label>Colour <input type="range" id="ktSat" min="40" max="120" value="90" style="width:120px"> <span id="ktSatV"></span></label>
+      <label>Brightness <input type="range" id="ktBright" min="70" max="110" value="97" style="width:120px"> <span id="ktBrightV"></span></label>
+    </div>
+    <div class="fields">
+      <label>Forest tint <input type="range" id="ktTint" min="0" max="150" value="70" style="width:120px"> <span id="ktTintV"></span></label>
+      <label>Black lift <input type="range" id="ktLift" min="0" max="30" value="6" style="width:120px"> <span id="ktLiftV"></span></label>
+      <label>Soft base <input type="range" id="ktBase" min="0" max="40" value="12" style="width:120px"> <span id="ktBaseV"></span></label>
+    </div>
+    <div class="fields">
+      <label>Size <input type="range" id="ktSize" min="60" max="180" value="115" style="width:120px"> <span id="ktSizeV"></span></label>
+      <label>Stands back <input type="range" id="ktBack" min="0" max="30" value="10" style="width:120px"> <span id="ktBackV"></span></label>
+    </div>
+    <details class="about"><summary>About this</summary>
+      <small class="lbl">Made 2026-11-12 so the look of the treasure can be set by eye (the user: the haze and the blur were too strong). It changes only how the hoard's picture is drawn behind the Slime King, never the art file, and it works at once (move a slider and look). <b>Blur</b> softens the crisp outlines (0 to 3 px), <b>Haze</b> veils the picture with the far forest's green (it recedes), <b>Colour</b> and <b>Brightness</b> are as for the fighters, <b>Forest tint</b> tints it toward the forest, <b>Black lift</b> turns the dark outline toward the forest's shadow green, <b>Soft base</b> fades the bottom rows so the coins melt into the ground. <b>Size</b> is the hoard's width against the King's and <b>Stands back</b> how far up the stage it stands. Your settings are remembered in this browser; <b>Copy my values</b> puts them in the box so they can be pasted into a message and made the defaults.</small>
+    </details>
+    </div>
+  </details>
+
   <details class="dev" id="fightPanel" open>
     <summary>Fight</summary>
     <div class="devbody">
@@ -484,6 +514,7 @@
     </details>
     </div>
   </details>
+
 
 
   <div class="panel">
@@ -1303,6 +1334,7 @@
   function hudMonster() {                                                             // the enemy's portrait, name tag and boss frame (called by setMonster)
     var key = monKey, m = MONSTERS[key], idle = m && (m.anims || []).filter(function (a) { return a.slot === "idle"; })[0];
     $("hpG").classList.toggle("boss", !!(m && m.king));
+    $("ktPanel").style.display = m && m.king ? "" : "none";                          // (the Treasure look panel is for the King's hoard)
     $("hpG").querySelector(".hp-tag").textContent = m && m.king ? "Boss" : "Foe";
     hudFace($("ptG"), "G:" + key, idle && idle.src, HUD_CROP[hudCropKey(key)], true, "goblin");
   }
@@ -7967,14 +7999,20 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   // THE HOARD IS GRADED TO SIT IN THE STAGE (the user, 2026-11-12: 'the prop looks so bright and sharp compared to the other stage props; blend it in so it looks like part of the stage rather than something put on on purpose').
   // The painted picture is saturated, crisp and outlined in near-black, the forest's own props are soft, a little desaturated and hazy. So the picture is processed ONCE for its size (cached): a small blur (the crisp
   // outlines), less saturation, the forest's tint, a lower brightness, the blacks lifted toward the forest's shadow green (the dark outline stops being black), a veil of the far forest's green over everything (it recedes
-  // like the background) and the bottom rows fade out so the coins melt into the ground (no hard base line). It follows the stage blend's on/off box; the numbers are KT_BLEND, all single values.
-  var KT_BLEND = { sat: 0.86, bright: 0.95, lift: 0.09, tint: 0.8, haze: 0.06, blur: 0.7, baseFade: 0.12 }, KT_FOREST = [88, 138, 100];
+  // like the background) and the bottom rows fade out so the coins melt into the ground (no hard base line). Its numbers are KT_BLEND (set by eye in the 'Treasure look' panel, remembered in localStorage wvg-treasure-look).
+  var KT_BLEND_DEF = { on: true, sat: 0.9, bright: 0.97, lift: 0.06, tint: 0.7, haze: 0.03, blur: 0.3, baseFade: 0.12 }, KT_PILE_DEF = { w: 1.15, dy: 0.1 }, KT_KEY = "wvg-treasure-look", KT_FOREST = [88, 138, 100];
+  var KT_BLEND = {};   // (2026-11-12, the user: the haze and the blur were too strong: the defaults are lower, and the 'Treasure look' panel sets every number by eye; the settings are remembered in localStorage)
+  (function () {
+    var sv = null, k; try { sv = JSON.parse(localStorage.getItem(KT_KEY)); } catch (e) {}
+    for (k in KT_BLEND_DEF) KT_BLEND[k] = sv && typeof sv[k] === typeof KT_BLEND_DEF[k] ? sv[k] : KT_BLEND_DEF[k];
+    for (k in KT_PILE_DEF) if (sv && typeof sv["pile_" + k] === "number") KT_PILE[k] = sv["pile_" + k]; else KT_PILE[k] = KT_PILE_DEF[k];
+  })();
   function kingPileGraded(tex, w, h) {
-    var dpr = window.devicePixelRatio || 1, key = [Math.round(w), Math.round(h), dpr, tex.naturalWidth || tex.width, blend.on ? 1 : 0, KT_BLEND.sat, KT_BLEND.bright, KT_BLEND.lift, KT_BLEND.haze, KT_BLEND.blur, KT_BLEND.baseFade].join("|");
+    var dpr = window.devicePixelRatio || 1, key = [Math.round(w), Math.round(h), dpr, tex.naturalWidth || tex.width, KT_BLEND.on ? 1 : 0, KT_BLEND.sat, KT_BLEND.bright, KT_BLEND.lift, KT_BLEND.tint, KT_BLEND.haze, KT_BLEND.blur, KT_BLEND.baseFade].join("|");
     if (KT.gk === key && KT.g) return KT.g;
     var W = Math.max(1, Math.round(w * dpr)), H = Math.max(1, Math.round(h * dpr)), c = document.createElement("canvas"), x = c.getContext("2d"), d, p, i, y, r, g, bl, lum, k, fade, tn = BL_TINT.map(function (v) { return (1 + KT_BLEND.tint * (v - 1)) * KT_BLEND.bright; });
     c.width = W; c.height = H; x.imageSmoothingQuality = "high";
-    if (!blend.on) { x.drawImage(tex, 0, 0, W, H); KT.gk = key; KT.g = c; return c; }
+    if (!KT_BLEND.on) { x.drawImage(tex, 0, 0, W, H); KT.gk = key; KT.g = c; return c; }
     var hasF = false; try { x.filter = "blur(" + (KT_BLEND.blur * dpr).toFixed(2) + "px)"; hasF = x.filter !== "none"; } catch (e) {}
     x.drawImage(tex, 0, 0, W, H);                                                    // (the blur; without canvas filters: drawn small and back, a softer picture)
     x.filter = "none";
@@ -7995,6 +8033,25 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     x.putImageData(d, 0, 0); KT.gk = key; KT.g = c;
     return c;
   }
+  var KT_SL = [["blur", "ktBlur", 10, function (v) { return v.toFixed(1) + " px"; }, "blur"], ["haze", "ktHaze", 100, function (v) { return Math.round(v * 100) + "%"; }, "haze"], ["sat", "ktSat", 100, function (v) { return Math.round(v * 100) + "%"; }, "sat"],
+    ["bright", "ktBright", 100, function (v) { return Math.round(v * 100) + "%"; }, "bright"], ["tint", "ktTint", 100, function (v) { return Math.round(v * 100) + "%"; }, "tint"], ["lift", "ktLift", 100, function (v) { return Math.round(v * 100) + "%"; }, "lift"],
+    ["baseFade", "ktBase", 100, function (v) { return Math.round(v * 100) + "%"; }, "baseFade"]];   // [setting, slider id, slider units per 1.0 (blur: per px), label, setting]
+  function ktSync(save) {                                                            // the panel shows the settings; the settings are saved
+    $("ktOn").checked = KT_BLEND.on;
+    KT_SL.forEach(function (d) { $(d[1]).value = Math.round(KT_BLEND[d[0]] * d[2]); $(d[1] + "V").textContent = d[3](KT_BLEND[d[0]]); });
+    $("ktSize").value = Math.round(KT_PILE.w * 100); $("ktSizeV").textContent = Math.round(KT_PILE.w * 100) + "%";
+    $("ktBack").value = Math.round(KT_PILE.dy * 100); $("ktBackV").textContent = Math.round(KT_PILE.dy * 100) + "%";
+    var o = { on: KT_BLEND.on }; KT_SL.forEach(function (d) { o[d[0]] = +KT_BLEND[d[0]].toFixed(3); }); o.pile_w = +KT_PILE.w.toFixed(3); o.pile_dy = +KT_PILE.dy.toFixed(3);
+    $("ktOut").value = JSON.stringify(o);
+    if (save) { try { localStorage.setItem(KT_KEY, JSON.stringify(o)); } catch (e) {} }
+  }
+  $("ktOn").onchange = function () { KT_BLEND.on = this.checked; ktSync(true); };
+  KT_SL.forEach(function (d) { $(d[1]).oninput = function () { KT_BLEND[d[0]] = +this.value / d[2]; ktSync(true); }; });
+  $("ktSize").oninput = function () { KT_PILE.w = +this.value / 100; ktSync(true); };
+  $("ktBack").oninput = function () { KT_PILE.dy = +this.value / 100; ktSync(true); };
+  $("ktReset").onclick = function () { var k; for (k in KT_BLEND_DEF) KT_BLEND[k] = KT_BLEND_DEF[k]; for (k in KT_PILE_DEF) KT_PILE[k] = KT_PILE_DEF[k]; ktSync(true); };
+  $("ktCopy").onclick = function () { var o = $("ktOut"); o.focus(); o.select(); try { if (navigator.clipboard) navigator.clipboard.writeText(o.value); else document.execCommand("copy"); } catch (e) {} this.textContent = "Copied"; var b = this; setTimeout(function () { b.textContent = "Copy my values"; }, 1400); };
+  ktSync(false);
   function kingTreasureDraw(cb, cf, now, dt, op) {                                   // called by the aura loop: the pile behind him, its glow and its glimmer
     if (!KT.on) return;
     if (monPose === "idle" && uG.style.transform === "" && op > 0.9) { var body = kingPt(256, 330); KT.home = { x: body.x, gy: kingPt(256, 470).y, s: body.w }; }   // (his standing place: not while he leaps or rides in)
@@ -8578,7 +8635,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   }
   try { $("devTools").open = localStorage.getItem("wvg-dev-open") === "1"; } catch (e) {}
   $("devTools").addEventListener("toggle", function () { try { localStorage.setItem("wvg-dev-open", this.open ? "1" : "0"); } catch (e) {} });
-  ["fightPanel", "bgPanel", "blPanel"].forEach(function (id) {                        // the Fight, Background and Stage blend menus fold like the developer tools (open by default; the choice is remembered)
+  ["fightPanel", "bgPanel", "blPanel", "ktPanel"].forEach(function (id) {                        // the Fight, Background and Stage blend menus fold like the developer tools (open by default; the choice is remembered)
     var d = $(id);
     try { var v = localStorage.getItem("wvg-open-" + id); if (v !== null) d.open = v === "1"; } catch (e) {}
     d.addEventListener("toggle", function () { try { localStorage.setItem("wvg-open-" + id, this.open ? "1" : "0"); } catch (e) {} });
