@@ -77,9 +77,32 @@
   .hud2 .v { position: absolute; z-index: 4; top: 50%; transform: translateY(-50%); font: 700 calc(var(--bh) * .68)/1 var(--display); letter-spacing: .05em; color: #fff; text-shadow: 0 1px 1px #000, 0 0 3px #000; direction: ltr; }
   .hud2 .hp.left .v { left: calc(var(--bh) * .6); }
   .hud2 .hp.right .v { right: calc(var(--bh) * .6); }
-  .hud2 .hp-fx { display: flex; flex-wrap: wrap; gap: 3px; min-height: calc(var(--bh) * 1.3); margin-top: calc(var(--bh) * .24); }
-  .hud2 .hp.left .hp-fx { justify-content: flex-start; }
-  .hud2 .hp.right .hp-fx { justify-content: flex-end; }
+  /* ---- the STATUS ICONS under the bars (2026-11-12, the user's layout): the bar's ten ticks are the grid. BUFFS fill the first five ticks of the row (the portrait end), the first applied nearest the portrait, each new one
+     further along; DEBUFFS fill the other five ticks starting from the very end of the bar (toward the VS) and grow toward the middle as more are applied. One icon is one tick wide (--ic, set by the script from the bar's width);
+     a debuff has a red frame, a buff a gold frame; the stack count (Burn) is a small number at the bottom right. For the right-hand bar the row is mirrored (buffs at its portrait end): HUD_FX_MIRROR in the script. */
+  .hud2 { --ic: 18px; --sl: 18px; }   /* --sl: the slot = one tick of the bar; --ic: the icon, centred in its slot (about 1.6 bar heights, never wider than the slot) */
+  .hud2 .hp-fx { display: flex; height: var(--ic); padding: 0 2px; margin-top: calc(var(--bh) * .24); }
+  .hud2 .fx-b, .hud2 .fx-d { flex: 0 0 50%; display: flex; min-width: 0; justify-content: flex-start; }
+  .hud2 .hp.left .fx-b { order: 1; flex-direction: row; }
+  .hud2 .hp.left .fx-d { order: 2; flex-direction: row-reverse; }
+  .hud2 .hp.right .fx-d { order: 1; flex-direction: row; }
+  .hud2 .hp.right .fx-b { order: 2; flex-direction: row-reverse; }
+  .hud2.fxplain .hp.right .fx-b { order: 1; flex-direction: row; }
+  .hud2.fxplain .hp.right .fx-d { order: 2; flex-direction: row-reverse; }
+  .hud2 .fxi { position: relative; flex: 0 0 var(--sl); width: var(--sl); height: var(--ic); box-sizing: border-box; pointer-events: auto; cursor: default; }
+  .hud2 .fxi > i { position: absolute; top: 1px; bottom: 1px; left: 50%; width: calc(var(--ic) - 2px); margin-left: calc(var(--ic) * -.5 + 1px); border-radius: 24%; border: 1.5px solid; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px #000a, inset 0 0 4px #0008; }
+  .hud2 .fxi.debuff > i { border-color: #e0584c; background: radial-gradient(circle at 50% 35%, #4d1813, #1d0807 86%); }
+  .hud2 .fxi.buff > i { border-color: #eecb68; background: radial-gradient(circle at 50% 35%, #31501f, #101c0c 86%); }
+  .hud2 .fxi svg { width: 78%; height: 78%; display: block; overflow: visible; }
+  .hud2 .fxi b { position: absolute; right: calc(50% - var(--ic) * .5 - 1px); bottom: -3px; font: 800 calc(var(--ic) * .58)/1 var(--display); color: #fff; letter-spacing: 0; text-shadow: -1px 0 #000, 1px 0 #000, 0 -1px #000, 0 1px #000, 0 0 3px #000; pointer-events: none; }
+  .hud2 .fxi.hid { display: none; }
+  .hud2 .fxi[data-more]::after { content: attr(data-more); position: absolute; right: calc(50% - var(--ic) * .5 - 2px); top: -4px; font: 800 calc(var(--ic) * .5)/1 var(--display); color: #fff; background: #c0352b; border-radius: 999px; padding: 1px 3px; }
+  .hud2 .fxi.pop > i { animation: fxPop .4s ease-out; }
+  .hud2 .fxi.bump > i { animation: fxBump .35s ease-out; }
+  .hud2 .fxi.out { animation: fxOut .26s ease-in forwards; }
+  @keyframes fxPop { 0% { transform: scale(1.9); filter: brightness(2.4); opacity: 0; } 55% { transform: scale(.88); opacity: 1; } 100% { transform: none; filter: none; opacity: 1; } }
+  @keyframes fxBump { 0% { transform: scale(1.35); filter: brightness(1.8); } 100% { transform: none; filter: none; } }
+  @keyframes fxOut { to { transform: scale(.3); opacity: 0; } }
   .hud2 .hud-vs { align-self: center; text-align: center; padding-top: calc(var(--pt) * .08); line-height: 1; user-select: none; }
   .hud2 .hud-vs b { display: block; font: italic 900 clamp(16px, calc(var(--hw) * .0434), 32px)/1 var(--display); letter-spacing: -.01em; transform: skewX(-8deg);
     background: linear-gradient(#fff6b0 0%, #ffbe3a 42%, #ee5d1c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: calc(var(--hw) * .0026) #3b1006;
@@ -94,7 +117,7 @@
   @keyframes hpShake { 0% { transform: translate(0, 0); } 20% { transform: translate(-3px, 1px); } 40% { transform: translate(3px, -1px); } 60% { transform: translate(-2px, 0); } 100% { transform: none; } }
   @keyframes hpFlash { from { filter: brightness(2.3); } to { filter: none; } }
   @keyframes hpHeal { from { box-shadow: 0 0 0 1px #000, 0 0 16px 3px #7dff6a, inset 0 2px 4px #000c; } to { box-shadow: 0 0 0 1px #000, 0 2px 4px #000a, inset 0 2px 4px #000c; } }
-  @media (prefers-reduced-motion: reduce) { .hud2 .hp.low .fill, .hud2 .hp.hit .hp-pt, .hud2 .hp.hit .track, .hud2 .hp.heal .track { animation: none; } .hud2 .fill, .hud2 .hp-ghost { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .hud2 .hp.low .fill, .hud2 .hp.hit .hp-pt, .hud2 .hp.hit .track, .hud2 .hp.heal .track { animation: none; } .hud2 .fill, .hud2 .hp-ghost { transition: none; } .hud2 .fxi.pop > i, .hud2 .fxi.bump > i, .hud2 .fxi.out { animation: none; } }
 
   .stage {
     --sh: clamp(220px, 52vw, 340px); /* base stage height; --extra adds headroom above it for tall (jump) frames (the same for every character: see HEADROOM in the script) */
@@ -286,9 +309,9 @@
     <div class="banner" id="banner">Victory</div>
     <div class="stagetag" id="stageTag"></div>
     <div class="hud2" id="hud2">
-      <div class="hp left" id="hpW"><div class="hp-pt"><canvas id="ptW" width="160" height="160"></canvas></div><div class="hp-body"><div class="name"><span>Warrior</span><em class="hp-tag">Hero</em></div><div class="track"><i class="hp-ghost"></i><div class="fill"></div><span class="v">120 / 120</span></div><div class="hp-fx" id="fxW"></div></div></div>
+      <div class="hp left" id="hpW"><div class="hp-pt"><canvas id="ptW" width="160" height="160"></canvas></div><div class="hp-body"><div class="name"><span>Warrior</span><em class="hp-tag">Hero</em></div><div class="track"><i class="hp-ghost"></i><div class="fill"></div><span class="v">120 / 120</span></div><div class="hp-fx" id="fxW"><div class="fx-b"></div><div class="fx-d"></div></div></div></div>
       <div class="hud-vs"><b>VS</b><small id="hudStage">Stage 1</small></div>
-      <div class="hp right" id="hpG"><div class="hp-pt"><canvas id="ptG" width="160" height="160"></canvas></div><div class="hp-body"><div class="name"><span>Goblin</span><em class="hp-tag">Foe</em></div><div class="track"><i class="hp-ghost"></i><div class="fill"></div><span class="v">60 / 60</span></div><div class="hp-fx" id="fxG"></div></div></div>
+      <div class="hp right" id="hpG"><div class="hp-pt"><canvas id="ptG" width="160" height="160"></canvas></div><div class="hp-body"><div class="name"><span>Goblin</span><em class="hp-tag">Foe</em></div><div class="track"><i class="hp-ghost"></i><div class="fill"></div><span class="v">60 / 60</span></div><div class="hp-fx" id="fxG"><div class="fx-b"></div><div class="fx-d"></div></div></div></div>
     </div>
   </div>
 
@@ -307,6 +330,20 @@
     <button data-speed="2">2x</button>
     <button data-speed="4">4x</button>
   </div>
+
+  <details class="dev" id="stPanel" open>
+    <summary>Status icons: try them on the stage</summary>
+    <div class="devbody">
+    <div class="fields">
+      <label>Put them on <select id="stTarget"><option value="W">the hero (left bar)</option><option value="G">the foe (right bar)</option></select></label>
+      <button data-st="burn">Burn (+1 stack)</button> <button data-st="chilled">Chilled</button> <button data-st="frozen">Frozen</button> <button data-st="shocked">Shocked</button> <button data-st="magDef">Magic Def down</button>
+      <button data-st="elusive">Elusive</button> <button data-st="guard">Defense up</button> <button id="stClear">Clear all</button>
+    </div>
+    <details class="about"><summary>About this</summary>
+      <small class="lbl">Made 2026-11-12 (docs/HUD.md). While a status lasts it shows as a small icon under its fighter's HP bar: <b>buffs</b> (Elusive, Defense up) fill the first five ticks of the bar, the first applied nearest the portrait; <b>debuffs</b> (Burn, Chilled, Frozen, Shocked, Magic Def down) fill the other five ticks starting from the end of the bar, toward the VS, and grow toward the middle as more are applied; Burn shows its stack count (2 or 3) at the bottom right. These buttons apply the real statuses (the same effects, the same icons the fights use); in a fight the icons come and go with the statuses by themselves. Hover an icon for its name.</small>
+    </details>
+    </div>
+  </details>
 
   <details class="dev" id="ktPanel" open style="display:none">
     <summary>Treasure look: the Slime King's hoard in the stage</summary>
@@ -1342,6 +1379,79 @@
     var key = typeof curChar !== "undefined" ? curChar : "warrior", ch = typeof CHARACTERS !== "undefined" && CHARACTERS[key], idle = ch && (ch.anims || []).filter(function (a) { return a.slot === "idle"; })[0];
     hudFace($("ptW"), "W:" + key, idle && idle.src, HUD_CROP[key], false, "hero");
   }
+
+  // ---------------------------------------------------------------- the STATUS ICONS under the HP bars (2026-11-12; docs/HUD.md)
+  // The page keeps a status on its fighter as a field (burn {stacks}, chilled, frozen, shocked, magDef = Magic Def down, elusive, guard = Defense up), set by the apply functions and cleared by the clear functions, the turn
+  // ticks and Reset. hudFxSync reads those fields ten times a second and keeps one icon per status: a new one appears (a pop) at the end of its group, a gone one fades, a Burn that gains a stack bumps. So the icons follow
+  // the applied order, and nothing in the game code needed to change. The glyphs are drawn here as SVG (HUD_STATUS): outlined, flat colours, readable at 18 px.
+  var HUD_FX_MIRROR = true, HUD_ORDER = ["burn", "chilled", "frozen", "shocked", "magDef", "elusive", "guard"], HUD_FX_MAX = 5;   // mirror: the right-hand bar's buffs sit at ITS portrait end (the left bar's at its portrait end too)
+  var HUD_STATUS = {
+    burn: { name: "Burn", kind: "debuff", stack: true, svg: '<path d="M12 1.8c.9 3.6 5.6 5.4 5.6 11.2a5.6 5.6 0 0 1-11.2 0c0-3.2 1.9-4.6 3-7 .5 1.5.9 2.6 1.7 3.3.3-2.6.3-5 .9-7.5z" fill="#ff7a1f" stroke="#2a0c02" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 11.2c.8 1.8 2.6 2.4 2.6 4.6a2.6 2.6 0 0 1-5.2 0c0-1.7 1.8-2.4 2.6-4.6z" fill="#ffd34a"/>' },
+    chilled: { name: "Chilled", kind: "debuff", svg: '<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.4 5.4 12 8l2.6-2.6M9.4 18.6 12 16l2.6 2.6" stroke="#0e2436" stroke-width="4.4"/><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.4 5.4 12 8l2.6-2.6M9.4 18.6 12 16l2.6 2.6" stroke="#c4ecff" stroke-width="2"/></g>' },
+    frozen: { name: "Frozen", kind: "debuff", svg: '<polygon points="12,2.2 20.2,7 20.2,17 12,21.8 3.8,17 3.8,7" fill="#7fd0ff" stroke="#0f2c44" stroke-width="1.4" stroke-linejoin="round"/><polygon points="12,2.2 20.2,7 12,11.8 3.8,7" fill="#dff6ff"/><polygon points="12,11.8 20.2,7 20.2,17 12,21.8" fill="#4aa6e0"/><path d="M12 11.8v10" stroke="#0f2c44" stroke-width=".9"/>' },
+    shocked: { name: "Shocked", kind: "debuff", svg: '<polygon points="14,1.8 5.2,13.2 10.8,13.2 9,22.2 18.8,10 12.8,10" fill="#ffe14a" stroke="#2c2204" stroke-width="1.4" stroke-linejoin="round"/>' },
+    magDef: { name: "Magic Def down", kind: "debuff", svg: '<path d="M12 2.2 20 5.4V12c0 4.9-3.4 8.2-8 9.8C7.4 20.2 4 16.9 4 12V5.4z" fill="#9a8cff" stroke="#1a1240" stroke-width="1.4" stroke-linejoin="round"/><path d="M12.4 2.8 10.2 9.4 14 12.2 10.8 21" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' },
+    elusive: { name: "Elusive", kind: "buff", svg: '<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 4.6A2 2 0 1 1 11 8H2m10.6 11.4A2 2 0 1 0 14 16H2m15.7-8.3A2.5 2.5 0 1 1 19.5 12H2" stroke="#1a1240" stroke-width="4.4"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2m10.6 11.4A2 2 0 1 0 14 16H2m15.7-8.3A2.5 2.5 0 1 1 19.5 12H2" stroke="#d3c6ff" stroke-width="2.2"/></g>' },
+    guard: { name: "Defense up", kind: "buff", svg: '<path d="M12 2.2 20 5.4V12c0 4.9-3.4 8.2-8 9.8C7.4 20.2 4 16.9 4 12V5.4z" fill="#b9c6dd" stroke="#141c2c" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 2.8V21" stroke="#8796b4" stroke-width="1"/><path d="M7.6 14.4 12 9.8l4.4 4.6" fill="none" stroke="#1a1208" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.6 14.4 12 9.8l4.4 4.6" fill="none" stroke="#f2c14e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' }
+  };
+  function hudFxMake(id, stacks) {
+    var st = HUD_STATUS[id], n = document.createElement("div");
+    n.className = "fxi " + st.kind + " pop"; n.dataset.id = id;
+    n.innerHTML = '<i><svg viewBox="0 0 24 24" aria-hidden="true">' + st.svg + "</svg></i>" + (st.stack ? "<b></b>" : "");
+    setTimeout(function () { n.classList.remove("pop"); }, 420);
+    return n;
+  }
+  function hudFxLayout(el) {                                                          // at most five icons show in each group; more are folded into a '+N' on the fifth
+    ["fx-b", "fx-d"].forEach(function (c) {
+      var cont = el.querySelector("." + c), kids = Array.prototype.filter.call(cont.children, function (k) { return !k.classList.contains("out"); }), i;
+      kids.forEach(function (k, j) { k.classList.toggle("hid", j >= HUD_FX_MAX); k.removeAttribute("data-more"); });
+      if (kids.length > HUD_FX_MAX) kids[HUD_FX_MAX - 1].setAttribute("data-more", "+" + (kids.length - HUD_FX_MAX));
+    });
+  }
+  function hudFxSync() {
+    [FIGHTERS.W, FIGHTERS.G].forEach(function (f) {
+      var el = f.hpEl, list = f._fxl || (f._fxl = {}), cur = {}, id, st, n, o, changed = false;
+      HUD_ORDER.forEach(function (k) { if ((o = f[k])) cur[k] = k === "burn" ? Math.max(1, o.stacks || 1) : 1; });
+      for (id in cur) {
+        st = HUD_STATUS[id]; n = list[id];
+        if (!n) { n = list[id] = hudFxMake(id, cur[id]); el.querySelector(st.kind === "buff" ? ".fx-b" : ".fx-d").appendChild(n); changed = true; }
+        if (st.stack) {
+          var b = n.querySelector("b"), txt = cur[id] > 1 ? String(cur[id]) : "";
+          if (b.textContent !== txt) { if (txt && b.textContent) { n.classList.remove("bump"); void n.offsetWidth; n.classList.add("bump"); setTimeout(function (nn) { nn.classList.remove("bump"); }, 380, n); } b.textContent = txt; }
+        }
+        n.title = st.name + (cur[id] > 1 ? " x" + cur[id] : "");
+      }
+      for (id in list) if (!(id in cur)) {
+        n = list[id]; delete list[id]; n.classList.add("out"); changed = true;
+        setTimeout(function (nn) { if (nn.parentNode) nn.parentNode.removeChild(nn); hudFxLayout(el); }, 280, n);
+      }
+      if (changed) hudFxLayout(el);
+    });
+  }
+  setInterval(hudFxSync, 90);
+  (function () {                                                                      // the icons are one tick wide: --ic follows the bar's width
+    var h = $("hud2"), st = $("stage");
+    function ic() { var tr = $("hpW").querySelector(".track"), tw = tr.clientWidth, sl = tw / 10; if (tw > 0) { h.style.setProperty("--sl", sl.toFixed(2) + "px"); h.style.setProperty("--ic", Math.max(11, Math.min(sl, tr.offsetHeight * 1.6)).toFixed(2) + "px"); } }
+    h.classList.toggle("fxplain", !HUD_FX_MIRROR);
+    ic(); if (window.ResizeObserver) new ResizeObserver(ic).observe(st); else window.addEventListener("resize", ic); setTimeout(ic, 600);
+  })();
+  function stApply(T, id) {                                                           // the test buttons: the real statuses
+    try {
+      if (id === "burn") applyBurn(T, (T.burn ? T.burn.stacks : 0) + 1);
+      else if (id === "chilled") applyChilled(T, 2);
+      else if (id === "shocked") applyShocked(T, 2);
+      else if (id === "magDef") applyWard(T, 2);
+      else if (id === "elusive") applyElusive(T, 2);
+      else if (id === "frozen") { if (!T.frozen) T.frozen = startFreeze({ pose: "attack", t0: performance.now(), frameMs: 1000 / (+$("fps_attack").value || 12) / speed }, T, { freeze: true, arriveAt: performance.now() + 120 / speed }); }
+      else if (id === "guard") { if (!T.guard) T.guard = { turns: 2, fresh: true, el: null }; }
+    } catch (err) { say("Could not apply " + id + ": " + (err && err.message), "sys"); }
+  }
+  $("stPanel").addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("button"), T = FIGHTERS[$("stTarget").value];
+    if (!b) return;
+    if (b.id === "stClear") { clearStatuses(T); return; }
+    if (b.dataset.st) stApply(T, b.dataset.st);
+  });
   (function () {                                                                      // the HUD is sized from the stage's width
     var st = $("stage"), h = $("hud2");
     function size() { h.style.setProperty("--hw", st.clientWidth + "px"); }
@@ -5364,7 +5474,7 @@
     stage.classList.remove("playing");
     document.querySelectorAll(".sprite").forEach(function (s) { s.getAnimations().forEach(function (a) { a.cancel(); }); s.style.filter = ""; });   // (the frozen look is a filter set by the freeze effect)
     clearGuard(FIGHTERS.G); FIGHTERS.G.guard = null;
-    FIGHTERS.W.frozen = null; FIGHTERS.G.frozen = null; FIGHTERS.W.chilled = null; FIGHTERS.G.chilled = null; FIGHTERS.W.magDef = null; FIGHTERS.G.magDef = null; FIGHTERS.W.burn = null; FIGHTERS.G.burn = null; FIGHTERS.W.shocked = null; FIGHTERS.G.shocked = null;
+    FIGHTERS.W.frozen = null; FIGHTERS.G.frozen = null; FIGHTERS.W.chilled = null; FIGHTERS.G.chilled = null; FIGHTERS.W.magDef = null; FIGHTERS.G.magDef = null; FIGHTERS.W.burn = null; FIGHTERS.G.burn = null; FIGHTERS.W.shocked = null; FIGHTERS.G.shocked = null; FIGHTERS.W.elusive = null; FIGHTERS.G.elusive = null; FIGHTERS.W.guard = null;   // (elusive and the hero's guard were left set by Reset: the status icons showed it, and a second Elusive would not draw; fixed 2026-11-12)
     document.querySelectorAll(".num,.fx,.scorch").forEach(function (n) { n.remove(); });
     fxClear(); brLive = null;                                                      // (the Barrier's layer goes with the rest)
     FIGHTERS.W.hp = FIGHTERS.W.max; FIGHTERS.G.hp = FIGHTERS.G.max;
@@ -8635,7 +8745,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   }
   try { $("devTools").open = localStorage.getItem("wvg-dev-open") === "1"; } catch (e) {}
   $("devTools").addEventListener("toggle", function () { try { localStorage.setItem("wvg-dev-open", this.open ? "1" : "0"); } catch (e) {} });
-  ["fightPanel", "bgPanel", "blPanel", "ktPanel"].forEach(function (id) {                        // the Fight, Background and Stage blend menus fold like the developer tools (open by default; the choice is remembered)
+  ["fightPanel", "bgPanel", "blPanel", "ktPanel", "stPanel"].forEach(function (id) {                        // the Fight, Background and Stage blend menus fold like the developer tools (open by default; the choice is remembered)
     var d = $(id);
     try { var v = localStorage.getItem("wvg-open-" + id); if (v !== null) d.open = v === "1"; } catch (e) {}
     d.addEventListener("toggle", function () { try { localStorage.setItem("wvg-open-" + id, this.open ? "1" : "0"); } catch (e) {} });
