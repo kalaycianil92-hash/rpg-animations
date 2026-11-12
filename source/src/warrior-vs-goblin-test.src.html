@@ -35,35 +35,36 @@
      Everything is sized from --hw, the stage's width in px (set by the script: a ResizeObserver), so it scales from a phone to the 760 px page. The fill of each bar is anchored at the CENTRE and drains toward its
      portrait (as in the reference); a pale ghost bar lags behind a hit; the bar flashes on a hit, pulses green on a heal and below 25% pulses; a defeated fighter's portrait goes grey. The bar's number sits at the portrait end.
      The row under each bar (.hp-fx) is kept for the buff and debuff icons (the next part). Classes are .hp (the ids hpW and hpG, kept: the code finds .fill, .v and the first span of .name in them), .hp-pt, .hp-body. */
-  .hud2 { --hw: 760px; --pt: clamp(38px, calc(var(--hw) * .092), 70px); --bh: clamp(12px, calc(var(--hw) * .025), 19px);
+  .hud2 { --hw: 760px; --pt: clamp(28px, calc(var(--hw) * .0644), 50px); --bh: clamp(9px, calc(var(--hw) * .0175), 14px); --nh: clamp(13px, calc(var(--hw) * .0215), 17px);   /* (2026-11-12, the user: 'a bit big for the stage layout: 70%': every size is .7 of the first version) */
     position: absolute; left: 0; right: 0; top: 0; z-index: 7; pointer-events: none;      /* (above the Victory / Defeat banner: the bars stay bright and readable under its dimming) */
-    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; column-gap: calc(var(--hw) * .008);
-    padding: calc(var(--hw) * .011) calc(var(--hw) * .014) 0; }
+    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: start; column-gap: calc(var(--hw) * .006);
+    padding: calc(var(--hw) * .009) calc(var(--hw) * .012) 0; }
   .hud2 .hp { min-width: 0; display: flex; align-items: flex-start; }
   .hud2 .hp.right { flex-direction: row-reverse; }
-  .hud2 .hp.boss { --pt: clamp(44px, calc(var(--hw) * .106), 80px); --bh: clamp(14px, calc(var(--hw) * .03), 23px); }
   .hud2 .hp-pt { position: relative; flex: none; z-index: 2; width: var(--pt); height: var(--pt); border-radius: 50%;
     background: radial-gradient(circle at 50% 30%, #3b4c72, #111727 78%);
-    box-shadow: 0 0 0 calc(var(--pt) * .05) #e9c660, 0 0 0 calc(var(--pt) * .09) #2a1c06, 0 4px 10px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }
-  .hud2 .hp.right .hp-pt { background: radial-gradient(circle at 50% 30%, #6e3c3c, #1d0f11 78%); box-shadow: 0 0 0 calc(var(--pt) * .05) #e2a650, 0 0 0 calc(var(--pt) * .09) #2a1406, 0 4px 10px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }
-  .hud2 .hp.boss .hp-pt { box-shadow: 0 0 0 calc(var(--pt) * .065) #f7d466, 0 0 0 calc(var(--pt) * .115) #4a3208, 0 0 16px 2px #f2c14ea0, 0 4px 10px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }
+    box-shadow: 0 0 0 calc(var(--pt) * .05) #e9c660, 0 0 0 calc(var(--pt) * .09) #2a1c06, 0 3px 8px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }
+  .hud2 .hp.right .hp-pt { background: radial-gradient(circle at 50% 30%, #6e3c3c, #1d0f11 78%); box-shadow: 0 0 0 calc(var(--pt) * .05) #e2a650, 0 0 0 calc(var(--pt) * .09) #2a1406, 0 3px 8px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }
+  .hud2 .hp.boss .hp-pt { box-shadow: 0 0 0 calc(var(--pt) * .065) #f7d466, 0 0 0 calc(var(--pt) * .115) #4a3208, 0 0 14px 2px #f2c14ea0, 0 3px 8px #000b, inset 0 0 calc(var(--pt) * .14) #000c; }   /* (the boss's ring is bolder, but it has the SAME size as the hero's: the bars align) */
   .hud2 .hp-pt canvas { display: block; width: 100%; height: 100%; border-radius: 50%; }
-  .hud2 .hp-body { flex: 1; min-width: 0; margin-top: calc(var(--pt) * .08); }
-  .hud2 .hp.left .hp-body { margin-left: calc(var(--pt) * -.28); }
-  .hud2 .hp.right .hp-body { margin-right: calc(var(--pt) * -.28); }
-  .hud2 .name { display: flex; align-items: baseline; gap: .55em; margin: 0 0 calc(var(--bh) * .16); white-space: nowrap; overflow: hidden;
-    font: 700 clamp(11px, calc(var(--hw) * .0195), 15px)/1.1 var(--display); letter-spacing: .06em; text-transform: uppercase; color: #f4f1e4; text-shadow: 0 1px 0 #000, 0 0 5px #000c; }
+  /* the bar STARTS right next to the portrait: it is not tucked under the ring any more (the ring reaches .09 of the portrait beyond it, plus 2 px of air) */
+  .hud2 .hp-body { flex: 1; min-width: 0; margin-top: calc(var(--pt) * .1); }
+  .hud2 .hp.left .hp-body { margin-left: calc(var(--pt) * .1 + 2px); }
+  .hud2 .hp.right .hp-body { margin-right: calc(var(--pt) * .1 + 2px); }
+  /* the name row has ONE fixed height for the hero and the boss (the boss's bigger name fits in it, bottom-aligned), so the two bars always sit at the same height */
+  .hud2 .name { display: flex; align-items: flex-end; gap: .55em; height: var(--nh); margin: 0 0 calc(var(--bh) * .18); white-space: nowrap; overflow: hidden; line-height: 1;
+    font: 700 clamp(9px, calc(var(--hw) * .0137), 11px)/1 var(--display); letter-spacing: .06em; text-transform: uppercase; color: #f4f1e4; text-shadow: 0 1px 0 #000, 0 0 5px #000c; }
   .hud2 .name > span { overflow: hidden; text-overflow: ellipsis; }
-  .hud2 .hp.left .name { flex-direction: row-reverse; justify-content: flex-start; padding-left: calc(var(--pt) * .32); }
-  .hud2 .hp.right .name { justify-content: flex-start; padding-right: calc(var(--pt) * .32); }
-  .hud2 .hp-tag { flex: none; font-style: normal; font-weight: 600; font-size: .74em; letter-spacing: .14em; color: #dcc387; padding: .05em .45em; border: 1px solid #dcc38799; border-radius: 3px; background: #0009; }
-  .hud2 .hp.boss .name { color: var(--gold); text-shadow: 0 1px 0 #000, 0 0 8px #c9962caa; font-size: clamp(12px, calc(var(--hw) * .022), 17px); }
+  .hud2 .hp.left .name { flex-direction: row-reverse; justify-content: flex-start; }
+  .hud2 .hp.right .name { justify-content: flex-start; }
+  .hud2 .hp-tag { flex: none; font-style: normal; font-weight: 600; font-size: .74em; letter-spacing: .14em; color: #dcc387; padding: .1em .45em; border: 1px solid #dcc38799; border-radius: 3px; background: #0009; }
+  .hud2 .hp.boss .name { color: var(--gold); text-shadow: 0 1px 0 #000, 0 0 8px #c9962caa; font-size: clamp(12px, calc(var(--hw) * .0205), 16px); }   /* the boss keeps a bigger, golden name */
   .hud2 .hp.boss .name > span:first-child::before { content: "\265B\00a0"; }
-  .hud2 .hp.boss .hp-tag { background: #f2c14e; color: #2a1c06; border-color: #f2c14e; }
+  .hud2 .hp.boss .hp-tag { background: #f2c14e; color: #2a1c06; border-color: #f2c14e; font-size: .66em; }
   .hud2 .track { position: relative; box-sizing: border-box; height: var(--bh); border-radius: 999px; overflow: hidden; direction: rtl;
     background: #0a1006; border: 2px solid #d9dfcf; box-shadow: 0 0 0 1px #000, 0 2px 4px #000a, inset 0 2px 4px #000c; }
   .hud2 .hp.right .track { direction: ltr; }
-  .hud2 .hp.boss .track { border-color: #eecb68; box-shadow: 0 0 0 1px #000, 0 0 10px #c9962c88, 0 2px 4px #000a, inset 0 2px 4px #000c; }
+  .hud2 .hp.boss .track { border-color: #eecb68; box-shadow: 0 0 0 1px #000, 0 0 8px #c9962c88, 0 2px 4px #000a, inset 0 2px 4px #000c; }
   .hud2 .fill { position: relative; z-index: 1; height: 100%; width: 100%; border-radius: 999px; transition: width .3s ease-out; }
   .hud2 #hpW .fill { background: linear-gradient(#c3f562, #78c425 52%, #4a8d11); }
   .hud2 #hpG .fill { background: linear-gradient(#ffa27e, #e2503f 52%, #a52921); }
@@ -73,17 +74,17 @@
   .hud2 .track::before { content: ""; position: absolute; z-index: 2; left: 0; right: 0; top: 0; height: 52%; background: linear-gradient(rgba(255,255,255,.34), rgba(255,255,255,0)); pointer-events: none; }
   .hud2 .track::after { content: ""; position: absolute; z-index: 3; inset: 0; pointer-events: none;
     background: repeating-linear-gradient(90deg, transparent 0, transparent calc(10% - 1px), rgba(0,0,0,.4) calc(10% - 1px), rgba(0,0,0,.4) 10%); }
-  .hud2 .v { position: absolute; z-index: 4; top: 50%; transform: translateY(-50%); font: 700 calc(var(--bh) * .66)/1 var(--display); letter-spacing: .05em; color: #fff; text-shadow: 0 1px 1px #000, 0 0 3px #000; direction: ltr; }
-  .hud2 .hp.left .v { left: calc(var(--pt) * .28 + 6px); }
-  .hud2 .hp.right .v { right: calc(var(--pt) * .28 + 6px); }
+  .hud2 .v { position: absolute; z-index: 4; top: 50%; transform: translateY(-50%); font: 700 calc(var(--bh) * .68)/1 var(--display); letter-spacing: .05em; color: #fff; text-shadow: 0 1px 1px #000, 0 0 3px #000; direction: ltr; }
+  .hud2 .hp.left .v { left: calc(var(--bh) * .6); }
+  .hud2 .hp.right .v { right: calc(var(--bh) * .6); }
   .hud2 .hp-fx { display: flex; flex-wrap: wrap; gap: 3px; min-height: calc(var(--bh) * 1.3); margin-top: calc(var(--bh) * .24); }
-  .hud2 .hp.left .hp-fx { justify-content: flex-start; padding-left: calc(var(--pt) * .32); }
-  .hud2 .hp.right .hp-fx { justify-content: flex-end; padding-right: calc(var(--pt) * .32); }
-  .hud2 .hud-vs { align-self: center; text-align: center; padding-top: calc(var(--pt) * .12); line-height: 1; user-select: none; }
-  .hud2 .hud-vs b { display: block; font: italic 900 clamp(22px, calc(var(--hw) * .062), 46px)/1 var(--display); letter-spacing: -.01em; transform: skewX(-8deg);
+  .hud2 .hp.left .hp-fx { justify-content: flex-start; }
+  .hud2 .hp.right .hp-fx { justify-content: flex-end; }
+  .hud2 .hud-vs { align-self: center; text-align: center; padding-top: calc(var(--pt) * .08); line-height: 1; user-select: none; }
+  .hud2 .hud-vs b { display: block; font: italic 900 clamp(16px, calc(var(--hw) * .0434), 32px)/1 var(--display); letter-spacing: -.01em; transform: skewX(-8deg);
     background: linear-gradient(#fff6b0 0%, #ffbe3a 42%, #ee5d1c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: calc(var(--hw) * .0026) #3b1006;
     filter: drop-shadow(0 2px 0 #3b1006) drop-shadow(0 0 10px #ff8a2a99); }
-  .hud2 .hud-vs small { display: block; margin-top: 3px; font: 600 clamp(8px, calc(var(--hw) * .0125), 11px) var(--display); letter-spacing: .28em; text-indent: .28em; text-transform: uppercase; color: #e6d7a6; text-shadow: 0 1px 1px #000; }
+  .hud2 .hud-vs small { display: block; margin-top: 3px; font: 600 clamp(7px, calc(var(--hw) * .0098), 9px) var(--display); letter-spacing: .28em; text-indent: .28em; text-transform: uppercase; color: #e6d7a6; text-shadow: 0 1px 1px #000; }
   .hud2 .hp.low .fill { animation: hpLow .7s ease-in-out infinite alternate; }
   .hud2 .hp.hit .hp-pt { animation: hpShake .38s ease-out; }
   .hud2 .hp.hit .track { animation: hpFlash .38s ease-out; }
@@ -214,12 +215,12 @@
   .banner { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; z-index: 6;
     font: 700 48px var(--display); letter-spacing: .12em; text-transform: uppercase; background: #0b0914aa; }
   .banner.show { display: flex; }
-  .stagetag { position: absolute; left: 0; right: 0; top: 24%; z-index: 6; pointer-events: none; opacity: 0; text-align: center;
+  .stagetag { position: absolute; left: 0; right: 0; top: 19%; z-index: 6; pointer-events: none; opacity: 0; text-align: center;
     font: 700 clamp(30px, 7vw, 52px) var(--display); letter-spacing: .24em; text-indent: .24em; text-transform: uppercase; color: var(--gold);
     text-shadow: 0 2px 0 #0b0914, 0 0 6px #0b0914, 0 0 20px #0b0914cc; }
   .stagetag small { display: block; margin-top: .25em; font: 600 clamp(14px, 3.4vw, 22px) var(--display); letter-spacing: .3em; text-indent: .3em; color: #ece2c8; }
 
-  .bossname { position: absolute; left: 0; right: 0; top: 22%; z-index: 6; pointer-events: none; text-align: center; font: 700 clamp(30px, 7vw, 54px) var(--display); letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; color: var(--gold);
+  .bossname { position: absolute; left: 0; right: 0; top: 17%; z-index: 6; pointer-events: none; text-align: center; font: 700 clamp(30px, 7vw, 54px) var(--display); letter-spacing: .3em; text-indent: .3em; text-transform: uppercase; color: var(--gold);
     text-shadow: 0 2px 0 #0b0914, 0 0 8px #0b0914, 0 0 24px #c9962ccc; }
   .bossname small { display: block; margin-bottom: .2em; font: 600 clamp(13px, 3vw, 20px) var(--display); letter-spacing: .5em; text-indent: .5em; color: #ece2c8; }
   .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -5453,7 +5454,7 @@
   // of 350 px). Its idle is in (a very slow, heavy breath: 5 fps, the dome moves 3%), the other animations follow. It is drawn about 1.5 times the size of the other monsters by the Monster size (sizeDef 150, up to 260): the
   // unit is moved toward the enemy by half of the extra width (--msx) so the staff stays on the stage. Holy and elemental skills: no vfx of its own yet.
   var KING_ANIMS = __SLIMEKING_ANIMS__;
-  MONSTERS.slime_king = { name: "Slime King", anims: KING_ANIMS, fps: 5, sizeDef: 150, sizeMax: 260, sqDef: 100, shiftX: 0.45 };   // (190 at first: the user, 2026-11-11: "so big, scale it down": 150 is about 1.4 times the Warrior's height)
+  MONSTERS.slime_king = { name: "Slime King", anims: KING_ANIMS, fps: 5, sizeDef: 150, sizeMax: 260, sqDef: 100, shiftX: -0.3 };   // (190 at first: the user, 2026-11-11: "so big, scale it down": 150 is about 1.4 times the Warrior's height)
   // Candidate idle sheets of the re-looked fire slime (2026-11-07): every Animations/Slime/idle/candidates/<tag>_fire_idle_strip.png gets its own entry in the Monster select, to be compared in a fight.
   var SLIME_CANDIDATES = __SLIME_CANDIDATES__, CAND_LABEL = { gpt: "ChatGPT sheet", gemini: "Gemini v3 sheet (heavy bounce)", gemini2: "Gemini v4 sheet (calm)" }, CAND_SQ = {};   // CAND_SQ: the Squash and stretch default of a candidate (the calm v4 sheet is shown as drawn)
   SLIME_CANDIDATES.forEach(function (c) {
@@ -7954,14 +7955,15 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     return c;
   }
   var KT_SPARK = [[0.12, 0.62, 0.5], [0.2, 0.42, 1.7], [0.82, 0.5, 2.9], [0.9, 0.7, 4.1], [0.74, 0.3, 5.3], [0.3, 0.78, 6.2], [0.62, 0.22, 7.7]];   // twinkling places on the pile (across, down, phase)
-  // THE PILE'S PLACE (the user, 2026-11-12: 'the treasure prop is so big and does not look right: much smaller; the look I want is the Slime King GUARDING the treasures, not sitting on top of them'): a SMALL hoard
-  // (0.48 of his width) behind his right shoulder, standing a little further back than he does (its base 0.05 of his width higher on the screen), so he stands in front of it with the staff beside it and about half of
-  // the pile shows past his skirt; the stage had only about 60 px to the right of his body, so the King now stands 0.3 of a unit width further toward the enemy (MONSTERS.slime_king.shiftX) and the pile fits to his right. A soft contact shadow grounds it.
-  var KT_PILE = { w: 0.8, dx: 3, dy: 0.08, over: 4 };   // (2026-11-12: 0.48 was too small; this is the interim size for the first picture while the user draws three new variations)
+  // THE PILE'S PLACE (2026-11-12). The user wanted the King at the RIGHT EDGE of the stage again ('I know you placed him there so the treasures show, but it feels wrong'), so the hoard now stands BEHIND him and
+  // to his LEFT: its high right part is hidden behind his body, its long slope (the picture faces left) fans out toward the hero between them, his staff in front of it: he guards it. KT_PILE: w = the hoard's width as a share
+  // of his width, dx = its centre against his centre in his widths (negative = toward the hero), dy = how far back it stands (a share of his width, up the screen).
+  var KT_PILE = { w: 0.9, dx: -0.42, dy: 0.1, edge: 0.6 };   // edge: a second, smaller copy of the hoard at the stage's right edge behind his shoulder (so the forest prop there, which the user did not want to see, stays covered); 0 = none
+  function KT_HOME_DY() { return KT.home ? KT.home.s * 0.02 : 0; }
   function kingPileBox() {                                                           // where the pile is: a box on the stage, behind and to the right of where he stands
     var h = KT.home; if (!h) return null;
     var tex = kingPileTex(), w = h.s * KT_PILE.w, ph = w * (tex.naturalHeight || tex.height) / (tex.naturalWidth || tex.width);   // (the picture's own shape; the stand-in is 480 x 200)
-    return { x: Math.min(h.x + h.s * KT_PILE.dx, stage.clientWidth - w / 2 + KT_PILE.over), gy: h.gy - h.s * KT_PILE.dy, w: w, h: ph };      // (dx is the farthest it may stand to his right; the pile is pushed ALL THE WAY to the stage's right edge: its right end is at the edge, `over` px beyond it, so the prop of the forest behind it cannot peek out past it: the user, 2026-11-12)
+    return { x: h.x + h.s * KT_PILE.dx, gy: h.gy - h.s * KT_PILE.dy, w: w, h: ph };
   }
   function kingTreasureDraw(cb, cf, now, dt, op) {                                   // called by the aura loop: the pile behind him, its glow and its glimmer
     if (!KT.on) return;
@@ -7972,6 +7974,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     var tex = kingPileTex(), i, sp, a;
     cb.save(); cb.fillStyle = "rgba(22,14,4,0.38)"; cb.beginPath(); cb.ellipse(b.x, b.gy - b.h * 0.02, b.w * 0.56, b.h * 0.2, 0, 0, 6.2832); cb.fill(); cb.restore();            // (a soft contact shadow)
     glowDot(cb, b.x, b.gy - b.h * 0.6, b.w * 0.62, "255,214,110", 0.2 * KT.glow);
+    if (KT_PILE.edge) { var w2 = b.w * KT_PILE.edge / KT_PILE.w, h2 = w2 * b.h / b.w; cb.save(); cb.drawImage(tex, stage.clientWidth - w2 + 4, b.gy - h2 - KT_HOME_DY(), w2, h2); cb.restore(); }   // (the edge copy, drawn first: further back)
     cb.save(); cb.drawImage(tex, b.x - b.w / 2, b.gy - b.h, b.w, b.h); cb.restore();
     for (i = 0; i < KT_SPARK.length; i++) {
       sp = KT_SPARK[i]; a = Math.sin(now * 0.0021 * (0.6 + i * 0.11) + sp[2]);
