@@ -5352,7 +5352,7 @@
   // of 350 px). Its idle is in (a very slow, heavy breath: 5 fps, the dome moves 3%), the other animations follow. It is drawn about 1.5 times the size of the other monsters by the Monster size (sizeDef 150, up to 260): the
   // unit is moved toward the enemy by half of the extra width (--msx) so the staff stays on the stage. Holy and elemental skills: no vfx of its own yet.
   var KING_ANIMS = __SLIMEKING_ANIMS__;
-  MONSTERS.slime_king = { name: "Slime King", anims: KING_ANIMS, fps: 5, sizeDef: 150, sizeMax: 260, sqDef: 100, shiftX: 0.3 };   // (190 at first: the user, 2026-11-11: "so big, scale it down": 150 is about 1.4 times the Warrior's height)
+  MONSTERS.slime_king = { name: "Slime King", anims: KING_ANIMS, fps: 5, sizeDef: 150, sizeMax: 260, sqDef: 100, shiftX: 0.45 };   // (190 at first: the user, 2026-11-11: "so big, scale it down": 150 is about 1.4 times the Warrior's height)
   // Candidate idle sheets of the re-looked fire slime (2026-11-07): every Animations/Slime/idle/candidates/<tag>_fire_idle_strip.png gets its own entry in the Monster select, to be compared in a fight.
   var SLIME_CANDIDATES = __SLIME_CANDIDATES__, CAND_LABEL = { gpt: "ChatGPT sheet", gemini: "Gemini v3 sheet (heavy bounce)", gemini2: "Gemini v4 sheet (calm)" }, CAND_SQ = {};   // CAND_SQ: the Squash and stretch default of a candidate (the calm v4 sheet is shown as drawn)
   SLIME_CANDIDATES.forEach(function (c) {
@@ -7856,7 +7856,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   // THE PILE'S PLACE (the user, 2026-11-12: 'the treasure prop is so big and does not look right: much smaller; the look I want is the Slime King GUARDING the treasures, not sitting on top of them'): a SMALL hoard
   // (0.48 of his width) behind his right shoulder, standing a little further back than he does (its base 0.05 of his width higher on the screen), so he stands in front of it with the staff beside it and about half of
   // the pile shows past his skirt; the stage had only about 60 px to the right of his body, so the King now stands 0.3 of a unit width further toward the enemy (MONSTERS.slime_king.shiftX) and the pile fits to his right. A soft contact shadow grounds it.
-  var KT_PILE = { w: 0.48, dx: 0.5, dy: 0.05 };
+  var KT_PILE = { w: 0.85, dx: 0.42, dy: 0.1 };   // (2026-11-12: 0.48 was too small; this is the interim size for the first picture while the user draws three new variations)
   function kingPileBox() {                                                           // where the pile is: a box on the stage, behind and to the right of where he stands
     var h = KT.home; if (!h) return null;
     var tex = kingPileTex(), w = h.s * KT_PILE.w, ph = w * (tex.naturalHeight || tex.height) / (tex.naturalWidth || tex.width);   // (the picture's own shape; the stand-in is 480 x 200)
