@@ -1,0 +1,221 @@
+{
+ "format": "hand-anchors/3",
+ "note": "Two tracks per frame: main (the left hand, far arm) and off (the right hand, near arm). x and y are fractions of one frame from its top left. Item length is a share of the frame WIDTH. a is degrees, 0 = item points up, clockwise is positive. front=false means the item is drawn behind the body. hide=true means no item on that frame. w squashes the item sideways (1 = normal width). Draw order: items behind (main, off), body, items in front (main, off), then the hand over each item in front whose overlay is true: only the hand's own pixels from the body frame, namely the pixels of the skin colour found around the mark (same hue, inside a circle of radius fist x frame width, connected to the mark), grown by 2 px to take in the outline; when no skin colour is found near the mark it is the whole circle. Each animation has offItem: what its off hand carries (kind shield, other = a second weapon or item, or none = no off-hand item, in which case the off track is all null) with its own length, pivot and overlay; for the off hand it takes precedence over the character-level items.off.",
+ "characters": [
+  {
+   "name": "Warrior",
+   "fist": 0.09,
+   "items": {
+    "main": {
+     "length": 0.42,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    },
+    "off": {
+     "length": 0.42,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    }
+   },
+   "animations": [
+    {
+     "name": "armored_thunderclap_guillotine_11frame",
+     "frames": 11,
+     "columns": 11,
+     "fps": 10,
+     "offItem": {
+      "kind": "other",
+      "picture": "sword",
+      "length": 0.42,
+      "pivot": 0.81,
+      "overlay": true
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.691,
+        "y": 0.676,
+        "a": 39,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.691,
+        "y": 0.676,
+        "a": 39,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.713,
+        "y": 0.449,
+        "a": -63,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.614,
+        "y": 0.372,
+        "a": -126,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.474,
+        "y": 0.452,
+        "a": -144,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.6,
+        "y": 0.282,
+        "a": -72,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.815,
+        "y": 0.669,
+        "a": 147,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.888,
+        "y": 0.73,
+        "a": 147,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.826,
+        "y": 0.77,
+        "a": 147,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.759,
+        "y": 0.607,
+        "a": 0,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.785,
+        "y": 0.477,
+        "a": -45,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.42,
+        "y": 0.679,
+        "a": 129,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.423,
+        "y": 0.676,
+        "a": 135,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.482,
+        "y": 0.446,
+        "a": -6,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.493,
+        "y": 0.397,
+        "a": -126,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.391,
+        "y": 0.489,
+        "a": -141,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.517,
+        "y": 0.275,
+        "a": -72,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.766,
+        "y": 0.686,
+        "a": 153,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.852,
+        "y": 0.747,
+        "a": 150,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.651,
+        "y": 0.786,
+        "a": 60,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.663,
+        "y": 0.601,
+        "a": -24,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.554,
+        "y": 0.518,
+        "a": -24,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

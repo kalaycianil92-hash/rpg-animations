@@ -418,6 +418,7 @@
     <div class="devbody">
     <div class="fields">
       <label>Scenario <select id="scn"><option value="win">Warrior wins</option><option value="lose">Warrior loses (plays death)</option><option value="combo">Mage combo: Shatter Lance on a Chilled, then on a Frozen target</option><option value="fire">Mage fire combo: Firebolt twice, then Cinderburst detonates the burns</option><option value="fire2">Mage fire combo: Pyroclasm sets 3 Burns, Cinderburst detonates all of them</option><option value="mdodge">Warrior wins, the monster dodges one strike (and he dodges one)</option><option value="mblock">Warrior wins, the monster blocks two strikes and he blocks one (a blocked hit cannot crit, 20% less damage)</option></select></label>
+      <label id="warriorWrap" data-chars="warrior">Warrior's attack <select id="warriorSkill"><option value="alt">Alternate the skills</option><option value="thunder">Thunderclap Guillotine</option><option value="sunder">Sunder Strike</option></select></label>
       <label id="rogueWrap" style="display:none">Rogue's attack <select id="rogueSkill"><option value="alt">Alternate the six skills</option><option value="shroud">Umbral Shroud</option><option value="abyssal">Abyssal Backstab</option><option value="shiv">Shadow Shiv</option><option value="stiletto">Static Stiletto</option><option value="kiss">Winter's Kiss</option><option value="permafrost">Permafrost Execution</option></select></label>
       <label id="rogueDefWrap" style="display:none"><input type="checkbox" id="rogueDef"> The target suffers Reduce Physical Def (Shadow Shiv then always hits critically)</label>
       <label id="rogueShockWrap" style="display:none"><input type="checkbox" id="rogueShock"> Static Stiletto always applies Shocked (otherwise a 25% chance)</label>
@@ -426,6 +427,7 @@
       <label id="rogueTChillWrap" style="display:none"><input type="checkbox" id="rogueTChilled"> The target is Chilled (Permafrost Execution consumes it for a chance to Freeze; a Chilled target from Winter's Kiss counts too)</label>
       <label id="rogueFreezeWrap" style="display:none"><input type="checkbox" id="rogueFreeze"> Permafrost Execution always Freezes a Chilled target (otherwise a 50% chance, a placeholder)</label>
       <label data-chars="mage">Mage's far hand carries <select id="farHand"><option value="orb">the orb</option><option value="book">the spell book</option></select></label>
+      <label data-chars="warrior">Warrior's near hand carries <select id="nearHand"><option value="sword">a sword</option><option value="shield">a shield</option></select></label>
       <label><input type="checkbox" id="showW" checked> Show weapons</label>
     </div>
     <div class="fields">
@@ -1151,6 +1153,10 @@
   // its length is the picture's height as a share of the frame width like every item). Everything that looks for "the orb" (the skills' charge glows) follows the equipped one. A marks file can also name
   // the picture "book" itself (the hand tool has it), then the file's own settings are used.
   var farBook = false, FARHAND_KEY = "wvg-mage-farhand", BOOK_CFG = { length: 0.14, pivot: 0.85, overlay: false };
+  // THE WARRIOR'S NEAR HAND (the user's rule, 2026-11-13): it can ALWAYS equip a shield, in every animation (existing and future); the marks only say where the hand is and which way the item points, so the
+  // page swaps the picture and its settings on the same marks (like the mage's orb or book): a sword (0.5 long, grip at 81%, the hand drawn over the grip) or the shield (0.3, centred on the mark, NEVER
+  // with the hand drawn over it). The choice is remembered in this browser; the swords stay in the far hand.
+  var nearShield = false, NEARHAND_KEY = "wvg-warrior-nearhand", SHIELD_CFG = { length: 0.3, pivot: 0.5, overlay: false };
   // Item pictures per character (found by the character's name in the marks file). A character listed here uses its own pictures for the far hand
   // (main track) and for the near hand's "other" item (off track); every other character uses the sword and the shield.
   var CHAR_ITEMS = { mage: { main: itemImgs.orb, other: itemImgs.staff } };
@@ -1158,10 +1164,12 @@
   function picImg(p) { return p === "sword" ? itemImgs.main : p === "orb" && farBook ? itemImgs.book : (itemImgs[p] || null); }
   function cfgOf(set, tk) {                                                         // the item settings of an arm: the file's, or the spell book's when it is equipped instead of the orb
     var c = tk === "main" ? set.main : set.off;
+    if (tk === "off" && nearShield && String(set.character || "").toLowerCase() === "warrior") return { kind: "shield", length: SHIELD_CFG.length, pivot: SHIELD_CFG.pivot, overlay: SHIELD_CFG.overlay, pic: "shield" };   // the Warrior's near hand carries the shield
+    if (c.kind === "shield" && c.overlay) return { kind: c.kind, length: c.length, pivot: c.pivot, overlay: false, pic: c.pic };                       // a shield never has the hand drawn over it
     return farBook && c.pic === "orb" ? { length: BOOK_CFG.length, pivot: BOOK_CFG.pivot, overlay: BOOK_CFG.overlay, pic: "orb" } : c;
   }
   function itemFor(set, tk) {
-    var cfg = tk === "main" ? set.main : set.off, im = cfg.kind === "shield" ? itemImgs.shield : picImg(cfg.pic);
+    var cfg = cfgOf(set, tk), im = cfg.kind === "shield" ? itemImgs.shield : picImg(cfg.pic);
     if (im) return im;
     var art = CHAR_ITEMS[String(set.character || "").toLowerCase()];
     if (tk === "main") return art ? art.main : itemImgs.main;
@@ -1178,7 +1186,7 @@
         var off = a.offItem || { kind: "shield", length: oi.length, pivot: oi.pivot, overlay: oi.overlay };
         anchorLib[baseName(a.name)] = {
           name: a.name, character: c.name || "", fist: c.fist || 0.09,
-          main: { length: mi.length || 0.42, pivot: mi.pivot || 0.81, overlay: mi.overlay !== false, pic: mi.picture || "" },
+          main: { length: mi.length || 0.5, pivot: mi.pivot || 0.81, overlay: mi.overlay !== false, pic: mi.picture || "" },
           off: { kind: off.kind || "shield", length: off.length || 0.3, pivot: off.pivot || 0.5, overlay: !!off.overlay, pic: off.picture || "" },
           tracks: a.tracks || { main: [], off: [] }
         };
@@ -1825,6 +1833,8 @@
       if (rKey === "shroud") return backstabPreview();
       if (rKey === "abyssal") return abyssalPreview();
     }
+    var wKey = null;                                                                                  // the Warrior previews the skill chosen in "Warrior's attack" (alternate: the first)
+    if (curChar === "warrior" && warriorKeys().length > 1) { wKey = warriorKeyChosen(); await useWarriorSkill(wKey); }
     resetState();
     var my = ++run;
     stage.classList.add("playing");
@@ -1836,12 +1846,12 @@
       var clk = player.clock;
       var drive = startPath(my, clk);
       if (rogueLike()) { if (rKey === "stiletto") ssFx(FIGHTERS.G, hitF, { myRun: my }); else if (rKey === "kiss") kissFx(FIGHTERS.G, hitF, { myRun: my }); else if (rKey === "permafrost") pfFx(FIGHTERS.G, hitF, { myRun: my, preview: true }); else shivFx(FIGHTERS.G, hitF); }   // (the Shadow Shiv's violet streak, the Static Stiletto's lightning, Winter's Kiss's frost, Permafrost Execution's glacier ice)
-      var skill = $("fxOn").checked && !rogueLike() ? startSkill(clk, hitF, FIGHTERS.G) : null;
+      var skill = !rogueLike() ? (wKey === "sunder" ? startSunder(clk, hitF, FIGHTERS.G) : ($("fxOn").checked ? startSkill(clk, hitF, FIGHTERS.G) : null)) : null;
       var wait = clkAt(clk, hitF, IN) - performance.now();
       if (wait > 0) await new Promise(function (r) { setTimeout(r, wait); });
       if (my !== run) break;
       if (skill) skill.impact(); else if (!(rogueLike() && (rKey === "kiss" || rKey === "permafrost"))) slash(FIGHTERS.G, 1);   // (the frozen dagger's own ice burst, and the glacier X, replace the slash)
-      anim(FIGHTERS.G.unit.querySelector(".sprite"), skill ? SHOCK : [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], skill ? 340 : 160).catch(function () {});
+      anim(FIGHTERS.G.unit.querySelector(".sprite"), skill && !skill.phys ? SHOCK : [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], skill && !skill.phys ? 340 : 160).catch(function () {});
       await drive;
       if (my !== run) break;
       await anim(uW, [{ transform: tr(pathAt(places.attack, 1e9)) }, { transform: "translate(0,0)" }], 280, "ease-in-out");
@@ -2030,8 +2040,8 @@
     if (!set || !p || !sh) return [];
     var L = layout(p), Wn = p.nw / L.cols, Hn = p.nh / L.rows, r = rectIn(sh), k = r.width / Wn, segs = [];
     ["main", "off"].forEach(function (tk) {
-      var an = set.tracks[tk] && set.tracks[tk][cf.i], cfg = tk === "main" ? set.main : set.off;
-      if (!an || an.hide || (tk === "off" && cfg.kind === "none")) return;
+      var an = set.tracks[tk] && set.tracks[tk][cf.i], cfg = cfgOf(set, tk);
+      if (!an || an.hide || (tk === "off" && (cfg.kind === "none" || cfg.kind === "shield"))) return;                 // (a shield in the near hand carries no lightning: only the swords do)
       var a = an.a * Math.PI / 180, dx = Math.sin(a), dy = -Math.cos(a), len = cfg.length * Wn * cfg.pivot, gx = an.x * Wn, gy = an.y * Hn;
       var sg = { x0: r.left + (gx + dx * len * 0.12) * k, y0: r.top + (gy + dy * len * 0.12) * k, x1: r.left + (gx + dx * len) * k, y1: r.top + (gy + dy * len) * k };
       var hl = cfg.length * Wn * (1 - cfg.pivot), px = r.left + (gx - dx * hl) * k, py = r.top + (gy - dy * hl) * k;        // the hilt's end behind the grip
@@ -4365,6 +4375,11 @@
     if (A === FIGHTERS.G && monSpitPack()) return monAttackAct(e, myRun, A, T);          // the fire slime spits an ember (Ember Spit) instead of lunging
     if (A === FIGHTERS.W && curChar === "mage" && packs.attack && $("fbOn").checked) return castAct(e, myRun, A, T);   // the mage casts instead of lunging (also when the cast is dodged: the spell flies on past the target)
     if (!plain && A === FIGHTERS.W && rogueLike() && packs.attack && !packs.attack.keyed && nFrames("attack") >= 4) return rogueAct(e, myRun, A, T);   // the Rogue uses one of her skills (Backstab, Shadow Shiv) instead of lunging
+    var wKey = null;                                                                  // the Warrior's skill of this blow (Thunderclap Guillotine, Sunder Strike...): its pack is swapped into the attack slot first
+    if (!plain && A === FIGHTERS.W && curChar === "warrior" && packs.attack && !packs.attack.keyed && warriorKeys().length > 1) {
+      wKey = warriorSkillNow(); await useWarriorSkill(wKey); if (myRun !== run) return;
+      if (wKey === "sunder") e = Object.assign({}, e, { verb: "cleaves", note: " with Sunder Strike" });
+    }
     var sign = A.dir;
     var a = centerOf(A.unit), t = centerOf(T.unit);
     var reach = (t.x - a.x) - sign * a.w * 0.8;
@@ -4398,7 +4413,7 @@
     }
     var clk = null;
     if (packPlays) { playPose("attack", false, aHolds).then(backToIdle); clk = player.clock; }
-    var skill = (A === FIGHTERS.W && packPlays && $("fxOn").checked && !rogueLike()) ? startSkill(clk, hitF, T) : null;   // the lightning skill rides on the attack pack's clock
+    var skill = (A === FIGHTERS.W && packPlays && !rogueLike()) ? (wKey === "sunder" ? startSunder(clk, hitF, T) : ($("fxOn").checked ? startSkill(clk, hitF, T) : null)) : null;   // the skill rides on the attack pack's clock (the lightning one, or Sunder Strike's physical one)
     var viaPath = packPlays && pathOn(), drive = null;
     if (viaPath) drive = startPath(myRun, clk);
     if (keyed) keyPose("attack", 0);
@@ -4451,11 +4466,11 @@
       if (T === FIGHTERS.W && packs.death && packs.death.keyed && T.hp <= 0 && $("still").checked) keyPose("death", 0);
       if (blk) blockFx(T, -sign, performance.now());
       if (skill) skill.impact(); else if (!blk && !e.noSlash) slash(T, sign);
-      floatNumber(T, (blk ? "BLOCK " : cr ? "CRIT " : "") + amt, blk ? "block" : e.numCls || (skill ? "bolt" : (cr ? "crit" : "")));
+      floatNumber(T, (blk ? "BLOCK " : cr ? "CRIT " : "") + amt, blk ? "block" : e.numCls || (skill && !skill.phys ? "bolt" : (cr ? "crit" : "")));
       say(A.name + " " + (e.verb || "slashes") + " " + T.name + " for " + amt + (blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage" + (e.crit ? ", the critical hit is cancelled" : "") + ")" : cr ? " (crit!)" : "") + (e.note || "") + ".", e.actor === "W" ? "w" : "g");
       var spr = T.unit.querySelector(".sprite");
       var jobs = [
-        blk ? anim(spr, [{ filter: "brightness(1.35)" }, { filter: "brightness(1)" }], 160) : (skill || e.shock) ? anim(spr, e.shockAnim || SHOCK, 340) : anim(spr, [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], 160),
+        blk ? anim(spr, [{ filter: "brightness(1.35)" }, { filter: "brightness(1)" }], 160) : ((skill && !skill.phys) || e.shock) ? anim(spr, e.shockAnim || SHOCK, 340) : anim(spr, [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], 160),
         anim(T.unit, [{ transform: "translateX(0)" }, { transform: "translateX(" + (sign * 10 * (blk ? 0.5 : 1)) + "px)" }, { transform: "translateX(" + (-sign * 6 * (blk ? 0.5 : 1)) + "px)" }, { transform: "translateX(0)" }], 240),
         sleep(300)
       ];
@@ -4876,6 +4891,52 @@
     var d = list.filter(function (x) { return x.file === sk.file; })[0] || (sk.fallback && list.filter(function (x) { return x.file === sk.fallback; })[0]);   // (a skill redone in a new strip falls back on the older one while the new one does not exist)
     if (!d || (packs.attack && packs.attack.file === d.file)) return Promise.resolve(!!d);
     return loadPack("attack", d.src, d.file).then(function () { return true; });
+  }
+  // ---------------------------------------------------------------- The Warrior's skills (2026-11-13)
+  // Like the Rogue's: every skill has its own folder in Animations/Warrior (all mapped to the attack slot in build.py); the strip of the chosen skill is swapped into the attack slot, with its marks, hit frame, fps,
+  // holds and path (all from its placement json), just before it is used. "Warrior's attack" picks one skill or alternates them (Thunderclap Guillotine first). Thunderclap Guillotine: startSkill (lightning).
+  // Sunder Strike: startSunder (physical: no lightning). The Warrior's skills are six in all; the user sends them one at a time (docs/WARRIOR_SKILLS.md).
+  var WARRIOR_SKILLS = { thunder: { file: "armored_thunderclap_guillotine_11frame_strip.png" }, sunder: { file: "armored_sunder_strike_8frame_strip.png" } }, WARRIOR_ORDER = ["thunder", "sunder"], wkCount = 0;
+  function warriorKeys() { return WARRIOR_ORDER.filter(function (k) { return DEFAULT_ANIMS.some(function (d) { return d.file === WARRIOR_SKILLS[k].file; }); }); }   // the skills whose art is in the page
+  function warriorKeyChosen() { var v = $("warriorSkill").value, ks = warriorKeys(); return v === "alt" || ks.indexOf(v) < 0 ? ks[0] : v; }   // (the preview: "alternate" shows the first)
+  function warriorSkillNow() { var v = $("warriorSkill").value, ks = warriorKeys(); return v === "alt" ? ks[wkCount++ % ks.length] : ks.indexOf(v) >= 0 ? v : ks[0]; }
+  function useWarriorSkill(key) {
+    var d = DEFAULT_ANIMS.filter(function (x) { return x.file === WARRIOR_SKILLS[key].file; })[0];
+    if (!d || (packs.attack && packs.attack.file === d.file)) return Promise.resolve(!!d);
+    return loadPack("attack", d.src, d.file).then(function () { return true; });
+  }
+  // SUNDER STRIKE (2026-11-13): "Delivers a heavy cleave of Physical Damage and 50% chance to Reduce Physical Def (-20% Physical Defense for 1 turn)..." A zero-cooldown skill: it does not have to be special. A grounded
+  // two-sword cleave (wind-up, raise, step-in, the blow on frame 4, follow-through): a steel-white crescent from where the blades were overhead down to where they land (the Thunderclap's slashDraw in a physical palette),
+  // a flash on the blow, steel sparks, dust along the ground and a short shake. The status (Reduce Physical Def) is NOT drawn: the user will generate and adjust all buffs and debuffs later.
+  var SUNDER = { shake: 10, pal: { core: "255,255,255", mid: "226,233,244", glow: "172,188,212", flash: "255,248,236" } };
+  function startSunder(clk, hitF, T) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tImpact = at(hitF, 0.4), F = { pal: SUNDER.pal, w: 1, k: 1, paint: 0, dark: 0 };
+    if (hitF > 1) fxAdd({ t0: at(hitF - 1, 0.5), t1: tImpact + 340, tStrike: at(hitF, 0), tImpact: tImpact, T: T, draw: function (ctx, now, L) { slashDraw(ctx, now, L, F); } });
+    return { phys: true, impact: function () { sunderImpact(T); } };
+  }
+  function sunderImpact(T) {
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.42, cy = r.top + r.height * 0.5, gy = r.top + r.height - r.height * 0.03, rnd = rngOf(now | 0), P = SUNDER.pal, sparks = [], puffs = [], i;
+    for (i = 0; i < 24; i++) { var ang = rnd() * 6.2832, sp = u * (0.8 + rnd() * 2.1) / 1000; sparks.push({ vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp - u * 0.4 / 1000, life: 220 + rnd() * 240 }); }
+    for (i = 0; i < 7; i++) puffs.push({ x: cx + (rnd() - 0.5) * u * 0.9, dx: (rnd() - 0.5) * u * 0.5, w: u * (0.1 + rnd() * 0.12), rise: u * (0.05 + rnd() * 0.14), d: rnd() * 90 });
+    shake(SUNDER.shake, 260);
+    fxAdd({ t0: now, t1: now + 820 / speed, draw: function (ctx, now2) {
+      var t = (now2 - now) * speed, G = u * 2.2 / 1e6;
+      if (t < 140) glowDot(ctx, cx, cy, u * (0.4 + 0.35 * t / 140), P.flash, 1.0 * Math.pow(1 - t / 140, 1.4));
+      if (t < 80) flashAll(ctx, P.flash, 0.1 * (1 - t / 80));
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      sparks.forEach(function (sp) {
+        if (t > sp.life) return;
+        var px = function (tm) { return cx + sp.vx * tm; }, py = function (tm) { return cy + sp.vy * tm + 0.5 * G * tm * tm; }, al = 1 - t / sp.life;
+        ctx.strokeStyle = "rgba(255,240,215," + al + ")"; ctx.lineWidth = Math.max(1.1, u * 0.009);
+        ctx.beginPath(); ctx.moveTo(px(Math.max(0, t - 28)), py(Math.max(0, t - 28))); ctx.lineTo(px(t), py(t)); ctx.stroke();
+      });
+      ctx.restore();
+      puffs.forEach(function (pf) {                                                 // dust along the ground: soft grey-brown ellipses that grow, drift and fade
+        var k = clamp01((t - pf.d) / 600); if (k <= 0 || k >= 1) return;
+        ctx.fillStyle = "rgba(172,152,122," + 0.32 * (1 - k) + ")";
+        ctx.beginPath(); ctx.ellipse(pf.x + pf.dx * k, gy - pf.rise * k, pf.w * (0.5 + k), pf.w * 0.4 * (0.5 + k), 0, 0, 6.2832); ctx.fill();
+      });
+    } });
   }
   function shivFx(T, hitF) {                                                         // a violet streak along the ground from where she starts to the strike spot, a puff at each end
     var h = homeOf(uW), th = homeOf(T.unit), reach = (th.x - h.x) - h.w * 0.8, f = bsFig(), fm = 1000 / (+$("fps_attack").value || 12) / speed, t = performance.now();
@@ -8805,6 +8866,15 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   $("farHand").onchange = function () {
     farBook = this.value === "book";
     try { localStorage.setItem(FARHAND_KEY, this.value); } catch (e) {}
+    if (curFrame) applyWeapon(curFrame.pose, curFrame.i);
+  };
+  (function () {                                                                      // what the Warrior's near hand carries (the user's rule 2026-11-13: a shield in any animation): remembered in this browser
+    var v = "sword"; try { v = localStorage.getItem(NEARHAND_KEY) === "shield" ? "shield" : "sword"; } catch (e) {}
+    $("nearHand").value = v; nearShield = v === "shield";
+  })();
+  $("nearHand").onchange = function () {
+    nearShield = this.value === "shield";
+    try { localStorage.setItem(NEARHAND_KEY, this.value); } catch (e) {}
     if (curFrame) applyWeapon(curFrame.pose, curFrame.i);
   };
   $("clear").onclick = function () {

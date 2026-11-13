@@ -7,13 +7,13 @@
    "fist": 0.09,
    "items": {
     "main": {
-     "length": 0.42,
+     "length": 0.5,
      "pivot": 0.81,
      "overlay": true,
      "picture": "sword"
     },
     "off": {
-     "length": 0.42,
+     "length": 0.5,
      "pivot": 0.81,
      "overlay": true,
      "picture": "sword"
@@ -24,13 +24,13 @@
      "name": "armored_thunderclap_guillotine_11frame",
      "frames": 11,
      "columns": 11,
-     "fps": 10,
+     "fps": 14,
      "offItem": {
-      "kind": "other",
-      "picture": "sword",
-      "length": 0.42,
+      "length": 0.5,
       "pivot": 0.81,
-      "overlay": true
+      "overlay": true,
+      "picture": "sword",
+      "kind": "other"
      },
      "tracks": {
       "main": [
@@ -133,16 +133,16 @@
         "w": 1
        },
        {
-        "x": 0.423,
-        "y": 0.676,
-        "a": 135,
+        "x": 0.42,
+        "y": 0.679,
+        "a": 129,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
         "x": 0.482,
-        "y": 0.446,
+        "y": 0.456,
         "a": -6,
         "front": true,
         "hide": false,
@@ -151,15 +151,15 @@
        {
         "x": 0.493,
         "y": 0.397,
-        "a": -126,
+        "a": -111,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.391,
-        "y": 0.489,
-        "a": -141,
+        "x": 0.396,
+        "y": 0.484,
+        "a": -135,
         "front": true,
         "hide": false,
         "w": 1
@@ -189,24 +189,24 @@
         "w": 1
        },
        {
-        "x": 0.651,
-        "y": 0.786,
+        "x": 0.646,
+        "y": 0.791,
         "a": 60,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.663,
-        "y": 0.601,
+        "x": 0.668,
+        "y": 0.606,
         "a": -24,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.554,
-        "y": 0.518,
+        "x": 0.556,
+        "y": 0.517,
         "a": -24,
         "front": true,
         "hide": false,

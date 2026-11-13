@@ -1,0 +1,172 @@
+{
+ "format": "hand-anchors/3",
+ "characters": [
+  {
+   "name": "Warrior",
+   "fist": 0.09,
+   "items": {
+    "main": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    },
+    "off": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    }
+   },
+   "animations": [
+    {
+     "name": "armored_sunder_strike_8frame",
+     "frames": 8,
+     "columns": 8,
+     "fps": 14,
+     "offItem": {
+      "length": 0.5,
+      "pivot": 0.81,
+      "overlay": true,
+      "picture": "sword",
+      "kind": "other"
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.352,
+        "y": 0.629,
+        "a": -120,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.377,
+        "y": 0.199,
+        "a": -128,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.801,
+        "y": 0.258,
+        "a": 50,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.904,
+        "y": 0.58,
+        "a": 115,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.879,
+        "y": 0.678,
+        "a": 135,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.947,
+        "y": 0.756,
+        "a": 130,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.732,
+        "y": 0.492,
+        "a": -35,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.781,
+        "y": 0.35,
+        "a": -42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.297,
+        "y": 0.629,
+        "a": -130,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.307,
+        "y": 0.219,
+        "a": -135,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.756,
+        "y": 0.234,
+        "a": 60,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.873,
+        "y": 0.592,
+        "a": 120,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.844,
+        "y": 0.689,
+        "a": 140,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.902,
+        "y": 0.775,
+        "a": 135,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.631,
+        "y": 0.475,
+        "a": -5,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.545,
+        "y": 0.381,
+        "a": 0,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

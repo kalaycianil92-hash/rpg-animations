@@ -7,12 +7,12 @@
    "fist": 0.09,
    "items": {
     "main": {
-     "length": 0.42,
+     "length": 0.5,
      "pivot": 0.81,
      "overlay": true
     },
     "off": {
-     "length": 0.42,
+     "length": 0.5,
      "pivot": 0.81,
      "overlay": true
     }
@@ -25,7 +25,7 @@
      "fps": 12,
      "offItem": {
       "kind": "other",
-      "length": 0.42,
+      "length": 0.5,
       "pivot": 0.81,
       "overlay": true
      },
