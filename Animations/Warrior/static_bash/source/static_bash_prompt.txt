@@ -1,0 +1,60 @@
+WARRIOR: STATIC BASH, THE STRIKE (6 key poses, 3 x 2). Written 2026-11-13, v3 (the same day). TWO SWORDS, both arms always together. NO thumb instructions any more.
+
+WHY v3 (the user, 2026-11-13): the v2 run-in sheet ("static_bash_sheet.png": a sprinter's start, two sprint strides, a final stride, two skids) was "not really usable", and the "thumbs up" wording "really confuses ChatGPT". The user's suggestion, which I take: the RUNNING part comes from the Warrior's EXISTING RUN strip (Animations/Warrior/run, five frames, the user's own sword marks: both swords in his hands while he runs) and only the STRIKE is generated. And the hands are described plainly now: closed fists side by side; the swords are drawn over them by the page anyway (the hand marks and the hand overlay), so the exact grip is not worth fighting ChatGPT for.
+
+THE SKILL (the user's text, 2026-11-13): "Slams the target with a lightning-infused sword, dealing Lightning Damage and 40% chance to apply Shocked (increases damage taken by 15% for 1 turn). If the target has Reduce Physical Def, this hit gains a flat +25% Critical Hit Chance." Zero cooldown: nothing special, but different from the Sunder Strike (a standing diagonal cleave) and the Thunderclap Guillotine (an airborne chop). The two statuses are NOT drawn.
+
+THE WHOLE ANIMATION (the page moves him along the path)
+ frames 1-9   RUN (the existing run strip, frames 1 to 5 and then 1 to 4 again), about 75 ms each: he sprints at the target; the swords crackle with lightning and lightning streaks trail behind him (code)
+ frame 10     skid and swing-in     NEW panel 1 (or 2, a little lower)     70 ms   both boots planted, dust, the arms swing forward
+ frame 11     SLAM                  NEW panel 3 (or 4, or 5)               100 ms  both arms out in front; the hit at 40% of it: a discharge of lightning from the contact point, a flash, a heavy shake
+ frame 12     follow-through        NEW panel 6                            130 ms
+ frame 13     recover               the Thunderclap sheet B's recover pose (already cut)  100 ms
+ frame 14     the idle's first frame (pasted in)
+So this sheet only has to bring the STRIKE: two skids, three slam versions and the follow-through; I use one of each.
+
+THE WEAPONS ARE A LAYER (as in every Warrior sheet): his hands are drawn EMPTY, as closed fists, and the two swords are placed afterwards with the hand tool, one in each fist. So the two fists must be exactly where the swords should be: in the skid at belt height in front of his body, in the slam both out in front with the swords pointing along the arms.
+
+HOW TO USE
+- ChatGPT first. Attach ONE small image: Animations/Warrior/static_bash/source/ref_man_standing.png (the man ONLY: his face, hair, armour, proportions, drawing style and SIZE; his standing pose and his fists are NOT to be copied). Ask for a landscape 3:2 image, as large as it will give you. Paste everything between the two lines of equals signs. (Do NOT attach a sheet of poses: ChatGPT copies them.)
+- Generate several, keep the best; as before you can name the files after the panels you want from each. Save them in inbox/ and tell me. If only some panels are bad, ask again for just those poses.
+- WHAT I CHECK: (1) the same man at the same size in all six panels, the bottom row not bigger than the top row; (2) every panel GROUNDED, both boots on the floor line (panel 6 may have the rear heel lifted, the toe stays down); (3) in EVERY panel the two fists are TOGETHER as a pair, side by side; (4) panels 3 and 4: a LEVEL battering swing, both arms straight out in front at chest to belt height, NOT a chop and NOT an overhead swing (that is the Sunder Strike); (5) NO sword, NO shield, NO lightning, NO glow, NO dust, NO motion lines; (6) nothing touches a panel edge; (7) one image, exactly six panels.
+
+Replies if it goes wrong (paste into the SAME chat):
+- It draws a sword, a shield, lightning, dust or speed lines: "Redo it. NO weapon, NO shield, NO effects of any kind: the hands are empty closed fists, and the character is drawn crisp on the flat magenta."
+- It copies the standing pose of the attached image: "Redo it. The attached image is only for the man's face, outfit, size and style. In every panel he is in the pose described in the prompt, not standing."
+- The arms are not a pair: "Redo it. BOTH arms always do the same thing together: in every panel the two fists are side by side, touching or almost touching."
+- A slam panel is a downward chop or an overhead swing: "Redo panels 3, 4 and 5. It is a LEVEL battering swing, not a chop: both arms straight out in front of him at chest to belt height, parallel to the floor, the two fists side by side at the very front. Nothing is above his shoulders."
+- A boot is off the floor or he jumps: "Redo it. This is a grounded attack: in every panel both boots are on the floor line (the floor is not drawn), nothing is in the air."
+- The figure changes size or the bottom row is bigger: "Redo it. The character is exactly the same size as in the attached image in all six panels, the bottom row NOT bigger than the top row. Do not zoom in or out between panels."
+- The outfit or face changes: "Redo it. The character in all panels is the man of the attached image: same armour, hair, face and proportions, nothing redesigned."
+- A part touches a panel edge: "Redo it. The whole character, fists and boots included, is at least 10% of the panel away from every panel edge."
+- Wrong layout: "Redo it. EXACTLY six panels, 3 columns by 2 rows, no lines between them, one flat magenta background."
+
+==============================================================================
+OUTPUT: exactly ONE static image, a sprite sheet, and nothing else. No GIF, no animation, no video, no extra images, no alternate versions.
+
+Create ONE sprite sheet image: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first, then the bottom row. It is the END of a charging attack for a fighter with two swords: after a sprint he skids to a stop swinging his arms forward, slams both swords level into the enemy in front of him, and the swing carries on. Six key poses of a sprite sheet, every panel one still pose, drawn crisp and clean; the motion is in the DIFFERENCE between the panels, never drawn inside one.
+
+CHARACTER: the exact same man as in the ATTACHED image (use it ONLY for his face, hair, tan skin, dark navy segmented plate armor with copper trim, shoulder pauldrons, chest plate, belt, brown leather bracers, dark trousers, navy plated shin guards, black boots, his proportions, his SIZE and the painted game-sprite drawing style with thick dark outlines). Do not redesign anything. No cape. Do NOT copy his standing pose or his fists: every panel is a NEW pose described below.
+
+VIEW: strict side view, the character faces RIGHT in every panel (the enemy is to the right), the head turned a little toward the viewer, as in the attached image. The camera is the same in all six panels.
+
+HANDS: the character holds two swords, one in each hand, but NO SWORD IS DRAWN: both hands are drawn EMPTY, as tight closed fists, held together side by side, touching or almost touching, as if gripping two sword handles. The two hands always stay together as a pair, in every panel.
+
+NO WEAPON, NO SHIELD, NO EFFECTS: no sword, no blade, no handle, no shield, no lightning, no glow, no sparks, no smoke, no dust, no shadows, no speed lines, no motion blur, no afterimages: the game adds all of that later.
+
+SAME SCALE AND FLOOR (very important): draw him at exactly the same size as in the attached image: standing upright he would be about 60% of the panel height (his head, from the top of the hair to the chin, is about 11% of the panel height). Do not zoom in or out between panels. The WHOLE body, both fists and both boots, is visible in every panel, never cropped; at least 10% empty margin on every side. The bottom row must NOT be drawn bigger than the top row. THIS IS A GROUNDED ATTACK: in EVERY panel his boots stand on a floor about 80% down the panel (the floor itself is not drawn), nothing is in the air, the same floor line in every panel.
+
+THE SIX FRAMES (in all of them both fists are together as a pair):
+1. Skid and swing-in. He is braking hard after a sprint: both boots flat on the floor, wide apart, the front (right) knee bent about 80 degrees, the rear (left) leg stretched straight back and sliding, the torso leaning forward about 15 degrees, BOTH arms swinging forward and the two fists together at belt height just in front of his body, the elbows bent about 100 degrees, the head up, the mouth wide open in a shout.
+2. Skid and swing-in, lower. The same, lower and more braced: the front knee bent about 95 degrees, the torso leaning forward about 22 degrees, BOTH fists together at belt height just in front of his body, the elbows bent, the head up.
+3. Slam (the blow lands, level). A braced lunge: the front knee bent about 70 degrees with the boot flat, the rear leg stretched straight back with the boot on the floor, the torso leaning forward about 15 degrees, BOTH arms thrust straight forward at chest height, level with the floor, nearly straight, the two fists side by side at the very front, the head up, the eyes on the enemy, the mouth wide open, all his weight behind the blow.
+4. Slam (a little lower). The same slam, lower: the front knee bent about 80 degrees, the torso leaning forward about 20 degrees, BOTH arms thrust forward and a little down, about 20 degrees below horizontal, the two fists side by side at belt height, the head up, the mouth wide open.
+5. Slam (heavy, down and forward). The same, heavier and steeper: the front knee bent about 90 degrees, the torso leaning forward about 30 degrees, BOTH arms thrust forward and down, about 40 degrees below horizontal, the two fists side by side at hip height out in front of the front knee, the head up, the mouth wide open.
+6. Follow-through. The swing carries on: the weight on the front leg whose knee is bent about 60 degrees, the rear leg stretched back with the heel lifted and the toe on the floor, the torso leaning forward about 20 degrees, BOTH arms swept forward and a little UP, the two fists side by side at shoulder height, the elbows extended, the head up and the eyes on the enemy, the breath heavy.
+
+BACKGROUND AND LAYOUT: one flat pure MAGENTA (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. NO GRID LINES, NO BORDERS and no lines between or around the panels. No text, numbers, labels, dust, motion lines, speed lines, impact stars, sparks, afterimages or any other effects. No magenta or pink on the character himself.
+
+FINAL REMINDER: ONE single static image only. Six equal panels, 3 columns by 2 rows. The same man at the same size as in the attached image in every panel (the bottom row not bigger): NO weapon, NO shield, NO effects, NO cape, and NOT his standing pose. BOTH fists always together as a pair. Every panel GROUNDED, both boots on the same floor line. Panels 3, 4 and 5: a LEVEL (or slightly downward) battering swing, both arms straight out in front, NOT a chop, NOT overhead. At least 10% margin on every side. Flat pure magenta background.
+==============================================================================

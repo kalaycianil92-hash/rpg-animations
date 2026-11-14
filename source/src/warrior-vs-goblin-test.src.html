@@ -418,7 +418,7 @@
     <div class="devbody">
     <div class="fields">
       <label>Scenario <select id="scn"><option value="win">Warrior wins</option><option value="lose">Warrior loses (plays death)</option><option value="combo">Mage combo: Shatter Lance on a Chilled, then on a Frozen target</option><option value="fire">Mage fire combo: Firebolt twice, then Cinderburst detonates the burns</option><option value="fire2">Mage fire combo: Pyroclasm sets 3 Burns, Cinderburst detonates all of them</option><option value="mdodge">Warrior wins, the monster dodges one strike (and he dodges one)</option><option value="mblock">Warrior wins, the monster blocks two strikes and he blocks one (a blocked hit cannot crit, 20% less damage)</option></select></label>
-      <label id="warriorWrap" data-chars="warrior">Warrior's attack <select id="warriorSkill"><option value="alt">Alternate the skills</option><option value="thunder">Thunderclap Guillotine</option><option value="sunder">Sunder Strike</option></select></label>
+      <label id="warriorWrap" data-chars="warrior">Warrior's attack <select id="warriorSkill"><option value="alt">Alternate the skills</option><option value="thunder">Thunderclap Guillotine</option><option value="sunder">Sunder Strike</option><option value="bash">Static Bash</option></select></label>
       <label id="rogueWrap" style="display:none">Rogue's attack <select id="rogueSkill"><option value="alt">Alternate the six skills</option><option value="shroud">Umbral Shroud</option><option value="abyssal">Abyssal Backstab</option><option value="shiv">Shadow Shiv</option><option value="stiletto">Static Stiletto</option><option value="kiss">Winter's Kiss</option><option value="permafrost">Permafrost Execution</option></select></label>
       <label id="rogueDefWrap" style="display:none"><input type="checkbox" id="rogueDef"> The target suffers Reduce Physical Def (Shadow Shiv then always hits critically)</label>
       <label id="rogueShockWrap" style="display:none"><input type="checkbox" id="rogueShock"> Static Stiletto always applies Shocked (otherwise a 25% chance)</label>
@@ -1846,7 +1846,7 @@
       var clk = player.clock;
       var drive = startPath(my, clk);
       if (rogueLike()) { if (rKey === "stiletto") ssFx(FIGHTERS.G, hitF, { myRun: my }); else if (rKey === "kiss") kissFx(FIGHTERS.G, hitF, { myRun: my }); else if (rKey === "permafrost") pfFx(FIGHTERS.G, hitF, { myRun: my, preview: true }); else shivFx(FIGHTERS.G, hitF); }   // (the Shadow Shiv's violet streak, the Static Stiletto's lightning, Winter's Kiss's frost, Permafrost Execution's glacier ice)
-      var skill = !rogueLike() ? (wKey === "sunder" ? startSunder(clk, hitF, FIGHTERS.G) : ($("fxOn").checked ? startSkill(clk, hitF, FIGHTERS.G) : null)) : null;
+      var skill = !rogueLike() ? (wKey === "sunder" ? startSunder(clk, hitF, FIGHTERS.G) : wKey === "bash" ? startBash(clk, hitF, FIGHTERS.G) : ($("fxOn").checked ? startSkill(clk, hitF, FIGHTERS.G) : null)) : null;
       var wait = clkAt(clk, hitF, IN) - performance.now();
       if (wait > 0) await new Promise(function (r) { setTimeout(r, wait); });
       if (my !== run) break;
@@ -2177,9 +2177,9 @@
     fxAdd({ t0: now, t1: now + 1250 / speed, seed: seed, draw: function (ctx, now2) {
       var t = (now2 - now) * speed, rr = rngOf(seed + Math.floor(t / 55) * 131), a;
       var colMs = 260 * (0.7 + 0.3 * s);
-      if (t < colMs) { a = 1 - t / colMs; drawBolt(ctx, boltPts(cx + (rr() - 0.5) * u * 0.25, -10, cx, ty, 0.14, 6, rr, Math.round(9 * (0.4 + 0.6 * s))), F.pal, u * 0.042 * (0.5 + 0.5 * s) * F.w, a * (Math.floor(t / 55) % 2 ? 0.85 : 1) * Math.min(1, F.k)); }
+      if (t < colMs && !F.noColumn) { a = 1 - t / colMs; drawBolt(ctx, boltPts(cx + (rr() - 0.5) * u * 0.25, -10, cx, ty, 0.14, 6, rr, Math.round(9 * (0.4 + 0.6 * s))), F.pal, u * 0.042 * (0.5 + 0.5 * s) * F.w, a * (Math.floor(t / 55) % 2 ? 0.85 : 1) * Math.min(1, F.k)); }
       if (F.paint > 0) {                                                // the painted lightning (toned down): the heavy bolt on the target, the burst and the crackle on the ground
-        if (t < colMs) tcBolt(ctx, fbTex.tc_bolt_heavy, cx, ty, Math.max(ty + 20, u * 1.2), u * 0.55 * (0.7 + 0.3 * s), (1 - t / colMs) * F.paint * 1.2, false);
+        if (t < colMs && !F.noColumn) tcBolt(ctx, fbTex.tc_bolt_heavy, cx, ty, Math.max(ty + 20, u * 1.2), u * 0.55 * (0.7 + 0.3 * s), (1 - t / colMs) * F.paint * 1.2, false);
         if (t < 320) fbTexDraw(ctx, fbTex.tc_burst, cx, ty + r.height * 0.12, 0, u * (0.5 + 0.35 * clamp01(t / 160)) * (0.6 + 0.4 * s), (1 - t / 320) * F.paint * 1.1, 0.5, Math.floor(t / 80) % 2 === 0);
         if (t < 600) fbTexDraw(ctx, fbTex.tc_ground, cx, gy, 0, u * (0.9 + 0.5 * s * clamp01(t / 200)), (1 - t / 600) * F.paint * 1.2, 0.5, Math.floor(t / 110) % 2 === 0);
       }
@@ -4379,6 +4379,7 @@
     if (!plain && A === FIGHTERS.W && curChar === "warrior" && packs.attack && !packs.attack.keyed && warriorKeys().length > 1) {
       wKey = warriorSkillNow(); await useWarriorSkill(wKey); if (myRun !== run) return;
       if (wKey === "sunder") e = Object.assign({}, e, { verb: "cleaves", note: " with Sunder Strike" });
+      if (wKey === "bash") e = Object.assign({}, e, { verb: "slams", note: " with Static Bash (Lightning Damage)" });
     }
     var sign = A.dir;
     var a = centerOf(A.unit), t = centerOf(T.unit);
@@ -4413,7 +4414,7 @@
     }
     var clk = null;
     if (packPlays) { playPose("attack", false, aHolds).then(backToIdle); clk = player.clock; }
-    var skill = (A === FIGHTERS.W && packPlays && !rogueLike()) ? (wKey === "sunder" ? startSunder(clk, hitF, T) : ($("fxOn").checked ? startSkill(clk, hitF, T) : null)) : null;   // the skill rides on the attack pack's clock (the lightning one, or Sunder Strike's physical one)
+    var skill = (A === FIGHTERS.W && packPlays && !rogueLike()) ? (wKey === "sunder" ? startSunder(clk, hitF, T) : wKey === "bash" ? startBash(clk, hitF, T) : ($("fxOn").checked ? startSkill(clk, hitF, T) : null)) : null;   // the skill rides on the attack pack's clock (the lightning one, or Sunder Strike's physical one)
     var viaPath = packPlays && pathOn(), drive = null;
     if (viaPath) drive = startPath(myRun, clk);
     if (keyed) keyPose("attack", 0);
@@ -4896,7 +4897,7 @@
   // Like the Rogue's: every skill has its own folder in Animations/Warrior (all mapped to the attack slot in build.py); the strip of the chosen skill is swapped into the attack slot, with its marks, hit frame, fps,
   // holds and path (all from its placement json), just before it is used. "Warrior's attack" picks one skill or alternates them (Thunderclap Guillotine first). Thunderclap Guillotine: startSkill (lightning).
   // Sunder Strike: startSunder (physical: no lightning). The Warrior's skills are six in all; the user sends them one at a time (docs/WARRIOR_SKILLS.md).
-  var WARRIOR_SKILLS = { thunder: { file: "armored_thunderclap_guillotine_11frame_strip.png" }, sunder: { file: "armored_sunder_strike_8frame_strip.png" } }, WARRIOR_ORDER = ["thunder", "sunder"], wkCount = 0;
+  var WARRIOR_SKILLS = { thunder: { file: "armored_thunderclap_guillotine_11frame_strip.png" }, sunder: { file: "armored_sunder_strike_8frame_strip.png" }, bash: { file: "armored_static_bash_21frame_strip.png" } }, WARRIOR_ORDER = ["thunder", "sunder", "bash"], wkCount = 0;
   function warriorKeys() { return WARRIOR_ORDER.filter(function (k) { return DEFAULT_ANIMS.some(function (d) { return d.file === WARRIOR_SKILLS[k].file; }); }); }   // the skills whose art is in the page
   function warriorKeyChosen() { var v = $("warriorSkill").value, ks = warriorKeys(); return v === "alt" || ks.indexOf(v) < 0 ? ks[0] : v; }   // (the preview: "alternate" shows the first)
   function warriorSkillNow() { var v = $("warriorSkill").value, ks = warriorKeys(); return v === "alt" ? ks[wkCount++ % ks.length] : ks.indexOf(v) >= 0 ? v : ks[0]; }
@@ -4908,6 +4909,41 @@
   // SUNDER STRIKE (2026-11-13): "Delivers a heavy cleave of Physical Damage and 50% chance to Reduce Physical Def (-20% Physical Defense for 1 turn)..." A zero-cooldown skill: it does not have to be special. A grounded
   // two-sword cleave (wind-up, raise, step-in, the blow on frame 4, follow-through): a steel-white crescent from where the blades were overhead down to where they land (the Thunderclap's slashDraw in a physical palette),
   // a flash on the blow, steel sparks, dust along the ground and a short shake. The status (Reduce Physical Def) is NOT drawn: the user will generate and adjust all buffs and debuffs later.
+  // STATIC BASH (2026-11-13): "Slams the target with a lightning-infused sword, dealing Lightning Damage and 40% chance to apply Shocked ...". The user's idea: he RUNS at the target with the lightning-infused swords and
+  // slams them in. The pack is the Warrior's own run strip (frames 1-5 and 1-4 again) plus the skid, the slam, the heavy slam, the recover and the idle (docs/WARRIOR_SKILLS.md): the swords crackle from the first frame
+  // and burn brighter on the way (crackleDraw, glowDraw: the Thunderclap's), jagged streaks trail behind him while he runs (trailDraw), dust is kicked up as he skids, and the blow discharges lightning from the contact
+  // point: the Thunderclap's impact without its sky bolt (impactFx with noColumn: a flash, ground rings, arcs, sparks, the painted burst and crackle at the user's 45%, a heavy shake). No dark screen, no aura: those are
+  // the Thunderclap's. Shocked and the crit bonus are NOT drawn (all buffs and debuffs come later).
+  function startBash(clk, hitF, T) {
+    // The frames (the user's plan, 2026-11-14, from hitF = the slam): idle infusion (1 .. runF - 1), the run at full speed (runF .. skidF - 1), the skid (skidF), the swords RAISED (hitF - 1), the slam (hitF).
+    var F = Object.assign({}, fxParams(), { noColumn: true, dark: 0, aura: 0 }), at = function (f, fr) { return clkAt(clk, f, fr); }, tImpact = at(hitF, 0.4);
+    var skidF = Math.max(2, hitF - 2), runF = Math.max(2, hitF - 11), t1 = at(1), tRun = at(runF), tSkid = at(skidF);
+    var charge = function (now) {                                                    // how charged the swords are, 0..1: the infusion builds up while he stands in the idle, stays full while he runs, and
+      if (now < tRun) return 0.12 + 0.48 * clamp01((now - t1) / Math.max(1, tRun - t1));                              // intensifies a little during the skid and while the swords are raised
+      if (now < tSkid) return 0.6;
+      return 0.6 + 0.32 * clamp01((now - tSkid) / Math.max(1, tImpact - tSkid));
+    };
+    fxAdd({ t0: t1, t1: tImpact + 80, draw: function (ctx, now) { crackleDraw(ctx, now, F, charge(now)); } });          // the swords crackle from the first frame
+    fxAdd({ t0: at(Math.min(3, runF)), t1: tImpact + 520, draw: function (ctx, now) {                                  // the blades burn white-hot: faintly in the infusion, steady in the run, brighter in the skid and the raise
+      var g = now < tImpact ? (now < tRun ? 0.3 * clamp01((now - at(Math.min(3, runF))) / Math.max(1, tRun - at(Math.min(3, runF)))) : now < tSkid ? 0.3 : 0.3 + 0.7 * clamp01((now - tSkid) / Math.max(1, tImpact - tSkid))) : clamp01(1 - (now - tImpact) / 500);
+      glowDraw(ctx, g, F);
+    } });
+    bashDust(at(skidF, 0.05));                                                       // dust behind his boots as he skids (no lightning trail: the user took it out)
+    return { impact: function () { impactFx(T, F); } };
+  }
+  function bashDust(t0) {                                                            // dust kicked up behind his boots as he skids to a stop (soft grey-brown ellipses that grow, drift back and fade)
+    var u = uW.offsetWidth, rnd = rngOf((t0 | 0) + 5), puffs = [], i;
+    for (i = 0; i < 9; i++) puffs.push({ dx: -u * (0.05 + rnd() * 0.5), w: u * (0.1 + rnd() * 0.13), rise: u * (0.04 + rnd() * 0.16), d: rnd() * 120 });
+    fxAdd({ t0: t0, t1: t0 + 800 / speed, draw: function (ctx, now) {
+      var L = this, t = (now - t0) * speed;
+      if (!L.p) { var r = rectIn(uW); L.p = { x: r.left + r.width * 0.34, gy: r.top + r.height * 470 / 512 }; }
+      puffs.forEach(function (pf) {
+        var k = clamp01((t - pf.d) / 620); if (k <= 0 || k >= 1) return;
+        ctx.fillStyle = "rgba(172,152,122," + 0.34 * (1 - k) + ")";
+        ctx.beginPath(); ctx.ellipse(L.p.x + pf.dx * (0.4 + k), L.p.gy - pf.rise * k, pf.w * (0.5 + k), pf.w * 0.4 * (0.5 + k), 0, 0, 6.2832); ctx.fill();
+      });
+    } });
+  }
   var SUNDER = { shake: 10, pal: { core: "255,255,255", mid: "226,233,244", glow: "172,188,212", flash: "255,248,236" } };
   function startSunder(clk, hitF, T) {
     var at = function (f, fr) { return clkAt(clk, f, fr); }, tImpact = at(hitF, 0.4), F = { pal: SUNDER.pal, w: 1, k: 1, paint: 0, dark: 0 };

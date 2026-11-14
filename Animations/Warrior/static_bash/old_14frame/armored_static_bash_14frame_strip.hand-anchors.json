@@ -1,0 +1,268 @@
+{
+ "format": "hand-anchors/3",
+ "characters": [
+  {
+   "name": "Warrior",
+   "fist": 0.09,
+   "items": {
+    "main": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    },
+    "off": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    }
+   },
+   "animations": [
+    {
+     "name": "armored_static_bash_14frame",
+     "frames": 14,
+     "columns": 14,
+     "fps": 14,
+     "offItem": {
+      "length": 0.5,
+      "pivot": 0.81,
+      "overlay": true,
+      "picture": "sword",
+      "kind": "other"
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.781,
+        "y": 0.336,
+        "a": -63,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.758,
+        "y": 0.484,
+        "a": 27,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.708,
+        "y": 0.461,
+        "a": 27,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.726,
+        "y": 0.276,
+        "a": -72,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.716,
+        "y": 0.463,
+        "a": 24,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.781,
+        "y": 0.336,
+        "a": -63,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.758,
+        "y": 0.484,
+        "a": 27,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.708,
+        "y": 0.461,
+        "a": 27,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.726,
+        "y": 0.276,
+        "a": -72,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.816,
+        "y": 0.621,
+        "a": 65,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.963,
+        "y": 0.561,
+        "a": 105,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.938,
+        "y": 0.684,
+        "a": 130,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.732,
+        "y": 0.492,
+        "a": -35,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.781,
+        "y": 0.35,
+        "a": -42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.368,
+        "y": 0.499,
+        "a": 93,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.526,
+        "y": 0.474,
+        "a": 36,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.433,
+        "y": 0.455,
+        "a": 57,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.254,
+        "y": 0.444,
+        "a": 114,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.434,
+        "y": 0.456,
+        "a": 63,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.368,
+        "y": 0.499,
+        "a": 93,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.526,
+        "y": 0.474,
+        "a": 36,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.433,
+        "y": 0.455,
+        "a": 57,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.254,
+        "y": 0.444,
+        "a": 114,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.768,
+        "y": 0.629,
+        "a": 75,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.932,
+        "y": 0.576,
+        "a": 110,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.904,
+        "y": 0.703,
+        "a": 135,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.631,
+        "y": 0.475,
+        "a": -5,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.545,
+        "y": 0.381,
+        "a": 0,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}
