@@ -1,0 +1,172 @@
+{
+ "format": "hand-anchors/3",
+ "characters": [
+  {
+   "name": "Warrior",
+   "fist": 0.09,
+   "items": {
+    "main": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    },
+    "off": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    }
+   },
+   "animations": [
+    {
+     "name": "armored_glacial_blade_8frame",
+     "frames": 8,
+     "columns": 8,
+     "fps": 14,
+     "offItem": {
+      "length": 0.5,
+      "pivot": 0.81,
+      "overlay": true,
+      "picture": "sword",
+      "kind": "other"
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.629,
+        "y": 0.58,
+        "a": 76,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.629,
+        "y": 0.58,
+        "a": 78,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.66,
+        "y": 0.576,
+        "a": 80,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.902,
+        "y": 0.562,
+        "a": 90,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.971,
+        "y": 0.453,
+        "a": 58,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.629,
+        "y": 0.58,
+        "a": 72,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.732,
+        "y": 0.492,
+        "a": -35,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.781,
+        "y": 0.35,
+        "a": -42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.586,
+        "y": 0.592,
+        "a": 82,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.586,
+        "y": 0.592,
+        "a": 84,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.629,
+        "y": 0.586,
+        "a": 86,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.879,
+        "y": 0.566,
+        "a": 92,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.945,
+        "y": 0.459,
+        "a": 62,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.586,
+        "y": 0.592,
+        "a": 78,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.631,
+        "y": 0.475,
+        "a": -5,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.545,
+        "y": 0.381,
+        "a": 0,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

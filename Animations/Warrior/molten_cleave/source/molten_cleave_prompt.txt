@@ -1,0 +1,62 @@
+WARRIOR: MOLTEN CLEAVE (6 key poses, 3 x 2): A RISING SWEEP. Written 2026-11-20. TWO SWORDS, both arms always together, plain "closed fists side by side" hands (no thumb instructions), ONE small reference picture.
+
+THE SKILL (the user's text, 2026-11-20): "Sweeps an overheated blade across the enemy, dealing moderate Fire Damage and 40% chance to apply Burn. If the target is Shocked, consumes the shock to overload: +50% bonus damage and extends the Burn duration by 1 turn. CD 1." (Burn, Shocked and the overload are NOT drawn: all buffs and debuffs come later. The cooldown is the engine's business.)
+
+THE LOOK (my design, to differ from the other three Warrior skills): the Thunderclap Guillotine is airborne (a vertical chop from above), the Sunder Strike a diagonal cleave DOWN from over the shoulder, the Static Bash a run-in with a LEVEL slam forward. Molten Cleave is a RISING SWEEP, low to high: he crouches with both swords dragging along the ground behind him (the page draws the blades glowing red-hot and showering sparks and embers on the floor), explodes forward and SWEEPS both blades up in a big arc through the enemy, from the ground behind him up past chest height to over his head, trailing fire. A "sweep" = one long arc: that is why the six poses go from LOW to HIGH. Everything is GROUNDED.
+
+WHAT I BUILD FROM THIS SHEET (about 8 frames at 14 fps, about 0.9 s, then the page slides him home)
+ frame 1 = panel 1  low wind-up, the swords drag behind him   250 ms   (the blades heat up, sparks fly: code)
+ frame 2 = panel 2  the sweep begins                            60 ms   (he steps in)
+ frame 3 = panel 3  level: the blow lands                       90 ms   the hit at 40% of it: a flash, a burst of flame and embers, a short shake
+ frame 4 = panel 4  rising                                      70 ms
+ frame 5 = panel 5  high                                        70 ms
+ frame 6 = panel 6  the top of the arc                         130 ms
+ frame 7 = the recover pose of the Thunderclap sheet B (already cut)  100 ms
+ frame 8 = the idle's first frame (pasted in)
+So this sheet only has to bring the six poses of the sweep; all six are used, in this order.
+
+THE WEAPONS ARE A LAYER (as in every Warrior sheet): his hands are drawn EMPTY, as closed fists, and the two swords are placed afterwards with the hand tool, one in each fist. So the two fists must be exactly where the swords should be: low behind his rear leg in panel 1, passing in front of him in panels 2 and 3, then rising to over his head in panels 4 to 6.
+
+HOW TO USE
+- ChatGPT first. Attach ONE small image: Animations/Warrior/static_bash/source/ref_man_standing.png (the man ONLY: his face, hair, armour, proportions, drawing style and SIZE; his standing pose and his fists are NOT to be copied). Ask for a landscape 3:2 image, as large as it will give you. Paste everything between the two lines of equals signs. (Do NOT attach a sheet of poses: ChatGPT copies them.)
+- Generate several, keep the best; as before you can name the files after the panels you want from each. Save them in inbox/ and tell me. If only some panels are bad, ask again for just those poses.
+- WHAT I CHECK: (1) the same man at the same size in all six panels, the bottom row not bigger than the top row; (2) every panel GROUNDED, both boots on the floor line (panel 2 may have the rear heel lifted and panel 6 too, the toes stay down); (3) in EVERY panel the two fists are TOGETHER as a pair, side by side; (4) THE ARC: the fists go from low behind him (1) to hip height in front (2) to chest height (3) to shoulder height (4) to head height (5) to above his head (6): each panel clearly higher than the one before; (5) NO sword, NO shield, NO fire, NO lightning, NO glow, NO dust, NO motion lines; (6) nothing touches a panel edge; (7) one image, exactly six panels.
+
+Replies if it goes wrong (paste into the SAME chat):
+- It draws a sword, a shield, fire, lightning, dust or speed lines: "Redo it. NO weapon, NO shield, NO effects of any kind: the hands are empty closed fists, and the character is drawn crisp on the flat magenta."
+- It copies the standing pose of the attached image: "Redo it. The attached image is only for the man's face, outfit, size and style. In every panel he is in the pose described in the prompt, not standing."
+- The arms are not a pair: "Redo it. BOTH arms always do the same thing together: in every panel the two fists are side by side, touching or almost touching."
+- The arc is not clear (panels look alike): "Redo it. The fists climb in six clear steps: panel 1 low behind his rear leg at knee height, panel 2 hip height in front, panel 3 chest height, panel 4 shoulder height, panel 5 head height, panel 6 above his head."
+- A boot is off the floor or he jumps: "Redo it. This is a grounded attack: in every panel the boots are on the floor line (the floor is not drawn), nothing is in the air."
+- The figure changes size or the bottom row is bigger: "Redo it. The character is exactly the same size as in the attached image in all six panels, the bottom row NOT bigger than the top row. Do not zoom in or out between panels."
+- The outfit or face changes: "Redo it. The character in all panels is the man of the attached image: same armour, hair, face and proportions, nothing redesigned."
+- A part touches a panel edge: "Redo it. The whole character, fists and boots included, is at least 10% of the panel away from every panel edge."
+- Wrong layout: "Redo it. EXACTLY six panels, 3 columns by 2 rows, no lines between them, one flat magenta background."
+
+==============================================================================
+OUTPUT: exactly ONE static image, a sprite sheet, and nothing else. No GIF, no animation, no video, no extra images, no alternate versions.
+
+Create ONE sprite sheet image: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first, then the bottom row. It is a "rising sweep" for a fighter with two swords: he starts in a deep crouch with both swords trailing low behind him, charges forward and swings both swords up in one long arc from the ground behind him to high above his head. Six key poses of a sprite sheet, every panel one still pose, drawn crisp and clean; the motion is in the DIFFERENCE between the panels, never drawn inside one.
+
+CHARACTER: the exact same man as in the ATTACHED image (use it ONLY for his face, hair, tan skin, dark navy segmented plate armor with copper trim, shoulder pauldrons, chest plate, belt, brown leather bracers, dark trousers, navy plated shin guards, black boots, his proportions, his SIZE and the painted game-sprite drawing style with thick dark outlines). Do not redesign anything. No cape. Do NOT copy his standing pose or his fists: every panel is a NEW pose described below.
+
+VIEW: strict side view, the character faces RIGHT in every panel (the enemy is to the right), the head turned a little toward the viewer, as in the attached image. The camera is the same in all six panels.
+
+HANDS: the character holds two swords, one in each hand, but NO SWORD IS DRAWN: both hands are drawn EMPTY, as tight closed fists, held together side by side, touching or almost touching, as if gripping two sword handles. The two hands always stay together as a pair, in every panel.
+
+NO WEAPON, NO SHIELD, NO EFFECTS: no sword, no blade, no handle, no shield, no fire, no flames, no lightning, no glow, no sparks, no smoke, no dust, no shadows, no speed lines, no motion blur, no afterimages: the game adds all of that later.
+
+SAME SCALE AND FLOOR (very important): draw him at exactly the same size as in the attached image: standing upright he would be about 60% of the panel height (his head, from the top of the hair to the chin, is about 11% of the panel height). Do not zoom in or out between panels. The WHOLE body, both fists and both boots, is visible in every panel, never cropped; at least 10% empty margin on every side. The bottom row must NOT be drawn bigger than the top row. THIS IS A GROUNDED ATTACK: in EVERY panel his boots stand on a floor about 80% down the panel (the floor itself is not drawn), nothing is in the air, the same floor line in every panel.
+
+THE SIX FRAMES (in all of them both fists are together as a pair; the fists CLIMB panel by panel):
+1. Low wind-up. A deep, wide crouch: the front (right) knee bent about 80 degrees with the boot flat, the rear (left) leg stretched back, the torso leaning forward about 30 degrees, the head up and the eyes locked on the enemy, a fierce, focused face; BOTH arms hang straight down and BACK behind his rear hip, the two fists together at KNEE height behind his rear leg (the swords would drag low behind him along the ground).
+2. The sweep begins. He explodes forward: the front boot lands in a long step with the knee bent about 70 degrees, the rear leg stretched back with the heel lifted and the toe on the floor, the torso leaning forward about 20 degrees, BOTH arms swinging forward and up from behind, nearly straight, the two fists together at HIP height just ahead of his front thigh, the mouth opening in a shout.
+3. Level: the blow lands. A braced lunge: the front knee bent about 60 degrees, the rear leg stretched back, the torso leaning forward about 15 degrees, BOTH arms thrust forward, nearly straight, the two fists together at CHEST height at the very front, level with the floor, the head up, the mouth wide open, all his weight behind the blow.
+4. Rising. The arc climbs: the torso straightening to about 10 degrees forward, the front knee bent about 50 degrees, BOTH arms swept forward and up, about 25 degrees above horizontal, the two fists together at SHOULDER height out in front, the head up.
+5. High. The arc keeps climbing: the torso almost upright, the front knee straightening to about 30 degrees of bend, the rear heel lifted, BOTH arms swept up and forward, about 60 degrees above horizontal, the two fists together at HEAD height just ahead of his face, the arms nearly straight, the mouth set.
+6. The top of the arc. The sweep ends high: the weight on the front leg, the rear heel lifted and the toe on the floor, the torso arched back about 10 degrees, BOTH arms straight up and a little back, the two fists together ABOVE and slightly behind his head, the head tilted up, the breath heavy.
+
+BACKGROUND AND LAYOUT: one flat pure MAGENTA (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. NO GRID LINES, NO BORDERS and no lines between or around the panels. No text, numbers, labels, dust, motion lines, speed lines, impact stars, sparks, afterimages or any other effects. No magenta or pink on the character himself.
+
+FINAL REMINDER: ONE single static image only. Six equal panels, 3 columns by 2 rows. The same man at the same size as in the attached image in every panel (the bottom row not bigger): NO weapon, NO shield, NO effects, NO cape, and NOT his standing pose. BOTH fists always together as a pair. Every panel GROUNDED. The fists CLIMB in six clear steps: knee height behind him (1), hip height in front (2), chest height (3), shoulder height (4), head height (5), above his head (6). At least 10% margin on every side. Flat pure magenta background.
+==============================================================================

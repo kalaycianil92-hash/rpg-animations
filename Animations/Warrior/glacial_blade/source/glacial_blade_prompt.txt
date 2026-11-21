@@ -1,0 +1,64 @@
+WARRIOR: GLACIAL BLADE (6 key poses, 3 x 2): A LOW THRUSTING LUNGE, "the frost ram". Written 2026-11-20. TWO SWORDS, both arms always together, plain "closed fists side by side" hands (no thumb instructions), ONE small reference picture.
+
+THE SKILL (the user's text, 2026-11-20): "Bashes the enemy with a frost-forged blade, dealing moderate Ice Damage and 40% chance to apply Chilled. If the target already has Reduce Physical Def, pushes the enemy's action bar back by 25%. CD 1." (Chilled and the action-bar push-back are NOT drawn: all buffs and debuffs come later. The cooldown is the engine's business.) The user left the design to me ("it is hard to create distinct animations for warrior skills, I am okay how you prefer to design it").
+
+THE LOOK (my design, to differ from the four Warrior skills before it): Thunderclap Guillotine = AIRBORNE, a chop from above. Sunder Strike = a diagonal cleave DOWN from over the shoulder. Static Bash = a run-in, a skid and a slam from over the head. Molten Cleave = a tall RISING sweep, low to high. Glacial Blade is the one skill that is a THRUST: nothing swings, nothing goes over his head. He sets himself in a low fencer's stance with both fists drawn back at his hip (the page frosts the blades over while he winds up), sinks, then drives forward in a deep LOW lunge, both blades pointing straight at the enemy like a battering ram, and rams them in at belly height ("bashes"), heaving up a little as he follows through. The silhouette is a long LOW HORIZONTAL line; every other skill is tall or diagonal. Everything is GROUNDED.
+
+WHAT I BUILD FROM THIS SHEET (about 8 frames at 14 fps, about 0.95 s, then the page slides him home)
+ frame 1 = panel 1  the coil: wide low stance, fists at the hip   280 ms   (frost forms on the blades, cold mist, frost on the floor: code)
+ frame 2 = panel 2  the load: sunk, fists at the rear hip         110 ms
+ frame 3 = panel 3  the drive: he explodes forward                 60 ms   (a streak of ice dust)
+ frame 4 = panel 4  THE BASH: full lunge, arms fully extended      100 ms   the hit at 40% of it: an ice-shard burst, a frost ring, crystals at the target's feet, a short heavy shake
+ frame 5 = panel 5  the shove: still driving, arms heaving up      130 ms
+ frame 6 = panel 6  the withdrawal: weight back, fists drawn in    100 ms
+ frame 7 = the recover pose of the Thunderclap sheet B (already cut)  100 ms
+ frame 8 = the idle's first frame (pasted in)
+So this sheet only has to bring the six poses; all six are used, in this order.
+
+THE WEAPONS ARE A LAYER (as in every Warrior sheet): his hands are drawn EMPTY, as closed fists, and the two swords are placed afterwards with the hand tool, one in each fist, pointing along the line of the arms. So the two fists must be exactly where the swords should be: at the hip in panels 1 to 3, thrust straight out in front of him in panels 4 and 5, drawn back in panel 6.
+
+HOW TO USE
+- ChatGPT first. Attach ONE small image: Animations/Warrior/static_bash/source/ref_man_standing.png (the man ONLY: his face, hair, armour, proportions, drawing style and SIZE; his standing pose and his fists are NOT to be copied). Ask for a landscape 3:2 image, as large as it will give you. Paste everything between the two lines of equals signs. (Do NOT attach a sheet of poses: ChatGPT copies them.)
+- Generate several, keep the best; as before you can name the files after the panels you want from each. Save them in inbox/ and tell me. If only some panels are bad, ask again for just those poses.
+- WHAT I CHECK: (1) the same man at the same size in all six panels, the bottom row not bigger than the top row; (2) every panel GROUNDED, both boots on the floor line (the rear heel may be lifted in panels 3 to 5, the toe stays down); (3) in EVERY panel the two fists are TOGETHER as a pair, side by side; (4) THE THRUST: the fists are folded in at the hip in panels 1, 2, 3 and 6 and FULLY EXTENDED straight out in front of him in panels 4 and 5, panel 5 a little higher than panel 4; (5) THE LEAN: upright and leaning a little BACK in 1 and 2, then forward more and more: 25 degrees (3), 35 degrees (4), 45 degrees (5), back up to 15 degrees (6); (6) NO sword, NO shield, NO fire, NO ice, NO lightning, NO glow, NO dust, NO motion lines; (7) nothing touches a panel edge; (8) one image, exactly six panels.
+
+Replies if it goes wrong (paste into the SAME chat):
+- It draws a sword, a shield, ice, fire, lightning, dust or speed lines: "Redo it. NO weapon, NO shield, NO effects of any kind: the hands are empty closed fists, and the character is drawn crisp on the flat magenta."
+- It copies the standing pose of the attached image: "Redo it. The attached image is only for the man's face, outfit, size and style. In every panel he is in the pose described in the prompt, not standing."
+- The arms are not a pair: "Redo it. BOTH arms always do the same thing together: in every panel the two fists are side by side, touching or almost touching."
+- Panels 4 and 5 are not extended (the arms stay bent): "Redo it. In panels 4 and 5 BOTH arms are fully straightened and thrust straight out in front of him, like pushing a battering ram, the two fists together at the end of the straight arms."
+- Panels 1 to 3 look the same: "Redo it. The fists start at his hip beside the belt (panel 1), go back behind the belt as he sinks (panel 2) and come forward to just ahead of the belt as he starts to lunge (panel 3). The torso leans back a little in 1 and 2 and forward in 3."
+- Panels 4 and 5 look the same: "Redo it. In panel 4 the arms are level with the floor at belly height; in panel 5 he is lower and further forward and the arms point UP about 30 degrees, the fists at chest height."
+- A boot is off the floor or he jumps: "Redo it. This is a grounded attack: in every panel the boots are on the floor line (the floor is not drawn), nothing is in the air."
+- The figure changes size or the bottom row is bigger: "Redo it. The character is exactly the same size as in the attached image in all six panels, the bottom row NOT bigger than the top row. Do not zoom in or out between panels."
+- The outfit or face changes: "Redo it. The character in all panels is the man of the attached image: same armour, hair, face and proportions, nothing redesigned."
+- A part touches a panel edge: "Redo it. The whole character, fists and boots included, is at least 10% of the panel away from every panel edge."
+- Wrong layout: "Redo it. EXACTLY six panels, 3 columns by 2 rows, no lines between them, one flat magenta background."
+
+==============================================================================
+OUTPUT: exactly ONE static image, a sprite sheet, and nothing else. No GIF, no animation, no video, no extra images, no alternate versions.
+
+Create ONE sprite sheet image: a grid of 3 columns x 2 rows, six equal square panels, read left to right, top row first, then the bottom row. It is a "lunging thrust" for a fighter with two swords: he starts in a low fencer's stance with both swords held back at his hip, sinks, then drives forward in a deep lunge and thrusts both swords straight out in front of him like a battering ram, heaves up a little and pulls back. Six key poses of a sprite sheet, every panel one still pose, drawn crisp and clean; the motion is in the DIFFERENCE between the panels, never drawn inside one.
+
+CHARACTER: the exact same man as in the ATTACHED image (use it ONLY for his face, hair, tan skin, dark navy segmented plate armor with copper trim, shoulder pauldrons, chest plate, belt, brown leather bracers, dark trousers, navy plated shin guards, black boots, his proportions, his SIZE and the painted game-sprite drawing style with thick dark outlines). Do not redesign anything. No cape. Do NOT copy his standing pose or his fists: every panel is a NEW pose described below.
+
+VIEW: strict side view, the character faces RIGHT in every panel (the enemy is to the right), the head turned a little toward the viewer, as in the attached image. The camera is the same in all six panels.
+
+HANDS: the character holds two swords, one in each hand, but NO SWORD IS DRAWN: both hands are drawn EMPTY, as tight closed fists, held together side by side, touching or almost touching, as if gripping two sword handles. The two hands always stay together as a pair, in every panel.
+
+NO WEAPON, NO SHIELD, NO EFFECTS: no sword, no blade, no handle, no shield, no fire, no flames, no ice, no frost, no lightning, no glow, no sparks, no smoke, no mist, no dust, no shadows, no speed lines, no motion blur, no afterimages: the game adds all of that later.
+
+SAME SCALE AND FLOOR (very important): draw him at exactly the same size as in the attached image: standing upright he would be about 60% of the panel height (his head, from the top of the hair to the chin, is about 11% of the panel height). Do not zoom in or out between panels. The WHOLE body, both fists and both boots, is visible in every panel, never cropped; at least 10% empty margin on every side. The bottom row must NOT be drawn bigger than the top row. THIS IS A GROUNDED ATTACK: in EVERY panel his boots stand on a floor about 80% down the panel (the floor itself is not drawn), nothing is in the air, the same floor line in every panel.
+
+THE SIX FRAMES (in all of them both fists are together as a pair; the fists start folded in at the hip, then thrust straight out, then are drawn back):
+1. The coil. A wide, low fencer's stance: both knees bent about 45 degrees, the front (right) boot ahead with the foot flat, the rear (left) boot well behind it, the torso upright, leaning back about 5 degrees, the head level and the eyes locked on the enemy, a cold, focused face. BOTH elbows are bent and pulled back so the two fists sit together at HIP height right beside his belt buckle, as if drawing back a spear.
+2. The load. He sinks and gathers himself: both knees bent about 70 degrees, the weight on the rear (left) leg, the torso leaning back about 10 degrees, the chin tucked, BOTH elbows pulled back as far as they go so the two fists sit together just BEHIND his belt at his rear hip, the elbows pointing back.
+3. The drive. He explodes forward off the rear leg: the front boot lands in a long step with the knee bent about 70 degrees, the rear leg stretched out behind him with the heel lifted and the toe on the floor, the torso leaning forward about 25 degrees, the mouth opening in a shout, BOTH arms bent about 90 degrees with the elbows back and the two fists together at WAIST height just ahead of his belt.
+4. The bash. A full, deep lunge: the front knee bent about 85 degrees with the thigh level with the floor and the shin upright, the rear leg stretched straight back with the heel lifted and the toe on the floor, the torso leaning forward about 35 degrees so his shoulders are over his front knee, BOTH arms thrust straight out in front of him, fully extended and level with the floor, the two fists together at BELLY height, the head forward between his shoulders, the mouth wide open in a roar.
+5. The shove. He keeps driving: the torso lower and further forward, about 45 degrees, the front knee bent about 100 degrees, the rear heel lifted high with the toe on the floor, BOTH arms still fully extended but now angled UP about 30 degrees above horizontal, the two fists together at CHEST height, further forward than in the last panel, as if heaving something up and away, the head down, the teeth gritted.
+6. The withdrawal. The weight shifts back onto the rear leg, the torso rising to about 15 degrees forward, both knees bent about 60 degrees, BOTH arms pulled back with the elbows bent about 90 degrees, the two fists together at BELT height in front of his stomach, the head up, breathing hard.
+
+BACKGROUND AND LAYOUT: one flat pure MAGENTA (#FF00FF) background filling the whole image, identical in every pixel. No gradient, floor, ground line, cast shadow, glow or vignette. NO GRID LINES, NO BORDERS and no lines between or around the panels. No text, numbers, labels, dust, motion lines, speed lines, impact stars, sparks, afterimages or any other effects. No magenta or pink on the character himself.
+
+FINAL REMINDER: ONE single static image only. Six equal panels, 3 columns by 2 rows. The same man at the same size as in the attached image in every panel (the bottom row not bigger): NO weapon, NO shield, NO effects, NO cape, and NOT his standing pose. BOTH fists always together as a pair. Every panel GROUNDED. The fists are folded in at the hip in panels 1, 2, 3 and 6 and FULLY EXTENDED straight out in front of him in panels 4 (belly height, level) and 5 (chest height, angled up). The lean grows: back 5 (1), back 10 (2), forward 25 (3), forward 35 (4), forward 45 (5), forward 15 (6). At least 10% margin on every side. Flat pure magenta background.
+==============================================================================

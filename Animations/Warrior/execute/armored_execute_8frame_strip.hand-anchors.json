@@ -1,0 +1,172 @@
+{
+ "format": "hand-anchors/3",
+ "characters": [
+  {
+   "name": "Warrior",
+   "fist": 0.09,
+   "items": {
+    "main": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    },
+    "off": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    }
+   },
+   "animations": [
+    {
+     "name": "armored_execute_8frame",
+     "frames": 8,
+     "columns": 8,
+     "fps": 14,
+     "offItem": {
+      "length": 0.5,
+      "pivot": 0.81,
+      "overlay": true,
+      "picture": "sword",
+      "kind": "other"
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.672,
+        "y": 0.484,
+        "a": 180,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.41,
+        "y": 0.312,
+        "a": 108,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.836,
+        "y": 0.383,
+        "a": 105,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.934,
+        "y": 0.568,
+        "a": 101,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.674,
+        "y": 0.52,
+        "a": 120,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.66,
+        "y": 0.602,
+        "a": 134,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.732,
+        "y": 0.492,
+        "a": -35,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.781,
+        "y": 0.35,
+        "a": -42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.637,
+        "y": 0.492,
+        "a": 180,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.375,
+        "y": 0.324,
+        "a": 115,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.809,
+        "y": 0.395,
+        "a": 112,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.91,
+        "y": 0.574,
+        "a": 104,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.645,
+        "y": 0.531,
+        "a": 125,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.629,
+        "y": 0.609,
+        "a": 140,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.631,
+        "y": 0.475,
+        "a": -5,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.545,
+        "y": 0.381,
+        "a": 0,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}
