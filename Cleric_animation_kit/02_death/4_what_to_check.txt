@@ -1,0 +1,13 @@
+CLERIC DEATH: what to do and what to check
+
+1. Start a NEW chat in Gemini or ChatGPT (ChatGPT usually keeps sizes better).
+2. Attach 1_attach_this_FIRST.png (the pose strip: poses only) FIRST and 2_attach_this_SECOND.png (the Cleric) SECOND. The order matters. Ask for a 3:2 image.
+3. Paste the whole text of 3_paste_this_prompt.txt.
+4. Generate 2 or 3 and keep the best. If the generator says it is out of image capacity, wait; do not shorten the prompt.
+5. Save the sheet as inbox/cleric_death_sheet.png and tell me. I cut it into a strip, check it against his idle, and put it in the test page.
+
+What to look at: (1) the same man and outfit in all six panels, also when he is falling and lying (emerald hair, pointed ear, plate armour, tabard, boots, no bandages, no helmet); (2) the poses follow the strip: 1 and 2 standing, 3 and 4 falling, 5 landing with the legs up, 6 lying flat; (3) the SAME SIZE in every panel: the lessons of the mage's and the Rogue's death sheets were that close-up faces in panels 1 and 2 come out too big and the falling panels too big; the prompt asks for the head size as a share of the panel and for the floor lower; measure the face and the boots in the cut (`--scale-mult`); (4) nothing is cropped and nothing touches a panel edge (the armoured body is wide when he lies); (5) no weapon, bare empty fists; (6) one image only.
+
+If the result copies the old outfit (bare chest, bandages, bare feet), reply in the same chat: "Redo it. The character in all panels must be the elven man from the second image, wearing his silver-steel plate armour with the big pauldrons, his cream tabard with the gold cross, his dark-brown belt, trousers and boots with the steel knee plates and greaves. Do not copy any clothing from the first image."
+
+If ONE thing is wrong tell me which; I will give you a one-line fix, or I join the good frames of several sheets.

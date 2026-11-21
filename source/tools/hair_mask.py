@@ -40,6 +40,10 @@ def warrior_skin(r, g, b, h, s, v):                                # his tan-bro
     return (h >= 10) & (h <= 30) & (s >= 0.35) & (s <= 0.8) & (v >= 0.35)
 
 
+def cleric_skin(r, g, b, h, s, v):                                 # the Cleric's light tan skin (hue about 31; the cream tabard and the gold trim are hue 40 and up, the brown leather is dark (v < 0.5), the steel has low saturation)
+    return (h >= 14) & (h <= 38) & (s >= 0.25) & (s <= 0.70) & (v >= 0.55) & (r > g + 15)
+
+
 # hue = windows in degrees (a window may wrap through 0: give (322, 360) and (0, 14)); sat / val = (min, max).
 # "strict" finds the hair's body (bright enough that the dark outlines and shading, which would join the hair to look-alikes like a scarf, are not part of it; it is eroded by `erode` px so
 # thin bridges break); "loose" is what may be added back round it (the dark shading and the outline-side pixels of the same hair, `grow` px at most, never through a neighbouring blob).
@@ -47,6 +51,8 @@ PROFILES = {
     "rogue": dict(hue=[(322, 360), (0, 14)], skin=rogue_skin, strict=dict(sat=0.38, val=0.28), loose=dict(sat=0.22, val=0.03), erode=1, grow=8, near=30, reach=None, block=350, chin=6, chain=0, chain_face=0, chain_thick=0),
     "spellblade": dict(hue=[(0, 26)], skin=spellblade_skin, strict=dict(sat=0.5, val=0.35), loose=dict(sat=0.3, val=0.08), erode=1, grow=8, near=30, reach=None, block=350, chin=6, chain=0, chain_face=0, chain_thick=0),
     "mage": dict(hue=[(26, 62), (19, 26, 0.45, 0.78)], skin=mage_skin, strict=dict(sat=0.28, val=0.35), loose=dict(sat=0.22, val=0.30), erode=0, grow=4, near=30, reach=-3, block=350, chin=None, chain=12, chain_face=260, chain_thick=4.5),
+    # the Cleric (2026-11-21): emerald-green hair (hue about 140 to 155, #1E9B5A with shadows #0F6A3C and highlights #5FD08C), a colour nothing else on him shares (the hair-mask rule); the eyebrows are green too but are separate blobs
+    "cleric": dict(hue=[(95, 175)], skin=cleric_skin, strict=dict(sat=0.28, val=0.14), loose=dict(sat=0.22, val=0.06), erode=0, grow=3, near=30, reach=None, block=10**9, chin=None, chain=14, chain_face=400, chain_thick=0),   # (block 10**9: no look-alike to keep out, so the strands of the hair, which the outlines split into big blobs, must not block each other; chain joins them)
     "warrior": dict(hue=[(0, 360)], skin=warrior_skin, strict=dict(sat=0.0, val=0.11, smax=0.65, vmax=0.38), loose=dict(sat=0.0, val=0.05, smax=0.8, vmax=0.45), erode=1, grow=6, near=30, reach=-3, block=350, chin=None, chain=0, chain_face=0, chain_thick=0, head_top=0.3),
 }
 

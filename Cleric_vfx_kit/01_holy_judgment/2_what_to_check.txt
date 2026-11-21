@@ -1,0 +1,13 @@
+CLERIC VFX SHEET: HOLY JUDGMENT: what to do and what to check
+
+1. Start a NEW chat in ChatGPT (Gemini as a second try). NO attachment: these are pure effect sheets.
+2. Ask for a 1:1 square image, as large as it will give you (1024 x 1024 or more).
+3. Paste the whole text of 1_paste_this_prompt.txt.
+4. Generate 2 or 3 and keep the best. If it says it is out of image capacity, wait; do not shorten the prompt.
+5. Save the sheet as inbox/Cleric_VFX/holy_judgment_sheet.png and tell me (or name the files after the panels you want from each). I cut it, wire the pieces into the Cleric's effects and the auras, and you judge it in motion.
+
+What to look at: (1) pure flat black everywhere; (2) every panel is ONE separate effect centred with black all round; (3) one gold colour family, calm and radiant, no fire, no lightning, no figures; (4) the ground pieces (4 and 9) are FLAT wide ovals, the upright pieces (1, 2, 3, 6, 7) have their base at the bottom; (5) panel 6 is a radiant DISC seen front-on (a halo with rays), panel 7 ONE wing of light standing upright; (6) nothing touches a panel edge; (7) the nine panels clearly differ in shape; (8) one image only.
+
+Replies if it goes wrong. If it draws fire, flames, embers or smoke: "Redo it. NO fire, NO flames, NO embers, NO smoke: only calm golden LIGHT." If it draws lightning or jagged zig-zags: "Redo it. NO lightning, NO jagged zig-zags, NO hairline forks." If it draws an angel, a figure, a face, a body or letters: "Redo it. NO angels, NO figures, NO faces, NO letters: only abstract light, one cross shape and one wing made of light." If it is orange, red, pink, blue, violet or green: "Redo it. One colour family only: warm gold (#FFC454 and #FFE896) with a warm white core (#FFFDF0) and a little deep amber (#C98A1C) on the faintest edges." If the background is not pure black or has a haze: "Redo it. The whole image is pure flat black (#000000), identical in every pixel, no gradient, no vignette, no haze, no panel borders." If the ground pieces are circles or tilted: "Redo it. Panels 4 and 9 are FLAT WIDE OVALS (about three times wider than tall) seen from a low angle, lying on the ground." If effects touch the edges: "Redo it. Each effect is centred in its panel with at least 8% pure black margin on every side and fades to pure black before the edge."
+
+If ONE panel is wrong tell me which; I will give you a one-line fix or join the good panels of several sheets.

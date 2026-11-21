@@ -1,0 +1,13 @@
+CLERIC RUN: what to do and what to check
+
+1. Start a NEW chat in Gemini or ChatGPT (ChatGPT usually keeps sizes better).
+2. Attach 1_attach_this_image.png (the only image) and ask for a 3:2 image (a wide sheet, 3 columns x 2 rows).
+3. Paste the whole text of 2_paste_this_prompt.txt.
+4. Generate 2 or 3 and keep the best. If the generator says it is out of image capacity, wait; do not shorten the prompt.
+5. Save the sheet as inbox/cleric_run_sheet_1.png and tell me. I cut it into a strip, check it against his idle, and put it in the test page.
+
+What to look at: (1) six DIFFERENT poses, not one pose repeated; (2) the boot on the floor slides backward from panel 1 to 5 (about +22, +12, +2, -8, -25% of his height from the hips); (3) the torso faces the camera side-on in every panel (not turned away) and the near pauldron stays visible; (4) panels 1, 2 and 5 have the wide diagonal arm swing, one fist forward and up, the other back and down; (5) the same man and the same size in every panel (emerald hair, plate armour, cream tabard, no helmet, no cape), nothing cropped, nothing touching a panel edge; (6) bare closed fists (no gauntlets); (7) one image only.
+
+For the run, generate two or three sheets (save them as cleric_run_sheet_1.png, _2.png, _3.png): I pick the best panels from each, as for the Warrior.
+
+If ONE thing is wrong tell me which; I will give you a one-line fix, or I join the good frames of several sheets.

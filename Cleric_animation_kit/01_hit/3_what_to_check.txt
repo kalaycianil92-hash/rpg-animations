@@ -1,0 +1,11 @@
+CLERIC HIT: what to do and what to check
+
+1. Start a NEW chat in Gemini or ChatGPT (ChatGPT usually keeps sizes better).
+2. Attach 1_attach_this_image.png (the only image) and ask for a 3:2 image (a wide sheet, 3 columns x 2 rows).
+3. Paste the whole text of 2_paste_this_prompt.txt.
+4. Generate 2 or 3 and keep the best. If the generator says it is out of image capacity, wait; do not shorten the prompt.
+5. Save the sheet as inbox/cleric_hit_sheet.png and tell me. I cut it into a strip, check it against his idle, and put it in the test page.
+
+What to look at: (1) the same man in all six panels (emerald hair, pointed ear, silver-steel plate with the big pauldrons, cream tabard with the gold cross, steel vambraces, no helmet, no cape); (2) panels 1 and 6 are the reference stance (the near fist at the middle of the chest, the far fist at belt height in front); (3) the rear boot stays on the same spot in every panel; (4) both hands are bare closed fists in every panel (no gauntlets); (5) the same size in every panel and nothing touches a panel edge (the idle came out at 85% of the panel when 60% was asked, so this prompt asks for 55%; the cutter rescales, but there must be margin); (6) the recoil is a heavy rock, not a flail, and the armour stays on; (7) one image only.
+
+If ONE thing is wrong tell me which; I will give you a one-line fix, or I join the good frames of several sheets.

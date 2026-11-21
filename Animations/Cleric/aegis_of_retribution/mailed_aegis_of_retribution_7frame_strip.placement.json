@@ -1,0 +1,37 @@
+{
+ "format": "frame-placement/1",
+ "animation": "attack",
+ "file": "mailed_aegis_of_retribution_7frame_strip.png",
+ "frames": 7,
+ "fps": 14,
+ "hitFrame": 5,
+ "smooth": true,
+ "holds": [
+  9,
+  0,
+  0,
+  249,
+  29,
+  69,
+  0
+ ],
+ "x": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "note": "Aegis of Retribution, a DRAFT. 7 frames at 14 fps (71 ms each) with holds: BRACE 80 ms (the idle's first frame), SWEEP LOW 71, RISE 71, the held CREST 320 (the code's glass half-dome forms), the SEAL 100 (the hit frame = the lock: hitFrame 5), STAND FIRM 140, the idle's frame. A FLAT path (x and y all 0): he casts from where he stands and does not move."
+}

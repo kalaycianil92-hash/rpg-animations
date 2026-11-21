@@ -22,13 +22,14 @@ MAGE_DIR = root.parent / "Animations" / "Mage"
 ROGUE_DIR = root.parent / "Animations" / "Rogue"
 ASSASSIN_DIR = root.parent / "Animations" / "Assassin"
 SPELLBLADE_DIR = root.parent / "Animations" / "Spellblade"
+CLERIC_DIR = root.parent / "Animations" / "Cleric"                    # the Cleric (2026-11-20): an elven man, cream tabard and steel mail; idle only so far (docs/CLERIC.md)
 SLIME_DIR = root.parent / "Animations" / "Slime"          # the fire slime (monsters, 2026-11-07): the right-hand fighter's art; only the idle so far
 ICESLIME_DIR = root.parent / "Animations" / "IceSlime"       # the ice slime (2026-11-08): the cold twin of the fire slime, same slots
 DARKSLIME_DIR = root.parent / "Animations" / "DarkSlime"                  # the dark slime (2026-11-09): violet, horns, a green key
 LIGHTNINGSLIME_DIR = root.parent / "Animations" / "LightningSlime"   # the lightning slime (2026-11-09): yellow with blue-white arcs, same slots
 ELITESLIME_DIR = root.parent / "Animations" / "EliteSlime"           # the Elite slime (2026-11-10): grey stone in armour with a shield and a floating sword fist, physical attacks, no element
 SLIMEKING_DIR = root.parent / "Animations" / "SlimeKing"               # the Slime King (2026-11-11): the boss, an ivory slime with a golden crown and a golden staff held by a floating glove, drawn about twice the size of the others
-SLOTS = {"idle": "idle", "jump_attack": "attack", "sunder_strike": "attack", "static_bash": "attack", "cast": "attack", "umbral_shroud": "attack", "abyssal_backstab": "attack", "shadow_shiv": "attack", "static_stiletto": "attack", "dagger_throw": "attack", "permafrost_execution": "attack", "ember_spit": "attack", "sword_slash": "attack", "shield_bash": "slam", "rockfall_drop": "bounce", "earthbreaker": "eruption", "stone_guard": "guard", "block": "block", "magma_slam": "slam", "magma_eruption": "eruption", "inferno_bounce": "bounce", "frost_spit": "attack", "spark_spit": "attack", "gloom_spit": "attack", "umbral_slam": "slam", "nightfall_bounce": "bounce", "abyssal_eruption": "eruption", "thunder_slam": "slam", "voltaic_eruption": "eruption", "skybolt_bounce": "bounce", "glacier_slam": "slam", "permafrost_eruption": "eruption", "blizzard_bounce": "bounce","radiant_ooze": "attack", "royal_decree": "decree", "staff_raise": "raise", "crown_slam": "bounce", "heal": "heal", "hit": "hit", "death": "death", "dodge": "dodge", "run": "run"}  # folder -> pack slot in the test page
+SLOTS = {"idle": "idle", "jump_attack": "attack", "sunder_strike": "attack", "static_bash": "attack", "molten_cleave": "attack", "glacial_blade": "attack", "execute": "attack", "radiant_smite": "attack", "dark_penance": "attack", "aegis_of_retribution": "attack", "unholy_siphon": "attack", "sanctified_judgment": "attack", "spiteful_covenant": "attack", "cast": "attack", "umbral_shroud": "attack", "abyssal_backstab": "attack", "shadow_shiv": "attack", "static_stiletto": "attack", "dagger_throw": "attack", "permafrost_execution": "attack", "ember_spit": "attack", "sword_slash": "attack", "shield_bash": "slam", "rockfall_drop": "bounce", "earthbreaker": "eruption", "stone_guard": "guard", "block": "block", "magma_slam": "slam", "magma_eruption": "eruption", "inferno_bounce": "bounce", "frost_spit": "attack", "spark_spit": "attack", "gloom_spit": "attack", "umbral_slam": "slam", "nightfall_bounce": "bounce", "abyssal_eruption": "eruption", "thunder_slam": "slam", "voltaic_eruption": "eruption", "skybolt_bounce": "bounce", "glacier_slam": "slam", "permafrost_eruption": "eruption", "blizzard_bounce": "bounce","radiant_ooze": "attack", "royal_decree": "decree", "staff_raise": "raise", "crown_slam": "bounce", "heal": "heal", "hit": "hit", "death": "death", "dodge": "dodge", "run": "run"}  # folder -> pack slot in the test page
 
 def inline(text):
     def repl(m):
@@ -130,6 +131,8 @@ for src in sorted((root / "src").glob("*.src.html")):
         text = text.replace("__ASSASSIN_ANIMS__", default_anims(ASSASSIN_DIR))
     if "__SPELLBLADE_ANIMS__" in text:
         text = text.replace("__SPELLBLADE_ANIMS__", default_anims(SPELLBLADE_DIR))
+    if "__CLERIC_ANIMS__" in text:
+        text = text.replace("__CLERIC_ANIMS__", default_anims(CLERIC_DIR))
     if "__SLIME_ANIMS__" in text:
         text = text.replace("__SLIME_ANIMS__", default_anims(SLIME_DIR))
     if "__ICESLIME_ANIMS__" in text:

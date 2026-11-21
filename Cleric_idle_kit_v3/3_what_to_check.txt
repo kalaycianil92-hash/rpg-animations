@@ -1,0 +1,10 @@
+CLERIC IDLE, ARMOURED LOOK: what to do and what to check
+
+1. Start a new chat in Gemini or ChatGPT (ChatGPT usually keeps sizes better).
+2. Attach 1_attach_this_image.png (the armoured Cleric, the only image) and ask for a 3:2 image (a wide sheet, 3 columns x 2 rows).
+3. Paste the whole text of 2_paste_this_prompt.txt.
+4. Generate a few and keep the best one. If the generator says it is out of image capacity, wait; do not shorten the prompt.
+5. Save the sheet as inbox/cleric_idle_sheet_v3.png and tell me. I cut it into a strip, check it, and put it in the test page. THE ARMOURED LOOK BECOMES THE CLERIC'S LOOK when its idle sheet arrives (the current idle in the page stays until then).
+
+WHAT TO LOOK AT: (1) the same man in all six panels (emerald hair, the pointed ear, silver-steel plate with big rounded pauldrons, cream tabard with the gold cross, steel vambraces, no helmet, no cape); (2) panel 1 is the picture's pose; (3) both fists stay in the same places (the near fist at the middle of the chest, the far fist lower in front at belt height), bare and empty, never swapped; (4) both boots stay on the same spot and the same floor height; (5) the six panels are almost the same, the differences are tiny; (6) he is the same size in every panel and nothing touches a panel edge (he is broad: check the pauldrons and the far fist); (7) no weapon, no shield; (8) no GIF and no extra images.
+If ONE thing is wrong tell me which; I will give you a one-line fix.

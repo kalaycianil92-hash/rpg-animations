@@ -1,0 +1,37 @@
+{
+ "format": "frame-placement/1",
+ "animation": "attack",
+ "file": "mailed_dark_penance_7frame_strip.png",
+ "frames": 7,
+ "fps": 14,
+ "hitFrame": 4,
+ "smooth": true,
+ "holds": [
+  39,
+  19,
+  249,
+  9,
+  69,
+  39,
+  0
+ ],
+ "x": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "note": "Dark Penance, a DRAFT. 7 frames at 14 fps (71 ms each) with holds: BOW 110 ms, KNEEL 90, the GATHER pause 320 (the code's dark gathers and creeps along the floor), RELEASE 80 (the hit at its end: hitFrame 4), POINT 140, recover 110, the idle's frame. A FLAT path (x and y all 0): he casts from where he stands and does not move."
+}

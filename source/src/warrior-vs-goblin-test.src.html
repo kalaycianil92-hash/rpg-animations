@@ -318,7 +318,7 @@
   <div class="bar">
     <button class="primary" id="play">Play</button>
     <button id="reset">Reset</button>
-    <label class="lbl" id="charWrap" style="display:none">Character <select id="charSel"><option value="warrior">Warrior</option><option value="mage">Elf mage (idle only so far)</option><option value="rogue">Rogue (idle only so far)</option><option value="assassin">Assassin (idle only so far)</option><option value="spellblade">Spellblade (idle only so far)</option></select></label>
+    <label class="lbl" id="charWrap" style="display:none">Character <select id="charSel"><option value="warrior">Warrior</option><option value="mage">Elf mage (idle only so far)</option><option value="rogue">Rogue (idle only so far)</option><option value="assassin">Assassin (idle only so far)</option><option value="spellblade">Spellblade (idle only so far)</option><option value="cleric">Cleric (idle only so far)</option></select></label>
     <label class="lbl" id="monWrap">Monster <select id="monSel"><option value="goblin">Goblin (placeholder)</option><option value="fire_slime">Fire slime (idle only so far)</option><option value="ice_slime">Ice slime (idle only so far)</option><option value="lightning_slime">Lightning slime</option><option value="dark_slime">Dark slime</option><option value="elite_slime">Elite slime (idle only so far)</option><option value="slime_king">Slime King (all skills)</option></select></label>
     <label class="lbl" id="monSizeWrap" style="display:none">Monster size <input type="range" id="monSize" min="40" max="260" step="5" value="100" style="width:90px;vertical-align:middle"> <span id="monSizeV">100%</span></label>
     <label class="lbl" id="monSqWrap" style="display:none">Squash and stretch <input type="range" id="monSq" min="0" max="100" step="5" value="50" style="width:90px;vertical-align:middle"> <span id="monSqV">50%</span></label>
@@ -418,7 +418,8 @@
     <div class="devbody">
     <div class="fields">
       <label>Scenario <select id="scn"><option value="win">Warrior wins</option><option value="lose">Warrior loses (plays death)</option><option value="combo">Mage combo: Shatter Lance on a Chilled, then on a Frozen target</option><option value="fire">Mage fire combo: Firebolt twice, then Cinderburst detonates the burns</option><option value="fire2">Mage fire combo: Pyroclasm sets 3 Burns, Cinderburst detonates all of them</option><option value="mdodge">Warrior wins, the monster dodges one strike (and he dodges one)</option><option value="mblock">Warrior wins, the monster blocks two strikes and he blocks one (a blocked hit cannot crit, 20% less damage)</option></select></label>
-      <label id="warriorWrap" data-chars="warrior">Warrior's attack <select id="warriorSkill"><option value="alt">Alternate the skills</option><option value="thunder">Thunderclap Guillotine</option><option value="sunder">Sunder Strike</option><option value="bash">Static Bash</option></select></label>
+      <label id="warriorWrap" data-chars="warrior">Warrior's attack <select id="warriorSkill"><option value="alt">Alternate the skills</option><option value="thunder">Thunderclap Guillotine</option><option value="sunder">Sunder Strike</option><option value="bash">Static Bash</option><option value="molten">Molten Cleave</option><option value="glacial">Glacial Blade</option><option value="execute">Execute</option></select></label>
+      <label id="clericWrap" data-chars="cleric">Cleric's attack <select id="clericSkill"><option value="alt">Alternate the skills</option><option value="smite">Radiant Smite</option><option value="penance">Dark Penance</option><option value="siphon">Unholy Siphon</option><option value="judgment">Sanctified Judgment</option><option value="aegis">Aegis of Retribution</option><option value="covenant">Spiteful Covenant</option></select></label>
       <label id="rogueWrap" style="display:none">Rogue's attack <select id="rogueSkill"><option value="alt">Alternate the six skills</option><option value="shroud">Umbral Shroud</option><option value="abyssal">Abyssal Backstab</option><option value="shiv">Shadow Shiv</option><option value="stiletto">Static Stiletto</option><option value="kiss">Winter's Kiss</option><option value="permafrost">Permafrost Execution</option></select></label>
       <label id="rogueDefWrap" style="display:none"><input type="checkbox" id="rogueDef"> The target suffers Reduce Physical Def (Shadow Shiv then always hits critically)</label>
       <label id="rogueShockWrap" style="display:none"><input type="checkbox" id="rogueShock"> Static Stiletto always applies Shocked (otherwise a 25% chance)</label>
@@ -709,7 +710,7 @@
   function bgFixed() { var l = bgLook(); return !!(l && l.fixed); }
   var BG_LAYERS = [{ name: "far", k: .25, cover: true }, { name: "ground", k: 1 }, { name: "mid", k: .6, cover: true }, { name: "props", k: .85 }];   // drawn in this order, k: speed relative to the ground
   var BG_FADE = 2.2;                                         // seconds at 100% speed for one look to give way to the next
-  var BG_STEP = { warrior: 18, mage: 10, rogue: 12, assassin: 12, spellblade: 12 };             // percent of a character width per run frame; the user judged these fine (2026-11-01)
+  var BG_STEP = { warrior: 18, mage: 10, rogue: 12, assassin: 12, spellblade: 12, cleric: 12 };             // percent of a character width per run frame; the user judged these fine (2026-11-01)
   var bgX = 0, bgV = 0, bgGoal = 0, bgT = 0, bgRaf = 0, bgTau = .2;   // bgX: px the ground has moved; bgV, bgGoal: character widths per second; bgTau: seconds the speed takes to ease
   var bgObjs = {}, bgCur = null, bgPrev = null, bgFade = 1;  // the looks decoded so far; the one shown, the one it is fading in over, how far (1 = done)
   function bgStepOf(ch) { var v; try { v = +localStorage.getItem("wvg-bg-step-" + ch); } catch (e) {} return v || BG_STEP[ch] || 15; }
@@ -811,7 +812,7 @@
     $("stageNo").disabled = fixed;
     $("bgEnter").style.display = look && look.id === "dungeon_gate" ? "" : "none";   // the entrance walk belongs to the Rootgate
     if (document.activeElement !== $("stageNo")) $("stageNo").value = stageNo;
-    $("bgWho").textContent = ch === "mage" ? "Mage" : ch === "rogue" ? "Rogue" : ch === "assassin" ? "Assassin" : ch === "spellblade" ? "Spellblade" : "Warrior";
+    $("bgWho").textContent = ch === "mage" ? "Mage" : ch === "rogue" ? "Rogue" : ch === "assassin" ? "Assassin" : ch === "spellblade" ? "Spellblade" : ch === "cleric" ? "Cleric" : "Warrior";
     $("bgStep").value = bgStepOf(ch); $("bgStepV").textContent = $("bgStep").value + "%";
     var cur = bgCur && (LOOKS.filter(function (l) { return l.id === bgCur.id; })[0] || ACTS.filter(function (a) { return a.id === bgCur.id; })[0]);
     var base = look ? look.where + ", " + look.name + (fixed ? "" : ", Stage " + stageNo) : "Stage " + stageNo + ", " + want.name;
@@ -1376,7 +1377,7 @@
   }
   // The portraits (2026-11-12): a round picture of each fighter drawn from FRAME 1 OF ITS IDLE STRIP: a square crop of the head (the five heroes) or of the whole face and body (the slimes, the Elite, the King with his crown), HUD_CROP =
   // [x, y, side] in the 512 px cell, measured on the strips (docs/HUD.md). The hero faces right (toward the VS) as drawn; the enemy is mirrored to face left, toward the VS. The goblin placeholder has no picture: a green face is drawn.
-  var HUD_CROP = { warrior: [238, 51, 124], mage: [228, 54, 124], rogue: [243, 53, 124], assassin: [253, 39, 124], spellblade: [255, 44, 124],
+  var HUD_CROP = { warrior: [238, 51, 124], mage: [228, 54, 124], rogue: [243, 53, 124], assassin: [253, 39, 124], spellblade: [255, 44, 124], cleric: [246, 55, 110],
     fire_slime: [60, 100, 380], ice_slime: [85, 160, 350], lightning_slime: [60, 120, 385], dark_slime: [55, 95, 380], elite_slime: [110, 160, 290], slime_king: [90, 100, 310] };
   var hudCache = {};
   function hudPlaceholder(x, W, H, kind) {                                            // a stand-in face: the goblin (green, pointed ears, a grin), or a plain disc
@@ -1835,6 +1836,8 @@
     }
     var wKey = null;                                                                                  // the Warrior previews the skill chosen in "Warrior's attack" (alternate: the first)
     if (curChar === "warrior" && warriorKeys().length > 1) { wKey = warriorKeyChosen(); await useWarriorSkill(wKey); }
+    var cKey = null;                                                                                  // the Cleric previews the skill chosen in "Cleric's attack" (alternate: the first)
+    if (curChar === "cleric" && clericKeys().length) { cKey = clericKeyChosen(); await useClericSkill(cKey); }
     resetState();
     var my = ++run;
     stage.classList.add("playing");
@@ -1846,12 +1849,13 @@
       var clk = player.clock;
       var drive = startPath(my, clk);
       if (rogueLike()) { if (rKey === "stiletto") ssFx(FIGHTERS.G, hitF, { myRun: my }); else if (rKey === "kiss") kissFx(FIGHTERS.G, hitF, { myRun: my }); else if (rKey === "permafrost") pfFx(FIGHTERS.G, hitF, { myRun: my, preview: true }); else shivFx(FIGHTERS.G, hitF); }   // (the Shadow Shiv's violet streak, the Static Stiletto's lightning, Winter's Kiss's frost, Permafrost Execution's glacier ice)
-      var skill = !rogueLike() ? (wKey === "sunder" ? startSunder(clk, hitF, FIGHTERS.G) : wKey === "bash" ? startBash(clk, hitF, FIGHTERS.G) : ($("fxOn").checked ? startSkill(clk, hitF, FIGHTERS.G) : null)) : null;
+      var skill = !rogueLike() ? (cKey === "aegis" ? startAegis(clk, hitF, FIGHTERS.W, { preview: true }) : cKey === "covenant" ? startCovenant(clk, hitF, FIGHTERS.W, { preview: true }) : cKey === "smite" ? startSmite(clk, hitF, FIGHTERS.G) : cKey === "penance" ? startPenance(clk, hitF, FIGHTERS.G) : cKey === "siphon" ? startSiphon(clk, hitF, FIGHTERS.G, false) : cKey === "judgment" ? startJudgment(clk, hitF, FIGHTERS.G, false) : wKey === "sunder" ? startSunder(clk, hitF, FIGHTERS.G) : wKey === "bash" ? startBash(clk, hitF, FIGHTERS.G) : wKey === "molten" ? startMolten(clk, hitF, FIGHTERS.G) : wKey === "glacial" ? startGlacial(clk, hitF, FIGHTERS.G) : wKey === "execute" ? startExecute(clk, hitF, FIGHTERS.G) : ($("fxOn").checked ? startSkill(clk, hitF, FIGHTERS.G) : null)) : null;
       var wait = clkAt(clk, hitF, IN) - performance.now();
       if (wait > 0) await new Promise(function (r) { setTimeout(r, wait); });
       if (my !== run) break;
-      if (skill) skill.impact(); else if (!(rogueLike() && (rKey === "kiss" || rKey === "permafrost"))) slash(FIGHTERS.G, 1);   // (the frozen dagger's own ice burst, and the glacier X, replace the slash)
-      anim(FIGHTERS.G.unit.querySelector(".sprite"), skill && !skill.phys ? SHOCK : [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], skill && !skill.phys ? 340 : 160).catch(function () {});
+      if (skill) skill.impact(); else if (!(rogueLike() && (rKey === "kiss" || rKey === "permafrost"))) slash(FIGHTERS.G, 1);
+      if (skill && skill.heal) skill.heal(40, true);   // (the frozen dagger's own ice burst, and the glacier X, replace the slash)
+      if (!(skill && skill.noTarget)) anim(FIGHTERS.G.unit.querySelector(".sprite"), skill && !skill.phys ? (skill.shockAnim || SHOCK) : [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], skill && !skill.phys ? 340 : 160).catch(function () {});
       await drive;
       if (my !== run) break;
       await anim(uW, [{ transform: tr(pathAt(places.attack, 1e9)) }, { transform: "translate(0,0)" }], 280, "ease-in-out");
@@ -2122,7 +2126,7 @@
   // THE SCREEN GOES DARK AT THE PEAK (2026-11-13, the user's idea for the Thunderclap Guillotine): the stage darkens BEHIND the two fighters (the part of an effect that is drawn on the canvas behind the characters,
   // like the Rogue's abDim), so only the warrior and the enemy stay lit, and the sky bolt and the blades blaze in the dark. It comes in from the middle of the launch frame to full when the apex frame starts, holds
   // through the apex, eases down to a third of it by the impact (the second bolt strikes in a mostly dark stage) and is gone 450 ms later. amt: how dark (0..1; 0.8 at most lets a hint of the forest through).
-  function tcDim(tIn0, tIn1, tOut0, tImpact, tEnd, amt) {
+  function tcDim(tIn0, tIn1, tOut0, tImpact, tEnd, amt, rgb) {                         // rgb: the colour of the dark ("3,6,20", a blue-black, by default; Execute's is a red-black)
     fxAdd({ t0: tIn0, t1: tEnd + 30, draw: function () {}, drawBack: function (ctx, now) {
       var a, s;
       if (now < tIn1) { s = clamp01((now - tIn0) / Math.max(1, tIn1 - tIn0)); a = s * s * (3 - 2 * s); }
@@ -2131,7 +2135,7 @@
       else { s = clamp01((now - tImpact) / Math.max(1, tEnd - tImpact)); a = 0.35 * (1 - s); }
       a *= amt;
       if (a <= 0.01) return;
-      ctx.fillStyle = "rgba(3,6,20," + a + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight);
+      ctx.fillStyle = "rgba(" + (rgb || "3,6,20") + "," + a + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight);
     } });
   }
   // THE SWORDS' STROKE (2026-11-12, the Thunderclap Guillotine: "the swords should make the hit"): a bright crescent from where the blade tips were during the plunge (above his head) over the top and
@@ -2822,7 +2826,7 @@
     if (!auraReady(L.tex)) return;
     var burst = clamp01((now - L.tEnd) * speed / L.fadeMs), lv = auraLevel(L.steps, L.tEnd, now) * (1 - burst), c = clamp01((now - L.t0) / Math.max(1, L.tEnd - L.t0));
     if (lv <= 0.01) return;
-    var im = fbTex[L.tex], tile = auraTile(L.tex), br = bodyPoint(), cr = rectIn(uW), cx = br.x, gy = cr.top + cr.height - 3, R = u * 0.4 * (1 + L.grow * burst), H = u * 1.15 * (1 + 0.3 * L.grow * burst);
+    var im = fbTex[L.tex], tile = auraTile(L.tex), br = bodyPoint(), cr = rectIn(uW), cx = L.cxf ? L.cxf() : br.x, gy = cr.top + cr.height - 3, R = u * 0.4 * (1 + L.grow * burst), H = u * 1.15 * (1 + 0.3 * L.grow * burst);
     var phi = (now - L.t0) * 0.0042 * speed + 1.6 * c * c, N = 96, rep = 2, W = im.naturalWidth, Hi = im.naturalHeight, ov = 2, sw0 = W * rep / N, k = Math.min(1.4, F.k), i, th, d, w, cs;
     ctx.globalCompositeOperation = "lighter";
     for (i = 0; i < N; i++) {
@@ -3665,7 +3669,7 @@
     L.S = S; L.sn = now; return S;
   }
   function brDraw(ctx, now, L, back) {
-    var S = brState(L, now), K = S.K, r = S.r, cx = S.cx, cy = S.cy, gy = S.gy, sd = S.sd, sc = L.sc, C = BR_RGB, ringR = r * 0.7, ringY = ringR * (L.geo ? 0.05 : 0.17);
+    var S = brState(L, now), K = S.K, r = S.r, cx = S.cx, cy = S.cy, gy = S.gy, sd = S.sd, sc = L.sc, C = L.rgb || BR_RGB, ringR = r * 0.7, ringY = ringR * (L.geo ? 0.05 : 0.17);
     var i, j, a, g, sy, yw, aw, rr, t2, ra, rp, ar, bx, by, ph, pos, th, x, oc, n, h, a0 = back ? (sd > 0 ? 4.7124 : 3.1416) : (sd > 0 ? 0 : 1.5708), a1 = a0 + 1.5708;   // a0..a1: the quarter of an ellipse that is in front of her (the far one on the back pass, the near one on the front pass)
     if (K < 0.004) return;
     ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
@@ -4380,6 +4384,21 @@
       wKey = warriorSkillNow(); await useWarriorSkill(wKey); if (myRun !== run) return;
       if (wKey === "sunder") e = Object.assign({}, e, { verb: "cleaves", note: " with Sunder Strike" });
       if (wKey === "bash") e = Object.assign({}, e, { verb: "slams", note: " with Static Bash (Lightning Damage)" });
+      if (wKey === "molten") e = Object.assign({}, e, { verb: "sweeps a molten blade through", note: " with Molten Cleave (Fire Damage)", numCls: "fire", shock: !e.dodge, shockAnim: FIRE_SHOCK });
+      if (wKey === "glacial") e = Object.assign({}, e, { verb: "rams a frost-forged blade into", note: " with Glacial Blade (Ice Damage)", numCls: "ice", shock: !e.dodge, shockAnim: ICE_SHOCK });   // (Chilled and the action-bar push-back are not drawn: statuses come later)
+      if (wKey === "execute") e = Object.assign({}, e, { verb: "impales", note: " with Execute (Physical Damage)" });   // (physical: the white number and the white flash; Burn, its detonation and the +50% under 35% HP are not drawn: statuses and the engine come later)
+      // (Molten Cleave: fire: the orange damage number and the orange flash on the target; Burn, Shocked and the overload are not drawn: statuses come later)
+    }
+    var cKey = null;                                                                  // the Cleric's skill of this blow (Radiant Smite...): its pack is swapped into the attack slot first
+    if (!plain && A === FIGHTERS.W && curChar === "cleric" && packs.attack && !packs.attack.keyed && clericKeys().length) {
+      if (aegisLeft > 0 && --aegisLeft === 0) barrierDrop(false);                          // (the Aegis lasts through the Cleric's next turn too: the game says 2 turns)
+      cKey = clericSkillNow(); await useClericSkill(cKey); if (myRun !== run) return;
+      if (cKey === "siphon") e = Object.assign({}, e, { verb: "drains", note: " with Unholy Siphon (Dark Damage)", numCls: "dark", shock: !e.dodge, shockAnim: PENANCE_SHOCK });   // (Weaken and Reduce Magic Def are not drawn: statuses come later)
+      if (cKey === "judgment") e = Object.assign({}, e, { verb: "calls down judgment on", note: " with Sanctified Judgment (Holy Damage)", numCls: "holy", shock: !e.dodge, shockAnim: HOLY_SHOCK, amount: Math.round(e.amount * JUD.mult) });   // (heavy: about the game's x1.40 against Radiant Smite's x0.44; the +40% bonus and the cleanse are not drawn: statuses come later)
+      if (cKey === "aegis") return aegisAct(myRun, A);
+      if (cKey === "covenant") return covenantAct(myRun, A);                               // (a self-buff that costs half his HP: no target, nothing is hit)                                     // (a self-buff: no target, nothing is hit)
+      if (cKey === "smite") e = Object.assign({}, e, { verb: "smites", note: " with Radiant Smite (Holy Damage)", numCls: "holy", shock: !e.dodge, shockAnim: HOLY_SHOCK });   // (Purified and the party heal are not drawn: statuses come later, there is no party)
+      if (cKey === "penance") e = Object.assign({}, e, { verb: "casts a dark chill on", note: " with Dark Penance (Dark Damage)", numCls: "dark", shock: !e.dodge, shockAnim: PENANCE_SHOCK });   // (Reduce Magic Def and the Purified extension are not drawn: statuses come later)
     }
     var sign = A.dir;
     var a = centerOf(A.unit), t = centerOf(T.unit);
@@ -4414,7 +4433,7 @@
     }
     var clk = null;
     if (packPlays) { playPose("attack", false, aHolds).then(backToIdle); clk = player.clock; }
-    var skill = (A === FIGHTERS.W && packPlays && !rogueLike()) ? (wKey === "sunder" ? startSunder(clk, hitF, T) : wKey === "bash" ? startBash(clk, hitF, T) : ($("fxOn").checked ? startSkill(clk, hitF, T) : null)) : null;   // the skill rides on the attack pack's clock (the lightning one, or Sunder Strike's physical one)
+    var skill = (A === FIGHTERS.W && packPlays && !rogueLike()) ? (cKey === "smite" ? startSmite(clk, hitF, T) : cKey === "penance" ? startPenance(clk, hitF, T) : cKey === "siphon" ? startSiphon(clk, hitF, T, e.dodge) : cKey === "judgment" ? startJudgment(clk, hitF, T, e.dodge) : wKey === "sunder" ? startSunder(clk, hitF, T) : wKey === "bash" ? startBash(clk, hitF, T) : wKey === "molten" ? startMolten(clk, hitF, T) : wKey === "glacial" ? startGlacial(clk, hitF, T) : wKey === "execute" ? startExecute(clk, hitF, T) : ($("fxOn").checked ? startSkill(clk, hitF, T) : null)) : null;   // the skill rides on the attack pack's clock (the lightning one, or Sunder Strike's physical one)
     var viaPath = packPlays && pathOn(), drive = null;
     if (viaPath) drive = startPath(myRun, clk);
     if (keyed) keyPose("attack", 0);
@@ -4469,6 +4488,7 @@
       if (skill) skill.impact(); else if (!blk && !e.noSlash) slash(T, sign);
       floatNumber(T, (blk ? "BLOCK " : cr ? "CRIT " : "") + amt, blk ? "block" : e.numCls || (skill && !skill.phys ? "bolt" : (cr ? "crit" : "")));
       say(A.name + " " + (e.verb || "slashes") + " " + T.name + " for " + amt + (blk ? " (blocked: " + Math.round(BLOCK_REDUCE * 100) + "% less damage" + (e.crit ? ", the critical hit is cancelled" : "") + ")" : cr ? " (crit!)" : "") + (e.note || "") + ".", e.actor === "W" ? "w" : "g");
+      if (skill && skill.heal) skill.heal(amt);                                        // (Radiant Smite: 40% of the damage dealt comes back to him)
       var spr = T.unit.querySelector(".sprite");
       var jobs = [
         blk ? anim(spr, [{ filter: "brightness(1.35)" }, { filter: "brightness(1)" }], 160) : ((skill && !skill.phys) || e.shock) ? anim(spr, e.shockAnim || SHOCK, 340) : anim(spr, [{ filter: "brightness(3.2)" }, { filter: "brightness(1)" }], 160),
@@ -4897,7 +4917,7 @@
   // Like the Rogue's: every skill has its own folder in Animations/Warrior (all mapped to the attack slot in build.py); the strip of the chosen skill is swapped into the attack slot, with its marks, hit frame, fps,
   // holds and path (all from its placement json), just before it is used. "Warrior's attack" picks one skill or alternates them (Thunderclap Guillotine first). Thunderclap Guillotine: startSkill (lightning).
   // Sunder Strike: startSunder (physical: no lightning). The Warrior's skills are six in all; the user sends them one at a time (docs/WARRIOR_SKILLS.md).
-  var WARRIOR_SKILLS = { thunder: { file: "armored_thunderclap_guillotine_11frame_strip.png" }, sunder: { file: "armored_sunder_strike_8frame_strip.png" }, bash: { file: "armored_static_bash_21frame_strip.png" } }, WARRIOR_ORDER = ["thunder", "sunder", "bash"], wkCount = 0;
+  var WARRIOR_SKILLS = { thunder: { file: "armored_thunderclap_guillotine_11frame_strip.png" }, sunder: { file: "armored_sunder_strike_8frame_strip.png" }, bash: { file: "armored_static_bash_21frame_strip.png" }, molten: { file: "armored_molten_cleave_8frame_strip.png" }, glacial: { file: "armored_glacial_blade_8frame_strip.png" }, execute: { file: "armored_execute_8frame_strip.png" } }, WARRIOR_ORDER = ["thunder", "sunder", "bash", "molten", "glacial", "execute"], wkCount = 0;
   function warriorKeys() { return WARRIOR_ORDER.filter(function (k) { return DEFAULT_ANIMS.some(function (d) { return d.file === WARRIOR_SKILLS[k].file; }); }); }   // the skills whose art is in the page
   function warriorKeyChosen() { var v = $("warriorSkill").value, ks = warriorKeys(); return v === "alt" || ks.indexOf(v) < 0 ? ks[0] : v; }   // (the preview: "alternate" shows the first)
   function warriorSkillNow() { var v = $("warriorSkill").value, ks = warriorKeys(); return v === "alt" ? ks[wkCount++ % ks.length] : ks.indexOf(v) >= 0 ? v : ks[0]; }
@@ -4905,6 +4925,760 @@
     var d = DEFAULT_ANIMS.filter(function (x) { return x.file === WARRIOR_SKILLS[key].file; })[0];
     if (!d || (packs.attack && packs.attack.file === d.file)) return Promise.resolve(!!d);
     return loadPack("attack", d.src, d.file).then(function () { return true; });
+  }
+  // ---------------------------------------------------------------- The Cleric's skills (2026-11-21, docs/CLERIC_SKILLS.md)
+  // Like the Warrior's: every skill has its own folder in Animations/Cleric (mapped to the attack slot in build.py); the chosen skill's strip is swapped into the attack slot, with its hit frame, fps, holds and path
+  // (from its placement json), just before it is used. "Cleric's attack" picks one skill or alternates them. The six skills come one at a time; RADIANT SMITE is the first.
+  var CLERIC_SKILLS = { smite: { file: "mailed_radiant_smite_7frame_strip.png" }, penance: { file: "mailed_dark_penance_7frame_strip.png" }, siphon: { file: "mailed_unholy_siphon_7frame_strip.png" }, judgment: { file: "mailed_sanctified_judgment_7frame_strip.png" }, aegis: { file: "mailed_aegis_of_retribution_7frame_strip.png" }, covenant: { file: "mailed_spiteful_covenant_7frame_strip.png" } }, CLERIC_ORDER = ["smite", "penance", "siphon", "judgment", "aegis", "covenant"], ckCount = 0;
+  function clericKeys() { return CLERIC_ORDER.filter(function (k) { return CLERIC_ANIMS.some(function (d) { return d.file === CLERIC_SKILLS[k].file; }); }); }   // the skills whose art is in the page
+  function clericKeyChosen() { var v = $("clericSkill").value, ks = clericKeys(); return v === "alt" || ks.indexOf(v) < 0 ? ks[0] : v; }   // (the preview: "alternate" shows the first)
+  function clericSkillNow() { var v = $("clericSkill").value, ks = clericKeys(), at = ks.filter(function (k) { return k !== "aegis" && k !== "covenant"; }); return v === "alt" ? at[ckCount++ % at.length] : ks.indexOf(v) >= 0 ? v : ks[0]; }   // ("Alternate" cycles the ATTACKS: the Aegis and the Covenant hit nothing, so they are played only when chosen)
+  function useClericSkill(key) {
+    var d = CLERIC_ANIMS.filter(function (x) { return x.file === CLERIC_SKILLS[key].file; })[0];
+    if (!d || (packs.attack && packs.attack.file === d.file)) return Promise.resolve(!!d);
+    return loadPack("attack", d.src, d.file).then(function () { return true; });
+  }
+  // RADIANT SMITE (the game's text: "Strikes the target with consecrated light, dealing Holy Damage and restoring 40% of the damage dealt as HP. In a party, every living ally is also healed for 10% of the damage dealt.
+  // 30% chance to apply Purified"): a one-handed overhead smite with a pause to consecrate (a 7-frame strip, the blow on frame 4). The weapon (a mace or a wand) is not in the art and he has no hand marks yet, so the effect
+  // is anchored on SMITE.fist: the far fist and the weapon's direction in every frame of the strip, measured by hand (0 = up, clockwise). The light: the weapon head starts to glow on the raise, a soft column of light
+  // comes down on it during the held pose and golden motes rise, a golden streak follows the stroke, the blow bursts in white-gold with rays, a ring on the ground and thrown motes, then 40% of the damage streams back
+  // to him as golden motes, his HP bar rises and a green +N shows. Purified and the party heal are NOT drawn (statuses come later, there is no party yet).
+  var SMITE = { fist: [[193, 405], [367, 194], [346, 118], [443, 257], [480, 401], [421, 380], [390, 370]], ang: [225, 15, 25, 105, 125, 60, 50], len: 130, heal: 0.4, shake: 6 };
+  function smiteTip() {                                                              // the weapon's head on the frame on screen, in stage px (null while another pose shows)
+    var cf = curFrame, sh = uW.querySelector(".sheet");
+    if (!cf || cf.pose !== "attack" || !sh || cf.i >= SMITE.fist.length) return null;
+    var r = rectIn(sh), k = r.width / 512, f = SMITE.fist[cf.i], a = SMITE.ang[cf.i] * Math.PI / 180;
+    return { x: r.left + (f[0] + Math.sin(a) * SMITE.len) * k, y: r.top + (f[1] - Math.cos(a) * SMITE.len) * k, fx: r.left + f[0] * k, fy: r.top + f[1] * k };
+  }
+  function startSmite(clk, hitF, T) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tR = at(2, 0), tH = at(3, 0), tS = at(hitF, 0), tI = at(hitF, 0.4), P = HOLY_PAL, hist = [], rnd = rngOf((tR | 0) + 3), motes = [], i;
+    for (i = 0; i < 16; i++) motes.push({ dx: (rnd() - 0.5) * 0.16, ph: rnd(), sp: 0.6 + rnd() * 0.8, s: 0.005 + rnd() * 0.006 });
+    var charge = function (now) {                                                    // how much light the weapon holds, 0..1: it starts on the raise, fills during the held pose, stays full on the stroke, goes out after the blow
+      if (now < tR) return 0;
+      if (now < tH) return 0.35 * clamp01((now - tR) / Math.max(1, tH - tR));
+      if (now < tS) return 0.35 + 0.65 * clamp01((now - tH) / Math.max(1, tS - tH));
+      if (now <= tI) return 1;
+      return clamp01(1 - (now - tI) / 380);
+    };
+    fxAdd({ t0: tR, t1: tI + 480, draw: function (ctx, now) {
+      var q = smiteTip(), c = charge(now), u = uW.offsetWidth, j, p, age, seg;
+      if (!q || c <= 0.01) return;
+      var beam = clamp01((now - tH + 60) / 140) * (now < tS ? 1 : clamp01(1 - (now - tS) / 140));     // a soft column of light comes down on the raised weapon during the held pose
+      if (beam > 0.01) {
+        var g = ctx.createLinearGradient(0, 0, 0, q.y);
+        g.addColorStop(0, "rgba(" + P.glow + ",0)"); g.addColorStop(1, "rgba(" + P.mid + "," + (0.34 * beam).toFixed(3) + ")");
+        ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = g; ctx.fillRect(q.x - u * 0.07, 0, u * 0.14, Math.max(1, q.y)); ctx.restore();
+      }
+      glowDot(ctx, q.x, q.y, u * (0.06 + 0.12 * c), P.glow, 0.5 * c);                                 // the weapon head, burning golden-white
+      glowDot(ctx, q.x, q.y, u * (0.04 + 0.07 * c), P.mid, 0.8 * c);
+      glowDot(ctx, q.x, q.y, u * (0.02 + 0.03 * c), P.core, 0.95 * c);
+      if (c > 0.45) {                                                                                 // a small cross of light on the head once it is bright
+        ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + P.core + "," + (0.7 * c).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.006);
+        ctx.beginPath(); ctx.moveTo(q.x - u * 0.09 * c, q.y); ctx.lineTo(q.x + u * 0.09 * c, q.y); ctx.moveTo(q.x, q.y - u * 0.09 * c); ctx.lineTo(q.x, q.y + u * 0.09 * c); ctx.stroke(); ctx.restore();
+      }
+      for (j = 0; j < motes.length; j++) {                                                            // golden motes rising round the head
+        p = motes[j]; age = (now * 0.00045 * speed * p.sp + p.ph) % 1;
+        glowDot(ctx, q.x + p.dx * u, q.y + u * 0.04 - age * u * 0.3, u * p.s * 2.8, P.core, 0.85 * Math.sin(age * 3.1416) * Math.min(1, c * 1.4));
+      }
+      if (now >= tS - 40) {                                                                           // the stroke leaves a golden streak between the frames
+        hist.push({ x: q.x, y: q.y, t: now }); while (hist.length && now - hist[0].t > 220) hist.shift();
+        ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+        for (j = 1; j < hist.length; j++) {
+          age = (now - hist[j].t) / 220; if (age >= 1) continue;
+          [[0.05, P.glow, 0.5], [0.022, P.mid, 0.8], [0.008, P.core, 0.95]].forEach(function (ps) {
+            ctx.strokeStyle = "rgba(" + ps[1] + "," + (ps[2] * (1 - age)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * ps[0] * (1 - age));
+            ctx.beginPath(); ctx.moveTo(hist[j - 1].x, hist[j - 1].y); ctx.lineTo(hist[j].x, hist[j].y); ctx.stroke();
+          });
+        }
+        ctx.restore();
+      }
+    } });
+    smitePaint(clk, hitF, T);
+    return { impact: function () { smiteImpact(T); }, heal: function (amt, preview) { smiteHeal(T, amt, preview); }, shockAnim: HOLY_SHOCK };
+  }
+  function smiteImpact(T) {                                                          // the blow: a white-gold flash, rays fanning up and out, a ring on the ground, motes thrown up
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.5, cy = r.top + r.height * 0.42, gy = r.top + r.height * 0.97, rnd = rngOf(now | 0), P = HOLY_PAL, rays = [], sp = [], i;
+    shake(SMITE.shake, 260);
+    for (i = 0; i < 12; i++) rays.push({ a: -Math.PI * (0.02 + 0.96 * i / 11) + (rnd() - 0.5) * 0.18, l: 0.28 + rnd() * 0.34, w: 0.6 + rnd() * 0.8 });
+    for (i = 0; i < 22; i++) sp.push({ a: -Math.PI * (0.05 + rnd() * 0.9), v: 0.25 + rnd() * 0.55, s: 0.006 + rnd() * 0.008, d: rnd() * 120 });
+    fxAdd({ t0: now, t1: now + 900 / speed, draw: function (ctx, now2) {
+      var t = (now2 - now) * speed, k, rk = clamp01(t / 650);
+      if (t < 380) { k = 1 - Math.pow(1 - t / 380, 2.2); glowDot(ctx, cx, cy, u * (0.1 + 0.5 * k), P.glow, 0.7 * (1 - t / 380)); glowDot(ctx, cx, cy, u * (0.07 + 0.35 * k), P.mid, 0.9 * (1 - t / 380)); glowDot(ctx, cx, cy, u * (0.03 + 0.14 * k), P.core, 0.95 * (1 - t / 380)); }
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      rays.forEach(function (ry) {
+        var kk = clamp01(t / 420), a1 = 1 - clamp01((t - 60) / 520); if (a1 <= 0) return;
+        var len = u * ry.l * (0.3 + 0.7 * kk);
+        ctx.strokeStyle = "rgba(" + P.mid + "," + (0.75 * a1).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.012 * ry.w * a1);
+        ctx.beginPath(); ctx.moveTo(cx + Math.cos(ry.a) * u * 0.05, cy + Math.sin(ry.a) * u * 0.05); ctx.lineTo(cx + Math.cos(ry.a) * (u * 0.05 + len), cy + Math.sin(ry.a) * (u * 0.05 + len)); ctx.stroke();
+      });
+      ctx.strokeStyle = "rgba(" + P.mid + "," + (0.7 * (1 - rk)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.014 * (1 - rk));
+      ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.1 + 0.55 * rk), u * (0.1 + 0.55 * rk) * 0.22, 0, 0, 6.2832); ctx.stroke();
+      ctx.restore();
+      glowEllipse(ctx, cx, gy, u * (0.3 + 0.3 * rk), u * 0.07, P.glow, 0.3 * (1 - rk));
+      sp.forEach(function (s) {
+        var kk = clamp01((t - s.d) / 700); if (kk <= 0 || kk >= 1) return;
+        glowDot(ctx, cx + Math.cos(s.a) * u * 0.45 * s.v * kk, cy + Math.sin(s.a) * u * 0.45 * s.v * kk - u * 0.06 * kk, u * s.s * 3, P.core, 0.85 * (1 - kk));
+      });
+    } });
+  }
+  function smiteHeal(T, amt, preview, o) {                                           // o (Unholy Siphon): { fixed: the amount, pal: the colours, label: the end of the log line }                                              // the 40%: golden motes stream from the target back to him, a glow on him, a green +N and his HP bar rises
+    var A = FIGHTERS.W, my = run, h = o && o.fixed != null ? Math.max(1, o.fixed) : Math.max(1, Math.round(amt * SMITE.heal)), got = Math.max(0, Math.min(A.max - A.hp, h)), now = performance.now(), P = (o && o.pal) || HOLY_PAL, rnd = rngOf((now | 0) + 11), ms = [], i;
+    var u = uW.offsetWidth, tr = rectIn(T.unit), p0 = { x: tr.left + tr.width * 0.5, y: tr.top + tr.height * 0.45 };
+    for (i = 0; i < 14; i++) ms.push({ d: i * 16, jx: (rnd() - 0.5) * u * 0.1, jy: (rnd() - 0.5) * u * 0.14, arc: u * (0.08 + rnd() * 0.16), s: 0.008 + rnd() * 0.008 });
+    var hero = function () { var sh = uW.querySelector(".sheet") || uW, r = rectIn(sh); return { x: r.left + r.width * 0.6, y: r.top + r.height * 0.47 }; };
+    fxAdd({ t0: now + 90 / speed, t1: now + 1150 / speed, draw: function (ctx, now2) {
+      var t = (now2 - now - 90 / speed) * speed, p1 = hero(), mid = { x: (p0.x + p1.x) / 2, y: Math.min(p0.y, p1.y) }, arrive = clamp01((t - 520) / 120) * (1 - clamp01((t - 700) / 380));
+      ms.forEach(function (m) {
+        var s = clamp01((t - m.d) / 420); if (s <= 0 || s >= 1) return;
+        var e = s * s * (3 - 2 * s), a = { x: p0.x + m.jx, y: p0.y + m.jy }, pos = bez(a, { x: mid.x, y: mid.y - m.arc }, p1, e), back = bez(a, { x: mid.x, y: mid.y - m.arc }, p1, Math.max(0, e - 0.07));
+        glowDot(ctx, back.x, back.y, u * m.s * 2.2, P.glow, 0.4 * Math.sin(s * 3.1416));
+        glowDot(ctx, pos.x, pos.y, u * m.s * 3.2, P.mid, 0.9 * Math.sin(s * 3.1416));
+        glowDot(ctx, pos.x, pos.y, u * m.s * 1.4, P.core, Math.sin(s * 3.1416));
+      });
+      glowDot(ctx, p1.x, p1.y, u * 0.34 * arrive + 1, P.glow, 0.34 * arrive);                          // a soft golden glow on him as the light arrives
+      glowDot(ctx, p1.x, p1.y, u * 0.2 * arrive + 1, P.mid, 0.3 * arrive);
+    } });
+    setTimeout(function () {                                                         // the heal lands: the HP bar rises (it flashes green), the number shows, the log says so
+      if (my !== run) return;
+      if (!preview) { A.hp += got; paintHp(A); say(A.name + " is restored for " + got + (got < h ? " (already near full HP)" : "") + ((o && o.label) || " (Radiant Smite heals 40% of the damage dealt)."), "w"); }
+      if (preview || got > 0) floatNumber(A, "+" + (preview ? h : got), "heal");
+    }, 560 / speed);
+  }
+
+  // DARK PENANCE (the game's text: "Chills the enemy's spirit with Dark Damage and 30% chance to apply Reduce Magic Def (-20% for 2 turns). If the target is already Purified, extends its duration by 1 turn."): a kneeling dark cast
+  // that never moves forward (a 7-frame strip, a FLAT path, the blow on frame 4): he bows his head, kneels and presses the weapon fist to the floor; during the pause a dark pool spreads under the fist and tendrils of
+  // darkness creep along the ground to the target; he rises and points, and the chill bursts out of the target: a violet-black bloom, pale cold wisps spiralling up out of its chest, a ring on the ground, the target gone
+  // dark for a moment. Reduce Magic Def and the Purified extension are NOT drawn (statuses come later). The violet is the dark slime's (DK_PAL). Anchored on PEN.fist, like Radiant Smite (no hand marks yet).
+  var PEN = { fist: [[368, 294], [312, 450], [311, 450], [442, 295], [458, 143], [407, 218], [389, 243]], shake: 5 };   // the far fist of each frame of the strip, in the strip's px (512 x 512 cells), measured from the strip
+  var PENANCE_SHOCK = [{ filter: "brightness(0.3) saturate(0.5) hue-rotate(235deg)", offset: 0 }, { filter: "brightness(0.55) saturate(0.7) hue-rotate(235deg)", offset: 0.55 }, { filter: "brightness(1)", offset: 1 }];
+  function penFist() {                                                               // the far fist on the frame on screen, in stage px, and the floor under him (null while another pose shows)
+    var cf = curFrame, sh = uW.querySelector(".sheet");
+    if (!cf || cf.pose !== "attack" || !sh || cf.i >= PEN.fist.length) return null;
+    var r = rectIn(sh), k = r.width / 512, f = PEN.fist[cf.i];
+    return { x: r.left + f[0] * k, y: r.top + f[1] * k, gy: r.top + 470 * k, k: k, i: cf.i };
+  }
+  function startPenance(clk, hitF, T) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tK = at(2, 0), tG = at(3, 0), tI = at(hitF, 0.4), P = DK_PAL, rnd = rngOf((tK | 0) + 7), pool = null, puffs = [], tend = [], i;
+    for (i = 0; i < 12; i++) puffs.push({ dx: (rnd() - 0.5) * 0.3, ph: rnd(), sp: 0.5 + rnd() * 0.7, s: 0.012 + rnd() * 0.012 });
+    for (i = 0; i < 4; i++) tend.push({ off: (i - 1.5) * 0.045, ph: rnd() * 6.28, amp: 0.01 + rnd() * 0.012, spd: 0.8 + rnd() * 0.5 });
+    var spread = function (now) { return now < tK ? 0 : 0.5 * clamp01((now - tK) / Math.max(1, tG - tK + 120)) + 0.5 * (now < tG ? 0 : clamp01((now - tG) / Math.max(1, tI - tG))); };   // how far the dark has spread, 0..1
+    var fadeOut = function (now) { return 1 - clamp01((now - tI) / 450); };
+    fxAdd({ t0: tK, t1: tI + 700, draw: function (ctx, now) {                                                  // in front of him: a violet glow on the fist and dark smoke rising from the pool
+      var q = penFist(), u = uW.offsetWidth, s = spread(now), fo = now > tI ? fadeOut(now) : 1, j, p, age;
+      if (q && !pool && q.i >= 1) pool = { x: q.x, y: q.gy - 6 * q.k };                                       // the pool forms where the fist first touches the floor and stays there
+      if (!pool || fo <= 0.01) return;
+      if (q && q.i >= 1 && q.i <= 3) glowDot(ctx, q.x, q.y, u * (0.05 + 0.07 * s), P.mid, 0.55 * fo);
+      for (j = 0; j < puffs.length; j++) {
+        p = puffs[j]; age = (now * 0.00045 * speed * p.sp + p.ph) % 1;
+        var px = pool.x + p.dx * u * (1 + age), py = pool.y - age * u * 0.24, rr = u * p.s * (0.8 + age * 1.6), al = 0.5 * Math.sin(age * 3.1416) * s * fo;
+        ctx.save(); ctx.fillStyle = "rgba(30,8,58," + (al * 0.8).toFixed(3) + ")"; ctx.beginPath(); ctx.arc(px, py, rr, 0, 6.2832); ctx.fill(); ctx.restore();
+        glowDot(ctx, px, py, rr * 1.6, P.glow, al * 0.45);
+      }
+    }, drawBack: function (cb, now) {                                                                          // behind the characters: the dark pool and the tendrils creeping along the floor to the target
+      var u = uW.offsetWidth, s = spread(now), fo = now > tI ? fadeOut(now) : 1;
+      if (!pool || s <= 0 || fo <= 0.01) return;
+      var tr = rectIn(T.unit), tg = { x: tr.left + tr.width * 0.5, y: tr.top + tr.height * 0.96 }, j, n, k, sx, sy, a;
+      var rp = u * (0.05 + 0.2 * Math.min(1, s * 1.6));                                                        // the pool
+      cb.save(); cb.fillStyle = "rgba(14,4,32," + (0.6 * Math.min(1, s * 2) * fo).toFixed(3) + ")"; cb.beginPath(); cb.ellipse(pool.x, pool.y, rp, rp * 0.28, 0, 0, 6.2832); cb.fill(); cb.restore();
+      glowEllipse(cb, pool.x, pool.y, rp * 1.05, rp * 0.3, P.glow, 0.35 * Math.min(1, s * 2) * fo);
+      var prog = clamp01((s - 0.45) / 0.55); prog = prog * prog * (3 - 2 * prog);                               // the tendrils crawl out during the pause and reach the target at the blow
+      if (prog <= 0.01) return;
+      for (j = 0; j < tend.length; j++) {
+        var td = tend[j], pts = [], steps = 26;
+        for (n = 0; n <= steps; n++) {
+          k = n / steps * prog; sx = pool.x + (tg.x - pool.x) * k; sy = pool.y + (tg.y - pool.y) * k + td.off * u * (1 - k * 0.7) + Math.sin(k * 14 + td.ph + now * 0.006 * td.spd * speed) * td.amp * u * (0.4 + k);
+          pts.push([sx, sy]);
+        }
+        [[0.03, "rgba(12,2,28," + (0.7 * fo).toFixed(3) + ")", false], [0.012, "rgba(" + P.mid + "," + (0.55 * fo).toFixed(3) + ")", true]].forEach(function (ps) {
+          cb.save(); cb.lineCap = "round"; cb.lineJoin = "round"; if (ps[2]) cb.globalCompositeOperation = "lighter"; cb.strokeStyle = ps[1];
+          for (n = 1; n < pts.length; n++) { cb.lineWidth = Math.max(1, u * ps[0] * (1 - n / pts.length * 0.8)); cb.beginPath(); cb.moveTo(pts[n - 1][0], pts[n - 1][1]); cb.lineTo(pts[n][0], pts[n][1]); cb.stroke(); }
+          cb.restore();
+        });
+        glowDot(cb, pts[pts.length - 1][0], pts[pts.length - 1][1], u * 0.03, P.core, 0.7 * fo);
+      }
+    } });
+    penancePaint(clk, hitF, T);
+    return { impact: function () { penanceImpact(T); }, shockAnim: PENANCE_SHOCK };
+  }
+  function penanceImpact(T) {                                                        // the chill bursts out of the target: a violet-black bloom, a cold flash, pale wisps spiralling up, a cold ring on the ground
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.5, cy = r.top + r.height * 0.45, gy = r.top + r.height * 0.97, rnd = rngOf(now | 0), P = DK_PAL, ws = [], i;
+    shake(PEN.shake, 260);
+    for (i = 0; i < 10; i++) ws.push({ a0: rnd() * 6.2832, r0: 0.1 + rnd() * 0.18, d: rnd() * 260, sp: 1.6 + rnd() * 1.2, rise: 0.5 + rnd() * 0.5, s: 0.006 + rnd() * 0.006 });
+    fxAdd({ t0: now, t1: now + 1150 / speed, draw: function (ctx, now2) {
+      var t = (now2 - now) * speed, k = clamp01(t / 300), fade = 1 - clamp01((t - 300) / 700), rk = clamp01(t / 650);
+      if (t < 160) glowDot(ctx, cx, cy, u * (0.12 + 0.2 * (t / 160)), P.flash, 0.8 * (1 - t / 160));
+      glowDot(ctx, cx, cy, u * (0.1 + 0.35 * k), P.glow, 0.5 * fade); glowDot(ctx, cx, cy, u * (0.05 + 0.18 * k), P.mid, 0.6 * fade);
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + P.mid + "," + (0.6 * (1 - rk)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.012 * (1 - rk));
+      ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.08 + 0.5 * rk), u * (0.08 + 0.5 * rk) * 0.22, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
+      ws.forEach(function (w) {                                                      // pale cold wisps spiralling up out of its chest in a loose helix
+        var kk = clamp01((t - w.d) / 800); if (kk <= 0 || kk >= 1) return;
+        var a = w.a0 + kk * w.sp * 3.1416, rad = u * w.r0 * (1 - 0.4 * kk), x = cx + Math.cos(a) * rad, y = cy + r.height * 0.12 - kk * r.height * w.rise * 0.9 + Math.sin(a) * rad * 0.25;
+        glowDot(ctx, x, y, u * w.s * 4.2, "214,222,255", 0.7 * Math.sin(kk * 3.1416));
+        glowDot(ctx, x, y, u * w.s * 2, "255,255,255", 0.8 * Math.sin(kk * 3.1416));
+      });
+    } });
+  }
+  // UNHOLY SIPHON (the game's text: "Channels dark tendrils into the target, dealing moderate Dark Damage and stealing 1.7% of the enemy's current HP (capped at 3.3% of the Cleric's max HP) to heal directly. If the target has Reduce Magic Def, 25%
+  // chance to apply Weaken (-20% Speed, -20% Accuracy for 2 turns)."): a reach and a wrench (a 7-frame strip, a FLAT path, the blow on frame 4). He thrusts the far fist out at the target and holds it: dark tendrils (the dark slime's violet, DK_PAL)
+  // stream out of his fist and latch onto the target's chest; then he WRENCHES the fist back, the tendrils go taut and the life is torn out: a dark ring shrinks into its chest with a violet-black bloom, and violet-green wisps stream back to him
+  // (smiteHeal with the Siphon's own colours) while his HP rises. The steal is a PLACEHOLDER: the game's 1.7% of the target's current HP (at most 3.3% of his max) is tiny, so the page takes 12% (at most 15%) to make it show in a 120-HP demo.
+  // A dodged cast: the tendrils fall away at the wrench and nothing is stolen. Weaken and Reduce Magic Def are NOT drawn (statuses come later). Anchored on SIP.fist (the far fist of each frame of the strip, measured; no hand marks yet).
+  var SIP = { fist: [[375, 278], [463, 162], [481, 127], [178, 273], [390, 205], [380, 223], [390, 242]], steal: 0.12, cap: 0.15, shake: 4 };
+  var SIP_PAL = { core: "232,255,238", mid: "150,235,170", glow: "128,70,206", deep: "60,20,110", flash: "236,255,240" };
+  function sipFist() {                                                               // the far fist on the frame on screen, in stage px (null while another pose shows)
+    var cf = curFrame, sh = uW.querySelector(".sheet");
+    if (!cf || cf.pose !== "attack" || !sh || cf.i >= SIP.fist.length) return null;
+    var r = rectIn(sh), k = r.width / 512, f = SIP.fist[cf.i];
+    return { x: r.left + f[0] * k, y: r.top + f[1] * k };
+  }
+  function siphonSteal(T) { return Math.max(1, Math.min(Math.round(T.hp * SIP.steal), Math.round(FIGHTERS.W.max * SIP.cap))); }
+  function startSiphon(clk, hitF, T, miss) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tR = at(2, 0), tC = at(3, 0), tW = at(hitF, 0), tI = at(hitF, 0.4), D = DK_PAL, rnd = rngOf((tR | 0) + 5), tend = [], i;
+    for (i = 0; i < 5; i++) tend.push({ off: (i - 2) * 0.034, ph: rnd() * 6.28, amp: 0.02 + rnd() * 0.016, spd: 0.7 + rnd() * 0.6, lag: i * 0.04 });
+    var ease = function (v) { v = clamp01(v); return v * v * (3 - 2 * v); };
+    fxAdd({ t0: tR, t1: tI + 1100, draw: function (ctx, now) {
+      var q = sipFist(); if (!q) return;
+      var u = uW.offsetWidth, tr = rectIn(T.unit), tg = { x: tr.left + tr.width * 0.5, y: tr.top + tr.height * 0.45 }, dx = tg.x - q.x, dy = tg.y - q.y, len = Math.max(1, Math.sqrt(dx * dx + dy * dy)), nx = -dy / len, ny = dx / len;
+      var taut = ease((now - (tW - 140)) / 140), al = 1,   // (they writhe while he channels and go taut only as he wrenches)
+       j, n, f, wob, pts, p, s;
+      if (miss) al = 1 - clamp01((now - tW) / 220); else if (now > tI + 60) al = 1 - clamp01((now - tI - 60) / 380);
+      if (al <= 0.01) return;
+      var amp = 1 - 0.88 * taut + (now >= tW ? -0.1 : 0);
+      for (j = 0; j < tend.length; j++) {
+        var td = tend[j], reach = ease((now - tR - td.lag * 300) / Math.max(1, tC + 180 - tR));
+        if (reach <= 0.01) continue;
+        pts = [];
+        for (n = 0; n <= 30; n++) {
+          f = n / 30 * reach; wob = (Math.sin(f * 9 + td.ph + now * 0.006 * td.spd * speed) * td.amp * Math.max(0.05, amp) + td.off * (1 - taut * 0.8)) * u * Math.sin(Math.PI * Math.min(1, f)) * 1.4;
+          pts.push({ x: q.x + dx * f + nx * wob, y: q.y + dy * f + ny * wob });
+        }
+        [[0.026, "rgba(12,2,28," + (0.75 * al).toFixed(3) + ")", false], [0.011, "rgba(" + D.mid + "," + (0.6 * al).toFixed(3) + ")", true], [0.004, "rgba(" + D.core + "," + (0.9 * al).toFixed(3) + ")", true]].forEach(function (ps) {
+          ctx.save(); ctx.lineCap = "round"; ctx.lineJoin = "round"; if (ps[2]) ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = ps[1];
+          for (n = 1; n < pts.length; n++) { ctx.lineWidth = Math.max(1, u * ps[0] * (1 - n / pts.length * 0.7)); ctx.beginPath(); ctx.moveTo(pts[n - 1].x, pts[n - 1].y); ctx.lineTo(pts[n].x, pts[n].y); ctx.stroke(); }
+          ctx.restore();
+        });
+        glowDot(ctx, pts[pts.length - 1].x, pts[pts.length - 1].y, u * 0.022, D.core, 0.8 * al);   // the leading tip
+        if (now < tI) {                                                              // dark knots slide along the tendril toward the target while it channels
+          s = ((now * 0.0011 * speed) + j * 0.21) % 1; p = pts[Math.min(pts.length - 1, Math.floor(s * (pts.length - 1) * Math.min(1, reach)))];
+          glowDot(ctx, p.x, p.y, u * 0.014, D.mid, 0.7 * al * clamp01((now - tC + 80) / 200));
+        }
+      }
+      if (!miss && now > tC + 100) glowDot(ctx, tg.x, tg.y, u * (0.03 + 0.06 * clamp01((now - tC - 100) / 300)), D.glow, 0.6 * al);   // where they latch on
+      if (now < tR + 200) glowDot(ctx, q.x, q.y, u * 0.05 * clamp01((now - tR) / 120), D.glow, 0.6);            // a violet glow on the fist as they leave it
+    } });
+    siphonPaint(clk, hitF, T, miss);
+    return { impact: function () { siphonImpact(T); }, heal: function (amt, preview) { smiteHeal(T, amt, preview, { fixed: siphonSteal(T), pal: SIP_PAL, label: " (Unholy Siphon steals a share of the target's current HP; the amount is a placeholder)." }); }, shockAnim: PENANCE_SHOCK };
+  }
+  function siphonImpact(T) {                                                         // the wrench: a dark ring shrinks into the target's chest, a violet-black bloom, a flash, green-violet motes torn out of it
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.5, cy = r.top + r.height * 0.45, D = DK_PAL, rnd = rngOf(now | 0), ms = [], i;
+    shake(SIP.shake, 220);
+    for (i = 0; i < 12; i++) ms.push({ a: rnd() * 6.2832, d: rnd() * 180, r: 0.04 + rnd() * 0.1, s: 0.006 + rnd() * 0.006 });
+    fxAdd({ t0: now, t1: now + 950 / speed, draw: function (ctx, now2) {
+      var t = (now2 - now) * speed, k = clamp01(t / 380), fade = 1 - clamp01((t - 320) / 520);
+      if (t < 150) glowDot(ctx, cx, cy, u * (0.1 + 0.14 * (t / 150)), D.flash, 0.85 * (1 - t / 150));
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + D.mid + "," + (0.8 * fade).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.012 * (1 - k * 0.5));
+      ctx.beginPath(); ctx.arc(cx, cy, u * (0.34 * (1 - k) + 0.02), 0, 6.2832); ctx.stroke(); ctx.restore();   // the ring that shrinks into its chest: the pull
+      glowDot(ctx, cx, cy, u * (0.1 + 0.08 * k), D.glow, 0.45 * fade);
+      ms.forEach(function (m) {                                                      // green-violet motes torn out of it
+        var kk = clamp01((t - m.d) / 520); if (kk <= 0 || kk >= 1) return;
+        var a = m.a + kk * 2.4, rr = u * m.r * (1 + 1.4 * kk);
+        glowDot(ctx, cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.8 - u * 0.05 * kk, u * m.s * 3.6, SIP_PAL.mid, 0.85 * Math.sin(kk * 3.1416));
+        glowDot(ctx, cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.8 - u * 0.05 * kk, u * m.s * 1.6, SIP_PAL.core, 0.9 * Math.sin(kk * 3.1416));
+      });
+    } });
+  }
+  // SANCTIFIED JUDGMENT (the game's text: "Calls down a pillar of divine light for heavy Holy Damage, dealing +40% bonus damage if the target is Purified or has Reduce Magic Def. If this lands while the Cleric has an active reflect barrier, cleanses 1
+  // random debuff from the Cleric."): a call from the heavens and a verdict (a 7-frame strip, a FLAT path, the blow on frame 4): he lifts his head, raises the far fist straight up on his toes with a cry and HOLDS it (450 ms), then throws the arm down and
+  // points at the target. Everything else is code and happens at the TARGET: during the lift and the call a ring of light with turning runes grows on the ground under it, a thread of light thickens above it and a glow gathers at the top of the stage; at the
+  // verdict the PILLAR crashes down (a column of white-gold light from the top of the stage onto the target: a screen flash, Radiant Smite's burst, a shockwave on the ground, a heavy shake) and burns on for about half a second. A dodged verdict: the pillar
+  // still crashes down, on the empty ground, without the flash and the burst. Heavy: the page's damage is JUD.mult (3) times the script's number, about the game's x1.40 against Radiant Smite's x0.44 (a placeholder, the engine decides); the +40% bonus, the cleanse,
+  // Purified and Reduce Magic Def are NOT drawn (statuses come later); the cooldown of 2 is the engine's. The ring and the glow on his fist ride on JUD.fist (the far fist of each frame, measured; no hand marks yet).
+  var JUD = { fist: [[384, 416], [360, 194], [375, 157], [436, 385], [434, 349], [370, 357], [390, 370]], mult: 3, shake: 8 };
+  function judFist() {                                                               // the far fist on the frame on screen, in stage px (null while another pose shows)
+    var cf = curFrame, sh = uW.querySelector(".sheet");
+    if (!cf || cf.pose !== "attack" || !sh || cf.i >= JUD.fist.length) return null;
+    var r = rectIn(sh), k = r.width / 512, f = JUD.fist[cf.i];
+    return { x: r.left + f[0] * k, y: r.top + f[1] * k };
+  }
+  function startJudgment(clk, hitF, T, miss) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tR = at(2, 0), tV = at(hitF, 0), tI = at(hitF, 0.4), P = HOLY_PAL, sc = 1 / speed;
+    var ease = function (v) { v = clamp01(v); return v * v * (3 - 2 * v); };
+    var geo = function () { var r = rectIn(T.unit); return { x: r.left + r.width * 0.5, gy: r.top + r.height * 0.97, top: r.top }; };
+    var col = function (ctx, x, w, y1, rgb, a) { var g = ctx.createLinearGradient(x - w / 2, 0, x + w / 2, 0); g.addColorStop(0, "rgba(" + rgb + ",0)"); g.addColorStop(0.5, "rgba(" + rgb + "," + a.toFixed(3) + ")"); g.addColorStop(1, "rgba(" + rgb + ",0)"); ctx.fillStyle = g; ctx.fillRect(x - w / 2, 0, w, y1); };
+    fxAdd({ t0: tR, t1: tI + 1600 * sc,
+      drawBack: function (cb, now) {                                                 // the ring of light and runes on the ground under the target (behind the characters)
+        var g = geo(), u = uW.offsetWidth, prog = ease((now - tR) / Math.max(1, tV - tR)), out = 1 - clamp01((now - tI - 500 * sc) / (700 * sc)), a, R, i, ang, x, y;
+        if (out <= 0.01) return;
+        a = (0.2 + 0.6 * prog) * out * (now >= tI ? 1.5 : 1); R = u * (0.07 + 0.13 * prog) * (1 + (now >= tI ? 0.25 * ease((now - tI) / (300 * sc)) : 0));
+        glowEllipse(cb, g.x, g.gy, R * 1.2, R * 0.3, P.glow, 0.35 * Math.min(1, a));
+        cb.save(); cb.globalCompositeOperation = "lighter"; cb.lineCap = "round";
+        cb.strokeStyle = "rgba(" + P.mid + "," + Math.min(1, 0.8 * a).toFixed(3) + ")"; cb.lineWidth = 2; cb.beginPath(); cb.ellipse(g.x, g.gy, R, R * 0.26, 0, 0, 6.2832); cb.stroke();
+        cb.strokeStyle = "rgba(" + P.core + "," + Math.min(1, 0.6 * a).toFixed(3) + ")"; cb.lineWidth = 1.2; cb.beginPath(); cb.ellipse(g.x, g.gy, R * 0.72, R * 0.19, 0, 0, 6.2832); cb.stroke();
+        for (i = 0; i < 16; i++) {                                                   // rune ticks turning round the ring
+          ang = i * 0.3927 + now * 0.0007 * speed; x = g.x + Math.cos(ang) * R; y = g.gy + Math.sin(ang) * R * 0.26;
+          cb.strokeStyle = "rgba(" + P.core + "," + Math.min(1, (i % 2 ? 0.5 : 0.8) * a).toFixed(3) + ")"; cb.lineWidth = i % 2 ? 1 : 2;
+          cb.beginPath(); cb.moveTo(x, y); cb.lineTo(g.x + Math.cos(ang) * R * (i % 2 ? 0.88 : 0.8), g.gy + Math.sin(ang) * R * 0.26 * (i % 2 ? 0.88 : 0.8)); cb.stroke();
+        }
+        cb.restore();
+      },
+      draw: function (ctx, now) {                                                    // in front: the thread of light and the glow above the target, the pillar, the screen flash, the glow on his fist
+        var g = geo(), u = uW.offsetWidth, prog = ease((now - tR) / Math.max(1, tV - tR)), q = judFist(), k, f, w, i;
+        if (now < tI) {
+          col(ctx, g.x, u * (0.03 + 0.07 * prog), g.gy, P.mid, 0.18 + 0.5 * prog);
+          glowDot(ctx, g.x, Math.max(u * 0.04, g.top - u * 0.14), u * (0.06 + 0.16 * prog), P.glow, 0.65 * prog); glowDot(ctx, g.x, Math.max(u * 0.04, g.top - u * 0.14), u * (0.03 + 0.08 * prog), P.core, 0.9 * prog);
+        } else {
+          k = clamp01((now - tI) / (90 * sc)); f = 1 - clamp01((now - tI - 450 * sc) / (550 * sc)) ; w = miss ? 0.7 : 1;
+          if (f > 0.01) {
+            ctx.save(); ctx.globalCompositeOperation = "lighter";
+            col(ctx, g.x, u * 0.7 * w * (0.4 + 0.6 * k), g.gy, P.glow, 0.28 * f); col(ctx, g.x, u * 0.4 * w * (0.3 + 0.7 * k), g.gy, P.mid, 0.5 * f); col(ctx, g.x, u * 0.16 * w * (0.2 + 0.8 * k), g.gy, P.core, 0.95 * f);
+            ctx.restore();
+            glowDot(ctx, g.x, g.gy, u * 0.3 * w * f + 1, P.glow, 0.5 * f);
+            if (!miss && now - tI < 220 * sc) { ctx.save(); ctx.fillStyle = "rgba(255,240,200," + (0.3 * (1 - (now - tI) / (220 * sc))).toFixed(3) + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight); ctx.restore(); }
+          }
+        }
+        if (q && now < tI + 350 * sc) {                                              // the far fist glows while he calls and when he points
+          f = now < tV ? 0.3 + 0.7 * prog : clamp01(1 - (now - tV) / (350 * sc));
+          glowDot(ctx, q.x, q.y, u * 0.06 * (0.6 + f), P.glow, 0.5 * f); glowDot(ctx, q.x, q.y, u * 0.03 * (0.6 + f), P.core, 0.85 * f);
+        }
+      } });
+    judgmentPaint(clk, hitF, T, miss);
+    return { impact: function () { judgmentImpact(T); }, shockAnim: HOLY_SHOCK };
+  }
+  function judgmentImpact(T) {                                                       // the pillar lands: Radiant Smite's white-gold burst, a heavier shake and two shockwave rings running out over the ground
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.5, gy = r.top + r.height * 0.97, P = HOLY_PAL;
+    smiteImpact(T); shake(JUD.shake, 360);
+    fxAdd({ t0: now, t1: now + 1000 / speed, draw: function (ctx, now2) {
+      var t = (now2 - now) * speed, i, k;
+      ctx.save(); ctx.globalCompositeOperation = "lighter";
+      for (i = 0; i < 2; i++) {
+        k = clamp01((t - i * 160) / 700); if (k <= 0 || k >= 1) continue;
+        ctx.strokeStyle = "rgba(" + P.mid + "," + (0.75 * (1 - k)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.016 * (1 - k));
+        ctx.beginPath(); ctx.ellipse(cx, gy, u * (0.1 + 0.9 * k), u * (0.1 + 0.9 * k) * 0.22, 0, 0, 6.2832); ctx.stroke();
+      }
+      ctx.restore();
+    } });
+  }
+  // AEGIS OF RETRIBUTION (the game's text: "Barrier of 100% combined DEF for 2 turns, reflects 40%, +20% damage while up; shelters the lowest-HP ally (20%)"): a SELF-BUFF, the first Cleric skill WITHOUT a target. A braced cast that draws a shield in the
+  // air (a 7-frame strip, a FLAT path, the lock on frame 5): the far fist traces a rising arc (low in front, shoulder height, high above his head: the crest, the hold) and plunges into a deep crouch (the seal = the hit frame). The
+  // page draws what the game's barrier is: the MAGE'S BARRIER GLASS (brDraw, the same renderer as her passive and as every Block: a half circle on the side the enemy is on, its ground ring, the bright arc that climbs it while it forms,
+  // the flash and the ring of light when it is complete) in a HOLY tint (L.rgb), raised from the sweep to the seal and locking in a flash on frame 5, with a golden trail that follows the far fist along the arc (AEG.fist = the far fist of
+  // each frame in the strip's pixels, measured; no hand marks yet). It hits nothing: no flash on the target, no damage number, nothing flinches (aegisAct in a fight, `noTarget` in the preview). It is the page's one barrier (brLive): it
+  // ripples when the Cleric is hit, breaks when he falls and goes when the fight ends; in a fight it also lasts through the Cleric's NEXT turn (the game says 2 turns: aegisLeft counts his turns), in the preview AEG.previewMs.
+  // "Alternate the skills" cycles the attacks only: an Aegis turn hits nothing, so it is played when it is chosen. Reflect, the +20% damage, the ally shelter and the 2-turn status are NOT drawn (statuses come later; there is no party).
+  var AEG = { fist: [[390, 370], [432, 470], [448, 243], [353, 134], [395, 409], [367, 367], [390, 370]], rgb: { line: "255,236,170", glow: "255,196,84", core: "255,250,225" }, vis: 0.8, previewMs: 3800 }, aegisLeft = 0;
+  function aegFistPt(i) {                                                            // the far fist of frame i (0-based) in stage px, from the sheet on screen
+    var sh = uW.querySelector(".sheet"), r = rectIn(sh), k = r.width / 512, f = AEG.fist[i];
+    return { x: r.left + f[0] * k, y: r.top + f[1] * k };
+  }
+  function aegCentre() { var r = rectIn(uW.querySelector(".sheet")), k = r.width / 512; return { x: r.left + 293 * k, y: r.top + 330 * k }; }   // his chest, the middle of the arc the fist draws round him
+  function aegGeo(L, A, rs) {                                                            // the glass's size and place, read again every frame (the sheet changes with the pose): the numbers blockFx uses on a character
+    var er = rectIn(A.unit.querySelector(".sheet") || A.unit), R = uW.offsetWidth * 0.5 * (rs || 1), sd = A.dir, bx = er.left + er.width * 0.572;
+    L.geo = { sd: sd, r: R, cx: bx + sd * R * 0.16, gy: er.top + er.height - er.width * 42 / 512, vis: AEG.vis };
+  }
+  function startAegis(clk, hitF, A, opt) {
+    opt = opt || {};
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, kt = [at(2, 0), at(3, 0), at(4, 0)], tLock = at(hitF, 0), P = HOLY_PAL, sc = 1 / speed, trail = [], L;
+    barrierDrop(false);                                                              // (a barrier that is still up lets go as the new one forms)
+    L = { t0: kt[0], t1: Infinity, sc: sc, castMs: Math.max(250, tLock - kt[0]), dropMs: BR_DROP_MS * sc, endAt: 0, broken: false, rip: [], rgb: AEG.rgb,
+      draw: function (ctx, now, l) { aegGeo(l, A); brDraw(ctx, now, l, false); }, drawBack: function (ctx, now, l) { aegGeo(l, A); brDraw(ctx, now, l, true); } };
+    brLive = L; fxAdd(L);
+    if (opt.preview) setTimeout(function () { if (brLive === L) barrierDrop(false); }, Math.max(0, tLock - performance.now()) + AEG.previewMs * sc);
+    var ease = function (u) { u = clamp01(u); return u * u * (3 - 2 * u); };
+    var tipAt = function (now) {                                                     // the fist's smooth path along the arc: low in front (frame 2), shoulder height (3), the crest (4)
+      var p = [aegFistPt(1), aegFistPt(2), aegFistPt(3)], c = aegCentre(), i, u, a, b, qx, qy;
+      if (now < kt[0]) return null;
+      for (i = 0; i < 2; i++) if (now < kt[i + 1]) {                                   // a curve bulging away from his chest between two key points, so the trail is an ARC and not a zigzag
+        u = ease((now - kt[i]) / Math.max(1, kt[i + 1] - kt[i])); a = p[i]; b = p[i + 1];
+        qx = (a.x + b.x) / 2 + ((a.x + b.x) / 2 - c.x) * 0.4; qy = (a.y + b.y) / 2 + ((a.y + b.y) / 2 - c.y) * 0.4;
+        return { x: (1 - u) * (1 - u) * a.x + 2 * (1 - u) * u * qx + u * u * b.x, y: (1 - u) * (1 - u) * a.y + 2 * (1 - u) * u * qy + u * u * b.y };
+      }
+      return p[2];
+    };
+    fxAdd({ t0: kt[0] - 40, t1: tLock + 1500, draw: function (ctx, now) {            // in front of him: the golden trail along the arc he draws, and a glow on the fist while he draws it
+      var u = uW.offsetWidth, tip = tipAt(now), j, a, w, s0, s1;
+      if (tip && now < tLock + 40) trail.push({ x: tip.x, y: tip.y, t: now });
+      while (trail.length && now - trail[0].t > 1100 * sc) trail.shift();
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round"; ctx.lineJoin = "round";
+      for (j = 1; j < trail.length; j++) {
+        s0 = trail[j - 1]; s1 = trail[j]; a = clamp01(1 - (now - s1.t) / (1100 * sc)); w = a * a;
+        ctx.strokeStyle = "rgba(" + P.glow + "," + (0.35 * w).toFixed(3) + ")"; ctx.lineWidth = Math.max(1, u * 0.024 * a); ctx.beginPath(); ctx.moveTo(s0.x, s0.y); ctx.lineTo(s1.x, s1.y); ctx.stroke();
+        ctx.strokeStyle = "rgba(" + P.core + "," + (0.9 * w).toFixed(3) + ")"; ctx.lineWidth = Math.max(0.8, u * 0.007 * a); ctx.beginPath(); ctx.moveTo(s0.x, s0.y); ctx.lineTo(s1.x, s1.y); ctx.stroke();
+      }
+      ctx.restore();
+      if (tip && now < tLock + 120) glowDot(ctx, tip.x, tip.y, u * 0.05, P.mid, 0.75 * clamp01(1 - (now - tLock) / 120));
+    } });
+    aegisPaint(clk, hitF, A, L);
+    return { noTarget: true, phys: true, impact: function () { shake(2, 140); floatNumber(A, "AEGIS", "holy"); } };
+  }
+  async function aegisAct(myRun, A) {                                                // a turn in which the Cleric only raises the barrier: nothing is hit, nothing flinches
+    var hitF = Math.max(1, +$("hitFrame").value || 5), done = playPose("attack", false, atkHolds()), clk = player.clock, fx, wait;
+    done.then(backToIdle);
+    fx = startAegis(clk, hitF, A, {});
+    aegisLeft = 2;
+    wait = clkAt(clk, hitF, 0.4) - performance.now();
+    if (wait > 0) await sleep(wait);
+    if (myRun !== run) return;
+    fx.impact();
+    say(A.name + " raises an Aegis of Retribution (a barrier; the reflect, the damage bonus and the ally shelter are not drawn).", "w");
+    await done;
+    if (myRun !== run) return;
+    clearAnims(A.unit);
+  }
+  // SPITEFUL COVENANT (the game's text: "Sacrifices 50% of current HP to grant a barrier equal to 200% of your combined Physical and Magic Defense for 2 turns, reflecting 60% of damage absorbed back as Holy Damage, and increasing your damage by 40%
+  // while it holds. In a party, every living ally is also sheltered in a barrier worth 15% of yours. 45% chance to apply Condemned (...). Can only be cast twice per battle."): the Aegis's ANGRY, COSTLY twin, a SELF-BUFF with no target (it goes through
+  // aegisAct's way: covenantAct): paying in pain, then a roar (a 7-frame strip, a FLAT path, the lock on frame 4). The page draws the COST and the barrier. The cost: during the two bowed frames dark-red motes are drawn out of his belly and sink into the
+  // ground under him (a red pool grows there) and his HP really drops by half (a red number and a log line; in the preview only the number). The barrier: at the roar it ERUPTS, the Mage's Barrier glass (brDraw, as the Aegis) in a crimson-gold tint, 25% bigger
+  // (200% of his DEF against the Aegis's 100%), snapping up in a flash with a ring of light on the ground and embers rising from it; like the Aegis it is the page's one barrier (brLive), ripples when he is hit, breaks if he falls, and lasts through his NEXT turn
+  // (aegisLeft). Reflect, +40% damage, the ally shelter, Condemned, the 2 turns and the twice-per-battle limit are NOT drawn (statuses and the engine come later: the page lets him cast it as often as it is chosen). "Alternate the skills" skips it.
+  var COV = { fist: [[300, 345], [312, 358], [358, 404], [381, 191], [363, 226], [351, 350], [390, 370]], rgb: { line: "255,128,104", glow: "224,52,48", core: "255,196,168" }, red: "190,26,38", size: 1.25, vis: 0.85, previewMs: 3800 };
+  function covPt(i) {                                                                // the far fist of frame i (0-based) in stage px, and the floor under him, from the sheet on screen
+    var sh = uW.querySelector(".sheet"), r = rectIn(sh), k = r.width / 512, f = COV.fist[i];
+    return { x: r.left + f[0] * k, y: r.top + f[1] * k, gy: r.top + r.height - r.width * 42 / 512, fx: r.left + 293 * k };   // (the floor is 42/512 of the cell's width above its bottom in the 512 cell of the idle and in the 640 cell of the attack)
+  }
+  // THE BARRIER AFTER THE CAST (2026-11-22; the user: the red shield must not stay after the cast). The Aegis and the Covenant are ONE category, a Barrier, so once the cast is over they look the SAME: the Aegis's steady glass (AEG.rgb, size 1, AEG.vis).
+  // The Covenant's own look (the crimson glass 25% bigger and half as bright, the red shield, the flames) is its CAST look only: it holds COV_HOLD_MS after the lock, then the shield melts away while the glass settles into the steady look over COV_SETTLE_MS.
+  var COV_HOLD_MS = 1100, COV_SETTLE_MS = 800;
+  function covSettle(now, tLock, sc) { var s = clamp01((now - tLock - COV_HOLD_MS * sc) / (COV_SETTLE_MS * sc)); return s * s * (3 - 2 * s); }   // 0 = the cast look, 1 = the steady Barrier
+  function mixRgb(a, b, s) { var p = a.split(","), q = b.split(","), i, o = []; for (i = 0; i < 3; i++) o.push(Math.round(+p[i] + (+q[i] - +p[i]) * s)); return o.join(","); }
+  function covGlass(l, A, now, tLock, sc) {                                          // the glass's size, brightness and colour at time `now` (read by both passes, so they agree)
+    var s = covSettle(now, tLock, sc), v0 = COV.vis * (pcImg("cp_shield") ? 0.5 : 1);
+    aegGeo(l, A, COV.size + (1 - COV.size) * s);
+    l.geo.vis = v0 + (AEG.vis - v0) * s;
+    l.rgb = { line: mixRgb(COV.rgb.line, AEG.rgb.line, s), glow: mixRgb(COV.rgb.glow, AEG.rgb.glow, s), core: mixRgb(COV.rgb.core, AEG.rgb.core, s) };
+  }
+  function startCovenant(clk, hitF, A, opt) {
+    opt = opt || {};
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, t1 = at(1, 0), tPay = at(1, 0.6), t3 = at(3, 0), tLock = at(hitF, 0), sc = 1 / speed, my = run, rnd = rngOf((t1 | 0) + 13), ms = [], sp = [], i, L;
+    var ease = function (v) { v = clamp01(v); return v * v * (3 - 2 * v); };
+    for (i = 0; i < 24; i++) ms.push({ d: i * ((t3 - t1) * 0.85 / 24), life: Math.max(620 * sc, (t3 - t1) * 0.3), jx: (rnd() - 0.5) * 0.07, ex: (rnd() - 0.5) * 0.16, bend: (rnd() - 0.5) * 0.12, s: 0.008 + rnd() * 0.008 });
+    for (i = 0; i < 22; i++) sp.push({ a: (rnd() - 0.5) * 1.6, v: 0.08 + rnd() * 0.22, d: rnd() * 260 * sc, life: (700 + rnd() * 500) * sc, s: 0.005 + rnd() * 0.006, x: (rnd() - 0.5) * 2 });
+    barrierDrop(false);                                                              // (a barrier that is still up lets go as the new one forms)
+    L = { t0: tLock - 60 * sc, t1: Infinity, sc: sc, castMs: 420 * sc, dropMs: BR_DROP_MS * sc, endAt: 0, broken: false, rip: [], rgb: COV.rgb,
+      draw: function (ctx, now, l) { covGlass(l, A, now, tLock, sc); brDraw(ctx, now, l, false); }, drawBack: function (cb, now, l) { covGlass(l, A, now, tLock, sc); brDraw(cb, now, l, true); } };
+    brLive = L; fxAdd(L);
+    if (opt.preview) setTimeout(function () { if (brLive === L) barrierDrop(false); }, Math.max(0, tLock - performance.now()) + COV.previewMs * sc);
+    setTimeout(function () {                                                         // the price: half of his current HP (a red number; in the preview only the number)
+      if (my !== run) return;
+      var cost = Math.max(1, Math.floor(A.hp * 0.5));
+      if (!opt.preview && A.hp > 1) { cost = Math.min(cost, A.hp - 1); A.hp -= cost; paintHp(A); say(A.name + " pays " + cost + " HP (half of his current HP) for the Spiteful Covenant.", "w"); }
+      floatNumber(A, "-" + cost, "burn");
+    }, Math.max(0, tPay - performance.now()));
+    fxAdd({ t0: t1 - 30, t1: tLock + 1700 * sc,
+      drawBack: function (cb, now) {                                                 // the red pool on the ground under him: it grows while he pays and goes out with the barrier's flash
+        var u = uW.offsetWidth, p = covPt(1), g = ease((now - t1) / Math.max(1, tLock - t1)), out = 1 - clamp01((now - tLock - 300 * sc) / (700 * sc)), R = u * (0.05 + 0.15 * g);
+        if (out <= 0.01 || now < t1) return;
+        glowEllipse(cb, p.fx, p.gy - 4, R * 1.2, R * 0.3, COV.red, 0.55 * g * out + 0.1 * out); glowEllipse(cb, p.fx, p.gy - 4, R * 0.7, R * 0.18, "255,120,90", 0.35 * g * out);
+      },
+      draw: function (ctx, now) {                                                    // in front: the motes drawn out of his belly and sinking into the ground, then the embers rising from the ring at the roar
+        var u = uW.offsetWidth, p = covPt(Math.min(1, Math.max(0, (curFrame && curFrame.pose === "attack" ? curFrame.i : 0)))), j, m, s, e, pos, a;
+        for (j = 0; j < ms.length; j++) {
+          m = ms[j]; s = (now - t1 - m.d) / m.life; if (s <= 0 || s >= 1 || now > t3 + 200 * sc) continue;
+          e = ease(s); pos = bez({ x: p.x + m.jx * u, y: p.y }, { x: p.x + (m.jx + m.bend) * u * 2, y: (p.y + p.gy) / 2 }, { x: p.fx + m.ex * u, y: p.gy - 3 }, e);
+          a = Math.sin(s * 3.1416);
+          glowDot(ctx, pos.x, pos.y, u * m.s * 3.4, COV.red, 0.85 * a); glowDot(ctx, pos.x, pos.y, u * m.s * 1.5, "255,150,120", 0.9 * a);
+        }
+        if (now >= tLock) {
+          for (j = 0; j < sp.length; j++) {
+            m = sp[j]; s = (now - tLock - m.d) / m.life; if (s <= 0 || s >= 1) continue;
+            glowDot(ctx, p.fx + (m.x * 0.3 + m.a * s * 0.3) * u * COV.size * 0.5, p.gy - 4 - s * u * m.v * 3.2, u * m.s * 3.2, COV.rgb.glow, 0.85 * Math.sin(s * 3.1416));
+            glowDot(ctx, p.fx + (m.x * 0.3 + m.a * s * 0.3) * u * COV.size * 0.5, p.gy - 4 - s * u * m.v * 3.2, u * m.s * 1.4, COV.rgb.core, 0.9 * Math.sin(s * 3.1416));
+          }
+        }
+      } });
+    covenantPaint(clk, hitF, A, L);
+    return { noTarget: true, phys: true, impact: function () { shake(3, 200); floatNumber(A, "COVENANT", "crit"); } };
+  }
+  async function covenantAct(myRun, A) {                                             // a turn in which the Cleric only pays and raises the barrier: nothing is hit, nothing flinches
+    var hitF = Math.max(1, +$("hitFrame").value || 4), done = playPose("attack", false, atkHolds()), clk = player.clock, fx, wait;
+    done.then(backToIdle);
+    fx = startCovenant(clk, hitF, A, {});
+    aegisLeft = 2;
+    wait = clkAt(clk, hitF, 0.4) - performance.now();
+    if (wait > 0) await sleep(wait);
+    if (myRun !== run) return;
+    fx.impact();
+    say(A.name + " raises a Spiteful Covenant (a barrier; the reflect, the damage bonus, Condemned and the ally shelter are not drawn).", "w");
+    await done;
+    if (myRun !== run) return;
+    clearAnims(A.unit);
+  }
+  // ---------------------------------------------------------------- the Cleric's PAINTED pieces (2026-11-22)
+  // The user: the code effects of the Cleric's skills look too simple. A PAINTED layer is drawn ON TOP of the code effects (which stay as the base). Two generations of pieces, all added like light (black adds nothing), cut by source/tools/cut_fx_sheet.py:
+  //  - the TAILORED sheets of the Cleric (the user's, 2026-11-22; prompts in Cleric_vfx_kit/, cut by Animations/Cleric/vfx/source/cut_tailored_sheets.py): hj_* HOLY (hj_sky, hj_beam, hj_pillar, hj_seal, hj_cross, hj_nimbus, hj_wing, hj_feathers, hj_shock),
+  //    dd_* DARK (dd_rope, dd_claws, dd_fissure, dd_seal, dd_wisp, dd_implode, dd_smoke, dd_veil, dd_motes), cp_* CRIMSON (cp_seal, cp_chains, cp_heart, cp_flames, cp_shield, cp_embers, cp_roar, cp_cracked, cp_rain);
+  //  - the older generic glow sheets: hl_* (holy_fx_glow_sheet.png) and dk_* (the dark slime's): the FALLBACK of every tailored piece (pcN picks the tailored one when it is loaded, else the old one, else the code shows alone).
+  // pcTex draws one (w x h px, any point of it on (x, y), turned, mirrored, TINTED). One paint function per skill, called from its start function; each runs on the same pack clock as the code effect.
+  // The CLERIC'S OWN AURAS (the user, 2026-11-22: the Mage's turning cylinder used as it is for every character looks low effort: it suits the Mage's stance and skills; each character gets auras of its own SHAPE in the same element COLOURS, docs/AURAS.md).
+  // HOLY = CONSECRATION: an ornate seal on the ground under his feet, a nimbus behind his head and shoulders, two wings of light behind him, feathers rising; DARK = SHADOW CREEPING FROM THE GROUND: a dark seal on the floor, a column of smoke behind him,
+  // claws rising at his feet, two ribbons of smoke at his sides, motes; PACT (the Covenant) = A HEARTBEAT: a crimson ring on the ground that pulses like a heart, flames at his feet, embers rising. They build up with the frames (30%, 60%, 100%) and fade after the blow.
+  function pcAura(A, steps, tEnd, fadeMs, tex) {
+    var kind = tex === "dark_aura" ? "dark" : tex === "cov_aura" ? "pact" : "holy", sc = 1 / speed;
+    fxAdd({ t0: steps[0].t, t1: tEnd + (fadeMs + 60) * sc,
+      drawBack: function (cb, now) { clAura(cb, now, true, kind, steps, tEnd, fadeMs, A); },
+      draw: function (ctx, now) { clAura(ctx, now, false, kind, steps, tEnd, fadeMs, A); } });
+  }
+  function clAura(ctx, now, back, kind, steps, tEnd, fadeMs, A) {
+    var lv = auraLevel(steps, tEnd, now) * (1 - clamp01((now - tEnd) * speed / fadeMs)), h, u, t, br, i, a, x, y, s, pulse, wh;
+    if (lv <= 0.01) return;
+    h = pcHero(A); u = uW.offsetWidth; t = now * 0.001 * speed; br = 0.85 + 0.15 * Math.sin(t * 5);
+    if (kind === "holy") {
+      if (back) {
+        pcTex(ctx, pcN("hj_seal", "hl_halo"), h.x, h.gy, u * (0.62 + 0.22 * lv), null, 0.85 * lv * br, {});                                    // consecrated ground
+        if (pcImg("hj_nimbus")) pcTex(ctx, "hj_nimbus", h.x, h.gy - h.H * 0.8, u * (0.34 + 0.2 * lv), null, 0.6 * lv * br, { rot: t * 0.25 });   // a nimbus behind head and shoulders
+        else { pcTex(ctx, "hl_burst", h.x, h.gy - h.H * 0.8, u * (0.42 + 0.24 * lv), null, 0.55 * lv * br, { rot: t * 0.3 }); pcTex(ctx, "hl_star", h.x, h.gy - h.H * 0.8, u * (0.18 + 0.16 * lv), null, 0.6 * lv, { rot: -t * 0.4 }); }
+        if (pcImg("hj_wing")) for (i = 0; i < 2; i++) {                                                                                          // two wings of light behind him, sweeping back
+          s = i ? 0.8 : 1.05; wh = h.H * s * (0.95 + 0.05 * Math.sin(t * 2.2 + i));
+          pcTex(ctx, "hj_wing", h.x - A.dir * u * (0.03 + i * 0.015), h.gy - h.H * (0.55 + i * 0.06), wh * 305 / 394, wh, (i ? 0.45 : 0.65) * lv, { ax: 0.08, ay: 0.95, flip: A.dir > 0, rot: (i ? 0.32 : 0) * A.dir });
+        }
+      } else {
+        pcTex(ctx, pcN("hj_feathers", "hl_motes"), h.x, h.cy - ((t * 0.18) % 1) * h.H * 0.35, u * 0.7, null, 0.55 * lv, {});                       // feathers and motes rising
+      }
+    } else if (kind === "dark") {
+      if (back) {
+        pcTex(ctx, pcN("dd_seal", "dk_ripple"), h.x, h.gy, u * (0.62 + 0.2 * lv), null, 0.85 * lv * br, {});                                    // a dark seal on the floor
+        pcTex(ctx, pcN("dd_smoke", "dk_geyser"), h.x + Math.sin(t * 1.3) * u * 0.01, h.gy, u * 0.5, h.H * 1.25 * Math.min(1, lv * 1.2), 0.26 * lv, { ay: 1 });   // a column of smoke behind him
+      } else {
+        for (i = 0; i < 2; i++) {                                                                                                                  // claws rising from the ground at his feet
+          pcTex(ctx, pcN("dd_claws", "dk_tendrils"), h.x + (i ? 1 : -1) * u * 0.16, h.gy, u * 0.36, null, 0.6 * lv * (0.85 + 0.15 * Math.sin(t * 3 + i * 2)), { ay: 1, flip: i === 1, rot: Math.sin(t * 1.7 + i * 1.5) * 0.05 });
+        }
+        if (pcImg("dd_veil")) pcTex(ctx, "dd_veil", h.x, h.gy, u * 0.5, h.H * 1.15, 0.3 * lv * (0.85 + 0.15 * Math.sin(t * 2.3)), { ay: 1 });       // two ribbons of smoke at his sides
+        pcTex(ctx, pcN("dd_motes", "dk_motes"), h.x, h.cy - ((t * 0.16) % 1) * h.H * 0.3, u * 0.7, null, 0.5 * lv, {});
+      }
+    } else {
+      pulse = Math.pow(Math.max(0, Math.sin(t * 6.5)), 3);                                                                                          // the heartbeat
+      if (back) {
+        pcTex(ctx, pcN("cp_heart", "hl_halo"), h.x, h.gy, u * (0.6 + 0.2 * lv + 0.14 * pulse), null, (0.55 + 0.4 * pulse) * lv, pcImg("cp_heart") ? {} : { tint: COV_TINT });
+      } else {
+        for (i = 0; i < 2; i++) pcTex(ctx, pcN("cp_flames", "hl_flames"), h.x + (i ? 1 : -1) * u * 0.14, h.gy, u * 0.26, h.H * (0.6 + 0.12 * Math.sin(t * 7 + i * 2)) * lv, 0.75 * lv, { ay: 1, flip: i === 1, tint: pcImg("cp_flames") ? undefined : COV_TINT });
+        pcTex(ctx, pcN("cp_embers", "hl_motes"), h.x, h.gy, u * 0.5, h.H * 1.2, 0.6 * lv, { ay: 1, tint: pcImg("cp_embers") ? undefined : COV_TINT });
+      }
+    }
+  }
+  var pcTintCache = {};
+  function pcEase(v) { v = clamp01(v); return v * v * (3 - 2 * v); }
+  function pcImg(name, tint) {
+    var im = fbTex[name]; if (!im || !im.complete || !im.naturalWidth) return null;
+    if (!tint) return im;
+    var key = name + "|" + tint, c = pcTintCache[key], x;
+    if (!c) { c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; x = c.getContext("2d"); x.drawImage(im, 0, 0); x.globalCompositeOperation = "source-atop"; x.fillStyle = tint; x.fillRect(0, 0, c.width, c.height); pcTintCache[key] = c; }
+    return c;
+  }
+  function pcN(nw, old) { return pcImg(nw) ? nw : old; }                              // the tailored piece when it is loaded, else the older generic one
+  function pcTex(ctx, name, x, y, w, h, a, o) {                                      // an additive picture w x h px (h null: its own proportions), the point (o.ax, o.ay) of it (0..1, default the middle) on (x, y), turned by o.rot, mirrored by o.flip, tinted by o.tint
+    o = o || {};
+    var im = pcImg(name, o.tint); if (!im || a <= 0.01 || w < 1) return false;
+    var iw = im.naturalWidth || im.width, ih = im.naturalHeight || im.height, ax = o.ax === undefined ? 0.5 : o.ax, ay = o.ay === undefined ? 0.5 : o.ay;
+    if (h == null) h = w * ih / iw;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(x, y); if (o.rot) ctx.rotate(o.rot); if (o.flip) ctx.scale(-1, 1);
+    ctx.drawImage(im, -w * ax, -h * ay, w, h); ctx.restore(); return true;
+  }
+  function pcTarget(T) { var r = rectIn(T.unit); return { x: r.left + r.width * 0.5, gy: r.top + r.height * 0.97, cy: r.top + r.height * 0.45, h: r.height }; }   // the target's middle, its feet and its chest, in stage px
+  function pcHero(A) { var er = rectIn(A.unit.querySelector(".sheet") || A.unit), gy = er.top + er.height - er.width * 42 / 512, H = er.width * 408 / 512; return { x: er.left + er.width * 0.572, gy: gy, cy: gy - H * 0.62, H: H }; }   // the Cleric's feet middle, floor and chest
+
+  // JUDGMENT: the call opens the sky above the target (hj_sky), charges a thin beam (hj_beam) and grows an ornate seal on the ground under it (hj_seal) with feathers falling in the beam; the verdict drops the full pillar (hj_pillar) with a cross-shaped
+  // flare (hj_cross), a starburst, a swirl of light, feathers rising and a shockwave ring (hj_shock); a missed verdict gets the pillar and the rings only.
+  function judgmentPaint(clk, hitF, T, miss) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tR = at(2, 0), tV = at(hitF, 0), tI = at(hitF, 0.4), sc = 1 / speed;
+    pcAura(FIGHTERS.W, [{ t: at(2, 0), lv: 0.35, rf: 0.5 }, { t: at(3, 0), lv: 0.8, rf: 0.5 }, { t: tV, lv: 1, rf: 0.3 }], at(hitF + 1, 0.8), 500, "holy_aura");
+    fxAdd({ t0: tR, t1: tI + 2300 * sc,
+      drawBack: function (cb, now) {                                                 // on the ground, behind the characters
+        var g = pcTarget(T), u = uW.offsetWidth, prog = pcEase((now - tR) / Math.max(1, tV - tR)), post = now - tI, out = 1 - clamp01((post - 700 * sc) / (900 * sc)), e = post > 0 ? pcEase(post / (500 * sc)) : 0, a, w;
+        if (out <= 0.01) return;
+        a = out * (0.25 + 0.6 * prog); w = u * (0.5 + 0.4 * prog) * (1 + 0.5 * e);
+        pcTex(cb, pcN("hj_seal", "hl_halo"), g.x, g.gy, w, null, a * (1 + 0.4 * e), {});
+        if (!pcImg("hj_seal")) pcTex(cb, "hl_halo", g.x, g.gy, w * 1.7, null, a * 0.55, {});
+        if (post > 0) pcTex(cb, pcN("hj_shock", "hl_halo"), g.x, g.gy, u * (0.6 + 1.7 * e), null, 0.85 * (1 - e) * out, {});
+      },
+      draw: function (ctx, now) {
+        var g = pcTarget(T), u = uW.offsetWidth, prog = pcEase((now - tR) / Math.max(1, tV - tR)), post = now - tI, f, k, e, a, sk = pcImg("hj_sky");
+        if (sk && post < 900 * sc) pcTex(ctx, "hj_sky", g.x, 0, u * (0.6 + 0.9 * prog), null, (0.15 + 0.8 * prog) * (post > 0 ? 1 - clamp01(post / (900 * sc)) : 1), { ay: 0 });   // the sky opens above the target
+        if (now < tI) {                                                              // the call: a thin beam charges and feathers fall in it
+          if (pcImg("hj_beam")) pcTex(ctx, "hj_beam", g.x, g.gy, u * (0.05 + 0.04 * prog), g.gy, 0.25 + 0.7 * prog, { ay: 1 });
+          else { pcTex(ctx, "hl_star", g.x, u * 0.14, u * (0.12 + 0.5 * prog), null, 0.95 * prog, { rot: Math.sin(now * 0.004) * 0.1 }); pcTex(ctx, "hl_pillar", g.x, g.gy, u * (0.1 + 0.16 * prog), g.gy, 0.15 + 0.4 * prog, { ay: 1 }); }
+          pcTex(ctx, pcN("hj_feathers", "hl_motes"), g.x, g.gy * 0.5 + Math.sin(now * 0.0021) * u * 0.02, u * 0.6, g.gy * 0.95, 0.65 * prog, {});
+          return;
+        }
+        k = clamp01(post / (90 * sc)); f = 1 - clamp01((post - 480 * sc) / (700 * sc));
+        if (f > 0.01) {                                                              // the verdict: the full pillar
+          pcTex(ctx, pcN("hj_pillar", "hl_pillar"), g.x, g.gy + u * 0.03, u * 0.46 * (miss ? 0.7 : 1) * (0.4 + 0.6 * k), g.gy + u * 0.05, 0.95 * f, { ay: 1 });
+          pcTex(ctx, pcN("hj_pillar", "hl_pillar"), g.x, g.gy + u * 0.03, u * 0.9 * (miss ? 0.7 : 1) * (0.4 + 0.6 * k), g.gy + u * 0.05, 0.3 * f, { ay: 1, flip: true });
+        }
+        if (miss) return;
+        e = pcEase(post / (380 * sc)); a = 1 - clamp01(post / (520 * sc));
+        pcTex(ctx, "hl_burst", g.x, g.cy, u * (0.45 + 1.1 * e), null, 0.8 * a, { rot: post * 0.0004 });
+        pcTex(ctx, pcN("hj_cross", "hl_star"), g.x, g.cy, u * (0.3 + 0.95 * e), null, 0.95 * a, {});                          // the cross-shaped flare
+        e = pcEase(post / (700 * sc)); a = 1 - clamp01(post / (900 * sc));
+        pcTex(ctx, "hl_swirl", g.x, g.cy, u * (0.35 + 0.9 * e), null, 0.75 * a, { rot: post * 0.0035 * speed });
+        pcTex(ctx, pcN("hj_feathers", "hl_motes"), g.x, g.cy - post * 0.00012 * speed * u, u * 0.9, null, 0.85 * (1 - clamp01(post / (1400 * sc))), {});
+      } });
+  }
+
+  // RADIANT SMITE: a thin beam from the sky onto the raised weapon, a turning star and a small cross of light on it, a comet that follows the stroke, and at the blow a cross-shaped flare, a starburst, a swirl, a shockwave ring on the ground and feathers.
+  function smitePaint(clk, hitF, T) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tH = at(3, 0), tS = at(hitF, 0), tI = at(hitF, 0.4), sc = 1 / speed, prev = null;
+    pcAura(FIGHTERS.W, [{ t: at(2, 0), lv: 0.25, rf: 0.5 }, { t: tH, lv: 0.55, rf: 0.5 }, { t: tS, lv: 1, rf: 0.3 }], at(hitF + 1, 0.5), 400, "holy_aura");
+    fxAdd({ t0: tH - 80, t1: tI + 1500 * sc,
+      drawBack: function (cb, now) {
+        var g = pcTarget(T), u = uW.offsetWidth, post = now - tI, e = pcEase(post / (500 * sc));
+        if (post > 0 && post < 1200 * sc) pcTex(cb, pcN("hj_shock", "hl_halo"), g.x, g.gy, u * (0.35 + 1.1 * e), null, 0.85 * (1 - clamp01(post / (1100 * sc))), {});
+      },
+      draw: function (ctx, now) {
+        var q = smiteTip(), u = uW.offsetWidth, hold = clamp01((now - tH + 60) / 140) * (now < tS ? 1 : clamp01(1 - (now - tS) / 160)), g = pcTarget(T), post = now - tI, dx, dy, e, a;
+        if (q && now >= tH - 60 && now <= tS + 200) {
+          if (pcImg("hj_beam")) pcTex(ctx, "hj_beam", q.x, q.y, u * 0.08, q.y, 0.9 * hold, { ay: 1 });
+          else pcTex(ctx, "hl_pillar", q.x, q.y + u * 0.02, u * 0.16, q.y + u * 0.02, 0.6 * hold, { ay: 1 });
+          pcTex(ctx, "hl_star", q.x, q.y, u * (0.1 + 0.22 * hold), null, 0.9 * hold, { rot: Math.sin(now * 0.004) * 0.12 });
+          pcTex(ctx, "hj_cross", q.x, q.y, u * (0.08 + 0.14 * hold), null, 0.7 * hold, {});
+        }
+        if (q && now >= tS - 40 && now <= tI + 160) {
+          if (prev) { dx = q.x - prev.x; dy = q.y - prev.y; if (dx * dx + dy * dy > 4) pcTex(ctx, "hl_comet", q.x, q.y, u * 0.5, null, 0.85, { rot: Math.atan2(dy, dx), ax: 0.9 }); }
+          prev = { x: q.x, y: q.y };
+        }
+        if (post > 0) {
+          e = pcEase(post / (360 * sc)); a = 1 - clamp01(post / (500 * sc));
+          pcTex(ctx, "hl_burst", g.x, g.cy, u * (0.4 + 0.8 * e), null, 0.8 * a, { rot: post * 0.0004 });
+          pcTex(ctx, "hj_cross", g.x, g.cy, u * (0.25 + 0.7 * e), null, 0.9 * a, {});
+          pcTex(ctx, "hl_swirl", g.x, g.cy, u * (0.3 + 0.6 * pcEase(post / (650 * sc))), null, 0.7 * (1 - clamp01(post / (800 * sc))), { rot: post * 0.003 * speed });
+          pcTex(ctx, pcN("hj_feathers", "hl_motes"), g.x, g.cy - post * 0.00015 * speed * u, u * 0.8, null, 0.8 * (1 - clamp01(post / (1100 * sc))), {});
+        }
+      } });
+  }
+
+  // DARK PENANCE: a dark seal under the pool and dark ground cracks (dd_fissure) that creep from it to the target while he gathers, and at the blow a burst, a column of smoke and claws rising from its feet and a cloud of motes.
+  function penancePaint(clk, hitF, T) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tK = at(2, 0), tG = at(3, 0), tI = at(hitF, 0.4), sc = 1 / speed, pool = null;
+    pcAura(FIGHTERS.W, [{ t: at(1, 0.5), lv: 0.25, rf: 0.6 }, { t: tG, lv: 0.6, rf: 0.5 }, { t: at(hitF, 0), lv: 0.95, rf: 0.3 }], at(hitF + 1, 0.5), 450, "dark_aura");
+    fxAdd({ t0: tK, t1: tI + 1700 * sc,
+      drawBack: function (cb, now) {
+        var q = penFist(), u = uW.offsetWidth, g = pcTarget(T), sp, x0, x1, post = now - tI, out = 1 - clamp01((post - 500 * sc) / (700 * sc)), w;
+        if (q && !pool && q.i >= 1) pool = { x: q.x, y: q.gy - 6 * q.k };
+        if (!pool || out <= 0.01) return;
+        sp = pcEase((now - tK) / Math.max(1, tI - tK));
+        pcTex(cb, pcN("dd_seal", "dk_ripple"), pool.x, pool.y, u * (0.25 + 0.3 * sp), null, 0.9 * out, {});                  // the seal under the pool
+        x0 = pool.x; x1 = g.x; w = Math.max(10, x1 - x0);
+        cb.save(); cb.beginPath(); cb.rect(x0, 0, w * sp, cb.canvas.height); cb.clip();                                    // the cracks creep along the floor, revealed from the pool to the target
+        pcTex(cb, pcN("dd_fissure", "dk_fissure"), x0 + w / 2, pool.y, w * 1.05, u * 0.16, 0.9 * out, {});
+        cb.restore();
+      },
+      draw: function (ctx, now) {
+        var g = pcTarget(T), u = uW.offsetWidth, post = now - tI, e, a;
+        if (post <= 0) return;
+        e = pcEase(post / (330 * sc)); a = 1 - clamp01(post / (520 * sc));
+        pcTex(ctx, "dk_burst", g.x, g.cy, u * (0.45 + 0.9 * e), null, 0.95 * a, { rot: post * 0.0004 });
+        a = 1 - clamp01((post - 150 * sc) / (900 * sc)); e = pcEase(post / (400 * sc));
+        pcTex(ctx, pcN("dd_smoke", "dk_geyser"), g.x, g.gy, u * 0.4, g.h * 1.25 * (0.3 + 0.7 * e), 0.8 * a, { ay: 1 });
+        pcTex(ctx, pcN("dd_claws", "dk_tendrils"), g.x, g.gy, u * 0.5, null, 0.9 * a * e, { ay: 1 });
+        pcTex(ctx, pcN("dd_motes", "dk_motes"), g.x, g.cy - post * 0.00012 * speed * u, u * 0.8, null, 0.85 * (1 - clamp01(post / (1300 * sc))), {});
+      } });
+  }
+
+  // UNHOLY SIPHON: a thick rope of dark energy (dd_rope) is thrown from his fist to the target while he channels, an orb on the fist, at the wrench a collapsing ring (dd_implode) shrinks into the target's chest with a burst and smoke at its feet,
+  // and the stolen life (dd_wisp, pale green-white) flies back to him along the rope.
+  function siphonPaint(clk, hitF, T, miss) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tR = at(2, 0), tW = at(hitF, 0), tI = at(hitF, 0.4), sc = 1 / speed;
+    pcAura(FIGHTERS.W, [{ t: at(2, 0), lv: 0.3, rf: 0.5 }, { t: at(3, 0), lv: 0.65, rf: 0.5 }, { t: tW, lv: 1, rf: 0.3 }], at(hitF + 1, 0.8), 450, "dark_aura");
+    fxAdd({ t0: tR, t1: tI + 1700 * sc,
+      drawBack: function (cb, now) {
+        var g = pcTarget(T), u = uW.offsetWidth, post = now - tI, e;
+        if (post > 0 && post < 700 * sc && !miss && !pcImg("dd_implode")) { e = clamp01(post / (500 * sc)); pcTex(cb, "dk_ripple", g.x, g.gy, u * (1.0 - 0.75 * e), null, 0.8 * (1 - e * e), {}); }   // (the old ripple only when the tailored ring is missing)
+      },
+      draw: function (ctx, now) {
+        var q = sipFist(); if (!q) return;
+        var u = uW.offsetWidth, g = pcTarget(T), dx = g.x - q.x, dy = g.cy - q.y, len = Math.sqrt(dx * dx + dy * dy), ang = Math.atan2(dy, dx), post = now - tI, k, s, p, e, a, grow;
+        if (now < tW + 90 * sc) {                                                    // the channel: a thick rope runs out to the target, an orb gathers on the fist
+          grow = pcEase((now - tR) / (260 * sc)); a = now < tW ? 0.9 : 0.9 * (1 - clamp01((now - tW) / (90 * sc)));
+          if (pcImg("dd_rope")) pcTex(ctx, "dd_rope", q.x, q.y, len * grow, u * (0.15 + 0.02 * Math.sin(now * 0.012)), a * grow, { rot: ang, ax: 0, ay: 0.5 });
+          pcTex(ctx, "dk_orb", q.x, q.y, u * 0.22 * clamp01((now - tR) / 150), null, 0.9, { rot: ang, ax: 0.75 });
+          if (!pcImg("dd_rope")) for (k = 0; k < 3; k++) { s = (((now - tR) * 0.0013 * speed) + k / 3) % 1; p = { x: q.x + dx * s, y: q.y + dy * s }; pcTex(ctx, "dk_orb", p.x, p.y, u * 0.34, null, 0.9 * Math.sin(s * 3.1416) * clamp01((now - tR) / 200), { rot: ang, ax: 0.9 }); }
+        }
+        if (post > 0 && !miss) {
+          e = pcEase(post / (330 * sc)); a = 1 - clamp01(post / (520 * sc));
+          pcTex(ctx, "dk_burst", g.x, g.cy, u * (0.4 + 0.8 * e), null, 0.85 * a, { rot: -post * 0.0005 });
+          e = clamp01(post / (520 * sc));
+          pcTex(ctx, pcN("dd_implode", "dk_ripple"), g.x, g.cy, u * (0.9 - 0.65 * e), null, 0.95 * (1 - e * e * 0.7), { rot: -post * 0.004 * speed });   // the ring collapses into its chest: the pull
+          a = 1 - clamp01((post - 100 * sc) / (800 * sc));
+          pcTex(ctx, pcN("dd_smoke", "dk_geyser"), g.x, g.gy, u * 0.34, g.h * 1.1 * (0.3 + 0.7 * pcEase(post / (400 * sc))), 0.75 * a, { ay: 1 });
+          for (k = 0; k < 3; k++) {                                                  // the stolen life flies back to him
+            s = clamp01((post - 120 * sc - k * 110 * sc) / (520 * sc)); if (s <= 0 || s >= 1) continue; p = { x: g.x - dx * s, y: g.cy - dy * s };
+            if (pcImg("dd_wisp")) pcTex(ctx, "dd_wisp", p.x, p.y, u * 0.5, null, 0.95 * Math.sin(s * 3.1416), { rot: ang + 3.1416, ax: 0.9 });
+            else pcTex(ctx, "dk_orb", p.x, p.y, u * 0.34, null, 0.9 * Math.sin(s * 3.1416), { rot: ang + 3.1416, ax: 0.9, tint: "rgba(110,255,160,0.55)" });
+          }
+        }
+      } });
+  }
+
+  // AEGIS: a golden seal under his feet, a nimbus on the side of the barrier and a soft shell of light and feathers inside the glass while it is up, a cross of light and a shockwave ring on the ground at the lock. Lives as long as the barrier does (the layer L).
+  function aegisPaint(clk, hitF, A, L) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, tK = at(2, 0), tLock = at(hitF, 0), sc = 1 / speed, P;
+    pcAura(A, [{ t: at(2, 0), lv: 0.3, rf: 0.5 }, { t: at(3, 0), lv: 0.6, rf: 0.5 }, { t: tLock, lv: 1, rf: 0.3 }], tLock + 900 * sc, 600, "holy_aura");
+    P = { t0: tK, t1: Infinity,
+      drawBack: function (cb, now) {
+        var h = pcHero(A), u = uW.offsetWidth, f = pcAlive(P, L, now), g = pcEase((now - tK) / Math.max(1, tLock - tK)), post = now - tLock;
+        if (f <= 0.01) return;
+        pcTex(cb, pcN("hj_seal", "hl_halo"), h.x, h.gy, u * (0.35 + 0.4 * g), null, (0.3 + 0.5 * g) * f, {});
+        pcTex(cb, "hj_nimbus", h.x + A.dir * u * 0.18, h.cy, u * (0.3 + 0.2 * g), null, 0.4 * g * f, { rot: now * 0.0003 * speed });
+        if (post > 0 && post < 900 * sc) pcTex(cb, pcN("hj_shock", "hl_halo"), h.x, h.gy, u * (0.6 + 1.4 * pcEase(post / (500 * sc))), null, 0.8 * (1 - clamp01(post / (850 * sc))), {});
+      },
+      draw: function (ctx, now) {
+        var h = pcHero(A), u = uW.offsetWidth, f = pcAlive(P, L, now), post = now - tLock, g = pcEase((now - tK) / Math.max(1, tLock - tK)), e;
+        if (f <= 0.01) return;
+        pcTex(ctx, "hl_veil", h.x + A.dir * u * 0.12, h.gy, u * 0.5, h.H * 1.5, (0.18 + 0.22 * g) * f * (0.85 + 0.15 * Math.sin(now * 0.004)), { ay: 1 });
+        pcTex(ctx, pcN("hj_feathers", "hl_motes"), h.x + A.dir * u * 0.12, h.cy - Math.sin(now * 0.0017) * u * 0.02, u * 0.55, null, 0.45 * g * f, {});
+        if (post > 0 && post < 700 * sc) { e = pcEase(post / (300 * sc)); pcTex(ctx, pcN("hj_cross", "hl_star"), h.x + A.dir * u * 0.18, h.cy, u * (0.25 + 0.5 * e), null, 0.9 * (1 - post / (700 * sc)), {}); pcTex(ctx, "hl_burst", h.x + A.dir * u * 0.18, h.cy, u * (0.3 + 0.7 * e), null, 0.6 * (1 - post / (700 * sc)), { rot: post * 0.0004 }); }
+      } };
+    fxAdd(P);
+  }
+  function pcAlive(P, L, now) {                                                      // 1 while the barrier L is up, fading as it lets go; 0 (and the layer ends) when it is gone or replaced
+    var f;
+    if (brLive !== L) { P.t1 = now; return 0; }
+    f = L.endAt ? 1 - clamp01((now - L.endAt) / Math.max(1, L.dropMs)) : 1;
+    if (f <= 0) P.t1 = now;
+    return f;
+  }
+
+  // COVENANT: the Aegis's angry twin, in CRIMSON (the tailored cp_* pieces; the older gold pieces tinted in code are the fallback): while he pays a contract seal (cp_seal) burns under him and a heartbeat ring (cp_heart) beats, embers rain on him (cp_rain)
+  // and crimson flames rise; at the roar chains break open on his chest (cp_chains), a shockwave crown (cp_roar) runs out over the ground, five big flames (cp_flames) erupt BEHIND him and a SHIELD of its own (cp_shield) stands in front of him for the CAST only
+  // (COV_HOLD_MS after the lock, then it melts away while the glass settles into the Aegis's steady Barrier look: covGlass); when the barrier breaks (he falls) the shield shows cracked (cp_cracked) for the break.
+  var COV_TINT = "rgba(255,62,44,0.62)", COV_TINT2 = "rgba(255,120,70,0.4)";
+  function covenantPaint(clk, hitF, A, L) {
+    var at = function (f, fr) { return clkAt(clk, f, fr); }, t1 = at(1, 0), t3 = at(3, 0), tLock = at(hitF, 0), sc = 1 / speed, P, rnd = rngOf((t1 | 0) + 41), fl = [rnd() < 0.5, rnd() < 0.5, rnd() < 0.5, rnd() < 0.5, rnd() < 0.5], tn = pcImg("cp_flames") ? undefined : COV_TINT;
+    pcAura(A, [{ t: t1, lv: 0.2, rf: 0.8 }, { t: at(2, 0), lv: 0.5, rf: 0.6 }, { t: t3, lv: 0.7, rf: 0.5 }, { t: tLock, lv: 1, rf: 0.3 }], tLock + 1400 * sc, 700, "cov_aura");
+    P = { t0: t1 - 30, t1: Infinity,
+      drawBack: function (cb, now) {
+        var h = pcHero(A), u = uW.offsetWidth, pay = pcEase((now - t1) / Math.max(1, tLock - t1)), post = now - tLock, f = post < 0 ? 1 : pcAlive(P, L, now), e = post > 0 ? pcEase(post / (450 * sc)) : 0, beat = 0.75 + 0.25 * Math.sin(now * 0.009), i, x, a;
+        if (now < t1 || f <= 0.01) return;
+        if (pcImg("cp_seal")) pcTex(cb, "cp_seal", h.x, h.gy, u * (0.45 + 0.3 * pay + 0.2 * e), null, (0.4 + 0.5 * pay) * f, {});                // the contract seal under him
+        pcTex(cb, pcN("cp_heart", "hl_halo"), h.x, h.gy, u * (0.4 + 0.5 * pay + 0.4 * e), null, (0.3 + 0.55 * pay) * beat * f, pcImg("cp_heart") ? {} : { tint: COV_TINT });
+        if (post > 0 && post < 1000 * sc) pcTex(cb, pcN("cp_roar", "hl_halo"), h.x, h.gy, u * (0.7 + 2.0 * e), null, 0.9 * (1 - clamp01(post / (950 * sc))), pcImg("cp_roar") ? {} : { tint: COV_TINT2 });
+        for (i = 0; i < 5 && post > 0; i++) {                                         // five big crimson flames erupt round him and burn down (BEHIND him: he stays in front of them)
+          x = h.x + (i - 2) * u * 0.22 * (1 + 0.15 * e); e = pcEase((post - i * 40 * sc) / (320 * sc)); a = (1 - clamp01((post - 350 * sc) / (900 * sc))) * (0.8 + 0.2 * Math.sin(now * 0.02 + i * 2));
+          pcTex(cb, pcN("cp_flames", "hl_flames"), x, h.gy, u * (0.34 + (i === 2 ? 0.14 : 0)), h.H * (i === 2 ? 1.2 : 0.9) * (0.3 + 0.7 * e), 0.8 * a * e, { ay: 1, flip: fl[i], tint: pcImg("cp_flames") ? undefined : (i % 2 ? COV_TINT2 : COV_TINT) });
+        }
+      },
+      draw: function (ctx, now) {
+        var h = pcHero(A), u = uW.offsetWidth, pay = pcEase((now - t1) / Math.max(1, t3 - t1)), post = now - tLock, f, e, a, i, sx, sh, sw, k, brk, q;
+        if (now < t1) return;
+        if (post < 0) {                                                              // paying: embers rain on him, crimson flames and sparkles rise round him
+          if (pcImg("cp_rain")) pcTex(ctx, "cp_rain", h.x, h.gy, u * 0.6, h.H * 1.6, 0.7 * pay, { ay: 1 });
+          for (i = 0; i < 2; i++) pcTex(ctx, pcN("cp_flames", "hl_flames"), h.x + (i ? 0.2 : -0.2) * u, h.gy, u * 0.3, h.H * 0.9 * pay, 0.8 * pay * (0.8 + 0.2 * Math.sin(now * 0.015 + i * 2)), { ay: 1, flip: i === 1, tint: tn });
+          pcTex(ctx, pcN("cp_embers", "hl_motes"), h.x, h.gy, u * 0.5, h.H * 1.2, 0.55 * pay, { ay: 1, tint: pcImg("cp_embers") ? undefined : COV_TINT });
+          return;
+        }
+        e = pcEase(post / (380 * sc)); a = 1 - clamp01(post / (420 * sc));
+        if (pcImg("cp_chains")) pcTex(ctx, "cp_chains", h.x, h.cy, u * (0.4 + 1.0 * e), null, 0.95 * a, { rot: post * 0.0004 });                            // the chains break open on his chest
+        else { pcTex(ctx, "hl_burst", h.x, h.cy, u * (0.4 + 1.3 * e), null, 0.6 * a, { rot: post * 0.0004, tint: COV_TINT2 }); pcTex(ctx, "hl_star", h.x, h.cy, u * (0.25 + 0.8 * e), null, 0.5 * a, {}); }
+        pcTex(ctx, "hl_swirl", h.x, h.cy, u * (0.5 + 1.1 * pcEase(post / (700 * sc))), null, 0.6 * (1 - clamp01(post / (900 * sc))), { rot: post * 0.0035 * speed, tint: COV_TINT });
+        f = pcAlive(P, L, now);
+        if (f > 0.01) {
+          brk = !!(L.endAt && L.broken);
+          q = 1 - covSettle(now, tLock, sc);                                           // 1 during the cast look, melting to 0 while the glass settles into the steady Barrier (the shield does NOT stay)
+          sh = h.H * 1.3; sw = sh * 301 / 392; k = (0.7 + 0.3 * pcEase(post / (300 * sc))) * (1 + 0.12 * (1 - q)); sx = h.x + A.dir * u * 0.3;
+          if (brk) pcTex(ctx, "cp_cracked", sx, h.gy, sw * 1.1 * 325 / 301, null, 0.95 * f, { ay: 1 });                                                       // the barrier breaks: the shield shows cracked, only for the break
+          else if (q > 0.01 && pcImg("cp_shield")) pcTex(ctx, "cp_shield", sx, h.gy, sw * k, sh * k, (0.75 + 0.1 * Math.sin(now * 0.005)) * f * q, { ay: 1 });   // its own shield stands in front of him while the cast look holds
+          else if (q > 0.01 && !pcImg("cp_shield")) { pcTex(ctx, "hl_veil", h.x + A.dir * u * 0.15, h.gy, u * 0.62, h.H * 1.6, (0.14 + 0.06 * Math.sin(now * 0.004)) * f * q, { ay: 1, tint: COV_TINT }); pcTex(ctx, "hl_motes", h.x + A.dir * u * 0.15, h.cy - (post % 2400) * 0.00008 * u, u * 0.7, null, 0.5 * f * q, { tint: COV_TINT }); }
+        }
+      } };
+    fxAdd(P);
   }
   // SUNDER STRIKE (2026-11-13): "Delivers a heavy cleave of Physical Damage and 50% chance to Reduce Physical Def (-20% Physical Defense for 1 turn)..." A zero-cooldown skill: it does not have to be special. A grounded
   // two-sword cleave (wind-up, raise, step-in, the blow on frame 4, follow-through): a steel-white crescent from where the blades were overhead down to where they land (the Thunderclap's slashDraw in a physical palette),
@@ -4972,6 +5746,236 @@
         ctx.fillStyle = "rgba(172,152,122," + 0.32 * (1 - k) + ")";
         ctx.beginPath(); ctx.ellipse(pf.x + pf.dx * k, gy - pf.rise * k, pf.w * (0.5 + k), pf.w * 0.4 * (0.5 + k), 0, 0, 6.2832); ctx.fill();
       });
+    } });
+  }
+  // MOLTEN CLEAVE (2026-11-20): "Sweeps an overheated blade across the enemy, dealing moderate Fire Damage and 40% chance to apply Burn. If the target is Shocked, consumes the shock to overload ... CD 1". A grounded
+  // RISING SWEEP (docs/WARRIOR_SKILLS.md section 4): he crouches with both swords dragging behind him, steps in and sweeps them up through the enemy to over his head. The game's one fire look (the mage's: FPALS.fire,
+  // her particles and her burst): the blades heat up (glowDraw in fire colours: dull red in the wind-up, red-hot in the sweep, white-hot at the blow, cooling after the top), sparks spray where the tips scrape the ground,
+  // a FLAME CRESCENT follows the tips through the sweep (a ribbon curved through where the tips were on each frame, drawn in 45 ms per frame, fading in about 330 ms, with flame wisps and embers leaving it), and the
+  // blow is the mage's fire burst (fbImpact) plus white-hot sparks thrown forward and up. Burn, Shocked and the overload are NOT drawn (all buffs and debuffs come later).
+  function startMolten(clk, hitF, T) {
+    var F = Object.assign({}, fxParams(), { pal: FPALS.fire, paint: 0, dark: 0, aura: 0 }), at = function (f, fr) { return clkAt(clk, f, fr); };
+    var nF = Math.max(hitF + 2, nFrames("attack")), last = Math.max(hitF, nF - 2), tImpact = at(hitF, 0.4), tTop = at(last + 1, 0), t1 = at(1), t2 = at(2);   // the sweep ends where the recover frame starts
+    var PF = { pal: FPALS.fire, k: Math.min(1.3, F.k) }, ps = [], keys = [], acc = {}, GR = 45;
+    fxAdd({ t0: t1, t1: tTop + 520 / speed, draw: function (ctx, now) {                // the blades heat up
+      var g = now < t2 ? 0.22 + 0.33 * clamp01((now - t1) / Math.max(1, t2 - t1)) : now < tTop ? 0.55 + 0.45 * clamp01((now - t2) / Math.max(1, tImpact - t2)) : clamp01(1 - (now - tTop) * speed / 520);
+      glowDraw(ctx, g * (0.93 + 0.07 * Math.sin(now * 0.05)), F);
+    } });
+    fxAdd({ t0: t1, t1: tTop + 950 / speed, draw: function (ctx, now, L) {              // the flame crescent, the flames on the blades, the sparks on the ground, the embers
+      var dt = L.last ? Math.min(60, now - L.last) * speed : 0, u = uW.offsetWidth, r = rectIn(uW), gy = r.top + r.height * 470 / 512, segs = bladeSegs(), rnd = L.rnd || (L.rnd = rngOf((clk.t0 | 0) + 29)), samples = [], recent, i, j, m, sg;
+      var rate = function (k, perMs) { acc[k] = (acc[k] || 0) + perMs * dt; var n = Math.floor(acc[k]); acc[k] -= n; return n; };
+      L.last = now;
+      if (now < tTop && segs.length && curFrame && curFrame.pose === "attack" && curFrame.i >= 1) {       // where the blade tips are on each frame of the sweep (from frame 2: the wind-up only drags, its sparks are below; a ribbon from frame 1 would stretch along the ground as he steps in), the middle of the two tips
+        var cx = 0, cy = 0, lk = keys[keys.length - 1]; segs.forEach(function (s) { cx += s.x1 / segs.length; cy += s.y1 / segs.length; });
+        if (!lk || lk.f !== curFrame.i) keys.push({ f: curFrame.i, t: now, x: cx, y: cy }); else { lk.x = cx; lk.y = cy; }   // (while a frame stays on screen its key follows the tip as the figure slides along the path)
+      }
+      for (i = 0; i + 1 < keys.length; i++) {                                           // a smooth curve through the keys (Catmull-Rom), each segment drawn from its start to its end over GR ms
+        var p0 = keys[Math.max(0, i - 1)], p1 = keys[i], p2 = keys[i + 1], p3 = keys[Math.min(keys.length - 1, i + 2)];
+        for (j = i ? 1 : 0; j <= 8; j++) {
+          var s = j / 8, s2 = s * s, s3 = s2 * s, cr = function (a, b, c, d) { return 0.5 * (2 * b + (c - a) * s + (2 * a - 5 * b + 4 * c - d) * s2 + (3 * b - a - 3 * c + d) * s3); };
+          samples.push({ x: cr(p0.x, p1.x, p2.x, p3.x), y: cr(p0.y, p1.y, p2.y, p3.y), t: p2.t + s * GR / speed });
+        }
+      }
+      var life = 330 / speed;
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      [[0.16, F.pal.glow, 0.36], [0.09, F.pal.mid, 0.62], [0.032, F.pal.core, 0.95]].forEach(function (ps2) {
+        for (i = 1; i < samples.length; i++) {
+          var a = samples[i - 1], b = samples[i];
+          if (b.t > now) break;
+          var q = 1 - (now - b.t) / life; if (q <= 0) continue;
+          q = Math.pow(q, 1.25);
+          ctx.strokeStyle = "rgba(" + ps2[1] + "," + Math.min(1, ps2[2] * q * Math.min(1, F.k)) + ")"; ctx.lineWidth = Math.max(0.8, ps2[0] * u * q * F.w);
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      });
+      ctx.restore();
+      recent = samples.filter(function (q) { return q.t <= now && now - q.t < 220 / speed; });
+      if (now < tTop && recent.length) {
+        for (m = rate("w", 0.05 * PF.k); m > 0; m--) { var w1 = recent[Math.floor(rnd() * recent.length)]; fbParticle(ps, w1.x + (rnd() - 0.5) * u * 0.05, w1.y + (rnd() - 0.5) * u * 0.05, (rnd() - 0.5) * 0.05 * u / 1000, -(0.05 + rnd() * 0.2) * u / 1000, 300 + rnd() * 320, u * (0.05 + rnd() * 0.05), "flame"); }
+        for (m = rate("e", 0.035 * PF.k); m > 0; m--) { var e1 = recent[Math.floor(rnd() * recent.length)]; fbParticle(ps, e1.x, e1.y, (rnd() - 0.25) * 0.5 * u / 1000, -(0.2 + rnd() * 0.8) * u / 1000, 450 + rnd() * 350, u * 0.011, "ember"); }
+      }
+      if (now < tTop) segs.forEach(function (sg2, si) {
+        for (m = rate("b" + si, 0.03 * PF.k); m > 0; m--) { var f1 = 0.25 + 0.75 * rnd(); fbParticle(ps, sg2.x0 + (sg2.x1 - sg2.x0) * f1, sg2.y0 + (sg2.y1 - sg2.y0) * f1, (rnd() - 0.5) * 0.04 * u / 1000, -(0.08 + rnd() * 0.15) * u / 1000, 260 + rnd() * 160, u * (0.035 + rnd() * 0.02), "flame"); }   // the blades burn
+        if (sg2.y1 > gy - u * 0.07 && now < at(3)) for (m = rate("g" + si, 0.12 * PF.k); m > 0; m--) fbParticle(ps, sg2.x1, sg2.y1, (rnd() - 0.35) * 0.55 * u / 1000, -(0.25 + rnd() * 0.8) * u / 1000, 220 + rnd() * 240, u * 0.009, "ember");   // sparks where a tip scrapes the ground
+      });
+      fbParticles(ctx, ps, dt, PF, u);
+    } });
+    return { impact: function () { moltenImpact(T); }, shockAnim: FIRE_SHOCK };
+  }
+  function moltenImpact(T) {                                                         // the blow: the mage's fire burst, a short shake and white-hot sparks flung forward and up
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.45, cy = r.top + r.height * 0.45, fw = T.dir < 0 ? 1 : -1, rnd = rngOf(now | 0), sp = [], i, P = FPALS.fire;
+    var Fm = fbParams("firebolt"); Fm.imp = Math.min(Fm.imp, 0.9);
+    fbImpact(T, Fm);
+    shake(10, 300);
+    for (i = 0; i < 26; i++) { var ang = -Math.PI * (0.04 + rnd() * 0.5), sv = u * (1.0 + rnd() * 2.2) / 1000; sp.push({ vx: fw * Math.cos(ang) * sv, vy: Math.sin(ang) * sv, life: 240 + rnd() * 320, hot: rnd() }); }
+    fxAdd({ t0: now, t1: now + 700 / speed, draw: function (ctx, now2) {
+      var t = (now2 - now) * speed, G = u * 2.4 / 1e6;
+      if (t < 90) flashAll(ctx, P.flash, 0.12 * (1 - t / 90));
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      sp.forEach(function (s) {
+        if (t > s.life) return;
+        var px = function (tm) { return cx + s.vx * tm; }, py = function (tm) { return cy + s.vy * tm + 0.5 * G * tm * tm; }, al = 1 - t / s.life;
+        ctx.strokeStyle = "rgba(" + (s.hot > 0.5 ? P.core : P.mid) + "," + al + ")"; ctx.lineWidth = Math.max(1.1, u * 0.009);
+        ctx.beginPath(); ctx.moveTo(px(Math.max(0, t - 30)), py(Math.max(0, t - 30))); ctx.lineTo(px(t), py(t)); ctx.stroke();
+      });
+      ctx.restore();
+    } });
+  }
+  // GLACIAL BLADE (2026-11-20): "Bashes the enemy with a frost-forged blade, dealing moderate Ice Damage and 40% chance to apply Chilled. If the target already has Reduce Physical Def, pushes the enemy's action bar back
+  // by 25%. CD 1". A low THRUSTING LUNGE (docs/WARRIOR_SKILLS.md section 5): he stands in a fencer's guard while the blades FROST OVER, pulls back a little, drives forward and rams both blades straight in, heaves up and
+  // withdraws. The game's one ice look (the mage's: IPALS.ice via fbParams("ice"), her mist, glints and chips, her icImpact; the Rogue's painted rime sleeve `rf_blade` grows along each blade from the hilt to the tip, kissBladeFrost):
+  // the sleeve and a pale glow on the blades (glowDraw), cold mist sinking off them, glints twinkling along them, frost on the ground where he stood for the coil (it stays when he lunges), chips and mist thrown back from the
+  // tips in the drive, and at the blow the mage's ice burst (shards, rings, crystals at the feet) with a short heavy shake. Chilled and the action-bar push-back are NOT drawn (all statuses come later).
+  function startGlacial(clk, hitF, T) {
+    var F = fbParams("ice"), at = function (f, fr) { return clkAt(clk, f, fr); }, u = uW.offsetWidth, rnd = rngOf((clk.t0 | 0) + 41), ps = [];
+    var nF = Math.max(hitF + 2, nFrames("attack")), t1 = at(1), tDrive = Math.min(at(3), at(hitF)), tImpact = at(hitF, 0.4), tEnd = at(Math.max(hitF + 1, nF - 1), 0), G = { pal: F.pal, k: F.k, w: 1, paint: 0, dark: 0 };
+    var ramp = function (now) { return clamp01((now - t1) / Math.max(1, tDrive - t1)); };                                  // 0 -> 1 over the coil, the gather and up to the drive
+    var cool = function (now) { return 1 - clamp01((now - tImpact) * speed / 650); };                                       // 1 until the blow, then the frost and the cold light fade over 650 ms
+    fxAdd({ t0: t1, t1: tImpact + 700 / speed, draw: function (ctx, now, L) {                                             // frost on the ground where he stands for the coil (it stays there when he lunges away)
+      var f = L.home || (L.home = bsFig()), lv = ramp(now) * 0.85 * cool(now), gi = fbTex.fz_ground, w = f.u * (0.8 + 0.2 * ramp(now));
+      glowEllipse(ctx, f.x, f.gy, f.u * (0.3 + 0.22 * ramp(now)), f.u * 0.07, F.pal.mid, 0.2 * lv * Math.min(1, F.k));
+      if (gi && gi.naturalWidth) fzTex(ctx, gi, f.x, f.gy, w, w * gi.naturalHeight / gi.naturalWidth, 0.7 * lv * Math.min(1, F.k), 0.5);
+    } });
+    fxAdd({ t0: t1, t1: tEnd + 700 / speed, draw: function (ctx, now, L) {                                                 // the blades: the rime sleeve and the pale glow, mist, glints, chips
+      var dt = L.last ? Math.min(60, now - L.last) * speed : 0, segs = bladeSegs(), kg = ramp(now) * cool(now), g = (now < tDrive ? 0.15 + 0.45 * ramp(now) : 0.6 + 0.3 * clamp01((now - tDrive) / Math.max(1, tImpact - tDrive))) * cool(now), n, q;
+      L.last = now;
+      glowDraw(ctx, g * (0.94 + 0.06 * Math.sin(now * 0.04)), G);
+      segs.forEach(function (sg, si) {
+        kissBladeFrost(ctx, now, sg.x0, sg.y0, sg.x1, sg.y1, kg, u);
+        if (now >= tImpact) return;
+        for (n = icRate(L, "m" + si, 0.03 * (0.4 + 0.6 * kg) * F.k, dt); n > 0; n--) { q = 0.2 + 0.8 * rnd(); icP(ps, "mist", sg.x0 + (sg.x1 - sg.x0) * q, sg.y0 + (sg.y1 - sg.y0) * q, (rnd() - 0.5) * 0.05 * u / 1000, (0.02 + rnd() * 0.07) * u / 1000, 600 + rnd() * 400, u * (0.035 + rnd() * 0.03), 0, 0); }   // cold air sinking off the blades
+        for (n = icRate(L, "s" + si, 0.012 * F.k, dt); n > 0; n--) { q = 0.15 + 0.85 * rnd(); icP(ps, "spark", sg.x0 + (sg.x1 - sg.x0) * q, sg.y0 + (sg.y1 - sg.y0) * q, 0, 0, 300 + rnd() * 300, u * (0.012 + rnd() * 0.012), 0, 0); }                                  // glints twinkling along them
+        if (now >= tDrive) for (n = icRate(L, "c" + si, 0.045 * F.k, dt); n > 0; n--) icP(ps, rnd() < 0.5 ? "chip" : "mist", sg.x1, sg.y1, -(0.1 + rnd() * 0.3) * u / 1000, (rnd() - 0.6) * 0.15 * u / 1000, 350 + rnd() * 250, u * (0.011 + rnd() * 0.012), rnd() * 6.28, (rnd() - 0.5) * 0.03);   // ice dust thrown back from the tips in the drive
+      });
+      icParticles(ctx, ps, dt, F, u);
+    } });
+    return { impact: function () { glacialImpact(T); }, shockAnim: ICE_SHOCK };
+  }
+  function glacialImpact(T) {                                                        // the blow: the mage's ice burst and a short heavy shake
+    var Fi = fbParams("ice"); Fi.imp = Math.min(Fi.imp, 0.95);
+    icImpact(T, Fi);
+    shake(9, 280);
+  }
+  // EXECUTE (2026-11-20): "Thrusts a superheated broadsword directly into the target for massive Physical Damage. If the target is suffering from Burn, instantly detonates all remaining burn ticks into burst damage.
+  // Deals +50% damage if the target's HP is below 35%. CD 2". The last Warrior skill, a 2-turn finisher (docs/WARRIOR_SKILLS.md section 6): "the executioner's impale", power = weight and dread. THE VIGIL (frame 1, 600 ms):
+  // the swords stand planted in the floor, the blades heat up white-hot, the floor cracks and glows round them, embers rise. THE DRAW (frame 2): they are wrenched out in a burst of sparks and the two blades FUSE into one
+  // huge white-hot BROADSWORD drawn by the page (about 1.55 times as long, several times as wide), while the stage goes dark red-black behind the two fighters. THE STRIDE and THE IMPALE (frames 3-4): sparks and slag trail from
+  // the broadsword's tip, the blow is a white flash, shock rings, glowing cracks racing out under the target, a column of sparks, debris and the biggest shake of the six, and the frame is HELD (a hit-stop made by the pack's
+  // hold) with the broadsword glowing in the target. THE WRENCH (frame 5): the heat bleeds out, steam and slag drips. The look is white-hot forged steel (FORGE: yellow-white, orange, dull red: no flames, those are the Molten
+  // Cleave's); the damage is physical (the white number). Burn, its detonation and the +50% under 35% HP are NOT drawn (statuses and the engine come later).
+  var FORGE = { core: "255,250,232", mid: "255,190,92", glow: "232,98,28", deep: "132,32,10", flash: "255,238,205" };
+  var CRACKP = { core: "255,196,104", mid: "238,108,30", glow: "172,48,14" };                 // glowing cracks in the floor: an orange lava look, not the white-blue of lightning
+  function forgeBlade(ctx, x0, y0, x1, y1, w, a) {                                   // the fused broadsword: a tapered white-hot blade from the hilt (x0, y0) to the tip (x1, y1), w px wide, three layers added together
+    var dx = x1 - x0, dy = y1 - y0, len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 4 || a <= 0.01) return;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.translate(x0, y0); ctx.rotate(Math.atan2(dy, dx));
+    [[1.9, FORGE.glow, 0.26], [1.15, FORGE.mid, 0.55], [0.5, FORGE.core, 0.95]].forEach(function (ly) {
+      var hw = w * ly[0] / 2;
+      ctx.beginPath(); ctx.moveTo(0, -hw * 0.6); ctx.lineTo(len * 0.62, -hw); ctx.lineTo(len * 0.9, -hw * 0.8); ctx.lineTo(len, 0); ctx.lineTo(len * 0.9, hw * 0.8); ctx.lineTo(len * 0.62, hw); ctx.lineTo(0, hw * 0.6); ctx.closePath();
+      ctx.fillStyle = "rgba(" + ly[1] + "," + Math.min(1, ly[2] * a) + ")"; ctx.fill();
+    });
+    ctx.restore();
+  }
+  function boltTrunc(b, f) {                                                         // the first share f of a jagged bolt and of its branches (a crack that grows)
+    var cut = function (pts) {
+      var n = pts.length - 1, t = clamp01(f) * n, i = Math.floor(t), out = pts.slice(0, i + 1);
+      if (i < n) { var q = t - i; out.push([pts[i][0] + (pts[i + 1][0] - pts[i][0]) * q, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * q]); }
+      return out;
+    };
+    return { pts: cut(b.pts), branches: b.branches.map(cut) };
+  }
+  function floorCracks(x, y, n, lenMin, lenVar, rnd) {                               // n jagged cracks spreading from (x, y) along the floor (flattened: the floor is seen from the side)
+    var list = [], i, th, len;
+    for (i = 0; i < n; i++) { th = i / n * 6.2832 + rnd() * 0.5; len = lenMin + rnd() * lenVar; list.push(boltPts(x, y, x + Math.cos(th) * len, y + Math.sin(th) * len * 0.28, 0.22, 4, rnd, 1)); }
+    return list;
+  }
+  function startExecute(clk, hitF, T) {
+    var F = Object.assign({}, fxParams(), { pal: FORGE, paint: 0, dark: 0, aura: 0 }), at = function (f, fr) { return clkAt(clk, f, fr); }, u = uW.offsetWidth, rnd = rngOf((clk.t0 | 0) + 53);
+    var nF = Math.max(hitF + 3, nFrames("attack")), t1 = at(1), t2 = at(2), t3 = at(3), tImpact = at(hitF, 0.4), tWr = at(hitF + 1), tEnd = at(nF - 1);   // the draw = frame 2, the stride = 3, the impale = the hit frame, the wrench = the next, the recover pack = the last two
+    var PF = { pal: FORGE, k: Math.min(1.3, F.k) }, SF = { k: Math.min(1, F.k), pal: IPALS.ice }, ps = [], st = [], cracks = null, burst = false;
+    var heat = function (now) { return now < t2 ? 0.25 + 0.55 * clamp01((now - t1) / Math.max(1, t2 - t1)) : now < tWr ? 1 : clamp01(1 - (now - tWr) * speed / 800); };   // the blades: dull red, then white-hot, then cooling after the blow
+    tcDim(t2, at(2, 0.9), tWr, at(hitF + 1, 0.8), tEnd, 0.72, "26,5,3");                                                                // the stage goes dark red-black behind the two fighters from the draw to the wrench
+    fxAdd({ t0: t1, t1: tEnd + 900 / speed, draw: function (ctx, now, L) {
+      var dt = L.last ? Math.min(60, now - L.last) * speed : 0, segs = bladeSegs(), r = rectIn(uW), gy = r.top + r.height * 470 / 512, h = heat(now), n, i, m, hx = 0, hy = 0, tx = 0, ty = 0, rate;
+      L.last = now;
+      rate = function (k, perMs) { L[k] = (L[k] || 0) + perMs * dt; var c = Math.floor(L[k]); L[k] -= c; return c; };
+      if (!cracks && segs.length && curFrame && curFrame.i === 0) {                   // where the blades are planted: the floor cracks from there
+        var px = 0; segs.forEach(function (s) { px += s.x1 / segs.length; });
+        cracks = { x: px, y: gy - u * 0.004, list: floorCracks(px, gy - u * 0.004, 9, u * 0.25, u * 0.45, rnd) };
+      }
+      if (cracks) {                                                                  // glowing cracks: they grow through the vigil, flare when the blades are torn out and fade
+        var cg = clamp01((now - t1) / Math.max(1, t2 - t1)), ca = now < t2 ? 0.55 + 0.45 * cg : 1 - clamp01((now - t2) * speed / 900), fl = 0.85 + 0.15 * Math.sin(now * 0.03);
+        if (ca > 0.01) cracks.list.forEach(function (b) { drawBolt(ctx, boltTrunc(b, Math.pow(cg, 0.7)), CRACKP, u * 0.011, ca * fl * Math.min(1, F.k)); });
+        if (ca > 0.01) glowEllipse(ctx, cracks.x, cracks.y, u * (0.3 + 0.25 * cg), u * 0.08, FORGE.glow, 0.3 * ca * cg * Math.min(1, F.k));
+        if (ca > 0.01 && pcPaintedReady()) { var fi = fbTex.pc_fissure, fw = u * (0.9 + 0.3 * cg); fzTex(ctx, fi, cracks.x, cracks.y + u * 0.01, fw, fw * fi.naturalHeight / fi.naturalWidth, 0.85 * ca * cg * Math.min(1, F.k), 0.62); }   // the painted ground fire (the pyroclasm sheet's crust of cracked lava with low flames) under the cracks
+        if (now < t2) for (m = rate("em", 0.05 * PF.k); m > 0; m--) fbParticle(ps, cracks.x + (rnd() - 0.5) * u * 0.1, cracks.y, (rnd() - 0.5) * 0.25 * u / 1000, -(0.3 + rnd() * 0.7) * u / 1000, 500 + rnd() * 400, u * 0.01, "ember");   // embers rise off the planted blades
+        else if (!burst) { burst = true; for (i = 0; i < 26; i++) { var a1 = -Math.PI * (0.05 + rnd() * 0.9), sp1 = u * (0.5 + rnd() * 1.4) / 1000; fbParticle(ps, cracks.x, cracks.y, Math.cos(a1) * sp1, Math.sin(a1) * sp1, 450 + rnd() * 450, u * 0.011, "ember"); } }   // the blades are torn out of the floor
+      }
+      glowDraw(ctx, h * (0.94 + 0.06 * Math.sin(now * 0.05)), F);                     // the blades glow
+      if (segs.length) {
+        segs.forEach(function (s) { hx += s.x0 / segs.length; hy += s.y0 / segs.length; tx += s.x1 / segs.length; ty += s.y1 / segs.length; });
+        if (now >= t2 && h > 0.02) {                                                  // the two blades fuse into one huge broadsword: from the hilt to 1.55 times the real tip, growing through the draw frame
+          var gr = clamp01((now - t2) * speed / Math.max(1, (t3 - t2) * 0.9 * speed)), ge = 1 - Math.pow(1 - gr, 3), k = 1 + 0.55 * ge;
+          forgeBlade(ctx, hx, hy, hx + (tx - hx) * k, hy + (ty - hy) * k, u * (0.04 + 0.07 * ge) * F.w, h * (0.35 + 0.65 * ge) * Math.min(1, F.k));
+          glowDot(ctx, hx + (tx - hx) * k, hy + (ty - hy) * k, u * (0.12 + 0.12 * ge), FORGE.flash, 0.4 * ge * h);
+          if (now >= t3 && now < tImpact) for (m = rate("sp", 0.1 * PF.k); m > 0; m--) fbParticle(ps, hx + (tx - hx) * k, hy + (ty - hy) * k, -(0.2 + rnd() * 0.5) * u / 1000, (rnd() - 0.6) * 0.5 * u / 1000, 300 + rnd() * 350, u * 0.01, "ember");   // sparks and slag trail from the tip in the stride
+        }
+        if (now >= tWr && now < tEnd) segs.forEach(function (s, si) {                // the wrench: slag drips and steam
+          for (m = rate("dr" + si, 0.04 * PF.k); m > 0; m--) fbParticle(ps, s.x1, s.y1, (rnd() - 0.5) * 0.05 * u / 1000, 0.05 * u / 1000, 500 + rnd() * 300, u * 0.009, "ember");
+          for (m = rate("st" + si, 0.03 * SF.k); m > 0; m--) { var q = 0.2 + 0.8 * rnd(); icP(st, "mist", s.x0 + (s.x1 - s.x0) * q, s.y0 + (s.y1 - s.y0) * q, (rnd() - 0.5) * 0.04 * u / 1000, -(0.06 + rnd() * 0.1) * u / 1000, 700 + rnd() * 400, u * (0.03 + rnd() * 0.025), 0, 0); }
+        });
+      }
+      fbParticles(ctx, ps, dt, PF, u); icParticles(ctx, st, dt, SF, u);
+    } });
+    return { phys: true, impact: function () { executeImpact(T); } };
+  }
+  function executeImpact(T) {                                                        // the blow: a white flash, shock rings, cracks racing out under the target, a column of sparks, debris, the biggest shake
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.45, cy = r.top + r.height * 0.42, gy = r.top + r.height - r.height * 0.03, rnd = rngOf(now | 0), ps = [], puffs = [], P = FORGE, PF = { pal: FORGE, k: 1.1 }, i;
+    var cr = floorCracks(cx, gy, 10, u * 0.4, u * 0.7, rnd);
+    var pt = cbPaintedReady() && pcPaintedReady(), rot = (rnd() - 0.5) * 0.7, flip = rnd() < 0.5;                          // the painted fire: the fire sheet's explosion, ring and debris (cb_*) and the pyroclasm sheet's ground burst, lava crust and cloud (pc_*); without the pictures only the code look is drawn
+    scorch(cx, gy, u * 1.1);
+    shake(16, 460);
+    for (i = 0; i < 34; i++) { var a1 = -Math.PI * (0.03 + rnd() * 0.94), sp1 = u * (0.8 + rnd() * 2.0) / 1000; fbParticle(ps, cx + (rnd() - 0.5) * u * 0.1, cy + (rnd() - 0.5) * u * 0.1, Math.cos(a1) * sp1, Math.sin(a1) * sp1, 450 + rnd() * 500, u * 0.012, "ember"); }   // sparks and slag
+    for (i = 0; i < 8; i++) fbParticle(ps, cx + (rnd() - 0.5) * u * 0.3, gy, (rnd() - 0.5) * 0.12 * u / 1000, -(0.5 + rnd() * 0.9) * u / 1000, 500 + rnd() * 300, u * (0.07 + rnd() * 0.05), "flame");   // a column of white-hot gas off the floor
+    for (i = 0; i < 9; i++) puffs.push({ x: cx + (rnd() - 0.5) * u * 0.9, dx: (rnd() - 0.5) * u * 0.6, w: u * (0.1 + rnd() * 0.14), rise: u * (0.05 + rnd() * 0.16), d: rnd() * 100 });
+    fxAdd({ t0: now, t1: now + 1500 / speed, draw: function (ctx, now2, L) {
+      var t = (now2 - now) * speed, dt = L.last ? Math.min(60, now2 - L.last) * speed : 0;
+      L.last = now2;
+      if (t < 170) glowDot(ctx, cx, cy, u * (0.5 + 0.7 * t / 170), P.flash, 1.0 * Math.pow(1 - t / 170, 1.3));
+      if (t < 240) glowDot(ctx, cx, cy, u * (0.25 + 0.3 * t / 240), P.core, 0.9 * Math.pow(1 - t / 240, 1.5));
+      if (t < 120) flashAll(ctx, P.flash, 0.3 * (1 - t / 120));
+      [0, 110].forEach(function (delay, ri) {                                        // shock rings: along the floor and, the first one, round the blow
+        var tt = (t - delay) / 560; if (tt <= 0 || tt >= 1) return;
+        var e = 1 - Math.pow(1 - tt, 3), rx = u * (0.1 + (ri ? 0.8 : 1.3) * e);
+        ctx.save(); ctx.globalCompositeOperation = "lighter";
+        ctx.strokeStyle = "rgba(" + P.glow + "," + 0.55 * (1 - tt) + ")"; ctx.lineWidth = u * 0.05 * (1 - tt) + 1; ctx.beginPath(); ctx.ellipse(cx, gy, rx, rx * 0.2, 0, 0, 6.2832); ctx.stroke();
+        ctx.strokeStyle = "rgba(" + P.core + "," + 0.85 * (1 - tt) + ")"; ctx.lineWidth = u * 0.014 * (1 - tt) + 0.8; ctx.stroke();
+        if (!ri) { ctx.strokeStyle = "rgba(" + P.mid + "," + 0.5 * (1 - tt) + ")"; ctx.lineWidth = u * 0.018 * (1 - tt) + 0.8; ctx.beginPath(); ctx.arc(cx, cy, u * (0.1 + 0.75 * e), 0, 6.2832); ctx.stroke(); }
+        ctx.restore();
+      });
+      var cf = clamp01(t / 380), ca = t < 700 ? 1 : 1 - clamp01((t - 700) / 700);   // the cracks race out under the target, glow and fade
+      if (ca > 0.01) cr.forEach(function (b) { drawBolt(ctx, boltTrunc(b, 1 - Math.pow(1 - cf, 2)), CRACKP, u * 0.013, ca * (0.85 + 0.15 * Math.sin(t * 0.04))); });
+      if (t < 900) glowEllipse(ctx, cx, gy, u * (0.5 + 0.6 * cf), u * 0.11, P.glow, 0.3 * (1 - t / 900));
+      puffs.forEach(function (pf) {                                                  // dust and debris: soft grey-brown ellipses that grow, drift and fade
+        var k = clamp01((t - pf.d) / 650); if (k <= 0 || k >= 1) return;
+        ctx.fillStyle = "rgba(172,152,122," + 0.34 * (1 - k) + ")"; ctx.beginPath(); ctx.ellipse(pf.x + pf.dx * k, gy - pf.rise * k, pf.w * (0.5 + k), pf.w * 0.4 * (0.5 + k), 0, 0, 6.2832); ctx.fill();
+      });
+      if (pt) {                                                                      // THE PAINTED FIRE (2026-11-20, the user's fire sheets): in front of the fighters, the explosion in the air and the fire ring along the floor (the rest is drawn behind them, in drawBack)
+        var ew = 1 - Math.pow(1 - clamp01(t / 400), 3), rw = u * (0.4 + 1.7 * (1 - Math.pow(1 - clamp01(t / 520), 3))), tt2 = t / 520;
+        fbTexDraw(ctx, fbTex.cb_blast, cx, cy, rot, u * (0.8 + 0.55 * ew), fbEnv(t, 0, 650, 110) * 0.85, 0.5, flip);                                    // the fire ball of the explosion
+        fbTexDraw(ctx, fbTex.cb_pop, cx, cy, rot * 2, u * (0.55 + 0.5 * clamp01(t / 160)), fbEnv(t, 0, 240, 60) * 0.9, 0.5, !flip);                    // the starburst at the heart of it
+        if (tt2 > 0 && tt2 < 1) fzTex(ctx, fbTex.cb_ring, cx, gy, rw, rw * 0.2, (1 - tt2) * 0.75, 0.5, !flip);                                          // a fire ring running out along the floor
+      }
+      fbParticles(ctx, ps, dt, PF, u);
+    }, drawBack: function (ctx, now2) {                                              // behind the fighters: the ground burst, the fire on the ground, the cloud and the aftermath (the warrior and the target stay clear in front of them)
+      if (!pt) return;
+      var t = (now2 - now) * speed, cf2 = clamp01(t / 380), im, bw, fw, fa;
+      im = fbTex.pc_base; bw = u * (1.1 + 0.4 * clamp01(t / 200));                                                                                     // the ground burst: lava and rocks thrown up
+      fzTex(ctx, im, cx, gy + u * 0.03, bw, bw * im.naturalHeight / im.naturalWidth, 0.9 * fbEnv(t, 0, 1300, 200), 0.72);
+      im = fbTex.pc_fissure; fw = u * (1.3 + 0.5 * cf2); fa = fbEnv(t, 60, 1400, 300) * (0.85 + 0.15 * Math.sin(t * 0.02));                         // the ground fire: a crust of glowing lava with low flames under the target, burning for a second
+      fzTex(ctx, im, cx, gy + u * 0.01, fw, fw * im.naturalHeight / im.naturalWidth, 0.9 * fa, 0.62);
+      fbTexDraw(ctx, fbTex.pc_cloud, cx, gy - u * 0.95 - u * 0.1 * t / 1500, 0, u * (0.7 + 0.4 * clamp01((t - 80) / 500)), 0.7 * fbEnv(t, 120, 1500, 300), 0.5);   // the cloud of smoke and fire rising behind it
+      fbTexDraw(ctx, fbTex.cb_debris, cx, cy + u * 0.04 + u * 0.1 * (t / 1500), 0, u * (0.8 + 0.3 * t / 1500), 0.75 * clamp01((t - 150) / 250) * clamp01((1500 - t) / 800), 0.5, flip);   // the aftermath
     } });
   }
   function shivFx(T, hitF) {                                                         // a violet streak along the ground from where she starts to the strike spot, a puff at each end
@@ -5719,7 +6723,7 @@
     clearGuard(FIGHTERS.G); FIGHTERS.G.guard = null;
     FIGHTERS.W.frozen = null; FIGHTERS.G.frozen = null; FIGHTERS.W.chilled = null; FIGHTERS.G.chilled = null; FIGHTERS.W.magDef = null; FIGHTERS.G.magDef = null; FIGHTERS.W.burn = null; FIGHTERS.G.burn = null; FIGHTERS.W.shocked = null; FIGHTERS.G.shocked = null; FIGHTERS.W.elusive = null; FIGHTERS.G.elusive = null; FIGHTERS.W.guard = null;   // (elusive and the hero's guard were left set by Reset: the status icons showed it, and a second Elusive would not draw; fixed 2026-11-12)
     document.querySelectorAll(".num,.fx,.scorch").forEach(function (n) { n.remove(); });
-    fxClear(); brLive = null;                                                      // (the Barrier's layer goes with the rest)
+    fxClear(); brLive = null; aegisLeft = 0;                                       // (the Barrier's layer goes with the rest)
     FIGHTERS.W.hp = FIGHTERS.W.max; FIGHTERS.G.hp = FIGHTERS.G.max;
     paintHp(FIGHTERS.W); paintHp(FIGHTERS.G);
     $("banner").classList.remove("show");
@@ -8939,6 +9943,9 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   // The Spellblade (2026-11-06), the Rogue's other level-25 branch look, made the same way from Animations/Rogue (strips named spellblade_..., in Animations/Spellblade/<animation>/; idle, run, hit, death,
   // dodge and the six skills since 2026-11-07; her hand marks are the Rogue's copied, to be re-marked in the hand tool). The Rogue's skill code serves her through SPELLBLADE_SKILLS.
   var SPELLBLADE_ANIMS = __SPELLBLADE_ANIMS__;
+  // The Cleric (2026-11-20), the fourth class: an elven man with emerald hair, a cream tabard over steel mail (docs/CLERIC.md). Strips named mailed_..., in Animations/Cleric/<animation>/; the idle only so far,
+  // no hand marks (so no items are drawn), no skills: a fight uses the plain slide, flash and fade for what he does not have yet.
+  var CLERIC_ANIMS = __CLERIC_ANIMS__;
   function registerAnims(list) {
     list.forEach(function (d) {
       if (d.anchors) { try { importMarks(d.anchors); } catch (e) {} }
@@ -8951,7 +9958,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
       }
     });
   }
-  registerAnims(DEFAULT_ANIMS); registerAnims(MAGE_ANIMS); registerAnims(ROGUE_ANIMS); registerAnims(ASSASSIN_ANIMS); registerAnims(SPELLBLADE_ANIMS);
+  registerAnims(DEFAULT_ANIMS); registerAnims(MAGE_ANIMS); registerAnims(ROGUE_ANIMS); registerAnims(ASSASSIN_ANIMS); registerAnims(SPELLBLADE_ANIMS); registerAnims(CLERIC_ANIMS);
   function loadAnims(list) { // idle first: the other packs measure their frames against it
     return new Promise(function (done) {
       (function loadNext(k) {
@@ -8964,7 +9971,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   }
   // Switching character loads that character's strips into the same packs. A pack the character does not have yet stays empty,
   // and the fight falls back to the plain slide, flash and fade for it.
-  var CHARACTERS = { warrior: { name: "Warrior", anims: DEFAULT_ANIMS }, mage: { name: "Mage", anims: MAGE_ANIMS }, rogue: { name: "Rogue", anims: ROGUE_ANIMS }, assassin: { name: "Assassin", anims: ASSASSIN_ANIMS }, spellblade: { name: "Spellblade", anims: SPELLBLADE_ANIMS } };
+  var CHARACTERS = { warrior: { name: "Warrior", anims: DEFAULT_ANIMS }, mage: { name: "Mage", anims: MAGE_ANIMS }, rogue: { name: "Rogue", anims: ROGUE_ANIMS }, assassin: { name: "Assassin", anims: ASSASSIN_ANIMS }, spellblade: { name: "Spellblade", anims: SPELLBLADE_ANIMS }, cleric: { name: "Cleric", anims: CLERIC_ANIMS } };
   var curChar = "warrior";
   // ---- What the page shows for the character on stage (2026-11-05, the user: only the necessary tabs): a panel with data-chars="warrior" / "mage" (several names separated by spaces) is shown only for those
   // characters (the Thunderclap Guillotine panel for the warrior, the skill and Barrier panels for the mage); the Fight panel lists only what the character needs (the scenario list has the mage's combos only for
@@ -9017,9 +10024,9 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     hudHero();
     return loadAnims(ch.anims).then(function () { renderMarksInfo(); applyCharUi(); });
   }
-  if (MAGE_ANIMS.length || ROGUE_ANIMS.length || ASSASSIN_ANIMS.length || SPELLBLADE_ANIMS.length) {
+  if (MAGE_ANIMS.length || ROGUE_ANIMS.length || ASSASSIN_ANIMS.length || SPELLBLADE_ANIMS.length || CLERIC_ANIMS.length) {
     $("charWrap").style.display = "";
-    [["mage", "Elf mage", MAGE_ANIMS], ["rogue", "Rogue", ROGUE_ANIMS], ["assassin", "Assassin", ASSASSIN_ANIMS], ["spellblade", "Spellblade", SPELLBLADE_ANIMS]].forEach(function (c) {   // each extra character's option lists the packs it has so far; one without any strip is removed
+    [["mage", "Elf mage", MAGE_ANIMS], ["rogue", "Rogue", ROGUE_ANIMS], ["assassin", "Assassin", ASSASSIN_ANIMS], ["spellblade", "Spellblade", SPELLBLADE_ANIMS], ["cleric", "Cleric", CLERIC_ANIMS]].forEach(function (c) {   // each extra character's option lists the packs it has so far; one without any strip is removed
       var opt = $("charSel").querySelector('option[value="' + c[0] + '"]');
       if (!opt) return;
       if (!c[2].length) { opt.remove(); return; }

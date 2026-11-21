@@ -1,0 +1,37 @@
+{
+ "format": "frame-placement/1",
+ "animation": "attack",
+ "file": "mailed_spiteful_covenant_7frame_strip.png",
+ "frames": 7,
+ "fps": 14,
+ "hitFrame": 4,
+ "smooth": true,
+ "holds": [
+  129,
+  529,
+  149,
+  29,
+  209,
+  69,
+  0
+ ],
+ "x": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "note": "Spiteful Covenant, a DRAFT. 7 frames at 14 fps (71 ms each) with holds: PAY 200 ms, DOUBLED OVER 600, RISE 220 (the user, 2026-11-22: a powerful skill, frames 1 to 3 twice as long), the ROAR 100 (the lock: hitFrame 4, the barrier erupts), HOLD 280, recover 140, the idle's frame. A FLAT path (x and y all 0): he casts from where he stands and does not move."
+}

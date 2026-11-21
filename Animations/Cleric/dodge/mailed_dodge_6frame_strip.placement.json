@@ -1,0 +1,4 @@
+{"format": "frame-placement/1", "animation": "dodge", "file": "mailed_dodge_6frame_strip.png", "frames": 6, "fps": 14, "evadeFrame": 3, "smooth": true, "xUnit": "frame-widths", 
+"x": [0, -0.05, -0.15, -0.22, -0.14, -0.03], 
+"y": [0, 0, 0.02, 0.025, 0, 0], 
+"note": "The same hop-back path as the warrior's, the mage's and the Rogue's dodge, with a small extra lift (y, in frame widths: 0.02 and 0.025 of a 512 px frame add about 10 and 13 px) because the Cleric's drawn hop is a short heavy one (his boots are 46 and 7 px up on frames 3 and 4, the Rogue's 57 and 11, the mage's 73 and 33). x: character widths from the home position, negative = away from the enemy. evadeFrame: the frame on screen when the dodged strike would have landed (the peak of the hop)."}

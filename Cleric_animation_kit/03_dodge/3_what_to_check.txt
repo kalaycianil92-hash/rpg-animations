@@ -1,0 +1,11 @@
+CLERIC DODGE: what to do and what to check
+
+1. Start a NEW chat in Gemini or ChatGPT (ChatGPT usually keeps sizes better).
+2. Attach 1_attach_this_image.png (the only image) and ask for a 3:2 image (a wide sheet, 3 columns x 2 rows).
+3. Paste the whole text of 2_paste_this_prompt.txt.
+4. Generate 2 or 3 and keep the best. If the generator says it is out of image capacity, wait; do not shorten the prompt.
+5. Save the sheet as inbox/cleric_dodge_sheet.png and tell me. I cut it into a strip, check it against his idle, and put it in the test page.
+
+What to look at: (1) the same man in all six panels (emerald hair, pointed ear, plate armour, cream tabard, no helmet, no cape); (2) panels 1 and 6 are the reference stance; the fists stay in their guard places in every panel (the near fist at the chest, the far fist at belt height); (3) panels 3 and 4 are in the air: both boots off the floor, about 15% of his height in panel 3 and about 6% in panel 4 (he is heavily armoured, so it is a short heavy hop, lower than the Rogue's); (4) the same size in every panel, and room above his head for the hop (the idle came out at 85% of the panel when 60% was asked, so the prompt asks for only 52% and for 25% empty space above the head); (5) both hands bare closed fists; (6) nothing touches a panel edge; (7) one image only.
+
+If ONE thing is wrong tell me which; I will give you a one-line fix, or I join the good frames of several sheets.

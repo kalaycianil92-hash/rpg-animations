@@ -2,7 +2,7 @@
 
 ## Why
 
-Every class splits into two branches at level 25 (decided 2026-11-05; the Rogue becomes Assassin + Spellblade, the Ranger is gone). At level 25 the character's LOOK changes, but every animation stays exactly the same frame by frame: the same poses, the same hand marks, paths, fps and effects. Each class therefore needs three looks (base, branch A, branch B) over the same animations.
+Every class splits into two branches at level 25 (decided 2026-11-05; the Rogue becomes Assassin + Spellblade, the Ranger is gone). **The game itself uses level 25 too since 2026-11-20** (`BRANCH_LEVEL` in the game project `InfinityTower`, it was 20), and the user said it may be moved to level 30-35 later: nothing in the art depends on the number, only on the fact that a branch look replaces the base look at that level. At level 25 the character's LOOK changes, but every animation stays exactly the same frame by frame: the same poses, the same hand marks, paths, fps and effects. Each class therefore needs three looks (base, branch A, branch B) over the same animations.
 
 **The question the pilot answers:** can ChatGPT or Gemini redraw an existing animation in a new look closely enough that the old marks, paths and effects still fit, with only a small automatic correction? Our experience says "close, not exact": the generators redraw a sheet instead of editing it, drift in size (the Shadow Shiv sheet came out 1.23 x too big, some Abyssal panels' heads 15% small) and in details from frame to frame (which shows as shimmer when played).
 

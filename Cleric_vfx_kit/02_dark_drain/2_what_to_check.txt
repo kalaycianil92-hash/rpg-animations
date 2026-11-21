@@ -1,0 +1,13 @@
+CLERIC VFX SHEET: DARK DRAIN: what to do and what to check
+
+1. Start a NEW chat in ChatGPT (Gemini as a second try). NO attachment: these are pure effect sheets.
+2. Ask for a 1:1 square image, as large as it will give you (1024 x 1024 or more).
+3. Paste the whole text of 1_paste_this_prompt.txt.
+4. Generate 2 or 3 and keep the best. If it says it is out of image capacity, wait; do not shorten the prompt.
+5. Save the sheet as inbox/Cleric_VFX/dark_drain_sheet.png and tell me (or name the files after the panels you want from each). I cut it, wire the pieces into the Cleric's effects and the auras, and you judge it in motion.
+
+What to look at: (1) pure flat black everywhere and NO dark filled discs or blobs; (2) every panel is ONE separate effect centred with black all round; (3) violet only (piece 5 green-white), curved shapes, no lightning; (4) the ground pieces (3 and 4) are FLAT WIDE OVALS, the upright pieces (2, 7, 8) have their base at the bottom; (5) panel 1 is a horizontal rope, panel 5 a horizontal ribbon with a bright head at the RIGHT; (6) nothing touches a panel edge; (7) the nine panels clearly differ; (8) one image only.
+
+Replies if it goes wrong. If it draws lightning or jagged zig-zags: "Redo it. NO lightning, NO straight jagged zig-zags, NO hairline forks: only CURVED flowing shapes: curling tendrils, swirls, crescents and soft wisps." If it draws black discs, filled dark shapes or a dark blob: "Redo it. NO black or dark filled shapes: everything is glowing violet LIGHT on pure black; a ring has an empty black middle." If it is cyan, blue-white, magenta, pink or orange: "Redo it. One colour family only: violet (#AF4AFF and #6914FF) with a pale pink-violet core (#EBCDFF) and deep indigo edges (#3C0AAA); only panel 5 is pale green-white." If it draws skulls, faces, hands with fingers or creatures: "Redo it. NO skulls, NO faces, NO creatures: only abstract shapes; the claws are plain curved dark spikes of light." If the background is not pure black or has a haze: "Redo it. The whole image is pure flat black (#000000), identical in every pixel, no gradient, no vignette, no haze, no panel borders." If effects touch the edges: "Redo it. Each effect is centred in its panel with at least 8% pure black margin on every side and fades to pure black before the edge."
+
+If ONE panel is wrong tell me which; I will give you a one-line fix or join the good panels of several sheets.

@@ -1,0 +1,38 @@
+{
+ "format": "frame-placement/1",
+ "animation": "attack",
+ "file": "mailed_radiant_smite_7frame_strip.png",
+ "frames": 7,
+ "fps": 14,
+ "hitFrame": 4,
+ "smooth": true,
+ "xUnit": "distance-share",
+ "holds": [
+  49,
+  29,
+  229,
+  19,
+  49,
+  39,
+  0
+ ],
+ "x": [
+  0,
+  0,
+  0.1,
+  0.9,
+  1.0,
+  1.0,
+  1.0
+ ],
+ "y": [
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0
+ ],
+ "note": "Radiant Smite, a DRAFT. 7 frames at 14 fps: wind-up 120 ms, raise 90, the held CONSECRATE pose 300 (the code's glow), the STRIKE 70 (the hit at its end: hitFrame 4), follow-through 120, recover 110, the idle's frame. holds = extra ms per frame on top of 1000/fps (71 ms): 49 + 71 = 120, 29 + 71 = 100, 229 + 71 = 300, 19 + 71 = 90, 49 + 71 = 120, 39 + 71 = 110. The page slides him toward the target during frames 3 and 4 and home after frame 7."
+}
