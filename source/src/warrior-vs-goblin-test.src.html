@@ -429,6 +429,7 @@
       <label id="rogueFreezeWrap" style="display:none"><input type="checkbox" id="rogueFreeze"> Permafrost Execution always Freezes a Chilled target (otherwise a 50% chance, a placeholder)</label>
       <label data-chars="mage">Mage's far hand carries <select id="farHand"><option value="orb">the orb</option><option value="book">the spell book</option></select></label>
       <label data-chars="warrior">Warrior's near hand carries <select id="nearHand"><option value="sword">a sword</option><option value="shield">a shield</option></select></label>
+      <label data-chars="cleric">Cleric's main hand carries <select id="clericWeapon"><option value="mace">the mace (Templar)</option><option value="wand">the wand (Occultist)</option></select></label>
       <label><input type="checkbox" id="showW" checked> Show weapons</label>
     </div>
     <div class="fields">
@@ -1140,8 +1141,8 @@
   // per character the hand size (fist) and the item settings (length as a share of the frame WIDTH, grip point, hand over the item); per animation
   // offItem (what the off hand carries: shield, other = a second weapon, none). They are found by name: armored_idle_strip.png uses "armored_idle".
   // Draw order: items behind the body, the body, items in front, then the hand over each item in front whose overlay is on.
-  var anchorLib = {}, anchorSets = {};
-  var itemImgs = { main: new Image(), shield: new Image(), orb: new Image(), staff: new Image(), book: new Image(), dagger: new Image(), cutlass: new Image() };
+  var anchorLib = {}, anchorLibShield = {}, anchorSets = {};   // anchorLibShield: the Warrior's marks for a SHIELD in the near hand (2026-11-23: <strip>.shield.hand-anchors.json), used instead of anchorLib's when the near-hand switch says shield
+  var itemImgs = { main: new Image(), shield: new Image(), orb: new Image(), staff: new Image(), book: new Image(), dagger: new Image(), cutlass: new Image(), mace: new Image(), wand: new Image() };
   itemImgs.main.src = "__ASSET:sword.png__";
   itemImgs.shield.src = "__ASSET:shield.png__";
   itemImgs.orb.src = "__ASSET:orb.png__";
@@ -1149,6 +1150,12 @@
   itemImgs.book.src = "__ASSET:book.png__";
   itemImgs.dagger.src = "__ASSET:dagger.png__";      // the Rogue's main hand (2026-11-04); a marks file names it as "picture": "dagger"
   itemImgs.cutlass.src = "__ASSET:cutlass.png__";    // the Rogue's off hand, shared with the warrior (his marks can name it too)
+  itemImgs.mace.src = "__ASSET:mace.png__";          // the Cleric's main hand, the Templar's weapon (2026-11-22); a marks file names it as "picture": "mace"
+  itemImgs.wand.src = "__ASSET:wand.png__";          // the Occultist's weapon: the same marks, the picture and settings swapped by the choice below
+  // THE CLERIC'S MAIN HAND (2026-11-22): the Templar's MACE or the Occultist's WAND, an equipment choice like the Mage's orb or book. A marks file names the far-hand item "mace" OR "wand" (the hand tool has both; where the
+  // hand is, the angle and behind or in front are the same for both) and the choice "Cleric's main hand carries" decides the picture. The weapon the marks NAME uses the marks' own length and grip point; the other one uses
+  // its default (MACE_CFG, WAND_CFG). The user's marks of 2026-11-22 name the wand (0.4 long, grip at 76%), so the wand is the default choice; to tune the mace, save marks that name the mace. Remembered in this browser.
+  var clericWand = true, CLERICWEAPON_KEY = "wvg-cleric-weapon", MACE_CFG = { length: 0.3, pivot: 0.79, overlay: true }, WAND_CFG = { length: 0.3, pivot: 0.79, overlay: true };
   // The mage's far hand carries EITHER the orb OR the spell book, never both and never one replacing the other during a fight: it is an equipment choice (the user, 2026-11-04). The marks files call the far-hand
   // item "orb" (where the hand is, the angle and in front or behind are the same for both); the choice in "Weapons and hands" swaps the picture and its settings (BOOK_CFG: a bit bigger than the orb,
   // its length is the picture's height as a share of the frame width like every item). Everything that looks for "the orb" (the skills' charge glows) follows the equipped one. A marks file can also name
@@ -1157,6 +1164,8 @@
   // THE WARRIOR'S NEAR HAND (the user's rule, 2026-11-13): it can ALWAYS equip a shield, in every animation (existing and future); the marks only say where the hand is and which way the item points, so the
   // page swaps the picture and its settings on the same marks (like the mage's orb or book): a sword (0.5 long, grip at 81%, the hand drawn over the grip) or the shield (0.3, centred on the mark, NEVER
   // with the hand drawn over it). The choice is remembered in this browser; the swords stay in the far hand.
+  // 2026-11-23: the user made MARKS FOR THE SHIELD (a grip point and length of 35% like the Cleric's: <strip>.shield.hand-anchors.json, build.py's anchorsShield, anchorLibShield): with the shield chosen the page uses those
+  // marks (positions, angles and the shield's own length and grip point) for every pose that has them, with a sword in the near hand the original marks, so the two never disturb each other; the switch swaps them live.
   var nearShield = false, NEARHAND_KEY = "wvg-warrior-nearhand", SHIELD_CFG = { length: 0.3, pivot: 0.5, overlay: false };
   // Item pictures per character (found by the character's name in the marks file). A character listed here uses its own pictures for the far hand
   // (main track) and for the near hand's "other" item (off track); every other character uses the sword and the shield.
@@ -1165,8 +1174,15 @@
   function picImg(p) { return p === "sword" ? itemImgs.main : p === "orb" && farBook ? itemImgs.book : (itemImgs[p] || null); }
   function cfgOf(set, tk) {                                                         // the item settings of an arm: the file's, or the spell book's when it is equipped instead of the orb
     var c = tk === "main" ? set.main : set.off;
-    if (tk === "off" && nearShield && String(set.character || "").toLowerCase() === "warrior") return { kind: "shield", length: SHIELD_CFG.length, pivot: SHIELD_CFG.pivot, overlay: SHIELD_CFG.overlay, pic: "shield" };   // the Warrior's near hand carries the shield
+    if (tk === "off" && nearShield && String(set.character || "").toLowerCase() === "warrior") {                  // the Warrior's near hand carries the shield: with the user's shield marks its own length and grip point (35% and 35%, like the Cleric's), else the default shield
+      if (set.shieldMarks) return { kind: "shield", length: set.off.length, pivot: set.off.pivot, overlay: false, pic: "shield" };
+      return { kind: "shield", length: SHIELD_CFG.length, pivot: SHIELD_CFG.pivot, overlay: SHIELD_CFG.overlay, pic: "shield" };
+    }
     if (c.kind === "shield" && c.overlay) return { kind: c.kind, length: c.length, pivot: c.pivot, overlay: false, pic: c.pic };                       // a shield never has the hand drawn over it
+    if (tk === "main" && (c.pic === "mace" || c.pic === "wand")) {                                                                                       // the Cleric's weapon: the choice decides the picture, the marks name one of the two
+      var want = clericWand ? "wand" : "mace", d = clericWand ? WAND_CFG : MACE_CFG;
+      return c.pic === want ? c : { length: d.length, pivot: d.pivot, overlay: d.overlay, pic: want };
+    }
     return farBook && c.pic === "orb" ? { length: BOOK_CFG.length, pivot: BOOK_CFG.pivot, overlay: BOOK_CFG.overlay, pic: "orb" } : c;
   }
   function itemFor(set, tk) {
@@ -1178,15 +1194,15 @@
     return art ? art.other : itemImgs.main;
   }
   function baseName(n) { return String(n).replace(/\.[^.]+$/, "").replace(/[_\- ]?(strip|pack|sheet)$/i, "").toLowerCase(); }
-  function importMarks(d) { // a hand-anchors/3 export; returns the animation names found
+  function importMarks(d, shield) { // a hand-anchors/3 export; returns the animation names found; shield: it is a SHIELD set (kept apart, see attachAnchors)
     if (!d || d.format !== "hand-anchors/3" || !d.characters) throw new Error("this is not a hand-anchors/3 export from the Hand Anchor Tool");
     var names = [];
     d.characters.forEach(function (c) {
       var mi = (c.items && c.items.main) || {}, oi = (c.items && c.items.off) || {};
       (c.animations || []).forEach(function (a) {
         var off = a.offItem || { kind: "shield", length: oi.length, pivot: oi.pivot, overlay: oi.overlay };
-        anchorLib[baseName(a.name)] = {
-          name: a.name, character: c.name || "", fist: c.fist || 0.09,
+        (shield ? anchorLibShield : anchorLib)[baseName(a.name)] = {
+          name: a.name, character: c.name || "", fist: c.fist || 0.09, shieldMarks: !!shield,
           main: { length: mi.length || 0.5, pivot: mi.pivot || 0.81, overlay: mi.overlay !== false, pic: mi.picture || "" },
           off: { kind: off.kind || "shield", length: off.length || 0.3, pivot: off.pivot || 0.5, overlay: !!off.overlay, pic: off.picture || "" },
           tracks: a.tracks || { main: [], off: [] }
@@ -1204,7 +1220,7 @@
     $("marksInfo").textContent = (have.length ? "Hand marks loaded for: " + have.join(", ") + "." : "No hand marks loaded.") + (miss.length ? " No marks for: " + miss.join(", ") + "." : "");
   }
   function attachAnchors(pose) { // gives a pose the marks that match its pack's file name
-    var p = packs[pose], set = p && p.file ? anchorLib[baseName(p.file)] : null;
+    var p = packs[pose], key = p && p.file ? baseName(p.file) : null, set = key ? (nearShield && anchorLibShield[key]) || anchorLib[key] : null;   // with a shield in the Warrior's near hand its shield marks are used when the file has them (the sword's marks would put the shield where a sword's grip is)
     if (set) { anchorSets[pose] = set; $("fistSize").value = Math.round(set.fist * 100); $("fistV").textContent = $("fistSize").value + "%"; }
     else delete anchorSets[pose];
     renderMarksInfo();
@@ -5800,12 +5816,25 @@
       });
       fbParticles(ctx, ps, dt, PF, u);
     } });
+    fxAdd({ t0: t1, t1: at(3) + 1900 / speed, x0: 1e9, x1: -1e9, draw: function () {}, drawBack: function (ctx, now, L) {         // GROUND FIRE (2026-11-23, the user): where the tips scrape the floor (the wind-up and the step in) it is left burning: a crust of glowing lava with low flames (the pyroclasm sheet's pc_fissure), tiled along the furrow behind the fighters
+      if (!pcPaintedReady()) return;
+      var u = uW.offsetWidth, r = rectIn(uW), gy = r.top + r.height * 470 / 512, segs = bladeSegs(), im = fbTex.pc_fissure, i, cx = 0, cy = 0;
+      if (now < at(3) && segs.length) {
+        segs.forEach(function (s) { cx += s.x1 / segs.length; cy += s.y1 / segs.length; });
+        if (cy > gy - u * 0.07) { L.x0 = Math.min(L.x0, cx); L.x1 = Math.max(L.x1, cx); L.ts = L.ts || now; }                // (the same test as the ground sparks: a tip within 7% of a character width of the floor)
+      }
+      if (!L.ts || L.x1 - L.x0 < u * 0.05) return;
+      var span = L.x1 - L.x0, w = u * 0.8, h = w * im.naturalHeight / im.naturalWidth, n = Math.max(1, Math.ceil(span / (w * 0.75)));
+      var a = clamp01((now - L.ts) * speed / 200) * (now < tImpact + 250 / speed ? 1 : 1 - clamp01((now - tImpact - 250 / speed) * speed / 900)) * 0.75 * Math.min(1, F.k) * (0.85 + 0.15 * Math.sin(now * 0.02));
+      for (i = 0; i < n; i++) fzTex(ctx, im, L.x0 + (n === 1 ? span / 2 : span * i / (n - 1)), gy + u * 0.01, w, h, a, 0.62, i % 2 === 1);
+    } });
     return { impact: function () { moltenImpact(T); }, shockAnim: FIRE_SHOCK };
   }
   function moltenImpact(T) {                                                         // the blow: the mage's fire burst, a short shake and white-hot sparks flung forward and up
     var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.45, cy = r.top + r.height * 0.45, fw = T.dir < 0 ? 1 : -1, rnd = rngOf(now | 0), sp = [], i, P = FPALS.fire;
     var Fm = fbParams("firebolt"); Fm.imp = Math.min(Fm.imp, 0.9);
     fbImpact(T, Fm);
+    moltenGround(T);
     shake(10, 300);
     for (i = 0; i < 26; i++) { var ang = -Math.PI * (0.04 + rnd() * 0.5), sv = u * (1.0 + rnd() * 2.2) / 1000; sp.push({ vx: fw * Math.cos(ang) * sv, vy: Math.sin(ang) * sv, life: 240 + rnd() * 320, hot: rnd() }); }
     fxAdd({ t0: now, t1: now + 700 / speed, draw: function (ctx, now2) {
@@ -5819,6 +5848,15 @@
         ctx.beginPath(); ctx.moveTo(px(Math.max(0, t - 30)), py(Math.max(0, t - 30))); ctx.lineTo(px(t), py(t)); ctx.stroke();
       });
       ctx.restore();
+    } });
+  }
+  function moltenGround(T) {                                                         // GROUND FIRE at the blow (2026-11-23, the user): a small ground burst (pc_base: lava and rocks thrown up) and a crust of glowing lava with low flames (pc_fissure) under the target, burning for about a second and a half; behind the fighters
+    if (!pcPaintedReady()) return;
+    var now = performance.now(), r = rectIn(T.unit), u = uW.offsetWidth, cx = r.left + r.width * 0.45, gy = r.top + r.height - r.height * 0.03;
+    fxAdd({ t0: now, t1: now + 1700 / speed, draw: function () {}, drawBack: function (ctx, now2) {
+      var t = (now2 - now) * speed, im = fbTex.pc_base, bw = u * (0.8 + 0.3 * clamp01(t / 200)), fw = u * (1.0 + 0.3 * clamp01(t / 380)), fa = fbEnv(t, 40, 1500, 300) * (0.85 + 0.15 * Math.sin(t * 0.02));
+      fzTex(ctx, im, cx, gy + u * 0.03, bw, bw * im.naturalHeight / im.naturalWidth, 0.8 * fbEnv(t, 0, 1000, 200), 0.72);
+      im = fbTex.pc_fissure; fzTex(ctx, im, cx, gy + u * 0.01, fw, fw * im.naturalHeight / im.naturalWidth, 0.85 * fa, 0.62);
     } });
   }
   // GLACIAL BLADE (2026-11-20): "Bashes the enemy with a frost-forged blade, dealing moderate Ice Damage and 40% chance to apply Chilled. If the target already has Reduce Physical Def, pushes the enemy's action bar back
@@ -9915,6 +9953,16 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   $("nearHand").onchange = function () {
     nearShield = this.value === "shield";
     try { localStorage.setItem(NEARHAND_KEY, this.value); } catch (e) {}
+    POSES.forEach(attachAnchors);                                                      // the shield and the sword have their own marks files: swap the marks of every loaded pose
+    if (curFrame) applyWeapon(curFrame.pose, curFrame.i);
+  };
+  (function () {                                                                      // what the Cleric's main hand carries (the Templar's mace or the Occultist's wand): remembered in this browser
+    var v = "wand"; try { v = localStorage.getItem(CLERICWEAPON_KEY) === "mace" ? "mace" : "wand"; } catch (e) {}
+    $("clericWeapon").value = v; clericWand = v === "wand";
+  })();
+  $("clericWeapon").onchange = function () {
+    clericWand = this.value === "wand";
+    try { localStorage.setItem(CLERICWEAPON_KEY, this.value); } catch (e) {}
     if (curFrame) applyWeapon(curFrame.pose, curFrame.i);
   };
   $("clear").onclick = function () {
@@ -9949,6 +9997,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   function registerAnims(list) {
     list.forEach(function (d) {
       if (d.anchors) { try { importMarks(d.anchors); } catch (e) {} }
+      if (d.anchorsShield) { try { importMarks(d.anchorsShield, true); } catch (e) {} }
       var pl = d.placement;
       if (pl && pl.blockFrame) PRESETS[d.file] = Object.assign(PRESETS[d.file] || {}, { pack: d.slot, blockFrame: pl.blockFrame, fps: pl.fps });   // a block pack has no path, only its block frame
       if (pl && pl.x && pl.y) {

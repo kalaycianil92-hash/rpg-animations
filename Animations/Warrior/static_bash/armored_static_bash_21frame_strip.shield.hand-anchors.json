@@ -1,0 +1,381 @@
+{
+ "format": "hand-anchors/3",
+ "note": "Two tracks per frame: main (the left hand, far arm) and off (the right hand, near arm). x and y are fractions of one frame from its top left. Item length is a share of the frame WIDTH. a is degrees, 0 = item points up, clockwise is positive. front=false means the item is drawn behind the body. hide=true means no item on that frame. w squashes the item sideways (1 = normal width). Draw order: items behind (main, off), body, items in front (main, off), then the hand over each item in front whose overlay is true: only the hand's own pixels from the body frame, namely the pixels of the skin colour found around the mark (same hue, inside a circle of radius fist x frame width, connected to the mark), grown by 2 px to take in the outline; when no skin colour is found near the mark it is the whole circle. Each animation has offItem: what its off hand carries (kind shield, other = a second weapon or item, or none = no off-hand item, in which case the off track is all null) with its own length, pivot and overlay; for the off hand it takes precedence over the character-level items.off.",
+ "characters": [
+  {
+   "name": "Warrior",
+   "fist": 0.01,
+   "items": {
+    "main": {
+     "length": 0.5,
+     "pivot": 0.81,
+     "overlay": true,
+     "picture": "sword"
+    },
+    "off": {
+     "length": 0.35,
+     "pivot": 0.35,
+     "overlay": false,
+     "picture": "shield"
+    }
+   },
+   "animations": [
+    {
+     "name": "armored_static_bash_21frame",
+     "frames": 21,
+     "columns": 21,
+     "fps": 11,
+     "offItem": {
+      "kind": "shield",
+      "picture": "shield",
+      "length": 0.35,
+      "pivot": 0.35,
+      "overlay": false
+     },
+     "tracks": {
+      "main": [
+       {
+        "x": 0.789,
+        "y": 0.353,
+        "a": -39,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.789,
+        "y": 0.353,
+        "a": -39,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.789,
+        "y": 0.343,
+        "a": -39,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.789,
+        "y": 0.36,
+        "a": -39,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.789,
+        "y": 0.36,
+        "a": -39,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.794,
+        "y": 0.355,
+        "a": -39,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.777,
+        "y": 0.334,
+        "a": -51,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.759,
+        "y": 0.484,
+        "a": 18,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.713,
+        "y": 0.453,
+        "a": 18,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.724,
+        "y": 0.272,
+        "a": -63,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.719,
+        "y": 0.462,
+        "a": 12,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.782,
+        "y": 0.331,
+        "a": -63,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.759,
+        "y": 0.484,
+        "a": 12,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.712,
+        "y": 0.452,
+        "a": 12,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.726,
+        "y": 0.279,
+        "a": -72,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.743,
+        "y": 0.625,
+        "a": 21,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.618,
+        "y": 0.239,
+        "a": -81,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.902,
+        "y": 0.558,
+        "a": 15,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.895,
+        "y": 0.701,
+        "a": 24,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.73,
+        "y": 0.504,
+        "a": 18,
+        "front": false,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.787,
+        "y": 0.354,
+        "a": -42,
+        "front": false,
+        "hide": false,
+        "w": 1
+       }
+      ],
+      "off": [
+       {
+        "x": 0.542,
+        "y": 0.388,
+        "a": 3,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.546,
+        "y": 0.393,
+        "a": 3,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.517,
+        "y": 0.426,
+        "a": 12,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.548,
+        "y": 0.403,
+        "a": 12,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.544,
+        "y": 0.405,
+        "a": 12,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.539,
+        "y": 0.405,
+        "a": 12,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.382,
+        "y": 0.501,
+        "a": 39,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.532,
+        "y": 0.475,
+        "a": 39,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.441,
+        "y": 0.453,
+        "a": 39,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.263,
+        "y": 0.447,
+        "a": 57,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.443,
+        "y": 0.453,
+        "a": 57,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.38,
+        "y": 0.502,
+        "a": 57,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.53,
+        "y": 0.471,
+        "a": 42,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.442,
+        "y": 0.456,
+        "a": 42,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.264,
+        "y": 0.447,
+        "a": 51,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.694,
+        "y": 0.642,
+        "a": 33,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.53,
+        "y": 0.225,
+        "a": 33,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.879,
+        "y": 0.572,
+        "a": 33,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.883,
+        "y": 0.699,
+        "a": 33,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.63,
+        "y": 0.492,
+        "a": 24,
+        "front": true,
+        "hide": false,
+        "w": 1
+       },
+       {
+        "x": 0.546,
+        "y": 0.385,
+        "a": 24,
+        "front": true,
+        "hide": false,
+        "w": 1
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

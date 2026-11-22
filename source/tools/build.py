@@ -93,6 +93,7 @@ def default_anims(anim_dir):
             "file": strip.name,
             "src": "data:image/png;base64," + base64.b64encode(strip.read_bytes()).decode(),
             "anchors": load(".hand-anchors.json"),
+            "anchorsShield": load(".shield.hand-anchors.json"),                   # the Warrior's marks for a SHIELD in the near hand (2026-11-23), used instead of "anchors" when the page's near-hand switch says shield
             "placement": load(".placement.json"),
             "squash": load(".squash.json"),
             "mouth": load(".mouth.json"),                                     # a monster's glowing mouth per frame (the Ember Spit's start point), when there is one                                   # per-frame proportions of a monster's idle (the page's Squash and stretch slider), when there are any
