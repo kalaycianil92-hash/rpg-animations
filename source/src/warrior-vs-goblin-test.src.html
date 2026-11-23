@@ -2081,8 +2081,8 @@
     ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(x, 0); if (flip) ctx.scale(-1, 1);
     ctx.drawImage(im, -w / 2, yTip - H, w, H); ctx.restore();
   }
-  function tcSleeve(ctx, sg, a) {                                                    // the electric sleeve along a sword: the picture's bright end on the tip, turned along the blade, as long as the blade
-    var im = fbTex.tc_blade;
+  function tcSleeve(ctx, sg, a) {                                                    // the electric sleeve along a sword: the picture's bright end on the tip, turned along the blade, as long as the blade (wa_sleeve, the fine one of the lightning aura sheet of 2026-11-23, when it is loaded; else the older tc_blade)
+    var im = auraReady("wa_sleeve") ? fbTex.wa_sleeve : fbTex.tc_blade;
     if (!im || !im.naturalWidth || a <= 0.01) return;
     var dx = sg.x1 - sg.x0, dy = sg.y1 - sg.y0, len = Math.sqrt(dx * dx + dy * dy) * 1.15;
     fbTexDraw(ctx, im, sg.x1, sg.y1, Math.atan2(dy, dx), len, a, 1, false);
@@ -2200,8 +2200,10 @@
       if (t < colMs && !F.noColumn) { a = 1 - t / colMs; drawBolt(ctx, boltPts(cx + (rr() - 0.5) * u * 0.25, -10, cx, ty, 0.14, 6, rr, Math.round(9 * (0.4 + 0.6 * s))), F.pal, u * 0.042 * (0.5 + 0.5 * s) * F.w, a * (Math.floor(t / 55) % 2 ? 0.85 : 1) * Math.min(1, F.k)); }
       if (F.paint > 0) {                                                // the painted lightning (toned down): the heavy bolt on the target, the burst and the crackle on the ground
         if (t < colMs && !F.noColumn) tcBolt(ctx, fbTex.tc_bolt_heavy, cx, ty, Math.max(ty + 20, u * 1.2), u * 0.55 * (0.7 + 0.3 * s), (1 - t / colMs) * F.paint * 1.2, false);
-        if (t < 320) fbTexDraw(ctx, fbTex.tc_burst, cx, ty + r.height * 0.12, 0, u * (0.5 + 0.35 * clamp01(t / 160)) * (0.6 + 0.4 * s), (1 - t / 320) * F.paint * 1.1, 0.5, Math.floor(t / 80) % 2 === 0);
-        if (t < 600) fbTexDraw(ctx, fbTex.tc_ground, cx, gy, 0, u * (0.9 + 0.5 * s * clamp01(t / 200)), (1 - t / 600) * F.paint * 1.2, 0.5, Math.floor(t / 110) % 2 === 0);
+        var WA = auraReady("wa_burst") && auraReady("wa_web") && auraReady("wa_erupt");                                   // the FINE pieces of the lightning aura sheet (2026-11-23) take the burst's and the ground's place; the older tc_* stay as the fallback
+        if (t < 320) fbTexDraw(ctx, WA ? fbTex.wa_burst : fbTex.tc_burst, cx, ty + r.height * 0.12, 0, u * (0.5 + 0.35 * clamp01(t / 160)) * (0.6 + 0.4 * s), (1 - t / 320) * F.paint * 1.1, 0.5, Math.floor(t / 80) % 2 === 0);
+        if (t < 600) fbTexDraw(ctx, WA ? fbTex.wa_web : fbTex.tc_ground, cx, gy, 0, u * (0.9 + 0.5 * s * clamp01(t / 200)), (1 - t / 600) * F.paint * 1.2, 0.5, Math.floor(t / 110) % 2 === 0);
+        if (WA && t < 700) fbTexDraw(ctx, fbTex.wa_erupt, cx, gy + u * 0.01, 0, u * (0.8 + 0.4 * s * clamp01(t / 200)), (1 - t / 700) * F.paint * 1.6, 0.5, Math.floor(t / 110) % 2 === 1, 1);   // lightning bursting out of the floor under the target
       }
       if (t < 240) glowDot(ctx, cx, ty + r.height * 0.12, u * (0.5 + 0.35 * (t / 240)) * (0.6 + 0.4 * s), F.pal.flash, 0.8 * s * Math.pow(1 - t / 240, 1.6) * F.k);
       if (t < 150) flashAll(ctx, F.pal.flash, 0.2 * s * (1 - t / 150) * F.k);
@@ -2241,6 +2243,67 @@
     } });
   }
 
+  // THE WARRIOR'S LIGHTNING AURA (2026-11-23, the user: "change the Thunderclap Guillotine's lightning aura"; docs/AURAS.md, the rule of 2026-11-22: every character's aura has its OWN SHAPE in the shared element colour). The Mage's
+  // turning cylinder (the lightning_aura picture wrapped round him) is gone from the Warrior: his element lives ON THE BLADES (crackleDraw, unchanged) AND IN THE GROUND. While he crouches the floor under him charges:
+  // a ring of arcs snaps round his feet (a flat ellipse, the user's painted ground crackle ss_ground under it), arcs crawl up his legs from the floor, blue sparks rise off the floor; as he leaves the ground a shock ring
+  // runs out along the floor with a burst of sparks and a puff of dust. The ground part stays where he crouched. Strength = the "Aura in the crouch" slider (70% = as designed). All of it in the game's one lightning
+  // blue (LTC); the picture ss_ground is optional (without it the code ring and arcs alone).
+  function wlAura(F, t0, t1, tLaunch) {                                              // t0: the charge starts, t1: it is full, tLaunch: he leaves the ground
+    var A = Math.min(1.3, F.aura / 0.7), PF = { pal: { core: LTC.core, mid: LTC.bright, glow: LTC.mid, deep: LTC.deep }, k: Math.min(1.2, F.k) }, ps = [], seed = (t0 | 0) + 71, rnd = rngOf(seed), burst = false;
+    bashDust(tLaunch);                                                               // dust kicked up as he leaves the floor
+    fxAdd({ t0: t0, t1: tLaunch + 800 / speed, draw: function (ctx, now, L) {
+      var dt = L.last ? Math.min(60, now - L.last) * speed : 0, home = L.home || (L.home = bsFig()), cur = bsFig(), u = home.u, pre = now < tLaunch, i, m, n, c = 0;
+      var WA = ["wa_ring", "wa_web", "wa_arc_a", "wa_arc_b", "wa_sparks", "wa_shock", "wa_burst", "wa_erupt"].every(auraReady);   // all nine fine pieces loaded
+      var lv = (pre ? (now < t1 ? 0.35 + 0.5 * clamp01((now - t0) / Math.max(1, t1 - t0)) : 0.85) : 0.85 * (1 - clamp01((now - tLaunch) * speed / 300))) * A, r2 = rngOf(Math.floor(now / 55) * 31 + 9);
+      L.last = now;
+      if (lv > 0.01) {
+        var rx = u * (0.32 + 0.12 * lv), ry = rx * 0.22, gy = home.gy - u * 0.01;
+        if (WA) {                                                                   // THE PAINTED PIECES (the user's lightning aura sheet, 2026-11-23): the hot web and the ring of arcs on the floor, an arc crawling up each leg (two pictures, flickering), a column of sparks rising off the floor
+          var ph = Math.floor(now / 65), fl = Math.floor(now / 90) % 2 === 0, hh = u * (0.5 + 0.2 * lv), spk = fbTex.wa_sparks, sh = u * 0.95 * (0.9 + 0.1 * r2());
+          glowEllipse(ctx, home.x, gy, rx * 1.1, ry * 1.5, SSPAL.glow, 0.18 * lv * Math.min(1, F.k));
+          fbTexDraw(ctx, fbTex.wa_web, home.x, gy, 0, u * (0.9 + 0.2 * lv), 0.5 * Math.min(1, lv), 0.5, !fl);
+          fbTexDraw(ctx, fbTex.wa_ring, home.x, gy, 0, u * (0.85 + 0.25 * lv), Math.min(1, lv * 1.1), 0.5, fl);
+          fbTexDraw(ctx, spk, home.x, home.gy, 0, sh * spk.naturalWidth / spk.naturalHeight, 0.8 * lv, 0.5, Math.floor(now / 120) % 2 === 0, 1);
+          [[-0.11, 0], [0.1, 1]].forEach(function (lg) {
+            var im = fbTex[(ph + lg[1]) % 2 ? "wa_arc_b" : "wa_arc_a"], hg = hh * (0.9 + 0.2 * r2());
+            fbTexDraw(ctx, im, cur.x + lg[0] * u, cur.gy, 0, hg * im.naturalWidth / im.naturalHeight, Math.min(1, 0.35 + 0.65 * lv) * 0.95, 0.5, (ph + lg[1]) % 3 === 0, 1);
+          });
+        } else {                                                                     // without the pictures: the code look (the user's older ground crackle if it is there, a ring of arcs, arcs up the legs)
+          if (auraReady("ss_ground")) fbTexDraw(ctx, fbTex.ss_ground, home.x, gy, 0, u * (0.8 + 0.25 * lv), Math.min(1, lv * 0.9), 0.5, Math.floor(now / 100) % 2 === 0);      // the user's painted crackle on the floor, re-struck every 100 ms
+          glowEllipse(ctx, home.x, gy, rx * 1.1, ry * 1.5, SSPAL.glow, 0.22 * lv * Math.min(1, F.k));
+          ctx.save(); ctx.globalCompositeOperation = "lighter";                         // the ring round his feet: a thin flat ellipse with arcs snapping along it
+          ctx.strokeStyle = "rgba(" + SSPAL.mid + "," + 0.4 * lv + ")"; ctx.lineWidth = u * 0.012; ctx.beginPath(); ctx.ellipse(home.x, gy, rx, ry, 0, 0, 6.2832); ctx.stroke();
+          ctx.strokeStyle = "rgba(" + SSPAL.core + "," + 0.6 * lv + ")"; ctx.lineWidth = Math.max(0.8, u * 0.004); ctx.stroke(); ctx.restore();
+          for (n = 7 + Math.round(lv * 4), i = 0; i < n; i++) {
+            var a0 = i / n * 6.2832 + r2() * 0.4, a1 = a0 + 0.3 + r2() * 0.5;
+            drawBolt(ctx, boltPts(home.x + Math.cos(a0) * rx, gy + Math.sin(a0) * ry, home.x + Math.cos(a1) * rx, gy + Math.sin(a1) * ry - u * 0.02 * r2(), 0.3, 3, r2, 0), SSPAL, u * 0.006, 0.45 + 0.45 * lv);
+          }
+          for (m = Math.round(1 + lv * 2); m > 0; m--) {                                // arcs crawling up his legs from the floor (they follow him if he is off the floor)
+            var x0 = cur.x + (r2() - 0.5) * u * 0.34, y0 = cur.gy, x1 = x0 + (r2() - 0.5) * u * 0.18, y1 = cur.gy - u * (0.16 + 0.3 * r2());
+            drawBolt(ctx, boltPts(x0, y0, x1, y1, 0.3, 3, r2, r2() < 0.3 ? 1 : 0), SSPAL, u * 0.007, 0.35 + 0.55 * lv);
+          }
+        }
+        if (pre) for (m = (L.acc = (L.acc || 0) + 0.06 * lv * PF.k * dt, c = Math.floor(L.acc), L.acc -= c, c); m > 0; m--) fbParticle(ps, home.x + (rnd() - 0.5) * u * 0.55, home.gy, (rnd() - 0.5) * 0.1 * u / 1000, -(0.15 + rnd() * 0.35) * u / 1000, 500 + rnd() * 500, u * (0.012 + rnd() * 0.012), "flame");   // blue sparks rise off the floor
+      }
+      if (!pre) {                                                                    // he leaves the ground: a shock ring runs out along the floor and a burst of sparks
+        if (!burst) { burst = true; for (i = 0; i < 20; i++) { var an = -Math.PI * (0.05 + rnd() * 0.9), sp = u * (0.8 + rnd() * 1.8) / 1000; fbParticle(ps, home.x + (rnd() - 0.5) * u * 0.4, home.gy, Math.cos(an) * sp, Math.sin(an) * sp, 350 + rnd() * 400, u * 0.011, "ember"); } }
+        var tt = (now - tLaunch) * speed / 520;
+        if (tt > 0 && tt < 1) {
+          var e = 1 - Math.pow(1 - tt, 3), rr = u * (0.15 + 0.8 * e);
+          ctx.save(); ctx.globalCompositeOperation = "lighter";
+          ctx.strokeStyle = "rgba(" + SSPAL.glow + "," + 0.55 * (1 - tt) * A + ")"; ctx.lineWidth = u * 0.04 * (1 - tt) + 1; ctx.beginPath(); ctx.ellipse(home.x, home.gy - u * 0.01, rr, rr * 0.2, 0, 0, 6.2832); ctx.stroke();
+          ctx.strokeStyle = "rgba(" + SSPAL.core + "," + 0.85 * (1 - tt) + ")"; ctx.lineWidth = u * 0.012 * (1 - tt) + 0.8; ctx.stroke(); ctx.restore();
+        }
+        if (WA) {                                                                    // the painted launch: a shock ring along the floor, lightning bursting out of the floor, the flash of the discharge on his body
+          var e2 = 1 - Math.pow(1 - clamp01((now - tLaunch) * speed / 420), 3), f2 = clamp01(1 - (now - tLaunch) * speed / 600), bt = clamp01(1 - (now - tLaunch) * speed / 300);
+          fbTexDraw(ctx, fbTex.wa_shock, home.x, home.gy - u * 0.01, 0, u * (0.5 + 1.1 * e2), 0.95 * f2 * A, 0.5, false);
+          fbTexDraw(ctx, fbTex.wa_erupt, home.x, home.gy + u * 0.01, 0, u * (0.7 + 0.35 * e2), 0.95 * f2 * A, 0.5, Math.floor(now / 90) % 2 === 0, 1);
+          if (bt > 0) fbTexDraw(ctx, fbTex.wa_burst, cur.x, cur.gy - u * 0.28, 0, u * (0.45 + 0.4 * (1 - bt)), 0.85 * bt * A, 0.5, false);
+        }
+      }
+      fbParticles(ctx, ps, dt, PF, u);
+    } });
+  }
   // One run of the skill, tied to the attack pack's clock. Returns an object whose impact() is called at the hit moment.
   function startSkill(clk, hitF, T) {
     var F = fxParams(), at = function (f, fr) { return clkAt(clk, f, fr); };   // (clkAt follows the pack's holds: the Thunderclap Guillotine's crouch and apex last longer)
@@ -2253,9 +2316,9 @@
     setTimeout(function () { if (myRun === run) shake(7 * F.shake, 300); }, Math.max(0, sky.t0 - performance.now()));
     if (strikeF < hitF) fxAdd({ t0: at(Math.min(strikeF + 1, hitF)), t1: tImpact, seed: seed + 11, draw: function (ctx, now, L) { trailDraw(ctx, now, L, F); } });
     if (hitF > 1) fxAdd({ t0: at(hitF - 1, 0.5), t1: tImpact + 340, tStrike: at(hitF, 0), tImpact: tImpact, T: T, draw: function (ctx, now, L) { slashDraw(ctx, now, L, F); } });   // the swords' stroke onto the target
-    if (F.aura > 0 && auraReady("lightning_aura")) {                                // a lightning aura forms round him while he crouches (the painted aura already in the page: 35% then 70%), and bursts outward as he leaves the ground
-      var launchF = Math.min(strikeF, Math.max(2, hitF > 3 ? 3 : hitF)), uA = uW.offsetWidth;
-      fxAdd(auraLayer(F, uA, at(chargeF), [{ t: at(chargeF), lv: 0.35 * F.aura, rf: 0.6 }, { t: at(Math.min(chargeF + 1, launchF)), lv: 0.85 * F.aura, rf: 0.7 }], at(launchF), 280, 0.35, "lightning_aura"));
+    if (F.aura > 0) {                                                               // the Warrior's own lightning aura (2026-11-23): the floor charges under him while he crouches (35% then 85%), and bursts out along the floor as he leaves the ground; no cylinder: see wlAura
+      var launchF = Math.min(strikeF, Math.max(2, hitF > 3 ? 3 : hitF));
+      wlAura(F, at(chargeF), at(Math.min(chargeF + 1, launchF)), at(launchF));
     }
     if (F.dark > 0 && strikeF > 2) tcDim(at(strikeF - 2, 0.3), at(strikeF, 0), at(Math.min(strikeF + 1, hitF), 0), tImpact, tImpact + 450 / speed, F.dark);   // the screen goes dark for the peak of the jump
     return { impact: function () { impactFx(T, F); } };
@@ -5902,7 +5965,16 @@
   // hold) with the broadsword glowing in the target. THE WRENCH (frame 5): the heat bleeds out, steam and slag drips. The look is white-hot forged steel (FORGE: yellow-white, orange, dull red: no flames, those are the Molten
   // Cleave's); the damage is physical (the white number). Burn, its detonation and the +50% under 35% HP are NOT drawn (statuses and the engine come later).
   var FORGE = { core: "255,250,232", mid: "255,190,92", glow: "232,98,28", deep: "132,32,10", flash: "255,238,205" };
-  var CRACKP = { core: "255,196,104", mid: "238,108,30", glow: "172,48,14" };                 // glowing cracks in the floor: an orange lava look, not the white-blue of lightning
+  var CRACKP = { core: "255,196,104", mid: "238,108,30", glow: "172,48,14" }, CRACK_VIS = 0.5;                // CRACK_VIS: how visible the code cracks are (the user, 2026-11-23: the lightning-like cracks in the vigil and after the blow at half strength)                 // glowing cracks in the floor: an orange lava look, not the white-blue of lightning
+  function shieldGeo() {                                                              // the Warrior's shield on the frame on screen (when his near hand carries one): its middle, its size and its angle in stage px, from the marks like bladeSegs
+    var cf = curFrame, set = cf && anchorSets[cf.pose], p = cf && packs[cf.pose], sh = uW.querySelector(".sheet");
+    if (!set || !p || !sh) return null;
+    var cfg = cfgOf(set, "off"), an = set.tracks.off && set.tracks.off[cf.i];
+    if (!an || an.hide || cfg.kind !== "shield") return null;
+    var L = layout(p), Wn = p.nw / L.cols, Hn = p.nh / L.rows, r = rectIn(sh), k = r.width / Wn, a = an.a * Math.PI / 180, im = itemImgs.shield, h = cfg.length * Wn;
+    var w = im && im.naturalHeight ? h * im.naturalWidth / im.naturalHeight * (an.w || 1) : h * 0.8, yc = (0.5 - cfg.pivot) * h;   // (the grip point is on the mark: the picture's middle is (0.5 - grip) of its height further down the shield's own axis)
+    return { x: r.left + (an.x * Wn - yc * Math.sin(a)) * k, y: r.top + (an.y * Hn + yc * Math.cos(a)) * k, w: w * k, h: h * k, ang: a };
+  }
   function forgeBlade(ctx, x0, y0, x1, y1, w, a) {                                   // the fused broadsword: a tapered white-hot blade from the hilt (x0, y0) to the tip (x1, y1), w px wide, three layers added together
     var dx = x1 - x0, dy = y1 - y0, len = Math.sqrt(dx * dx + dy * dy);
     if (len < 4 || a <= 0.01) return;
@@ -5927,6 +5999,31 @@
     for (i = 0; i < n; i++) { th = i / n * 6.2832 + rnd() * 0.5; len = lenMin + rnd() * lenVar; list.push(boltPts(x, y, x + Math.cos(th) * len, y + Math.sin(th) * len * 0.28, 0.22, 4, rnd, 1)); }
     return list;
   }
+  var shieldEdge = null;
+  function shieldEdgePts() {                                                         // points on the edge of the shield picture as fractions of its width and height from its middle (made once from the picture's alpha)
+    if (shieldEdge) return shieldEdge;
+    var im = itemImgs.shield; if (!im || !im.naturalHeight) return null;
+    var W = im.naturalWidth, H = im.naturalHeight, cv = document.createElement("canvas"), cx = cv.getContext("2d"), d, pts = [], x, y, a;
+    cv.width = W; cv.height = H; cx.drawImage(im, 0, 0); d = cx.getImageData(0, 0, W, H).data;
+    a = function (xx, yy) { return xx < 0 || yy < 0 || xx >= W || yy >= H ? 0 : d[(yy * W + xx) * 4 + 3]; };
+    for (y = 0; y < H; y += 3) for (x = 0; x < W; x += 3) if (a(x, y) > 100 && (a(x - 4, y) < 60 || a(x + 4, y) < 60 || a(x, y - 4) < 60 || a(x, y + 4) < 60)) pts.push([(x - W / 2) / W, (y - H / 2) / H]);
+    shieldEdge = pts.length ? pts : null; return shieldEdge;
+  }
+  function exeShieldFire(ctx, now, hs, sgeo, u, rate, ps, rnd, PF, F) {              // THE SHIELD'S FIRE AURA (2026-11-23, the user chose version A of five): hs is the heat level (0 to 0.5: half of the sword's)
+    var fl = 0.88 + 0.12 * Math.sin(now * 0.03), m, im = fbTex.ex_shield_fire, E = shieldEdgePts(), sa = Math.cos(sgeo.ang), sb = Math.sin(sgeo.ang);
+    if (im && im.naturalWidth) {                                                     // the Cleric's crimson pact shield (panel 5 of the user's crimson_pact_vfx_sheet.png) recoloured to the forged-fire colours, in its own proportions (it is not fitted 100% to the shield: 122% of its height, squeezed 8% sideways), turned with the shield
+      var hh = sgeo.h * 1.22, ww = hh * im.naturalWidth / im.naturalHeight * 0.92;
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, 2.4 * hs * fl * Math.min(1, F.k)); ctx.translate(sgeo.x, sgeo.y); ctx.rotate(sgeo.ang); ctx.drawImage(im, -ww / 2, -hh / 2, ww, hh); ctx.restore();
+    }
+    if (E) for (m = rate("sf", 0.2 * PF.k * hs); m > 0; m--) {                       // small flames born orange on the shield's own edge, mostly its top, licking upward
+      var q = E[Math.floor(rnd() * E.length)];
+      if (q[1] > 0.05 && rnd() < 0.65) continue;
+      var ex = q[0] * sgeo.w, ey = q[1] * sgeo.h;
+      fbParticle(ps, sgeo.x + ex * sa - ey * sb, sgeo.y + ex * sb + ey * sa, (rnd() - 0.5) * 0.05 * u / 1000, -(0.15 + rnd() * 0.3) * u / 1000, 380 + rnd() * 320, u * 0.05 * (0.8 + rnd() * 0.5), "flame");
+      ps[ps.length - 1].age = ps[ps.length - 1].life * 0.32;                         // (born orange, not white)
+    }
+    for (m = rate("se", 0.025 * PF.k * hs); m > 0; m--) fbParticle(ps, sgeo.x + (rnd() - 0.5) * sgeo.w * 0.8, sgeo.y + (rnd() - 0.5) * sgeo.h * 0.8, (rnd() - 0.5) * 0.2 * u / 1000, -(0.15 + rnd() * 0.3) * u / 1000, 400 + rnd() * 300, u * 0.008, "ember");   // a few embers
+  }
   function startExecute(clk, hitF, T) {
     var F = Object.assign({}, fxParams(), { pal: FORGE, paint: 0, dark: 0, aura: 0 }), at = function (f, fr) { return clkAt(clk, f, fr); }, u = uW.offsetWidth, rnd = rngOf((clk.t0 | 0) + 53);
     var nF = Math.max(hitF + 3, nFrames("attack")), t1 = at(1), t2 = at(2), t3 = at(3), tImpact = at(hitF, 0.4), tWr = at(hitF + 1), tEnd = at(nF - 1);   // the draw = frame 2, the stride = 3, the impale = the hit frame, the wrench = the next, the recover pack = the last two
@@ -5943,13 +6040,15 @@
       }
       if (cracks) {                                                                  // glowing cracks: they grow through the vigil, flare when the blades are torn out and fade
         var cg = clamp01((now - t1) / Math.max(1, t2 - t1)), ca = now < t2 ? 0.55 + 0.45 * cg : 1 - clamp01((now - t2) * speed / 900), fl = 0.85 + 0.15 * Math.sin(now * 0.03);
-        if (ca > 0.01) cracks.list.forEach(function (b) { drawBolt(ctx, boltTrunc(b, Math.pow(cg, 0.7)), CRACKP, u * 0.011, ca * fl * Math.min(1, F.k)); });
-        if (ca > 0.01) glowEllipse(ctx, cracks.x, cracks.y, u * (0.3 + 0.25 * cg), u * 0.08, FORGE.glow, 0.3 * ca * cg * Math.min(1, F.k));
+        if (ca > 0.01) cracks.list.forEach(function (b) { drawBolt(ctx, boltTrunc(b, Math.pow(cg, 0.7)), CRACKP, u * 0.011, ca * fl * CRACK_VIS * Math.min(1, F.k)); });
+        if (ca > 0.01) glowEllipse(ctx, cracks.x, cracks.y, u * (0.3 + 0.25 * cg), u * 0.08, FORGE.glow, 0.3 * CRACK_VIS * ca * cg * Math.min(1, F.k));
         if (ca > 0.01 && pcPaintedReady()) { var fi = fbTex.pc_fissure, fw = u * (0.9 + 0.3 * cg); fzTex(ctx, fi, cracks.x, cracks.y + u * 0.01, fw, fw * fi.naturalHeight / fi.naturalWidth, 0.85 * ca * cg * Math.min(1, F.k), 0.62); }   // the painted ground fire (the pyroclasm sheet's crust of cracked lava with low flames) under the cracks
         if (now < t2) for (m = rate("em", 0.05 * PF.k); m > 0; m--) fbParticle(ps, cracks.x + (rnd() - 0.5) * u * 0.1, cracks.y, (rnd() - 0.5) * 0.25 * u / 1000, -(0.3 + rnd() * 0.7) * u / 1000, 500 + rnd() * 400, u * 0.01, "ember");   // embers rise off the planted blades
         else if (!burst) { burst = true; for (i = 0; i < 26; i++) { var a1 = -Math.PI * (0.05 + rnd() * 0.9), sp1 = u * (0.5 + rnd() * 1.4) / 1000; fbParticle(ps, cracks.x, cracks.y, Math.cos(a1) * sp1, Math.sin(a1) * sp1, 450 + rnd() * 450, u * 0.011, "ember"); } }   // the blades are torn out of the floor
       }
       glowDraw(ctx, h * (0.94 + 0.06 * Math.sin(now * 0.05)), F);                     // the blades glow
+      var sgeo = h > 0.02 ? shieldGeo() : null;                                       // THE SHIELD'S FIRE (2026-11-23, the user): with a shield in the near hand only the one sword burns, so the shield gets a fire aura too, HALF as strong (exeShieldFire: versions to choose from)
+      if (sgeo) exeShieldFire(ctx, now, h * 0.5, sgeo, u, rate, ps, rnd, PF, F);
       if (segs.length) {
         segs.forEach(function (s) { hx += s.x0 / segs.length; hy += s.y0 / segs.length; tx += s.x1 / segs.length; ty += s.y1 / segs.length; });
         if (now >= t2 && h > 0.02) {                                                  // the two blades fuse into one huge broadsword: from the hilt to 1.55 times the real tip, growing through the draw frame
@@ -5992,7 +6091,7 @@
         ctx.restore();
       });
       var cf = clamp01(t / 380), ca = t < 700 ? 1 : 1 - clamp01((t - 700) / 700);   // the cracks race out under the target, glow and fade
-      if (ca > 0.01) cr.forEach(function (b) { drawBolt(ctx, boltTrunc(b, 1 - Math.pow(1 - cf, 2)), CRACKP, u * 0.013, ca * (0.85 + 0.15 * Math.sin(t * 0.04))); });
+      if (ca > 0.01) cr.forEach(function (b) { drawBolt(ctx, boltTrunc(b, 1 - Math.pow(1 - cf, 2)), CRACKP, u * 0.013, ca * CRACK_VIS * (0.85 + 0.15 * Math.sin(t * 0.04))); });
       if (t < 900) glowEllipse(ctx, cx, gy, u * (0.5 + 0.6 * cf), u * 0.11, P.glow, 0.3 * (1 - t / 900));
       puffs.forEach(function (pf) {                                                  // dust and debris: soft grey-brown ellipses that grow, drift and fade
         var k = clamp01((t - pf.d) / 650); if (k <= 0 || k >= 1) return;
