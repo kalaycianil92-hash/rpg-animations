@@ -73,11 +73,13 @@ marks = {"format": "hand-anchors/3", "characters": [{
     "animations": [{"name": "armored_static_bash_21frame", "frames": 21, "columns": 21, "fps": 14, "offItem": dict(sword, kind="other"), "tracks": {"main": main, "off": off}}]}]}
 
 # timing: base frame 1000/14 = 71.4 ms. The idle infusion 100 ms a frame, the run 70, the skid 110, the swords raised 260 (the animation slows down), the slam 100, the heavy slam 130, the recover 100
-TARGET_MS = [100] * 6 + [70] * 9 + [110, 260, 100, 130, 100, 70]
-BASE = 1000 / 14
+# 2026-11-23 (the user): the run (frames 7-15) 25% faster (70 -> 57 ms), the skid, the raised swords and the slam (16-18) 25% slower (110, 260, 100 -> 138, 325, 125); the base frame is 1000/17.5 = 57 ms
+FPS = 17.5
+TARGET_MS = [100] * 6 + [57] * 9 + [138, 325, 125, 130, 100, 70]
+BASE = 1000 / FPS
 holds = [max(0, round(t - BASE)) for t in TARGET_MS]
 x = [0] * 6 + [round(0.94 * k / 8, 4) for k in range(9)] + [1.0, 1.01, 1.02, 1.05, 1.05, 1.05]
-place = {"format": "frame-placement/1", "animation": "attack", "file": STEM + ".png", "frames": 21, "fps": 14, "hitFrame": 18, "smooth": True, "holds": holds,
+place = {"format": "frame-placement/1", "animation": "attack", "file": STEM + ".png", "frames": 21, "fps": FPS, "hitFrame": 18, "smooth": True, "holds": holds,
          "x": x, "y": [0] * 21,
          "note": "Static Bash (2026-11-14). x: 0 = home, 1 = strike point (target centre minus 0.8 character widths); y: none (grounded). Frames 1-6: he stands in the idle while the swords are infused with lightning "
                  "(0.6 s), 7-15 the run strip at full speed (0.63 s), 16 the skid and 17 the swords raised (the animation slows down, the lightning intensifies), 18 the SLAM (the hit, at 40% of it), 19 the heavy slam, "

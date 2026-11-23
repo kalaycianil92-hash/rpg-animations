@@ -4,7 +4,7 @@
  "characters": [
   {
    "name": "Warrior",
-   "fist": 0.01,
+   "fist": 0.03,
    "items": {
     "main": {
      "length": 0.5,
@@ -35,99 +35,99 @@
      "tracks": {
       "main": [
        {
-        "x": 0.787,
-        "y": 0.351,
-        "a": -33,
-        "front": false,
+        "x": 0.781,
+        "y": 0.357,
+        "a": -30,
+        "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.787,
-        "y": 0.356,
-        "a": -33,
-        "front": false,
+        "x": 0.781,
+        "y": 0.354,
+        "a": -30,
+        "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.787,
-        "y": 0.351,
-        "a": -33,
-        "front": false,
+        "x": 0.779,
+        "y": 0.349,
+        "a": -30,
+        "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.787,
-        "y": 0.356,
-        "a": -33,
-        "front": false,
+        "x": 0.777,
+        "y": 0.347,
+        "a": -30,
+        "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.787,
-        "y": 0.356,
-        "a": -33,
-        "front": false,
+        "x": 0.779,
+        "y": 0.361,
+        "a": -30,
+        "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.787,
-        "y": 0.351,
-        "a": -33,
-        "front": false,
+        "x": 0.781,
+        "y": 0.354,
+        "a": -30,
+        "front": true,
         "hide": false,
         "w": 1
        }
       ],
       "off": [
        {
-        "x": 0.542,
-        "y": 0.389,
-        "a": 0,
+        "x": 0.543,
+        "y": 0.408,
+        "a": 3,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.542,
-        "y": 0.389,
-        "a": 0,
+        "x": 0.545,
+        "y": 0.401,
+        "a": 3,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.521,
-        "y": 0.412,
-        "a": 0,
+        "x": 0.545,
+        "y": 0.393,
+        "a": 3,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.54,
-        "y": 0.395,
-        "a": 0,
+        "x": 0.545,
+        "y": 0.397,
+        "a": 3,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.546,
-        "y": 0.403,
-        "a": 0,
+        "x": 0.545,
+        "y": 0.402,
+        "a": 3,
         "front": true,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.536,
-        "y": 0.41,
-        "a": 0,
+        "x": 0.545,
+        "y": 0.405,
+        "a": 3,
         "front": true,
         "hide": false,
         "w": 1

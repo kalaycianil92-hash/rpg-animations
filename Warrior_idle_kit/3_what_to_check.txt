@@ -1,0 +1,25 @@
+WARRIOR IDLE, FRESH TRY (near arm frozen): what to do and what to check
+
+WHY: in the current idle the near arm (the one that carries the shield) sways and sinks by up to about 5% of the frame height between frames, so a shield strapped to it wobbles and the idle looks wrong. The new idle breathes with the chest, the shoulders and the head only; the near forearm and fist are a frozen block.
+
+1. Start a new chat in ChatGPT (it keeps sizes and spacing better than Gemini) or Gemini.
+2. Attach 1_attach_this_image.png (the man standing in his guard, the ONLY image) and ask for a landscape 3:2 image (3 columns x 2 rows), as large as it will give you.
+3. Paste the whole text of 2_paste_this_prompt.txt.
+4. Generate a few and keep the best one. If the generator says it is out of image capacity, wait; do not shorten the prompt.
+5. Save the sheet as inbox/warrior_idle_sheet_v2.png and tell me. I cut it into a 6-frame strip, check the sizes and the feet, and put it in the test page next to the old idle (the old one stays until you are happy). The near fist is on the same spot in all six frames, so ONE grip mark per hand fits every frame; I place them for you from the old marks and you only check them in the hand tool (sword and shield).
+
+WHAT TO LOOK AT (in this order):
+(1) THE NEAR ARM (the elbow, the forearm and the fist closest to you): in all six panels it is in exactly the same place, same angle, same fist. Lay the panels over each other in your head: it must not bob, sink, sway or turn. THIS IS THE WHOLE POINT.
+(2) Panel 1 is the picture's pose (near fist at the middle of the chest, far fist forward and a little higher); the two arms are never swapped.
+(3) Both boots stay on the same spot and the same floor height in all six panels.
+(4) The six panels are almost the same: only the chest, the shoulders and the head rise and sink a hair, the tips of the hair sway.
+(5) The same man in all six panels: spiky black hair, navy plate with copper trim, brown bracers, no sword, no shield, nothing in the hands.
+(6) The same size in every panel (the bottom row not bigger than the top row) and nothing touches a panel edge.
+(7) No GIF and no extra images.
+
+If ONE thing is wrong tell me which; I will give you a one-line fix. If the near arm still moves in only one or two panels, do not redo the whole sheet: tell me which panels, I can reuse the good ones and copy the near arm from panel 1 into the others myself.
+
+Replies if it goes wrong:
+- The near arm moves: "Redo it. The near arm from the elbow to the fist is in exactly the same place in all six panels, like a statue's arm. Only the chest, shoulders and head move, by about 1% of the panel height."
+- A sword, a shield or an effect appears: "Redo it. NO items, NO effects: only the character on the flat magenta."
+- The figure changes size: "Redo it. The same size in all six panels, the same as the reference image, the bottom row not bigger than the top row."

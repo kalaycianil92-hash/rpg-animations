@@ -1166,6 +1166,7 @@
   // with the hand drawn over it). The choice is remembered in this browser; the swords stay in the far hand.
   // 2026-11-23: the user made MARKS FOR THE SHIELD (a grip point and length of 35% like the Cleric's: <strip>.shield.hand-anchors.json, build.py's anchorsShield, anchorLibShield): with the shield chosen the page uses those
   // marks (positions, angles and the shield's own length and grip point) for every pose that has them, with a sword in the near hand the original marks, so the two never disturb each other; the switch swaps them live.
+  var fistManual = false;                                                           // true once the Hand size slider is moved by hand: then it decides the hand size, else each marks file's own
   var nearShield = false, NEARHAND_KEY = "wvg-warrior-nearhand", SHIELD_CFG = { length: 0.3, pivot: 0.5, overlay: false };
   // Item pictures per character (found by the character's name in the marks file). A character listed here uses its own pictures for the far hand
   // (main track) and for the near hand's "other" item (off track); every other character uses the sword and the shield.
@@ -1221,7 +1222,7 @@
   }
   function attachAnchors(pose) { // gives a pose the marks that match its pack's file name
     var p = packs[pose], key = p && p.file ? baseName(p.file) : null, set = key ? (nearShield && anchorLibShield[key]) || anchorLib[key] : null;   // with a shield in the Warrior's near hand its shield marks are used when the file has them (the sword's marks would put the shield where a sword's grip is)
-    if (set) { anchorSets[pose] = set; $("fistSize").value = Math.round(set.fist * 100); $("fistV").textContent = $("fistSize").value + "%"; }
+    if (set) anchorSets[pose] = set;                                                 // (the hand size of the file is used when the pose is drawn, drawGearTo: it used to be copied into the one shared slider here, so the LAST file loaded decided the hand size of every pose)
     else delete anchorSets[pose];
     renderMarksInfo();
     return !!set;
@@ -1330,7 +1331,9 @@
     cb.clearRect(0, 0, CW, H); cf.clearRect(0, 0, CW, H);
     cb.setTransform(1, 0, 0, 1, M, 0); cf.setTransform(1, 0, 0, 1, M, 0);
     if (!$("showW").checked || !set) return;
-    var rad = Math.max(2, Math.round((+$("fistSize").value || 9) / 100 * W)), fa = $("forceFront").checked, marks = {};
+    var fr = fistManual ? (+$("fistSize").value || 9) / 100 : (set.fist || 0.09);      // the hand size: each marks file's own (as in the Hand Anchor Tool, 2026-11-23), unless the slider was moved by hand
+    if (!fistManual && $("fistSize").value !== String(Math.round(fr * 100))) { $("fistSize").value = Math.round(fr * 100); $("fistV").textContent = $("fistSize").value + "%"; }   // (the slider shows the hand size of the pose on screen)
+    var rad = Math.max(2, Math.round(fr * W)), fa = $("forceFront").checked, marks = {};
     ["main", "off"].forEach(function (tk) {
       var an = set.tracks[tk] && set.tracks[tk][i], cfg = cfgOf(set, tk);
       if (!an || an.hide || (tk === "off" && cfg.kind === "none")) return;
@@ -2142,14 +2145,14 @@
   // THE SCREEN GOES DARK AT THE PEAK (2026-11-13, the user's idea for the Thunderclap Guillotine): the stage darkens BEHIND the two fighters (the part of an effect that is drawn on the canvas behind the characters,
   // like the Rogue's abDim), so only the warrior and the enemy stay lit, and the sky bolt and the blades blaze in the dark. It comes in from the middle of the launch frame to full when the apex frame starts, holds
   // through the apex, eases down to a third of it by the impact (the second bolt strikes in a mostly dark stage) and is gone 450 ms later. amt: how dark (0..1; 0.8 at most lets a hint of the forest through).
-  function tcDim(tIn0, tIn1, tOut0, tImpact, tEnd, amt, rgb) {                         // rgb: the colour of the dark ("3,6,20", a blue-black, by default; Execute's is a red-black)
+  function tcDim(tIn0, tIn1, tOut0, tImpact, tEnd, amt, rgb, peak) {                  // rgb: the colour of the dark ("3,6,20", a blue-black, by default; Execute's is a red-black); peak: how dark it is at the full hold (default amt; the Thunderclap Guillotine uses 1: the stage is BLACK while he hangs at the apex)
     fxAdd({ t0: tIn0, t1: tEnd + 30, draw: function () {}, drawBack: function (ctx, now) {
       var a, s;
       if (now < tIn1) { s = clamp01((now - tIn0) / Math.max(1, tIn1 - tIn0)); a = s * s * (3 - 2 * s); }
       else if (now < tOut0) a = 1;
       else if (now < tImpact) { s = clamp01((now - tOut0) / Math.max(1, tImpact - tOut0)); a = 1 - (1 - 0.35) * s * s * (3 - 2 * s); }
       else { s = clamp01((now - tImpact) / Math.max(1, tEnd - tImpact)); a = 0.35 * (1 - s); }
-      a *= amt;
+      a = peak === undefined ? a * amt : a * (amt + (peak - amt) * a);                // (with a peak the level rises from amt to the peak as the dark comes to its full hold)
       if (a <= 0.01) return;
       ctx.fillStyle = "rgba(" + (rgb || "3,6,20") + "," + a + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight);
     } });
@@ -2248,13 +2251,14 @@
   // a ring of arcs snaps round his feet (a flat ellipse, the user's painted ground crackle ss_ground under it), arcs crawl up his legs from the floor, blue sparks rise off the floor; as he leaves the ground a shock ring
   // runs out along the floor with a burst of sparks and a puff of dust. The ground part stays where he crouched. Strength = the "Aura in the crouch" slider (70% = as designed). All of it in the game's one lightning
   // blue (LTC); the picture ss_ground is optional (without it the code ring and arcs alone).
-  function wlAura(F, t0, t1, tLaunch) {                                              // t0: the charge starts, t1: it is full, tLaunch: he leaves the ground
+  function wlAura(F, t0, t1, tLaunch, tDark) {                                       // t0: the charge starts, t1: it is full, tLaunch: he leaves the ground, tDark: the strike frame starts (the stage is black from then: the launch effects are over by then)
     var A = Math.min(1.3, F.aura / 0.7), PF = { pal: { core: LTC.core, mid: LTC.bright, glow: LTC.mid, deep: LTC.deep }, k: Math.min(1.2, F.k) }, ps = [], seed = (t0 | 0) + 71, rnd = rngOf(seed), burst = false;
-    bashDust(tLaunch);                                                               // dust kicked up as he leaves the floor
+    var lms = Math.max(160, Math.min(520, (tDark - tLaunch) * speed * 0.95));          // how long the launch effects last (ms at 100% speed): at most 520, shorter when the strike frame follows quickly
+    bashDust(tLaunch, 520 / lms * 1.2);                                              // dust kicked up as he leaves the floor (quicker when the launch is short)
     fxAdd({ t0: t0, t1: tLaunch + 800 / speed, draw: function (ctx, now, L) {
       var dt = L.last ? Math.min(60, now - L.last) * speed : 0, home = L.home || (L.home = bsFig()), cur = bsFig(), u = home.u, pre = now < tLaunch, i, m, n, c = 0;
       var WA = ["wa_ring", "wa_web", "wa_arc_a", "wa_arc_b", "wa_sparks", "wa_shock", "wa_burst", "wa_erupt"].every(auraReady);   // all nine fine pieces loaded
-      var lv = (pre ? (now < t1 ? 0.35 + 0.5 * clamp01((now - t0) / Math.max(1, t1 - t0)) : 0.85) : 0.85 * (1 - clamp01((now - tLaunch) * speed / 300))) * A, r2 = rngOf(Math.floor(now / 55) * 31 + 9);
+      var lv = (pre ? (now < t1 ? 0.35 + 0.5 * clamp01((now - t0) / Math.max(1, t1 - t0)) : 0.85) : 0.85 * (1 - clamp01((now - tLaunch) * speed / (lms * 0.6)))) * A, r2 = rngOf(Math.floor(now / 55) * 31 + 9);
       L.last = now;
       if (lv > 0.01) {
         var rx = u * (0.32 + 0.12 * lv), ry = rx * 0.22, gy = home.gy - u * 0.01;
@@ -2286,8 +2290,8 @@
         if (pre) for (m = (L.acc = (L.acc || 0) + 0.06 * lv * PF.k * dt, c = Math.floor(L.acc), L.acc -= c, c); m > 0; m--) fbParticle(ps, home.x + (rnd() - 0.5) * u * 0.55, home.gy, (rnd() - 0.5) * 0.1 * u / 1000, -(0.15 + rnd() * 0.35) * u / 1000, 500 + rnd() * 500, u * (0.012 + rnd() * 0.012), "flame");   // blue sparks rise off the floor
       }
       if (!pre) {                                                                    // he leaves the ground: a shock ring runs out along the floor and a burst of sparks
-        if (!burst) { burst = true; for (i = 0; i < 20; i++) { var an = -Math.PI * (0.05 + rnd() * 0.9), sp = u * (0.8 + rnd() * 1.8) / 1000; fbParticle(ps, home.x + (rnd() - 0.5) * u * 0.4, home.gy, Math.cos(an) * sp, Math.sin(an) * sp, 350 + rnd() * 400, u * 0.011, "ember"); } }
-        var tt = (now - tLaunch) * speed / 520;
+        if (!burst) { burst = true; ps.forEach(function (q) { q.life = Math.min(q.life, q.age + lms * 0.4); }); for (i = 0; i < 20; i++) { var an = -Math.PI * (0.05 + rnd() * 0.9), sp = u * (0.8 + rnd() * 1.8) / 1000; fbParticle(ps, home.x + (rnd() - 0.5) * u * 0.4, home.gy, Math.cos(an) * sp, Math.sin(an) * sp, lms * (0.3 + 0.4 * rnd()), u * 0.011, "ember"); } }   // (the sparks still in the air die quickly too)
+        var tt = (now - tLaunch) * speed / lms;
         if (tt > 0 && tt < 1) {
           var e = 1 - Math.pow(1 - tt, 3), rr = u * (0.15 + 0.8 * e);
           ctx.save(); ctx.globalCompositeOperation = "lighter";
@@ -2295,7 +2299,7 @@
           ctx.strokeStyle = "rgba(" + SSPAL.core + "," + 0.85 * (1 - tt) + ")"; ctx.lineWidth = u * 0.012 * (1 - tt) + 0.8; ctx.stroke(); ctx.restore();
         }
         if (WA) {                                                                    // the painted launch: a shock ring along the floor, lightning bursting out of the floor, the flash of the discharge on his body
-          var e2 = 1 - Math.pow(1 - clamp01((now - tLaunch) * speed / 420), 3), f2 = clamp01(1 - (now - tLaunch) * speed / 600), bt = clamp01(1 - (now - tLaunch) * speed / 300);
+          var e2 = 1 - Math.pow(1 - clamp01((now - tLaunch) * speed / (lms * 0.8)), 3), f2 = clamp01(1 - (now - tLaunch) * speed / lms), bt = clamp01(1 - (now - tLaunch) * speed / (lms * 0.6));
           fbTexDraw(ctx, fbTex.wa_shock, home.x, home.gy - u * 0.01, 0, u * (0.5 + 1.1 * e2), 0.95 * f2 * A, 0.5, false);
           fbTexDraw(ctx, fbTex.wa_erupt, home.x, home.gy + u * 0.01, 0, u * (0.7 + 0.35 * e2), 0.95 * f2 * A, 0.5, Math.floor(now / 90) % 2 === 0, 1);
           if (bt > 0) fbTexDraw(ctx, fbTex.wa_burst, cur.x, cur.gy - u * 0.28, 0, u * (0.45 + 0.4 * (1 - bt)), 0.85 * bt * A, 0.5, false);
@@ -2318,9 +2322,11 @@
     if (hitF > 1) fxAdd({ t0: at(hitF - 1, 0.5), t1: tImpact + 340, tStrike: at(hitF, 0), tImpact: tImpact, T: T, draw: function (ctx, now, L) { slashDraw(ctx, now, L, F); } });   // the swords' stroke onto the target
     if (F.aura > 0) {                                                               // the Warrior's own lightning aura (2026-11-23): the floor charges under him while he crouches (35% then 85%), and bursts out along the floor as he leaves the ground; no cylinder: see wlAura
       var launchF = Math.min(strikeF, Math.max(2, hitF > 3 ? 3 : hitF));
-      wlAura(F, at(chargeF), at(Math.min(chargeF + 1, launchF)), at(launchF));
+      wlAura(F, at(chargeF), at(Math.min(chargeF + 1, launchF)), at(launchF), at(strikeF));
     }
-    if (F.dark > 0 && strikeF > 2) tcDim(at(strikeF - 2, 0.3), at(strikeF, 0), at(Math.min(strikeF + 1, hitF), 0), tImpact, tImpact + 450 / speed, F.dark);   // the screen goes dark for the peak of the jump
+    var tChg = at(chargeF), tStk = at(strikeF, 0.1);                                  // with a shield in the near hand: its lightning aura (half of the swords charge): it charges in the crouch, is full from the strike frame and fades after the blow
+    shieldAuraFx("bolt", tChg, tImpact + 700 / speed, function (now) { return now < tStk ? 0.25 + 0.45 * clamp01((now - tChg) / Math.max(1, tStk - tChg)) : now < tImpact ? 1 : clamp01(1 - (now - tImpact) * speed / 500); }, F);
+    if (F.dark > 0 && strikeF > 2) tcDim(at(strikeF - 2, 0.3), at(strikeF, 0), at(Math.min(strikeF + 1, hitF), 0), tImpact, tImpact + 450 / speed, F.dark, undefined, 1);   // the screen goes dark for the peak of the jump, FULLY dark (black) on the strike frame (the user, 2026-11-23: only the warrior and the enemy are visible while he hangs there)
     return { impact: function () { impactFx(T, F); } };
   }
   function fxSync() {
@@ -5776,6 +5782,7 @@
       if (now < tSkid) return 0.6;
       return 0.6 + 0.32 * clamp01((now - tSkid) / Math.max(1, tImpact - tSkid));
     };
+    shieldAuraFx("bolt", t1, tImpact + 700 / speed, function (now) { return now < tImpact ? charge(now) : charge(tImpact) * clamp01(1 - (now - tImpact) * speed / 500); }, F);   // with a shield in the near hand: its lightning aura (half of the swords charge)
     fxAdd({ t0: t1, t1: tImpact + 80, draw: function (ctx, now) { crackleDraw(ctx, now, F, charge(now)); } });          // the swords crackle from the first frame
     fxAdd({ t0: at(Math.min(3, runF)), t1: tImpact + 520, draw: function (ctx, now) {                                  // the blades burn white-hot: faintly in the infusion, steady in the run, brighter in the skid and the raise
       var g = now < tImpact ? (now < tRun ? 0.3 * clamp01((now - at(Math.min(3, runF))) / Math.max(1, tRun - at(Math.min(3, runF)))) : now < tSkid ? 0.3 : 0.3 + 0.7 * clamp01((now - tSkid) / Math.max(1, tImpact - tSkid))) : clamp01(1 - (now - tImpact) / 500);
@@ -5784,11 +5791,12 @@
     bashDust(at(skidF, 0.05));                                                       // dust behind his boots as he skids (no lightning trail: the user took it out)
     return { impact: function () { impactFx(T, F); } };
   }
-  function bashDust(t0) {                                                            // dust kicked up behind his boots as he skids to a stop (soft grey-brown ellipses that grow, drift back and fade)
+  function bashDust(t0, ds) {                                                        // ds: a time scale (default 1; above 1 the puffs are over sooner)                                                            // dust kicked up behind his boots as he skids to a stop (soft grey-brown ellipses that grow, drift back and fade)
     var u = uW.offsetWidth, rnd = rngOf((t0 | 0) + 5), puffs = [], i;
     for (i = 0; i < 9; i++) puffs.push({ dx: -u * (0.05 + rnd() * 0.5), w: u * (0.1 + rnd() * 0.13), rise: u * (0.04 + rnd() * 0.16), d: rnd() * 120 });
-    fxAdd({ t0: t0, t1: t0 + 800 / speed, draw: function (ctx, now) {
-      var L = this, t = (now - t0) * speed;
+    ds = ds || 1;
+    fxAdd({ t0: t0, t1: t0 + 800 / (speed * ds), draw: function (ctx, now) {
+      var L = this, t = (now - t0) * speed * ds;
       if (!L.p) { var r = rectIn(uW); L.p = { x: r.left + r.width * 0.34, gy: r.top + r.height * 470 / 512 }; }
       puffs.forEach(function (pf) {
         var k = clamp01((t - pf.d) / 620); if (k <= 0 || k >= 1) return;
@@ -5836,9 +5844,10 @@
     var F = Object.assign({}, fxParams(), { pal: FPALS.fire, paint: 0, dark: 0, aura: 0 }), at = function (f, fr) { return clkAt(clk, f, fr); };
     var nF = Math.max(hitF + 2, nFrames("attack")), last = Math.max(hitF, nF - 2), tImpact = at(hitF, 0.4), tTop = at(last + 1, 0), t1 = at(1), t2 = at(2);   // the sweep ends where the recover frame starts
     var PF = { pal: FPALS.fire, k: Math.min(1.3, F.k) }, ps = [], keys = [], acc = {}, GR = 45;
+    var heatM = function (now) { return now < t2 ? 0.22 + 0.33 * clamp01((now - t1) / Math.max(1, t2 - t1)) : now < tTop ? 0.55 + 0.45 * clamp01((now - t2) / Math.max(1, tImpact - t2)) : clamp01(1 - (now - tTop) * speed / 520); };   // how hot the blades are
+    shieldAuraFx("fire", t1, tTop + 700 / speed, heatM, F);                           // with a shield in the near hand: its fire aura (half of the blades heat)
     fxAdd({ t0: t1, t1: tTop + 520 / speed, draw: function (ctx, now) {                // the blades heat up
-      var g = now < t2 ? 0.22 + 0.33 * clamp01((now - t1) / Math.max(1, t2 - t1)) : now < tTop ? 0.55 + 0.45 * clamp01((now - t2) / Math.max(1, tImpact - t2)) : clamp01(1 - (now - tTop) * speed / 520);
-      glowDraw(ctx, g * (0.93 + 0.07 * Math.sin(now * 0.05)), F);
+      glowDraw(ctx, heatM(now) * (0.93 + 0.07 * Math.sin(now * 0.05)), F);
     } });
     fxAdd({ t0: t1, t1: tTop + 950 / speed, draw: function (ctx, now, L) {              // the flame crescent, the flames on the blades, the sparks on the ground, the embers
       var dt = L.last ? Math.min(60, now - L.last) * speed : 0, u = uW.offsetWidth, r = rectIn(uW), gy = r.top + r.height * 470 / 512, segs = bladeSegs(), rnd = L.rnd || (L.rnd = rngOf((clk.t0 | 0) + 29)), samples = [], recent, i, j, m, sg;
@@ -5875,7 +5884,7 @@
       }
       if (now < tTop) segs.forEach(function (sg2, si) {
         for (m = rate("b" + si, 0.03 * PF.k); m > 0; m--) { var f1 = 0.25 + 0.75 * rnd(); fbParticle(ps, sg2.x0 + (sg2.x1 - sg2.x0) * f1, sg2.y0 + (sg2.y1 - sg2.y0) * f1, (rnd() - 0.5) * 0.04 * u / 1000, -(0.08 + rnd() * 0.15) * u / 1000, 260 + rnd() * 160, u * (0.035 + rnd() * 0.02), "flame"); }   // the blades burn
-        if (sg2.y1 > gy - u * 0.07 && now < at(3)) for (m = rate("g" + si, 0.12 * PF.k); m > 0; m--) fbParticle(ps, sg2.x1, sg2.y1, (rnd() - 0.35) * 0.55 * u / 1000, -(0.25 + rnd() * 0.8) * u / 1000, 220 + rnd() * 240, u * 0.009, "ember");   // sparks where a tip scrapes the ground
+        if ((sg2.y1 > gy - u * 0.07 || nearShield) && now < at(3)) for (m = rate("g" + si, 0.12 * PF.k); m > 0; m--) fbParticle(ps, sg2.x1, nearShield ? gy : sg2.y1, (rnd() - 0.35) * 0.55 * u / 1000, -(0.25 + rnd() * 0.8) * u / 1000, 220 + rnd() * 240, u * 0.009, "ember");   // sparks where a tip scrapes the ground
       });
       fbParticles(ctx, ps, dt, PF, u);
     } });
@@ -5884,7 +5893,7 @@
       var u = uW.offsetWidth, r = rectIn(uW), gy = r.top + r.height * 470 / 512, segs = bladeSegs(), im = fbTex.pc_fissure, i, cx = 0, cy = 0;
       if (now < at(3) && segs.length) {
         segs.forEach(function (s) { cx += s.x1 / segs.length; cy += s.y1 / segs.length; });
-        if (cy > gy - u * 0.07) { L.x0 = Math.min(L.x0, cx); L.x1 = Math.max(L.x1, cx); L.ts = L.ts || now; }                // (the same test as the ground sparks: a tip within 7% of a character width of the floor)
+        if (cy > gy - u * 0.07 || nearShield) { L.x0 = Math.min(L.x0, cx); L.x1 = Math.max(L.x1, cx); L.ts = L.ts || now; }   // (the same test as the ground sparks: a tip within 7% of a character width of the floor; with a SHIELD in the near hand the one sword is held up and never scrapes the floor, so the trail follows the sword's x all through the wind-up and the step in: the same furrow as with two swords, 2026-11-23)
       }
       if (!L.ts || L.x1 - L.x0 < u * 0.05) return;
       var span = L.x1 - L.x0, w = u * 0.8, h = w * im.naturalHeight / im.naturalWidth, n = Math.max(1, Math.ceil(span / (w * 0.75)));
@@ -5932,13 +5941,15 @@
     var nF = Math.max(hitF + 2, nFrames("attack")), t1 = at(1), tDrive = Math.min(at(3), at(hitF)), tImpact = at(hitF, 0.4), tEnd = at(Math.max(hitF + 1, nF - 1), 0), G = { pal: F.pal, k: F.k, w: 1, paint: 0, dark: 0 };
     var ramp = function (now) { return clamp01((now - t1) / Math.max(1, tDrive - t1)); };                                  // 0 -> 1 over the coil, the gather and up to the drive
     var cool = function (now) { return 1 - clamp01((now - tImpact) * speed / 650); };                                       // 1 until the blow, then the frost and the cold light fade over 650 ms
+    var gl = function (now) { return (now < tDrive ? 0.15 + 0.45 * ramp(now) : 0.6 + 0.3 * clamp01((now - tDrive) / Math.max(1, tImpact - tDrive))) * cool(now); };   // how frosted the blades are
+    shieldAuraFx("ice", t1, tEnd + 700 / speed, gl, F);                                                                     // with a shield in the near hand: its frost aura (half of the blades)
     fxAdd({ t0: t1, t1: tImpact + 700 / speed, draw: function (ctx, now, L) {                                             // frost on the ground where he stands for the coil (it stays there when he lunges away)
       var f = L.home || (L.home = bsFig()), lv = ramp(now) * 0.85 * cool(now), gi = fbTex.fz_ground, w = f.u * (0.8 + 0.2 * ramp(now));
       glowEllipse(ctx, f.x, f.gy, f.u * (0.3 + 0.22 * ramp(now)), f.u * 0.07, F.pal.mid, 0.2 * lv * Math.min(1, F.k));
       if (gi && gi.naturalWidth) fzTex(ctx, gi, f.x, f.gy, w, w * gi.naturalHeight / gi.naturalWidth, 0.7 * lv * Math.min(1, F.k), 0.5);
     } });
     fxAdd({ t0: t1, t1: tEnd + 700 / speed, draw: function (ctx, now, L) {                                                 // the blades: the rime sleeve and the pale glow, mist, glints, chips
-      var dt = L.last ? Math.min(60, now - L.last) * speed : 0, segs = bladeSegs(), kg = ramp(now) * cool(now), g = (now < tDrive ? 0.15 + 0.45 * ramp(now) : 0.6 + 0.3 * clamp01((now - tDrive) / Math.max(1, tImpact - tDrive))) * cool(now), n, q;
+      var dt = L.last ? Math.min(60, now - L.last) * speed : 0, segs = bladeSegs(), kg = ramp(now) * cool(now), g = gl(now), n, q;
       L.last = now;
       glowDraw(ctx, g * (0.94 + 0.06 * Math.sin(now * 0.04)), G);
       segs.forEach(function (sg, si) {
@@ -6009,27 +6020,66 @@
     for (y = 0; y < H; y += 3) for (x = 0; x < W; x += 3) if (a(x, y) > 100 && (a(x - 4, y) < 60 || a(x + 4, y) < 60 || a(x, y - 4) < 60 || a(x, y + 4) < 60)) pts.push([(x - W / 2) / W, (y - H / 2) / H]);
     shieldEdge = pts.length ? pts : null; return shieldEdge;
   }
-  function exeShieldFire(ctx, now, hs, sgeo, u, rate, ps, rnd, PF, F) {              // THE SHIELD'S FIRE AURA (2026-11-23, the user chose version A of five): hs is the heat level (0 to 0.5: half of the sword's)
-    var fl = 0.88 + 0.12 * Math.sin(now * 0.03), m, im = fbTex.ex_shield_fire, E = shieldEdgePts(), sa = Math.cos(sgeo.ang), sb = Math.sin(sgeo.ang);
-    if (im && im.naturalWidth) {                                                     // the Cleric's crimson pact shield (panel 5 of the user's crimson_pact_vfx_sheet.png) recoloured to the forged-fire colours, in its own proportions (it is not fitted 100% to the shield: 122% of its height, squeezed 8% sideways), turned with the shield
-      var hh = sgeo.h * 1.22, ww = hh * im.naturalWidth / im.naturalHeight * 0.92;
-      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, 2.4 * hs * fl * Math.min(1, F.k)); ctx.translate(sgeo.x, sgeo.y); ctx.rotate(sgeo.ang); ctx.drawImage(im, -ww / 2, -hh / 2, ww, hh); ctx.restore();
-    }
-    if (E) for (m = rate("sf", 0.2 * PF.k * hs); m > 0; m--) {                       // small flames born orange on the shield's own edge, mostly its top, licking upward
-      var q = E[Math.floor(rnd() * E.length)];
-      if (q[1] > 0.05 && rnd() < 0.65) continue;
-      var ex = q[0] * sgeo.w, ey = q[1] * sgeo.h;
-      fbParticle(ps, sgeo.x + ex * sa - ey * sb, sgeo.y + ex * sb + ey * sa, (rnd() - 0.5) * 0.05 * u / 1000, -(0.15 + rnd() * 0.3) * u / 1000, 380 + rnd() * 320, u * 0.05 * (0.8 + rnd() * 0.5), "flame");
-      ps[ps.length - 1].age = ps[ps.length - 1].life * 0.32;                         // (born orange, not white)
-    }
-    for (m = rate("se", 0.025 * PF.k * hs); m > 0; m--) fbParticle(ps, sgeo.x + (rnd() - 0.5) * sgeo.w * 0.8, sgeo.y + (rnd() - 0.5) * sgeo.h * 0.8, (rnd() - 0.5) * 0.2 * u / 1000, -(0.15 + rnd() * 0.3) * u / 1000, 400 + rnd() * 300, u * 0.008, "ember");   // a few embers
+  // THE SHIELD'S ELEMENT AURA (2026-11-23). With a shield in the Warrior's near hand only the one sword carries the skill's element (bladeSegs skips the shield), so the shield gets an aura of its own, HALF as strong as
+  // the sword's (the user chose the look from five versions: the Cleric's crimson pact shield, panel 5 of crimson_pact_vfx_sheet.png, in the shape of a pointed shield, recoloured; made by
+  // Animations/Warrior/execute/source/make_shield_aura.py into wsa_fire (with its flame emblem), wsa_ice and wsa_bolt (no emblem), in its own proportions: 122% of the shield's height, squeezed 8% sideways, turned with the
+  // shield), and for the other elements (the user asked for the same for the ice and the lightning skills): fire = small flames born orange on the shield's real edge and embers (Execute, Molten Cleave); ice = glints
+  // twinkling on the edge, mist sinking off it and small chips flaking away (Glacial Blade, the mage's ice particles); lightning = short arcs jumping off the edge and blue sparks (Thunderclap Guillotine, Static Bash).
+  // level(now): how hot, frosted or charged the sword is (0..1); the shield shows half of it, so it grows and fades with the blade.
+  function shieldAuraFx(el, t0, t1, level, F) {
+    var rnd = rngOf((t0 | 0) + 97), ps = [], ips = [], acc = {};
+    var PF = el === "bolt" ? { pal: { core: LTC.core, mid: LTC.bright, glow: LTC.mid, deep: LTC.deep }, k: Math.min(1.2, F.k) } : { pal: FORGE, k: Math.min(1.3, F.k) }, IF = { pal: IPALS.ice, k: Math.min(1, F.k) };
+    fxAdd({ t0: t0, t1: t1, draw: function (ctx, now, L) {
+      var dt = L.last ? Math.min(60, now - L.last) * speed : 0, u = uW.offsetWidth, lv = level(now), hs = lv * 0.5, sg = lv > 0.02 ? shieldGeo() : null, fl = 0.88 + 0.12 * Math.sin(now * 0.03), m, E = shieldEdgePts();
+      var im = fbTex[el === "ice" ? "wsa_ice" : el === "bolt" ? "wsa_bolt" : "wsa_fire"], r2 = rngOf(Math.floor(now / 55) * 31 + 17);
+      var rate = function (k, perMs) { acc[k] = (acc[k] || 0) + perMs * dt; var n = Math.floor(acc[k]); acc[k] -= n; return n; };
+      L.last = now;
+      if (sg && E) {
+        var sa = Math.cos(sg.ang), sb = Math.sin(sg.ang), pt = function (top) {                // a random point on the shield's real edge in stage px (mostly the top edge when top is true), with the way out of the shield
+          var q, tries = 0;
+          do { q = E[Math.floor(rnd() * E.length)]; tries++; } while (top && q[1] > 0.05 && rnd() < 0.65 && tries < 6);
+          var ex = q[0] * sg.w, ey = q[1] * sg.h, px = sg.x + ex * sa - ey * sb, py = sg.y + ex * sb + ey * sa, dx = px - sg.x, dy = py - sg.y, dl = Math.sqrt(dx * dx + dy * dy) || 1;
+          return { x: px, y: py, ox: dx / dl, oy: dy / dl };
+        };
+        if (im && im.naturalWidth) {
+          var hh = sg.h * 1.22, ww = hh * im.naturalWidth / im.naturalHeight * 0.92;
+          ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, 2.4 * hs * fl * Math.min(1, F.k)); ctx.translate(sg.x, sg.y); ctx.rotate(sg.ang); ctx.drawImage(im, -ww / 2, -hh / 2, ww, hh); ctx.restore();
+        }
+        if (el === "fire") {
+          for (m = rate("a", 0.2 * PF.k * hs); m > 0; m--) {                                  // small flames born orange on the edge, licking upward
+            var f = pt(true);
+            fbParticle(ps, f.x, f.y, (rnd() - 0.5) * 0.05 * u / 1000, -(0.15 + rnd() * 0.3) * u / 1000, 380 + rnd() * 320, u * 0.05 * (0.8 + rnd() * 0.5), "flame");
+            ps[ps.length - 1].age = ps[ps.length - 1].life * 0.32;                           // (born orange, not white)
+          }
+          for (m = rate("b", 0.025 * PF.k * hs); m > 0; m--) fbParticle(ps, sg.x + (rnd() - 0.5) * sg.w * 0.8, sg.y + (rnd() - 0.5) * sg.h * 0.8, (rnd() - 0.5) * 0.2 * u / 1000, -(0.15 + rnd() * 0.3) * u / 1000, 400 + rnd() * 300, u * 0.008, "ember");
+        } else if (el === "ice") {
+          for (m = rate("a", 0.07 * IF.k * hs); m > 0; m--) { var g1 = pt(false); icP(ips, "spark", g1.x, g1.y, 0, 0, 300 + rnd() * 300, u * (0.012 + rnd() * 0.012), 0, 0); }                                                         // glints twinkling on the edge
+          for (m = rate("b", 0.06 * IF.k * hs); m > 0; m--) { var m1 = pt(false); icP(ips, "mist", m1.x, m1.y, (rnd() - 0.5) * 0.05 * u / 1000, (0.02 + rnd() * 0.06) * u / 1000, 600 + rnd() * 400, u * (0.035 + rnd() * 0.03), 0, 0); }   // cold air sinking off it
+          for (m = rate("c", 0.03 * IF.k * hs); m > 0; m--) { var c1 = pt(false); icP(ips, "chip", c1.x, c1.y, c1.ox * 0.12 * u / 1000, (c1.oy * 0.12 - 0.02) * u / 1000, 350 + rnd() * 250, u * (0.01 + rnd() * 0.01), rnd() * 6.28, (rnd() - 0.5) * 0.03); }   // small chips flaking away
+        } else if (shHasTex()) {                                                           // lightning: the pieces of the SHOCKED look (the user's Shocked sheet, sh_*), re-rolled every 90 ms like on a shocked body, sized to the shield (the user, 2026-11-23: the jagged thread-like arcs looked bad: use what the Shocked state uses)
+          var sr = rngOf(Math.floor(now / 90) * 17 + 3), ck = Math.min(1, 0.4 + 1.2 * hs), names = ["sh_arc_a", "sh_arc_b", "sh_arc_c", "sh_tree"], H = sg.h, W = sg.w, c, pk;
+          var loc = function (fx, fy) { return { x: sg.x + fx * W * sa - fy * H * sb, y: sg.y + fx * W * sb + fy * H * sa }; };       // a point in the shield's own frame (fractions of its width and height from its middle)
+          c = loc(0, 0); fbTexDraw(ctx, fbTex.sh_web, c.x, c.y, sr() * 6.2832, H * 1.0, (0.4 + 0.2 * sr()) * ck, 0.5, sr() < 0.5);                                      // the faint shimmer across it
+          for (m = Math.round(1 + 1.5 * ck); m > 0; m--) {                                                                                                               // arcs and trees crawling over it
+            c = loc((sr() - 0.5) * 0.6, (sr() - 0.5) * 0.7); pk = names[Math.floor(sr() * 4) % 4];
+            fbTexDraw(ctx, fbTex[pk], c.x, c.y, sr() * 6.2832, H * (pk === "sh_tree" ? 0.5 : 0.6 + 0.2 * sr()), (0.8 + 0.2 * sr()) * ck, 0.5, sr() < 0.5);
+          }
+          if (sr() < 0.5 * ck) { c = loc(0, (sr() - 0.5) * 0.6); fbTexDraw(ctx, fbTex.sh_wrap, c.x, c.y, (sr() - 0.5) * 0.7 + sg.ang, W * 1.1, 0.8 * ck, 0.5, sr() < 0.5); }                  // a line across it
+          if (sr() < 0.6 * ck) { c = loc((sr() - 0.5) * 0.8, (sr() - 0.5) * 0.8); fbTexDraw(ctx, sr() < 0.5 ? fbTex.sh_star : fbTex.sh_spark, c.x, c.y, sr() * 6.2832, H * (0.2 + 0.14 * sr()), 0.9 * ck, 0.5, sr() < 0.5); }   // a flash
+          if (sr() < 0.4 * ck) { c = loc((sr() - 0.5) * 0.5, -0.5); fbTexDraw(ctx, fbTex.sh_rise, c.x, c.y, (sr() - 0.5) * 0.5 + sg.ang, H * 0.45, 0.85 * ck, 0.5, sr() < 0.5, 1); }               // arcs hopping up from its top edge
+          for (m = 0; m < 2; m++) { c = loc((sr() - 0.5) * 0.8, (sr() - 0.5) * 0.9); glowDot(ctx, c.x, c.y, u * (0.01 + 0.012 * sr()), SSPAL.core, 0.85 * ck); }                      // small bright sparks
+        }
+      }
+      fbParticles(ctx, ps, dt, PF, u); icParticles(ctx, ips, dt, IF, u);
+    } });
   }
   function startExecute(clk, hitF, T) {
     var F = Object.assign({}, fxParams(), { pal: FORGE, paint: 0, dark: 0, aura: 0 }), at = function (f, fr) { return clkAt(clk, f, fr); }, u = uW.offsetWidth, rnd = rngOf((clk.t0 | 0) + 53);
     var nF = Math.max(hitF + 3, nFrames("attack")), t1 = at(1), t2 = at(2), t3 = at(3), tImpact = at(hitF, 0.4), tWr = at(hitF + 1), tEnd = at(nF - 1);   // the draw = frame 2, the stride = 3, the impale = the hit frame, the wrench = the next, the recover pack = the last two
     var PF = { pal: FORGE, k: Math.min(1.3, F.k) }, SF = { k: Math.min(1, F.k), pal: IPALS.ice }, ps = [], st = [], cracks = null, burst = false;
     var heat = function (now) { return now < t2 ? 0.25 + 0.55 * clamp01((now - t1) / Math.max(1, t2 - t1)) : now < tWr ? 1 : clamp01(1 - (now - tWr) * speed / 800); };   // the blades: dull red, then white-hot, then cooling after the blow
-    tcDim(t2, at(2, 0.9), tWr, at(hitF + 1, 0.8), tEnd, 0.72, "26,5,3");                                                                // the stage goes dark red-black behind the two fighters from the draw to the wrench
+    shieldAuraFx("fire", t1, tEnd + 900 / speed, heat, F);                                                                                  // with a shield in the near hand: its fire aura (half of the swords heat)
+    tcDim(at(1, 0.35), at(2, 0.9), at(Math.min(hitF + 2, nF - 1), 0.8), tEnd + 250 / speed, tEnd + 1000 / speed, 0.78, "64,6,3", 0.87);   // the stage goes deep red behind the two fighters (2026-11-23, the user: 'extend and intensify a bit': it creeps in from the middle of the vigil, is redder and darker (it was a dark brown at 72%), holds through the impale, the wrench and the standing over, then eases off over a second after the last frame starts: about 2.3 s instead of 1.2 s at 100% speed)
     fxAdd({ t0: t1, t1: tEnd + 900 / speed, draw: function (ctx, now, L) {
       var dt = L.last ? Math.min(60, now - L.last) * speed : 0, segs = bladeSegs(), r = rectIn(uW), gy = r.top + r.height * 470 / 512, h = heat(now), n, i, m, hx = 0, hy = 0, tx = 0, ty = 0, rate;
       L.last = now;
@@ -6047,8 +6097,6 @@
         else if (!burst) { burst = true; for (i = 0; i < 26; i++) { var a1 = -Math.PI * (0.05 + rnd() * 0.9), sp1 = u * (0.5 + rnd() * 1.4) / 1000; fbParticle(ps, cracks.x, cracks.y, Math.cos(a1) * sp1, Math.sin(a1) * sp1, 450 + rnd() * 450, u * 0.011, "ember"); } }   // the blades are torn out of the floor
       }
       glowDraw(ctx, h * (0.94 + 0.06 * Math.sin(now * 0.05)), F);                     // the blades glow
-      var sgeo = h > 0.02 ? shieldGeo() : null;                                       // THE SHIELD'S FIRE (2026-11-23, the user): with a shield in the near hand only the one sword burns, so the shield gets a fire aura too, HALF as strong (exeShieldFire: versions to choose from)
-      if (sgeo) exeShieldFire(ctx, now, h * 0.5, sgeo, u, rate, ps, rnd, PF, F);
       if (segs.length) {
         segs.forEach(function (s) { hx += s.x0 / segs.length; hy += s.y0 / segs.length; tx += s.x1 / segs.length; ty += s.y1 / segs.length; });
         if (now >= t2 && h > 0.02) {                                                  // the two blades fuse into one huge broadsword: from the hilt to 1.55 times the real tip, growing through the draw frame
@@ -6948,7 +6996,7 @@
   readFile($("fG"), function (src) { setSprite("sG", src); });
   readFile($("fS"), function (src) { slashSheet = src; });
   readFile($("fWpn"), function (src) { var im = new Image(); im.onload = function () { itemImgs.main = im; }; im.src = src; });
-  $("fistSize").oninput = function () { $("fistV").textContent = $("fistSize").value + "%"; };
+  $("fistSize").oninput = function () { fistManual = true; $("fistV").textContent = $("fistSize").value + "%"; };   // moving the slider takes over the hand size of every pose until the page is reloaded
   $("applyMarks").onclick = function () {
     try { var names = importMarks(JSON.parse($("marks").value)); POSES.forEach(attachAnchors); wmsg("Hand marks read for: " + names.join(", ") + "."); }
     catch (e) { wmsg("Could not read the marks: " + e.message, true); }
