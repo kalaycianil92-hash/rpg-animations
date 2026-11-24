@@ -224,7 +224,7 @@
   .num.heal { color: #eaffd9; font-size: 42px; text-shadow: 0 0 8px #6be86b, 0 0 20px #2fb52f, 0 2px 0 #000; }   /* a heal (+N) */
   .num.block { color: #e2eefc; font-size: 24px; letter-spacing: .06em; white-space: nowrap; text-shadow: 0 0 8px #6aa0ff, 0 2px 0 #000; }   /* a blocked hit (BLOCK 14) */
   .num.elusive { color: #e9defd; font-size: 24px; letter-spacing: .08em; white-space: nowrap; text-shadow: 0 0 8px #8a5cff, 0 2px 0 #000; }   /* the Elusive buff */
-  .num.glacier { color: #effcff; font-size: 54px; text-shadow: 0 0 8px #3fd0e0, 0 0 26px #1e6f9f, 0 3px 0 #000; }   /* the Rogue's Permafrost Execution: big, white with a glacial teal glow (her third kind of cold: not the mage's sky blue, not Winter's Kiss's periwinkle) */
+  .num.glacier { color: #f4f8ff; font-size: 54px; text-shadow: 0 0 8px #a8c4ff, 0 0 26px #c4a8ff, 0 3px 0 #000; }   /* the Rogue's Permafrost Execution: big (a finishing blow), in Winter's Kiss's silver-white and periwinkle since 2026-11-25 (it was glacier teal) */
   .num.frost { color: #f4f8ff; font-size: 42px; text-shadow: 0 0 8px #a8c4ff, 0 0 20px #c4a8ff, 0 2px 0 #000; }   /* the Rogue's Winter's Kiss: silver-white with a periwinkle and lilac glow (her frost, not the mage's sky blue) */
   /* Skill effects are drawn on one canvas over the stage; the scorch mark lies on the ground under the fighters. */
   #fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; }
@@ -4941,17 +4941,17 @@
   // double slash (ab_cross) and a burst (ab_burst) on the back, a crack in the ground (ab_ground) and claws of shadow-light (ab_claws) round the target's feet, a heavy shake, the target driven forward and flashed,
   // a big number (class "abyss"). Damage is a placeholder: x2 the scripted amount, x1.5 more against a Blinded or Reduce Physical Def target (two boxes stand in: the page has neither status). The pictures are the
   // user's effect sheet rogue_abyssal_fx_sheet.png (assets/fx/ab_*.png); without them code stands in.
-  var AB = { holds: [0, 260, 0, 0, 0, 170, 0, 0], damage: 2, bonus: 1.5, lift: 0.1, behind: 0.3, f3ms: 334, dark: 0.95, artR: 0.85, artRair: 0.75, cape: 0.15, capeMax: 0.3, near: 0.1, artTop: 0.23, topMargin: 0.03 };   // holds: extra ms on frame 2 (the dissolve) and frame 6 (the hit-stop); frame 3 (the arrival) lasts f3ms in all (see abHolds); lift: how much higher (in her widths) than the strike point she appears; dark: how dark the screen goes at the end of frame 2 (0..1)
+  var AB = { holds: [0, 260, 0, 0, 0, 170, 0, 0], f4x: 0.5, damage: 2, bonus: 1.5, lift: 0.1, behind: 0.3, f3ms: 334, dark: 1, artR: 0.85, artRair: 0.75, cape: 0.15, capeMax: 0.3, near: 0.1, artTop: 0.23, topMargin: 0.03 };   // holds: extra ms on frame 2 (the dissolve) and frame 6 (the hit-stop); frame 3 (the arrival) lasts f3ms in all (see abHolds); f4x: frame 4 (the coil in the air) lasts that much longer (0.5 = 50%, the user 2026-11-25); lift: how much higher (in her widths) than the strike point she appears; dark: how dark the screen goes at the end of frame 2 (0..1; 1 since 2026-11-25: black, only the two fighters stay visible)
   var AB_TEX = ["ab_rift", "ab_cross", "ab_burst", "ab_streak", "ab_ground", "ab_claws"];
   function abHasTex() { return AB_TEX.every(auraReady); }
-  function abHolds() { var h = AB.holds.slice(); h[2] = Math.max(0, AB.f3ms - 1000 / (+$("fps_attack").value || 12)); return h; }   // frame 3 (the arrival) lasts f3ms (334 ms at 100% speed): the portal opens and she steps out of it
-  function abDim(t1, t2, t3, tHit, tEnd) {                                           // the stage darkens (behind the characters, so the two fighters stay lit): a little while she gathers (frame 1 to the middle of frame 2), then at the END of frame 2 the whole screen goes dark (t3 = the start of frame 3); it clears after the hit
+  function abHolds() { var fm = 1000 / (+$("fps_attack").value || 12), h = AB.holds.slice(); h[2] = Math.max(0, AB.f3ms - fm); h[3] += AB.f4x * fm; return h; }   // frame 3 (the arrival) lasts f3ms (334 ms at 100% speed): the portal opens and she steps out of it
+  function abDim(t1, t2, t3, tOut0, tOut1) {                                        // the stage darkens (behind the characters, so the two fighters stay lit): a little while she gathers (frame 1 to the middle of frame 2), then at the END of frame 2 the whole screen goes BLACK (t3 = the start of frame 3); it stays black through the strike, the landing and the rise and clears from tOut0 to tOut1 (the user, 2026-11-25: "completely dark, just the player character and the enemy")
     var tMid = t2 + (t3 - t2) * 0.5;
-    fxAdd({ t0: t1, t1: tEnd + 30, draw: function () {}, drawBack: function (ctx, now) {
-      var s = clamp01((now - t1) / Math.max(1, tMid - t1)), d = clamp01((now - tMid) / Math.max(1, t3 - tMid)), c = 1 - clamp01((now - tHit) / Math.max(1, tEnd - tHit)), a;
+    fxAdd({ t0: t1, t1: tOut1 + 30, draw: function () {}, drawBack: function (ctx, now) {
+      var s = clamp01((now - t1) / Math.max(1, tMid - t1)), d = clamp01((now - tMid) / Math.max(1, t3 - tMid)), c = 1 - clamp01((now - tOut0) / Math.max(1, tOut1 - tOut0)), a;
       a = (0.22 * s * s * (3 - 2 * s) + (AB.dark - 0.22) * d * d * (3 - 2 * d)) * c;
       if (a <= 0.01) return;
-      ctx.fillStyle = "rgba(5,0,14," + a + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight);
+      ctx.fillStyle = "rgba(0,0,0," + a + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight);
     } });
   }
   function abRift(cx, cy, u, t0) {                                                   // the abyssal portal: out of the dark a tall tear opens in the air where she steps out: a crimson glow lighting the dark round it, a dark core behind her, the glowing rim in front
@@ -5036,7 +5036,7 @@
     var T1 = at(1), T2 = at(2), T3 = at(3), T4 = at(4), T5 = at(5), tHit = at(hitF, IN), T7 = at(hitF + 1), tEnd = clk.t0 + clk.total, f0 = bsFig(), dissolve = (T3 - T2) * 0.6, diveStart = at(4, 0.55);
     var blk = !!e.block && !e.dodge && !preview, bSpec = blk && T === FIGHTERS.G ? blockSpec() : null, blockRun = bSpec ? monBlock(myRun, Math.max(0, (tHit - performance.now()) * speed - blockPre(bSpec)), bSpec) : null;   // a BLOCKED backstab (the blow comes from BEHIND: the user, 2026-11-10: it can be blocked; the glass is on the far side)
     // 1. she gathers and dissolves at home (as in the Umbral Shroud) while the stage dims
-    abDim(T1 + (T2 - T1) * 0.5, T2, T3, tHit, tHit + 500 / speed);                  // the screen goes dark at the end of frame 2 ...
+    abDim(T1 + (T2 - T1) * 0.5, T2, T3, tEnd, tEnd + 450 / speed);                  // the screen goes black at the end of frame 2 and stays black to the end of the strip ...
     abRift(h.x + dxA, h.y + dyA + h.h * 0.02, w, T3 - 20 / speed);                     // ... and out of the dark the portal opens where she will step out (frame 3, twice as long)
     if (dark) fxAdd(auraLayer(F, w, T1, [{ t: T1, lv: 0.45, rf: 0.6 }, { t: T2, lv: 1, rf: 0.5 }], T3 - 260 / speed, 220, 0.3, "dark_aura"));
     await bsWait(T2 + (T3 - T2) * 0.3); if (myRun !== run) return;
@@ -6693,10 +6693,28 @@
   // possible to change it to horizontal halo which spins around rogue, centering the waist area?" Without the pictures everything is drawn from code.
   var KISS_TEX = ["rf_ground", "rf_blade", "rf_trail", "rf_burst", "rf_band"];
   function kissHasTex() { return KISS_TEX.every(auraReady); }
-  function kissHaloDraw(ctx, now, lv, seed) {                                        // lv 0..1: frost spreads on the ground under her and a faint glow at her waist (the spinning ring itself is kissRingDraw)
+  // The frost on the ground forms ROUND her feet, not under them (2026-11-25, the user: "it should form outside their feet, the empty area should be bigger so it does not look like they are stepping on it"):
+  // rf_ground_ring.png is rf_ground pulled apart into a ring with a hole about 0.6-0.66 of her width wide (her feet span about 0.49 in Winter's Kiss and Permafrost Execution; the Rogue's, the Assassin's and the
+  // Spellblade's strips alike), made by Animations/Rogue/dagger_throw/source/make_kiss_ground_ring.py. The middle of its hole sits on her ground line under bsFig's x (where her feet are centred); its far
+  // half is drawn behind the characters, its near half in front. KG: w its width in her widths at full strength (0.85 x the picture's 1.49 times rf_ground's width: the crystals a little smaller than before),
+  // ax/ay the middle of the hole as shares of the picture (printed by the script), lift how far above the ground line that middle sits (in her widths).
+  var KG = { w: 1.27, ax: 0.506, ay: 0.455, lift: 0.006 };
+  function kissGroundDraw(ctx, x, gy, w, a, back) {                                  // the frost ring with the middle of its hole at (x, gy), w wide: back = its far half (behind the characters), else its near half (in front); false without the picture
+    var im = fbTex.rf_ground_ring;
+    if (!im || !im.naturalWidth) return false;
+    if (a <= 0.01) return true;
+    var h = w * im.naturalHeight / im.naturalWidth, sy = KG.ay * im.naturalHeight, left = x - KG.ax * w;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a);
+    if (back) ctx.drawImage(im, 0, 0, im.naturalWidth, sy, left, gy - KG.ay * h, w, KG.ay * h);
+    else ctx.drawImage(im, 0, sy, im.naturalWidth, im.naturalHeight - sy, left, gy, w, h - KG.ay * h);
+    ctx.restore(); return true;
+  }
+  function kissHaloDraw(ctx, now, lv, seed, back) {                                  // lv 0..1: frost forms on the ground round her feet (back: its far half, behind the characters; else its near half) and a faint glow at her waist (the spinning ring itself is kissRingDraw)
     if (lv <= 0.01) return;
-    var f = bsFig(), r = rectIn(uW.querySelector(".sheet") || uW), u = f.u, rnd = rngOf(seed), i, t, k, L, a, dx, yo;
+    var f = bsFig(), r = rectIn(uW.querySelector(".sheet") || uW), u = f.u, rnd = rngOf(seed), i, t, k, L, a, dx, yo, gw = u * KG.w * (0.9 + 0.1 * lv), ga = Math.min(1, lv * 1.1);
+    if (back) { kissGroundDraw(ctx, f.x, f.gy - u * KG.lift, gw, ga, true); return; }
     glowDot(ctx, f.x, r.top + r.height * 0.52, u * 0.45, KPAL.glow, 0.05 * lv);
+    if (kissGroundDraw(ctx, f.x, f.gy - u * KG.lift, gw, ga, false)) return;
     if (kissHasTex()) { fbTexDraw(ctx, fbTex.rf_ground, f.x, f.gy - u * 0.012, 0, u * 0.95 * (0.6 + 0.4 * lv), Math.min(1, lv * 1.1), 0.5); return; }
     ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
     for (i = 0; i < 16; i++) {                                                       // code fallback: frost crystals spreading along the ground from her feet
@@ -6827,7 +6845,7 @@
     }
     var tc = tRel - t0;                                                                                  // the charge: from the start to the throw frame
     function lvAt(now) { return Math.min(1, 0.15 + 0.85 * clamp01((now - t0) / (tc * 0.6))) * (1 - clamp01((now - tHit) / (fm * 2))); }       // how strong the frost aura is: grows over the first 60% of the charge, fades over the two frames after the hit
-    fxAdd({ t0: t0, t1: tEnd + 40, drawBack: function (ctx, now) { kissRingDraw(ctx, now, lvAt(now), true, t0, tc); }, draw: function (ctx, now) {
+    fxAdd({ t0: t0, t1: tEnd + 40, drawBack: function (ctx, now) { kissHaloDraw(ctx, now, lvAt(now), seed, true); kissRingDraw(ctx, now, lvAt(now), true, t0, tc); }, draw: function (ctx, now) {
       var lv = lvAt(now), sg, p, q, j, k, ar, dx, dy, rn, a2, fl;
       kissHaloDraw(ctx, now, lv, seed);
       kissRingDraw(ctx, now, lv, false, t0, tc);
@@ -6877,76 +6895,46 @@
   // carry her to the target (one in the middle of the field, one next to the enemy); both hands attack, the crossed arms fly apart and leave an X; it ends in the pose of the user's own picture; two quick frames back.
   // The pack (permafrost_execution, 19 frames at 12 fps, a pack-and-path attack like the Shadow Shiv; frames are repeated for timing, the pack has one frame time; the user had the first five frames of the 14-frame
   // version doubled: more focus and charge): 1-4 settle, 5-11 focus (the frost gathers), 12 dash (x 0.5, an arc), 13 arrive, 14 SLASH = the hit frame, 15-17 the finishing pose (the X freezes), 18 retreat, 19 the idle.
-  // pfFx draws it all from the hit frame and the frames before and after it: round her feet a GLACIER CROWN (a ring of
-  // ice spikes on the ground: pf_crown_a young, then pf_crown_b full, the far half behind her and the near half in front) grows over the focus, glints rise from it, a glacial glow runs along both blades;
-  // a streak of ice behind her on the dash (pf_streak) and on the way back; at the hit pfImpact: the X (pf_cross) cut into the target with a flash and a burst (pf_burst), then the X freezes over (pf_cross_ice),
-  // a crown rises round the target's feet, and when she retreats the ice X shatters (a second, bigger burst). The status (pfStatus): a Chilled target (the page's real status, or the box) has its Chilled
+  // pfFx draws it all from the hit frame and the frames before and after it. THE LOOK IS WINTER'S KISS'S since 2026-11-25 (the user: "Permafrost execution and Winter's kiss have different ice effects, it should be
+  // the same color at least. Let's use Winter's kiss style for both, also please add same ice circle around hip area during Permafrost execution (first 11 frames). Let's also darken the stage for the first 11
+  // frames"): over frames 1-11 (everything before the dash) the stage goes dark behind the two fighters (tcDim), Winter's Kiss's frost RING spins round her waist (kissRingDraw, faster and faster) over its frost
+  // on the ground (kissHaloDraw), ice glints rise round her and the rime sleeve (kissBladeFrost) grows along both blades; a Kiss ice-dust streak (rf_trail) behind her on the dash and on the way back; at the hit
+  // pfImpact: the X (pf_cross) cut into the target with a flash and the Kiss shatter (rf_burst), then the X freezes over (pf_cross_ice), Kiss frost spreads on the ground under the target, and when she retreats the
+  // ice X shatters (a second, bigger burst). The X is the only picture of its own: the user's glacier-teal X recoloured into the Kiss frost (make_pf_kiss_colours.py; the teal originals, the glacier crowns, the
+  // teal burst and streak are kept in Animations/Rogue/permafrost_execution/source/teal_fx_originals/). The status (pfStatus): a Chilled target (the page's real status, or the box) has its Chilled
   // consumed for a roll to Freeze (the mage's freeze block, startFreeze with `arriveAt`: the ice climbs the target from the hit; a frozen target loses its next turn, frozenTurn); otherwise, or if the roll
-  // fails, Chilled is applied (applyChilled). Placeholders: Ice Damage x1.5 the scripted amount (PF.damage), 50% (PF.freeze) or the box "always Freezes". Palette: glacier teal and white (PFPAL), the Rogue's third kind
-  // of cold (not the mage's sky blue, not Winter's Kiss's periwinkle); the pictures are the user's ChatGPT sheet cut into assets/fx (pf_*.png), prompt Animations/Rogue/permafrost_execution/source/permafrost_fx_prompt.txt.
-  var PF = { damage: 1.5, freeze: 0.5, crown: 1.0 };
-  var PFPAL = { core: "234,251,255", mid: "63,208,224", glow: "30,111,159" };
-  var PF_TEX = ["pf_crown_a", "pf_crown_b", "pf_cross", "pf_cross_ice", "pf_burst", "pf_streak"];
-  var PF_CY = { pf_crown_a: 0.545, pf_crown_b: 0.73 };                               // where the middle of each crown's ring (its empty oval) is, as a share of the picture's height: the ring stands on the ground there, the part above it is the far half
-  function pfHasTex() { return PF_TEX.every(auraReady); }
-  function pfStar(ctx, x, y, s, a) {                                                 // a four-point ice glint in the glacier colours
-    if (a <= 0.01) return;
-    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-    ctx.strokeStyle = "rgba(" + PFPAL.core + "," + Math.min(1, a) + ")"; ctx.lineWidth = Math.max(1, s * 0.14);
-    ctx.beginPath(); ctx.moveTo(x - s, y); ctx.lineTo(x + s, y); ctx.moveTo(x, y - s * 1.35); ctx.lineTo(x, y + s * 1.35); ctx.stroke();
-    ctx.restore();
-    glowDot(ctx, x, y, s * 0.9, PFPAL.mid, 0.45 * Math.min(1, a));
-  }
-  function pfCrown(ctx, back, name, x, gy, w, a) {                                   // a glacier crown with the middle of its ring at (x, gy), w wide: back = the far half (behind the characters), else the near half (in front)
-    if (a <= 0.01) return;
-    var im = fbTex[name];
-    if (!im || !im.naturalWidth) {
-      if (!back) { ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + PFPAL.mid + "," + 0.6 * Math.min(1, a) + ")"; ctx.lineWidth = Math.max(1.5, w * 0.012); ctx.beginPath(); ctx.ellipse(x, gy, w * 0.45, w * 0.08, 0, 0, 6.283); ctx.stroke(); ctx.restore(); }
-      return;
-    }
-    var h = w * im.naturalHeight / im.naturalWidth, cy = PF_CY[name] * h, sy = PF_CY[name] * im.naturalHeight;
-    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a);
-    if (back) ctx.drawImage(im, 0, 0, im.naturalWidth, sy, x - w / 2, gy - cy, w, cy);
-    else ctx.drawImage(im, 0, sy, im.naturalWidth, im.naturalHeight - sy, x - w / 2, gy, w, h - cy);
-    ctx.restore();
-  }
-  function pfBladeFrost(ctx, now, tk, k, u) {                                        // a glacial glow along a blade (growing from the hilt to the tip as k rises) and a glint on the tip
-    var sg = bladeSegOf(tk); if (!sg || k <= 0.01) return;
-    var x1 = sg.x0 + (sg.x1 - sg.x0) * clamp01(k * 1.25), y1 = sg.y0 + (sg.y1 - sg.y0) * clamp01(k * 1.25);
-    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-    ctx.strokeStyle = "rgba(" + PFPAL.mid + "," + 0.34 * k + ")"; ctx.lineWidth = u * 0.03; ctx.beginPath(); ctx.moveTo(sg.x0, sg.y0); ctx.lineTo(x1, y1); ctx.stroke();
-    ctx.strokeStyle = "rgba(" + PFPAL.core + "," + 0.75 * k + ")"; ctx.lineWidth = Math.max(1, u * 0.008); ctx.stroke();
-    ctx.restore();
-    pfStar(ctx, x1, y1, u * 0.028 * (0.75 + 0.25 * Math.sin(now * 0.012)), k);
-  }
-  function pfImpact(T, tShat, fm) {                                                  // the X is cut into the target (flash, burst), freezes over, the ice X shatters when she retreats; a crown rises round its feet
+  // fails, Chilled is applied (applyChilled). Placeholders: Ice Damage x1.5 the scripted amount (PF.damage), 50% (PF.freeze) or the box "always Freezes".
+  var PF = { damage: 1.5, freeze: 0.5, crown: 1.0, dark: 1 };                       // crown: the width of the frost under the target (in her widths, at least 1.15 of the target's); dark: how dark the stage goes over frames 1-11 (1 = black, only the two fighters stay visible)
+  var PF_TEX = ["pf_cross", "pf_cross_ice"];                                         // the X; everything else is Winter's Kiss's frost (KISS_TEX)
+  function pfHasTex() { return PF_TEX.every(auraReady) && kissHasTex(); }
+  function pfImpact(T, tShat, fm) {                                                  // the X is cut into the target (flash, the Kiss shatter), freezes over, the ice X shatters when she retreats; frost spreads on the ground under it
     var c = centerOf(T.unit), u = uW.offsetWidth, t0 = performance.now(), gyT = rectIn(T.unit).bottom, xs = c.x, ys = c.y - c.h * 0.1, S = Math.min(u * 1.3, Math.max(u * 0.7, c.h * 0.85)), flip = Math.random() < 0.5;
     var rnd = rngOf((t0 | 0) + 23), i, chips = [], tIce = t0 + fm * 0.9, tEnd = tShat + 2.6 * fm, cw = Math.max(u * 0.9, c.w * 1.15) * PF.crown, tex = pfHasTex();
     for (i = 0; i < 16; i++) chips.push({ a: rnd() * 6.283, d: S * (0.25 + 0.55 * rnd()), s: u * (0.008 + 0.012 * rnd()), g: u * (0.05 + 0.1 * rnd()) });
-    function crowns(ctx, back, now) {
-      var gr = clamp01((now - t0) / (2.2 * fm)), fd = 1 - clamp01((now - tShat) / (2.4 * fm)), ca = clamp01(gr * 2.2) * (1 - clamp01((gr - 0.3) / 0.4)) * fd, cb = clamp01((gr - 0.3) / 0.5) * fd, w = cw * (0.7 + 0.3 * gr);
-      pfCrown(ctx, back, "pf_crown_a", xs, gyT, w, ca); pfCrown(ctx, back, "pf_crown_b", xs, gyT, w, cb);
-    }
-    fxAdd({ t0: t0, t1: tEnd + 40, drawBack: function (ctx, now) { crowns(ctx, true, now); }, draw: function (ctx, now) {
+    fxAdd({ t0: t0, t1: tEnd + 40, drawBack: function (ctx, now) {                   // the Kiss frost on the ground under the target: spreads over two frames, melts after the shatter
+      var gr = clamp01((now - t0) / (2.2 * fm)), a = clamp01(gr * 1.6) * (1 - clamp01((now - tShat) / (2.4 * fm)));
+      if (a <= 0.01) return;
+      if (auraReady("rf_ground")) { fbTexDraw(ctx, fbTex.rf_ground, xs, gyT - u * 0.012, 0, cw * (0.7 + 0.3 * gr), Math.min(1, a * 1.1), 0.5); return; }
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + KPAL.mid + "," + 0.6 * a + ")"; ctx.lineWidth = Math.max(1.5, cw * 0.012); ctx.beginPath(); ctx.ellipse(xs, gyT, cw * 0.45, cw * 0.08, 0, 0, 6.283); ctx.stroke(); ctx.restore();
+    }, draw: function (ctx, now) {
       var k = clamp01((now - t0) / (110 / speed)), sc = 0.55 + 0.45 * (1 - (1 - k) * (1 - k)), iceK = clamp01((now - tIce) / (fm * 1.2)), fresh = 1 - iceK, ice = iceK * (1 - clamp01((now - tShat) / (140 / speed)));
       var fl = 1 - clamp01((now - t0) / (140 / speed)), kb = clamp01((now - t0) / (260 / speed)), ks = clamp01((now - tShat) / (380 / speed)), j, s, e;
-      crowns(ctx, false, now);
-      if (fl > 0.01) { ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = "rgba(170,240,255," + 0.2 * fl * fl + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight); ctx.restore(); }
-      glowDot(ctx, xs, ys, S * 0.6 * (0.4 + 0.6 * k), PFPAL.core, 0.7 * fl);
+      if (fl > 0.01) { ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = "rgba(" + KPAL.flash + "," + 0.2 * fl * fl + ")"; ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight); ctx.restore(); }
+      glowDot(ctx, xs, ys, S * 0.6 * (0.4 + 0.6 * k), KPAL.core, 0.7 * fl);
       if (tex) {
         fbTexDraw(ctx, fbTex.pf_cross, xs, ys, 0, S * sc, fresh, 0.5, flip);
         fbTexDraw(ctx, fbTex.pf_cross_ice, xs, ys, 0, S * sc, ice, 0.5, flip);
-        if (kb < 1) fbTexDraw(ctx, fbTex.pf_burst, xs, ys, 0, S * (0.5 + 0.55 * kb), (1 - kb) * 1.2, 0.5, !flip);
-        if (now >= tShat && ks < 1) fbTexDraw(ctx, fbTex.pf_burst, xs, ys, 0, S * (0.7 + 0.8 * ks), (1 - ks) * 1.3, 0.5, flip);
+        if (kb < 1) fbTexDraw(ctx, fbTex.rf_burst, xs, ys, 0, S * (0.5 + 0.55 * kb), (1 - kb) * 1.2, 0.5, !flip);
+        if (now >= tShat && ks < 1) fbTexDraw(ctx, fbTex.rf_burst, xs, ys, 0, S * (0.7 + 0.8 * ks), (1 - ks) * 1.3, 0.5, flip);
       } else {                                                                       // code: two crossing cuts
         ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
         [[-1, -1, 1, 1], [1, -1, -1, 1]].forEach(function (d) {
-          ctx.strokeStyle = "rgba(" + PFPAL.mid + "," + 0.7 * (fresh + ice) + ")"; ctx.lineWidth = S * 0.05 * sc; ctx.beginPath(); ctx.moveTo(xs + d[0] * S * 0.45 * sc, ys + d[1] * S * 0.45 * sc); ctx.lineTo(xs + d[2] * S * 0.45 * sc, ys + d[3] * S * 0.45 * sc); ctx.stroke();
-          ctx.strokeStyle = "rgba(" + PFPAL.core + "," + (fresh + ice) + ")"; ctx.lineWidth = Math.max(1, S * 0.014); ctx.stroke();
+          ctx.strokeStyle = "rgba(" + KPAL.mid + "," + 0.7 * (fresh + ice) + ")"; ctx.lineWidth = S * 0.05 * sc; ctx.beginPath(); ctx.moveTo(xs + d[0] * S * 0.45 * sc, ys + d[1] * S * 0.45 * sc); ctx.lineTo(xs + d[2] * S * 0.45 * sc, ys + d[3] * S * 0.45 * sc); ctx.stroke();
+          ctx.strokeStyle = "rgba(" + KPAL.core + "," + (fresh + ice) + ")"; ctx.lineWidth = Math.max(1, S * 0.014); ctx.stroke();
         });
         ctx.restore();
       }
-      if (now >= tShat) { e = 1 - (1 - ks) * (1 - ks); for (j = 0; j < chips.length; j++) { s = chips[j]; pfStar(ctx, xs + Math.cos(s.a) * s.d * e, ys + Math.sin(s.a) * s.d * e * 0.8 + s.g * ks * ks, s.s * (1 - 0.5 * ks), 1 - ks); } }
+      if (now >= tShat) { e = 1 - (1 - ks) * (1 - ks); for (j = 0; j < chips.length; j++) { s = chips[j]; kissStar(ctx, xs + Math.cos(s.a) * s.d * e, ys + Math.sin(s.a) * s.d * e * 0.8 + s.g * ks * ks, s.s * (1 - 0.5 * ks), 1 - ks); } }
     } });
     shake(4, 230);
   }
@@ -6966,33 +6954,34 @@
   }
   function pfFx(T, hitF, o) {                                                        // started with the pack (19 frames at 12 fps, a pack-and-path attack: see the comment above)
     var fm = 1000 / (+$("fps_attack").value || 12) / speed, t0 = performance.now(), at = function (f, fr) { return t0 + (f - 1 + (fr || 0)) * fm; };
-    var tDash = at(hitF - 2, 0), tHit = at(hitF, 0.4), tShat = at(hitF + 4, 0), tEnd = at(hitF + 6, 0), myRun = o.myRun || run;
-    var r0 = rectIn(uW.querySelector(".sheet") || uW), u = r0.width, hx = r0.left + r0.width * 0.572, hgy = r0.top + r0.height - r0.width * 42 / 512, rnd = rngOf((t0 | 0) + 5), i, motes = [];
+    var tDash = at(hitF - 2, 0), tHit = at(hitF, 0.4), tShat = at(hitF + 4, 0), tEnd = at(hitF + 6, 0), myRun = o.myRun || run, tc = tDash - t0;
+    var u = rectIn(uW.querySelector(".sheet") || uW).width, rnd = rngOf((t0 | 0) + 5), seed = (t0 | 0) + 19, i, motes = [];
     for (i = 0; i < 16; i++) motes.push({ ox: (rnd() - 0.5) * 0.85, ph: rnd(), sp: 0.6 + rnd() * 0.8, s: 0.007 + 0.008 * rnd() });
-    function gr(now) { return clamp01((now - t0) / Math.max(1, tDash - t0)); }       // the gathering of the frost: 0 to 1 over the first frames (until the dash)
-    function fd(now) { return 1 - clamp01((now - tDash) / (2 * fm)); }               // ... and its fade over the two frames of the dash
-    function bk(now) { return (0.12 + 0.88 * gr(now)) * (1 - clamp01((now - tHit) / (3 * fm))); }   // the glow on her blades: grows over the focus, fades over the finishing frames
-    function streak(ctx, now, ta, tb, flip) {                                        // the ice streak behind her while she crosses the field (dash: head in front of her, to the right; retreat: to the left)
+    function gr(now) { return clamp01((now - t0) / Math.max(1, tc)); }              // the gathering of the frost: 0 to 1 over frames 1-11 (until the dash)
+    function lv(now) { return Math.min(1, 0.15 + 0.85 * clamp01((now - t0) / (tc * 0.6))) * (1 - clamp01((now - tDash) / (0.6 * fm))); }   // the frost aura (the ring and the frost on the ground) as in Winter's Kiss: full after 60% of the focus, gone early in the dash frame
+    function bk(now) { return (0.12 + 0.88 * gr(now)) * (1 - clamp01((now - tHit) / (3 * fm))); }   // the rime on her blades: grows over the focus, thaws over the finishing frames
+    function streak(ctx, now, ta, tb, flip) {                                        // the Kiss ice-dust streak behind her while she crosses the field (dash: head in front of her, to the right; retreat: to the left)
       var a = clamp01((now - ta) / (0.25 * fm)) * (1 - clamp01((now - (tb - 0.6 * fm)) / (0.6 * fm))), r, hxx, hyy;
       if (a <= 0.01) return;
       r = rectIn(uW.querySelector(".sheet") || uW); hxx = r.left + r.width * (flip ? 0.3 : 0.7); hyy = r.top + r.height * 0.6;
-      if (pfHasTex()) fbTexDraw(ctx, fbTex.pf_streak, hxx, hyy, 0, u * 1.2, a, 1, flip);
-      else glowDot(ctx, hxx + (flip ? 1 : -1) * u * 0.3, hyy, u * 0.25, PFPAL.mid, 0.3 * a);
+      if (auraReady("rf_trail")) fbTexDraw(ctx, fbTex.rf_trail, hxx, hyy, 0, u * 1.2, a, 1, flip);
+      else glowDot(ctx, hxx + (flip ? 1 : -1) * u * 0.3, hyy, u * 0.25, KPAL.mid, 0.3 * a);
     }
+    if (PF.dark > 0) tcDim(t0, at(2, 0), tDash, tDash + 0.5 * fm, tDash + 1.2 * fm, PF.dark, "2,3,12");   // frames 1-11: the stage goes dark behind the two fighters (in over frame 1, black until the dash, gone early in the arrival frame)
     fxAdd({ t0: t0, t1: tEnd + 80, drawBack: function (ctx, now) {
-      var g = gr(now), f = fd(now), w = u * PF.crown * (0.8 + 0.2 * g), ca = clamp01(g * 2.2) * (1 - clamp01((g - 0.3) / 0.4)) * f, cb = clamp01((g - 0.3) / 0.5) * f;
-      glowDot(ctx, hx, hgy - u * 0.02, u * 0.5, PFPAL.mid, 0.1 * g * f);
-      pfCrown(ctx, true, "pf_crown_a", hx, hgy, w, ca); pfCrown(ctx, true, "pf_crown_b", hx, hgy, w, cb);
+      kissHaloDraw(ctx, now, lv(now), seed, true);
+      kissRingDraw(ctx, now, lv(now), true, t0, tc);
       streak(ctx, now, at(hitF - 2, 0) - 0.15 * fm, at(hitF - 1, 0.8), false);
       streak(ctx, now, at(hitF + 4, 0) - 0.1 * fm, at(hitF + 5, 0.6), true);
     }, draw: function (ctx, now) {
-      var g = gr(now), f = fd(now), w = u * PF.crown * (0.8 + 0.2 * g), ca = clamp01(g * 2.2) * (1 - clamp01((g - 0.3) / 0.4)) * f, cb = clamp01((g - 0.3) / 0.5) * f, j, m, fr;
-      pfCrown(ctx, false, "pf_crown_a", hx, hgy, w, ca); pfCrown(ctx, false, "pf_crown_b", hx, hgy, w, cb);
-      for (j = 0; j < motes.length; j++) {                                           // glints rising from the crown
+      var l = lv(now), f = bsFig(), j, m, fr;
+      kissHaloDraw(ctx, now, l, seed);
+      kissRingDraw(ctx, now, l, false, t0, tc);
+      for (j = 0; j < motes.length; j++) {                                           // ice glints rising round her
         m = motes[j]; fr = (m.ph + (now - t0) * m.sp * 0.00035 * speed) % 1;
-        pfStar(ctx, hx + m.ox * u * 0.5, hgy - fr * u * 0.95, u * m.s, Math.sin(Math.PI * fr) * g * f * 0.9);
+        kissStar(ctx, f.x + m.ox * u * 0.5, f.gy - fr * u * 0.95, u * m.s, Math.sin(Math.PI * fr) * gr(now) * l * 0.9);
       }
-      pfBladeFrost(ctx, now, "main", bk(now), u); pfBladeFrost(ctx, now, "off", bk(now), u);
+      ["main", "off"].forEach(function (tk) { var sg = bladeSegOf(tk); if (sg) kissBladeFrost(ctx, now, sg.x0, sg.y0, sg.x1, sg.y1, bk(now), u); });
     } });
     setTimeout(function () {
       if (myRun !== run || o.dodge) return;
