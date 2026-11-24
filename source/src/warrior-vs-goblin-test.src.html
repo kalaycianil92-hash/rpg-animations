@@ -170,6 +170,9 @@
   .gear.front { z-index: 3; }
   .marks { width: 100%; box-sizing: border-box; height: 90px; background: #0b0914; color: var(--fg); border: 1px solid var(--line); border-radius: 3px; padding: 6px; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; resize: vertical; }
   .wmsg { color: var(--heal); font-size: 13px; }
+  .rcsw { display: inline-flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .rcsw button { width: 20px; height: 20px; padding: 0; min-width: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,.45); cursor: pointer; }
+  .rcsw button:hover { outline: 2px solid var(--accent, #6cf); }
 
   /* Attack path editor: one translucent copy of the warrior per frame, dragged to where that frame should stand. */
   .ghost { pointer-events: none; opacity: .3; transition: opacity .12s; }
@@ -431,6 +434,16 @@
       <label data-chars="warrior">Warrior's near hand carries <select id="nearHand"><option value="sword">a sword</option><option value="shield">a shield</option></select></label>
       <label data-chars="cleric">Cleric's main hand carries <select id="clericWeapon"><option value="mace">the mace (Templar)</option><option value="wand">the wand (Occultist)</option></select></label>
       <label><input type="checkbox" id="showW" checked> Show weapons</label>
+    </div>
+    <div class="fields" data-chars="warrior mage rogue cleric" id="rcBox">
+      <strong>Recolour</strong>
+      <label>Hair <input type="color" id="rcHair" value="#2f2e2f"></label>
+      <span class="rcsw" id="rcHairSw"></span>
+      <span style="flex-basis:100%;height:0"></span>
+      <label>Skin <input type="color" id="rcSkin" value="#b67e61"></label>
+      <span class="rcsw" id="rcSkinSw"></span>
+      <button id="rcReset">Original colours</button>
+      <span class="wmsg" id="rcMsg"></span>
     </div>
     <div class="fields">
       <button id="previewAtk">Preview attack (loops)</button>
@@ -1257,20 +1270,21 @@
     var cc = cv.getContext("2d"), id;
     cc.drawImage(p.img, sx + x0, sy + y0, w, h, 0, 0, w, h);
     try { id = cc.getImageData(0, 0, w, h); } catch (e) { return null; }
-    var d = id.data, n = w * h, ox = cx - x0, oy = cy - y0, r2 = rad * rad, seed2 = r2 * 0.3;
+    var d = id.data, n = w * h, ox = cx - x0, oy = cy - y0, r2 = rad * rad, seed2 = r2 * 0.3, s0 = d;      // s0: the pixels the hand is FOUND on: the original picture when the strip is recoloured (a very dark or pale skin would fail the skin-colour test), else the same pixels
+    if (p.img0 && p.img0 !== p.img) { try { var c0 = document.createElement("canvas"); c0.width = w; c0.height = h; var x0c = c0.getContext("2d"); x0c.drawImage(p.img0, sx + x0, sy + y0, w, h, 0, 0, w, h); s0 = x0c.getImageData(0, 0, w, h).data; } catch (e) { s0 = d; } }
     var hue = new Float32Array(n), ish = new Uint8Array(n), sinS = [], cosS = [], cnt = [], q, x, y, b, k;
     for (b = 0; b < 12; b++) { sinS[b] = 0; cosS[b] = 0; cnt[b] = 0; }
     for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
       var dd = (x - ox) * (x - ox) + (y - oy) * (y - oy);
       if (dd > r2) continue;
       k = y * w + x; q = k * 4;
-      if (d[q + 3] < 128) continue;
-      var R = d[q], G = d[q + 1], B = d[q + 2], mx = Math.max(R, G, B), dl = mx - Math.min(R, G, B);
+      if (s0[q + 3] < 128) continue;
+      var R = s0[q], G = s0[q + 1], B = s0[q + 2], mx = Math.max(R, G, B), dl = mx - Math.min(R, G, B);
       if (!dl || dl / mx < 0.2 || mx < 90) continue;               // grey, dull or dark: not skin
       var hu = mx === R ? ((G - B) / dl) % 6 : mx === G ? (B - R) / dl + 2 : (R - G) / dl + 4;
       hu *= 60; if (hu < 0) hu += 360;
       hue[k] = hu; ish[k] = 1;
-      if (dd <= seed2 && d[q + 3] >= 200) { b = Math.floor(hu / 30) % 12; cnt[b]++; sinS[b] += Math.sin(hu * Math.PI / 180); cosS[b] += Math.cos(hu * Math.PI / 180); }
+      if (dd <= seed2 && s0[q + 3] >= 200) { b = Math.floor(hu / 30) % 12; cnt[b]++; sinS[b] += Math.sin(hu * Math.PI / 180); cosS[b] += Math.cos(hu * Math.PI / 180); }
     }
     var best = -1, bestScore = 0, near = function (j) { return [(j + 11) % 12, j, (j + 1) % 12]; };
     for (b = 0; b < 12; b++) {
@@ -1310,6 +1324,133 @@
     if (!(key in p._hand)) p._hand[key] = buildHand(p, i, an, rad);
     return p._hand[key];
   }
+  // ---------------------------------------------------------------- RECOLOUR: the Warrior's hair and skin (2026-11-24, the user's wish)
+  // Each Warrior strip has a HAIR mask and a SKIN mask next to it (Animations/Warrior/<animation>/<strip>.hair-mask.png and .skin-mask.png, made by source/tools/hair_mask.py and skin_mask.py; the build inlines
+  // them as d.hairMask / d.skinMask). White = hair (skin), grey = partly. When a colour is chosen the page paints a recoloured copy of every strip: the HAIR is colourised (every masked pixel takes the chosen colour
+  // at its own brightness relative to the hair's average, so the shading and the highlights stay), the SKIN is tinted (every masked pixel's channels are multiplied by chosen colour / his average skin colour, so the
+  // muscle shading stays), both blended by the mask's weight. The copy becomes the pack's picture (pk.src / pk.img; pk.src0 / pk.img0 keep the original), so the sprite, the portrait, the hands drawn over the
+  // swords and the ghosts of the path editor all show it. Copies are cached per colour pair and the rest of the character's strips are prepared in the background so a skill starts without a wait.
+  // RC_REF: his own average hair colour and brightness and his average skin colour (measured on the idle with the masks, rc_refs.py): choosing exactly these colours changes nothing.
+  // Since 2026-11-25 the Mage, the Rogue and the Cleric have it too: each character has its OWN colours (RCS, remembered in the browser) and its own RC_REF; RC and RC_REF always point at the character on stage (rcSelect).
+  // RC_CFG: per character the average hair colour (rgb and brightness) and skin colour of the idle, measured with its masks (the numbers come from the mask pixels of the idle strip).
+  var RC_CFG = {
+    warrior: { ref: { hair: [47, 46, 47], hairV: 0.19, skin: [179, 123, 95] }, own: "his own" },
+    mage: { ref: { hair: [175, 135, 86], hairV: 0.69, skin: [210, 159, 140] }, own: "her own" },
+    rogue: { ref: { hair: [101, 37, 50], hairV: 0.40, skin: [165, 116, 82] }, own: "her own" },
+    cleric: { ref: { hair: [37, 109, 65], hairV: 0.43, skin: [209, 160, 110] }, own: "his own" }
+  };
+  var RCM = {}, RCS = {}, RC_KEY = "wvg-recolor2", RC = { hair: null, skin: null }, RC_REF = RC_CFG.warrior.ref, rcCache = {}, rcTok = 0, rcTimer = null, rcUiSync = function () {};
+  try {
+    var rcs = JSON.parse(localStorage.getItem(RC_KEY) || "null");
+    if (!rcs) { var old = JSON.parse(localStorage.getItem("wvg-recolor") || "null"); rcs = old ? { warrior: old } : {}; }     // (the first version only knew the Warrior: its one choice moves in)
+    Object.keys(RC_CFG).forEach(function (k) { var o = rcs[k]; if (o && (o.hair || o.skin)) RCS[k] = { hair: o.hair || null, skin: o.skin || null }; });
+  } catch (e) {}
+  function rcSelect(ch) {                                                            // the character on stage changed: its colours and its reference colours; a character without masks (the Assassin, the Spellblade) has nothing to recolour
+    rcTok++;
+    if (RC_CFG[ch]) { RC = RCS[ch] || (RCS[ch] = { hair: null, skin: null }); RC_REF = RC_CFG[ch].ref; } else { RC = { hair: null, skin: null }; }
+    rcUiSync();
+  }
+  rcSelect("warrior");
+  function rcOn() { return !!(RC.hair || RC.skin); }
+  function rcWant() { return rcOn() ? (RC.hair ? "h" + RC.hair.join(",") : "") + "|" + (RC.skin ? "s" + RC.skin.join(",") : "") : ""; }
+  function rcMaskArr(m, kind, w, h) {                                                // a strip's mask as weights 0..255 (blurred a little so the recolour fades out at the edge), loaded once
+    var key = kind + "A";
+    if (!m[kind]) return Promise.resolve(null);
+    if (m[key]) return Promise.resolve(m[key]);
+    return new Promise(function (res) {
+      var im = new Image();
+      im.onload = function () {
+        var c = document.createElement("canvas"); c.width = w; c.height = h;
+        var x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(im, 0, 0, w, h);
+        var d = x.getImageData(0, 0, w, h).data, n = w * h, a = new Uint8ClampedArray(n), t = new Uint8ClampedArray(n), i, j, q;
+        for (i = 0; i < n; i++) a[i] = d[i * 4];
+        for (j = 0; j < h; j++) { q = j * w; t[q] = a[q]; t[q + w - 1] = a[q + w - 1]; for (i = 1; i < w - 1; i++) t[q + i] = (a[q + i - 1] + 2 * a[q + i] + a[q + i + 1]) >> 2; }
+        for (j = 1; j < h - 1; j++) { q = j * w; for (i = 0; i < w; i++) a[q + i] = (t[q - w + i] + 2 * t[q + i] + t[q + w + i]) >> 2; }
+        m[key] = a; res(a);
+      };
+      im.onerror = function () { res(null); };
+      im.src = m[kind];
+    });
+  }
+  function rcRender(pk, m) {                                                         // the recoloured copy of a strip as a blob URL (null when there is nothing to paint)
+    var w = pk.nw, h = pk.nh, HT = RC.hair, ST = RC.skin;
+    return Promise.all([HT ? rcMaskArr(m, "hair", w, h) : null, ST ? rcMaskArr(m, "skin", w, h) : null]).then(function (ms) {
+      var ha = ms[0], sa = ms[1];
+      if (!ha && !sa) return null;
+      var c = document.createElement("canvas"); c.width = w; c.height = h;
+      var x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(pk.img0, 0, 0);
+      var id = x.getImageData(0, 0, w, h), d = id.data, n = w * h, i, q, r, g, b, wt, f, k, tr, tg, tb, hv = RC_REF.hairV;
+      var gr = ST ? [Math.min(4, ST[0] / RC_REF.skin[0]), Math.min(4, ST[1] / RC_REF.skin[1]), Math.min(4, ST[2] / RC_REF.skin[2])] : null;
+      for (i = 0; i < n; i++) {
+        q = i * 4;
+        if (d[q + 3] === 0) continue;
+        wt = ha ? ha[i] : 0;
+        if (wt) {                                                                    // hair: colourise, keeping the brightness relative to the hair's average
+          wt /= 255; r = d[q]; g = d[q + 1]; b = d[q + 2];
+          f = Math.max(r, g, b) / 255 / hv; tr = HT[0]; tg = HT[1]; tb = HT[2];
+          if (f <= 1) { tr *= f; tg *= f; tb *= f; } else { k = Math.min(1, (f - 1) * 0.5); tr += (255 - tr) * k; tg += (255 - tg) * k; tb += (255 - tb) * k; }
+          d[q] = r + (tr - r) * wt; d[q + 1] = g + (tg - g) * wt; d[q + 2] = b + (tb - b) * wt;
+        }
+        wt = sa ? sa[i] : 0;
+        if (wt) {                                                                    // skin: multiply the channels by chosen / average, keeping the shading
+          wt /= 255; r = d[q]; g = d[q + 1]; b = d[q + 2];
+          d[q] = r + (Math.min(255, r * gr[0]) - r) * wt; d[q + 1] = g + (Math.min(255, g * gr[1]) - g) * wt; d[q + 2] = b + (Math.min(255, b * gr[2]) - b) * wt;
+        }
+      }
+      x.putImageData(id, 0, 0);
+      return new Promise(function (res) { c.toBlob(function (bl) { res(bl ? URL.createObjectURL(bl) : null); }, "image/png"); });
+    });
+  }
+  function rcApplyPack(pk) {                                                         // gives a pack the recoloured picture (or its original back); resolves when it is swapped
+    var m = RCM[pk.file], want = rcWant();
+    if (!m || !pk.img0 || pk._rc === want) return Promise.resolve();
+    var swap = function (url) {
+      return new Promise(function (res) {
+        if (!url) { pk.src = pk.src0; pk.img = pk.img0; pk._hand = {}; pk._rc = want; res(); return; }
+        var im = new Image();
+        im.onload = function () { pk.src = url; pk.img = im; pk._hand = {}; pk._rc = want; res(); };
+        im.onerror = function () { res(); };
+        im.src = url;
+      });
+    };
+    if (!want) return swap(null);
+    var ck = pk.file + "|" + want;
+    if (rcCache[ck]) return swap(rcCache[ck]);
+    return rcRender(pk, m).then(function (url) { rcCache[ck] = url || null; return swap(url); });
+  }
+  function rcDrop() {                                                                // the colours changed: the cached copies go (their URLs are freed a little later, the stage may still show them)
+    var old = rcCache; rcCache = {};
+    setTimeout(function () { Object.keys(old).forEach(function (k) { if (old[k]) URL.revokeObjectURL(old[k]); }); }, 10000);
+  }
+  function rcRefresh() {                                                             // show the new pictures: the sprite on stage, the portrait, the ghosts of the path editor
+    var el = uW.querySelector(".sheet");
+    hudHero();
+    if (el) { el._img = null; if (curFrame && packs[curFrame.pose]) showFrame(el, packs[curFrame.pose], curFrame.i, curFrame.pose); }
+    try { renderGhosts(); } catch (e) {}
+  }
+  function rcWarm(tok) {                                                             // prepares the character's other strips in the background (one at a time), so a skill starts without a wait
+    if (tok !== rcTok || !rcOn() || !RC_CFG[curChar]) return;
+    var want = rcWant(), todo = CHARACTERS[curChar].anims.filter(function (d) { return RCM[d.file] && !((d.file + "|" + want) in rcCache); });
+    if (!todo.length) return;
+    var d = todo[0], im = new Image();
+    im.onload = function () {
+      rcRender({ nw: im.naturalWidth, nh: im.naturalHeight, img0: im, file: d.file }, RCM[d.file]).then(function (url) {
+        if (tok !== rcTok) { if (url) URL.revokeObjectURL(url); return; }
+        rcCache[d.file + "|" + want] = url || null;
+        setTimeout(function () { rcWarm(tok); }, 40);
+      });
+    };
+    im.src = d.src;
+  }
+  function rcApplyAll() {                                                            // recolours every loaded pack of the character on stage, then shows it
+    var tok = ++rcTok, ps = POSES.map(function (k) { return packs[k]; }).filter(function (p) { return p && RCM[p.file]; });
+    return ps.reduce(function (pr, p) { return pr.then(function () { return tok === rcTok ? rcApplyPack(p) : null; }); }, Promise.resolve()).then(function () {
+      if (tok !== rcTok) return;
+      rcRefresh();
+      setTimeout(function () { rcWarm(tok); }, 80);
+    });
+  }
+
   function drawItemOn(ctx, im, cfg, an, W, H) {
     if (!im || !im.naturalHeight) return;
     var scale = (cfg.length * W) / im.naturalHeight;
@@ -6958,12 +7099,14 @@
     return new Promise(function (resolve) {
       var im = new Image();
       im.onload = function () {
-        packs[pose] = { src: src, nw: im.naturalWidth, nh: im.naturalHeight, img: im, file: fileName || "" };
+        var pk0 = packs[pose] = { src: src, nw: im.naturalWidth, nh: im.naturalHeight, img: im, file: fileName || "", src0: src, img0: im };   // (src0 / img0: the original picture; src / img become the recoloured copy when the Recolour tool is on)
         if ($("autoFrames").checked) {
           // Frames are 512 px wide (or as wide as the idle pack's frames). They may be taller than wide, e.g. 512 x 640 for jump animations.
           var fw = packs.idle && packs.idle !== packs[pose] ? packs.idle.nw / layout(packs.idle).cols : (im.naturalWidth % 512 === 0 ? 512 : im.naturalHeight);
           packs[pose].frames = Math.max(1, Math.round(im.naturalWidth / fw));
         }
+        (rcOn() ? rcApplyPack(pk0) : Promise.resolve()).then(function () {         // a chosen recolour is painted before the pack is used
+        if (packs[pose] !== pk0) { resolve(); return; }
         var L = layout(packs[pose]);
         attachAnchors(pose);
         if (pose === "block" && PRESETS[fileName || ""]) { if (PRESETS[fileName].fps) $("fps_block").value = PRESETS[fileName].fps; if (PRESETS[fileName].blockFrame) $("blockFrame").value = PRESETS[fileName].blockFrame; }   // (the block's fps and block frame come with the pack's placement json)
@@ -6974,6 +7117,7 @@
         else if (pose === "idle") renderGhosts();
         fitStage(); fxSync();
         resolve();
+        });
       };
       im.src = src;
     });
@@ -10145,6 +10289,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     list.forEach(function (d) {
       if (d.anchors) { try { importMarks(d.anchors); } catch (e) {} }
       if (d.anchorsShield) { try { importMarks(d.anchorsShield, true); } catch (e) {} }
+      if (d.hairMask || d.skinMask) RCM[d.file] = { hair: d.hairMask || null, skin: d.skinMask || null };      // (the Recolour tool's masks, see rcRender)
       var pl = d.placement;
       if (pl && pl.blockFrame) PRESETS[d.file] = Object.assign(PRESETS[d.file] || {}, { pack: d.slot, blockFrame: pl.blockFrame, fps: pl.fps });   // a block pack has no path, only its block frame
       if (pl && pl.x && pl.y) {
@@ -10209,6 +10354,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     var ch = CHARACTERS[key];
     if (!ch) return Promise.resolve();
     curChar = key;
+    rcSelect(key);                                                                    // (the Recolour tool: this character's colours, before its strips load)
     applyCharUi();
     stageNo = 1;
     bgSync();
@@ -10218,7 +10364,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     FIGHTERS.W.name = ch.name;
     $("hpW").querySelector(".name span").textContent = ch.name;
     hudHero();
-    return loadAnims(ch.anims).then(function () { renderMarksInfo(); applyCharUi(); });
+    return loadAnims(ch.anims).then(function () { renderMarksInfo(); applyCharUi(); if (rcOn()) { rcRefresh(); setTimeout(function () { rcWarm(rcTok); }, 400); } });
   }
   if (MAGE_ANIMS.length || ROGUE_ANIMS.length || ASSASSIN_ANIMS.length || SPELLBLADE_ANIMS.length || CLERIC_ANIMS.length) {
     $("charWrap").style.display = "";
@@ -10231,6 +10377,37 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     });
     $("charSel").onchange = function () { switchCharacter(this.value); };
   }
+  // The Recolour panel (2026-11-24): two colour boxes and a row of swatches for each; the choice is remembered in this browser. The boxes show his own colours when nothing is changed.
+  (function () {
+    var HAIR_SW = [["black", "#2f2e2f"], ["dark brown", "#4a3020"], ["brown", "#6b4423"], ["auburn", "#8a3b1f"], ["red", "#b3261e"], ["ginger", "#d2691e"], ["blonde", "#d9b45a"], ["platinum", "#e8e4d8"], ["grey", "#8a8d94"], ["white", "#f4f4f4"], ["blue", "#2f5fd0"], ["green", "#2fa84f"], ["pink", "#e0509a"], ["purple", "#7a3fc4"]];
+    var SKIN_SW = [["his own", "#b67e61"], ["fair", "#e6b79b"], ["light", "#d9a37d"], ["tan", "#c08a5c"], ["brown", "#8f5e3c"], ["dark", "#6a4430"], ["deep", "#4a2f22"], ["olive", "#a99a55"], ["green", "#6aa84f"], ["grey", "#9a9a9a"], ["blue", "#5b8fd6"], ["red", "#c0503c"]];
+    var hex = function (a) { return "#" + a.map(function (v) { return ("0" + Math.round(v).toString(16)).slice(-2); }).join(""); };
+    var rgb = function (h) { return [1, 3, 5].map(function (i) { return parseInt(h.substr(i, 2), 16); }); };
+    var msg = function (t) { $("rcMsg").textContent = t !== undefined ? t : (rcOn() ? "Recoloured: " + [RC.hair ? "hair" : "", RC.skin ? "skin" : ""].filter(Boolean).join(" and ") : "Original colours."); };
+    var changed = function () {
+      try { localStorage.setItem(RC_KEY, JSON.stringify(RCS)); } catch (e) {}
+      rcDrop(); msg("Recolouring..."); clearTimeout(rcTimer);
+      rcTimer = setTimeout(function () { rcApplyAll().then(function () { msg(); }); }, 120);
+    };
+    var pick = function (box, which, val) { $(box).value = val; RC[which] = rgb(val); changed(); };
+    [["rcHairSw", HAIR_SW, "rcHair", "hair"], ["rcSkinSw", SKIN_SW, "rcSkin", "skin"]].forEach(function (g) {
+      g[1].forEach(function (c) {
+        var b = document.createElement("button"); b.type = "button"; b.title = c[0]; b.style.background = c[1];
+        b.onclick = function () { pick(g[2], g[3], c[0] === "his own" ? hex(RC_REF.skin) : c[1]); };      // (the first skin swatch is the character's own skin)
+        $(g[0]).appendChild(b);
+      });
+    });
+    rcUiSync = function () {                                                          // the boxes show the character's own colours (or the ones chosen); the first skin swatch is its own skin
+      $("rcHair").value = hex(RC.hair || RC_REF.hair); $("rcSkin").value = hex(RC.skin || RC_REF.skin);
+      var own = $("rcSkinSw").firstChild, c = RC_CFG[curChar];
+      if (own && c) { own.style.background = hex(RC_REF.skin); own.title = c.own; }
+      msg();
+    };
+    rcUiSync();
+    $("rcHair").oninput = function () { RC.hair = rgb(this.value); changed(); };
+    $("rcSkin").oninput = function () { RC.skin = rgb(this.value); changed(); };
+    $("rcReset").onclick = function () { RC.hair = RC.skin = null; $("rcHair").value = hex(RC_REF.hair); $("rcSkin").value = hex(RC_REF.skin); changed(); };
+  })();
   applyCharUi();
   hudHero();
   loadAnims(DEFAULT_ANIMS).then(function () { applyCharUi(); });

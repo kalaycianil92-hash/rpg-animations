@@ -69,7 +69,8 @@ def bg_scenes():
         print("scene", s.name, ", ".join(f.stem for f in files), "(STAND-IN)" if (s / "standin.txt").exists() else "")
     return json.dumps(scenes, separators=(",", ":"))
 
-def default_anims(anim_dir):
+def default_anims(anim_dir, masks=False):
+    """masks: also embed each strip's hair mask and skin mask (<strip>.hair-mask.png, <strip>.skin-mask.png: the page's Recolour tool, 2026-11-24; the Warrior, Mage, Rogue and Cleric have them in the page; the Assassin and the Spellblade do not yet)"""
     entries = []
     if not anim_dir.is_dir():
         return "[]"
@@ -88,6 +89,9 @@ def default_anims(anim_dir):
         def load(suffix):
             f = folder / (stem + suffix)
             return json.loads(f.read_text(encoding="utf-8")) if f.exists() else None
+        def png(suffix):
+            f = folder / (stem + suffix)
+            return "data:image/png;base64," + base64.b64encode(f.read_bytes()).decode() if masks and f.exists() else None
         entries.append({
             "slot": SLOTS[folder.name],
             "file": strip.name,
@@ -96,6 +100,8 @@ def default_anims(anim_dir):
             "anchorsShield": load(".shield.hand-anchors.json"),                   # the Warrior's marks for a SHIELD in the near hand (2026-11-23), used instead of "anchors" when the page's near-hand switch says shield
             "placement": load(".placement.json"),
             "squash": load(".squash.json"),
+            "hairMask": png(".hair-mask.png"),                                  # (the Recolour tool: white = hair / skin; the page recolours these pixels of the strip)
+            "skinMask": png(".skin-mask.png"),
             "mouth": load(".mouth.json"),                                     # a monster's glowing mouth per frame (the Ember Spit's start point), when there is one                                   # per-frame proportions of a monster's idle (the page's Squash and stretch slider), when there are any
         })
         print("animation", folder.name, "->", SLOTS[folder.name], strip.name,
@@ -119,21 +125,21 @@ for src in sorted((root / "src").glob("*.src.html")):
     name = src.name.replace(".src.html", ".html")
     text = src.read_text(encoding="utf-8")
     if "__DEFAULT_ANIMS__" in text:
-        text = text.replace("__DEFAULT_ANIMS__", default_anims(ANIM_DIR))
+        text = text.replace("__DEFAULT_ANIMS__", default_anims(ANIM_DIR, masks=True))
     if "__FX_TEXTURES__" in text:
         text = text.replace("__FX_TEXTURES__", fx_textures())
     if "__BG_SCENES__" in text:
         text = text.replace("__BG_SCENES__", bg_scenes())
     if "__MAGE_ANIMS__" in text:
-        text = text.replace("__MAGE_ANIMS__", default_anims(MAGE_DIR))
+        text = text.replace("__MAGE_ANIMS__", default_anims(MAGE_DIR, masks=True))
     if "__ROGUE_ANIMS__" in text:
-        text = text.replace("__ROGUE_ANIMS__", default_anims(ROGUE_DIR))
+        text = text.replace("__ROGUE_ANIMS__", default_anims(ROGUE_DIR, masks=True))
     if "__ASSASSIN_ANIMS__" in text:
         text = text.replace("__ASSASSIN_ANIMS__", default_anims(ASSASSIN_DIR))
     if "__SPELLBLADE_ANIMS__" in text:
         text = text.replace("__SPELLBLADE_ANIMS__", default_anims(SPELLBLADE_DIR))
     if "__CLERIC_ANIMS__" in text:
-        text = text.replace("__CLERIC_ANIMS__", default_anims(CLERIC_DIR))
+        text = text.replace("__CLERIC_ANIMS__", default_anims(CLERIC_DIR, masks=True))
     if "__SLIME_ANIMS__" in text:
         text = text.replace("__SLIME_ANIMS__", default_anims(SLIME_DIR))
     if "__ICESLIME_ANIMS__" in text:

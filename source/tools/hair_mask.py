@@ -48,11 +48,12 @@ def cleric_skin(r, g, b, h, s, v):                                 # the Cleric'
 # "strict" finds the hair's body (bright enough that the dark outlines and shading, which would join the hair to look-alikes like a scarf, are not part of it; it is eroded by `erode` px so
 # thin bridges break); "loose" is what may be added back round it (the dark shading and the outline-side pixels of the same hair, `grow` px at most, never through a neighbouring blob).
 PROFILES = {
-    "rogue": dict(hue=[(322, 360), (0, 14)], skin=rogue_skin, strict=dict(sat=0.38, val=0.28), loose=dict(sat=0.22, val=0.03), erode=1, grow=8, near=30, reach=None, block=350, chin=6, chain=0, chain_face=0, chain_thick=0),
+    "rogue": dict(hue=[(322, 360), (0, 14)], skin=rogue_skin, strict=dict(sat=0.38, val=0.28), loose=dict(sat=0.22, val=0.03), erode=1, grow=8, near=30, reach=None, block=350, chin=6, chain=0, chain_face=0, chain_thick=0, ears=dict(hue=(12, 36), sat=0.3, val=0.38, smin=6, smax=450, grow=1), strands=dict(link=6, smin=30, reach=22, face=45, thick=2.5, scarf_pad=8, behind=-4, front_y=22, max_dist=40, max_behind=99, open=5, hue=(325, 358), sat=0.5, val=(0.10, 0.46))),
     "spellblade": dict(hue=[(0, 26)], skin=spellblade_skin, strict=dict(sat=0.5, val=0.35), loose=dict(sat=0.3, val=0.08), erode=1, grow=8, near=30, reach=None, block=350, chin=6, chain=0, chain_face=0, chain_thick=0),
-    "mage": dict(hue=[(26, 62), (19, 26, 0.45, 0.78)], skin=mage_skin, strict=dict(sat=0.28, val=0.35), loose=dict(sat=0.22, val=0.30), erode=0, grow=4, near=30, reach=-3, block=350, chin=None, chain=12, chain_face=260, chain_thick=4.5),
+    "mage": dict(hue=[(26, 62), (19, 26, 0.45, 0.78)], skin=mage_skin, strict=dict(sat=0.28, val=0.35), loose=dict(sat=0.22, val=0.30), erode=0, grow=4, near=30, reach=-3, block=350, chin=None, chain=12, chain_face=260, chain_thick=4.5,
+                 braid=dict(hue=(5, 62), sat=0.38, val=0.30, link=21, link_far=30, thick_far=4.0, far_face=75, thick=3.0, smin=40, smax=900, iters=12, opens=(3, 5))),
     # the Cleric (2026-11-21): emerald-green hair (hue about 140 to 155, #1E9B5A with shadows #0F6A3C and highlights #5FD08C), a colour nothing else on him shares (the hair-mask rule); the eyebrows are green too but are separate blobs
-    "cleric": dict(hue=[(95, 175)], skin=cleric_skin, strict=dict(sat=0.28, val=0.14), loose=dict(sat=0.22, val=0.06), erode=0, grow=3, near=30, reach=None, block=10**9, chin=None, chain=14, chain_face=400, chain_thick=0),   # (block 10**9: no look-alike to keep out, so the strands of the hair, which the outlines split into big blobs, must not block each other; chain joins them)
+    "cleric": dict(hue=[(95, 175)], skin=cleric_skin, strict=dict(sat=0.28, val=0.14), loose=dict(sat=0.22, val=0.06), erode=0, grow=3, near=30, reach=None, block=10**9, chin=None, chain=14, chain_face=400, chain_thick=0, brows=dict(hue=(60, 175), sat=0.25, val=0.08, near=45, min=8)),   # (block 10**9: no look-alike to keep out, so the strands of the hair, which the outlines split into big blobs, must not block each other; chain joins them)
     "warrior": dict(hue=[(0, 360)], skin=warrior_skin, strict=dict(sat=0.0, val=0.11, smax=0.65, vmax=0.38), loose=dict(sat=0.0, val=0.05, smax=0.8, vmax=0.45), erode=1, grow=6, near=30, reach=-3, block=350, chin=None, chain=0, chain_face=0, chain_thick=0, head_top=0.3),
 }
 
@@ -155,19 +156,146 @@ def hair_in_frame(rgba, P):
     hair = ndi.binary_opening(hair, iterations=1)
     hair = ndi.binary_closing(hair, iterations=2)
     hair = ndi.binary_fill_holes(hair) & fg & ~face
+    chin_rows = np.ones(fg.shape, bool)
     if P["chin"] is not None:                                            # (an upright head: nothing of the hair colour below the chin is hair; the Rogue's scarf, which can touch her hair, lies there)
         ys, xs = np.where(fg)
         ax = np.array([Fx - xs.mean(), Fy - ys.mean()]); na = np.hypot(*ax)
         if na > 8 and -ax[1] / na >= np.cos(np.radians(40)):
-            hair &= np.arange(fg.shape[0])[:, None] <= fy.max() + P["chin"]
+            chin_rows = np.arange(fg.shape[0])[:, None] <= fy.max() + P["chin"]
+            hair &= chin_rows
     lab2, n2 = ndi.label(hair)
     if n2:
         sz = ndi.sum(hair, lab2, range(1, n2 + 1))
         hair = np.isin(lab2, 1 + np.where(sz >= 100)[0])
+    for opn in (P.get("braid") or {}).get("opens", ()):                  # the Mage's braid, link by link (2026-11-25): in some strips (cast, dodge, hit, run) the lower braid is pinkish-brown, outside the hair's hue window, and the chain above stops at her shoulder
+        if not hair.any():                                               # (two passes: a 3 x 3 opening, then a 5 x 5 one that cuts the braid loose from the robe's gold trim it touches at the shoulder; the second finds what the first one lost in the trim's big blob)
+            break
+        B = P["braid"]                                                   # take blobs of that wider warm colour, each thick (a braid is, a trim line is not) and within `link` px of the hair so far, again and again along the braid
+        cand = fg & ~ndi.binary_dilation(face, iterations=2) & (h >= B["hue"][0]) & (h <= B["hue"][1]) & (s >= B["sat"]) & (v >= B["val"])
+        cand0 = cand
+        cand = ndi.binary_opening(cand, structure=np.ones((opn, opn), bool))
+        if opn > 3:
+            cand = ndi.binary_dilation(cand, iterations=2) & cand0
+        blab, bn = ndi.label(cand, structure=np.ones((3, 3), bool))
+        todo = []
+        thk = {}
+        for i in range(1, bn + 1):
+            bm = blab == i
+            if B["smin"] <= bm.sum() <= B["smax"] and not (bm & hair).any():
+                thk[i] = ndi.distance_transform_edt(bm).max()
+                if thk[i] >= B["thick"]:
+                    todo.append(i)
+        d00 = ndi.distance_transform_edt(~hair)                           # (distance from the hair proper, before the braid is followed)
+        for _ in range(B["iters"]):
+            dc = ndi.distance_transform_edt(~hair)
+            add = [i for i in todo if dc[blab == i].min() <= B["link"] or (d00[blab == i].min() <= B["link_far"] and thk[i] >= B["thick_far"] and dist[blab == i].min() <= B["far_face"])]   # (a farther hop only from the hair proper, and only for a really thick blob: the first link of the braid at the shoulder, not a belt pouch reached from the braid's tip)
+            if not add:
+                break
+            for i in add:
+                hair |= blab == i
+                todo.remove(i)
+        hair = ndi.binary_closing(hair, iterations=2) & fg & ~face
+    if P.get("strands") and hair.any():                                  # the Rogue's dark burgundy strands at her nape and behind her jaw (2026-11-25): the same colour as the scarf's dark folds, so by place and shape only: blobs of dark hair colour, thick enough, close to the hair and to the face, that are not on the scarf (the big blobs of its colour, filled in and widened)
+        Sd = P["strands"]
+        bigs = np.isin(slab, [i for i in range(1, sn + 1) if ssz[i - 1] >= P["block"] and i != order[0]])   # (every big blob of the hair's colour that is not the hair itself, also one the hair absorbed because it touches it: the scarf)
+        scarf = ndi.binary_dilation(ndi.binary_fill_holes(ndi.binary_closing(others | bigs, iterations=3)), iterations=Sd["scarf_pad"])
+        strandc = fg & (h >= Sd["hue"][0]) & (h <= Sd["hue"][1]) & (s >= Sd["sat"]) & (v >= Sd["val"][0]) & (v <= Sd["val"][1]) & ~skin   # (the burgundy: hue 325 to 358, not the skin's reds, not the black outline)
+        cand = strandc & ~scarf & ~ndi.binary_dilation(face, iterations=1) & ~hair
+        hy2, hx2 = np.nonzero(hair)
+        bvec = np.array([hx2.mean() - Fx, hy2.mean() - Fy]); bn = np.hypot(*bvec)       # (behind the face: from the face's middle towards the hair's middle; the dark edge of the scarf in front of the neck is not hair)
+        if bn > 5:
+            yy2, xx2 = np.mgrid[0:fg.shape[0], 0:fg.shape[1]]
+            cand &= (((xx2 - Fx) * bvec[0] + (yy2 - Fy) * bvec[1]) / bn >= Sd["behind"]) | (yy2 <= Fy + Sd["front_y"])   # (in front of the face only up to its middle and a bit below: the lock of hair behind the jaw, not the scarf's edge under the chin)
+        if bn > 5:
+            cand &= np.hypot(xx2 - Fx, yy2 - Fy) <= Sd["max_dist"]                      # (not farther from the face's middle than the head is big: the hood's rim and the scarf lie lower)
+            cand &= ((xx2 - Fx) * bvec[0] + (yy2 - Fy) * bvec[1]) / bn <= Sd["max_behind"]
+        cand0 = cand
+        cand = ndi.binary_opening(cand, structure=np.ones((Sd["open"], Sd["open"]), bool))    # (a thick opening: a strand is 5 to 10 px thick, the hood's crimson rim line is not)
+        cand = ndi.binary_dilation(cand, iterations=(Sd["open"] - 1) // 2) & cand0
+        slab2, sn2 = ndi.label(cand)
+        dh = ndi.distance_transform_edt(~hair)
+        for i in range(1, sn2 + 1):
+            sm = slab2 == i
+            if sm.sum() >= Sd["smin"] and dh[sm].min() <= Sd["link"] and dist[sm].min() <= Sd["face"] and ndi.distance_transform_edt(sm).max() >= Sd["thick"]:
+                part = sm & (dh <= Sd["reach"]) & chin_rows                          # (the strands join the scarf's dark parts into one big blob: only what lies within `reach` px of the hair is taken)
+                if part.sum() >= Sd["smin"]:
+                    hair |= part
+        hair = ndi.binary_closing(hair, iterations=2) & fg & ~face
+    if P.get("ears") and hair.any():                                     # the ear lies inside the hair and is skin, not hair (2026-11-25, the user: the hair colour also changed the ear): tan blobs inside the hair mask are cut out of it, and the skin mask takes them
+        E = P["ears"]
+        tan = fg & (h >= E["hue"][0]) & (h <= E["hue"][1]) & (s >= E["sat"]) & (v >= E["val"])
+        tan = ndi.binary_dilation(tan, iterations=E.get("grow", 1)) & fg & (h >= E["hue"][0] - 6) & (h <= E["hue"][1] + 4) & (s >= E["sat"] * 0.8) & (v >= E["val"] * 0.8)    # (the ear's lit rim and its darker shading)
+        elab, en = ndi.label(tan & ndi.binary_dilation(hair, iterations=1), structure=np.ones((3, 3), bool))
+        for i in range(1, en + 1):
+            em = elab == i
+            if E["smin"] <= em.sum() <= E["smax"]:
+                hair &= ~em
+    if P.get("brows") and hair.any():                                    # the Cleric's eyebrows are the hair's emerald, but separate blobs: every blob of the hair colour near the face joins the hair
+        Bw = P["brows"]
+        cand = fg & ~face & (h >= Bw["hue"][0]) & (h <= Bw["hue"][1]) & (s >= Bw["sat"]) & (v >= Bw["val"]) & (dist <= Bw["near"])
+        blab, bn = ndi.label(cand, structure=np.ones((3, 3), bool))
+        for i in range(1, bn + 1):
+            bm = blab == i
+            if bm.sum() >= Bw["min"] and not (bm & hair).any():
+                hair |= bm
+        hair = ndi.binary_closing(hair, iterations=1) & fg & ~face
     return hair
 
 
-def mask_for_strip(path, P, frame):
+# THE WARRIOR'S HEAD SEEDS (2026-11-24). The face finder above takes the highest skin blob as the face; when his arms are raised above his head (the Molten Cleave, the Sunder Strike, the Static
+# Bash's raised swords, the Thunderclap's arch), when he is lying (the death) or in a few other poses it picks an arm or a fist and the frame gets no hair at all (a recolour would flash back to the old
+# colour on those frames). So for those frames the hair is found from a SEED: a point on the hair read from the picture (cell coordinates, frames counted from 1): the hair is then the neutral dark
+# pixels (his hair is nearly colourless, his armour is a little blue and his leather brown) connected to the seed within a head's radius. {folder: {frame: (x, y)}}
+WARRIOR_SEEDS = {
+    "death": {5: (112, 321), 6: (80, 423)},
+    "execute": {3: (325, 168)},
+    "glacial_blade": {4: (341, 208), 5: (369, 204)},
+    "jump_attack": {4: (288, 278), 5: (280, 321), 6: (289, 224)},
+    "molten_cleave": {5: (270, 121), 6: (265, 121)},
+    "run": {4: (288, 95)},
+    "static_bash": {10: (288, 95), 15: (288, 95), 17: (307, 170)},
+    "sunder_strike": {2: (231, 138), 3: (346, 172)},
+    "dodge": {3: (253, 140)},
+}
+
+
+def hair_from_seed(rgba, seed, R=30):
+    """the hair around a seed point (x, y) on the hair: neutral dark pixels connected to it inside a disc of radius R, shading grown back"""
+    rgb = rgba[..., :3].astype(float)
+    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+    fg = rgba[..., 3] > 128
+    hsv = np.array(Image.fromarray(rgba[..., :3]).convert("HSV")).astype(float)
+    h, s, v = hsv[..., 0] * 360 / 255, hsv[..., 1] / 255, hsv[..., 2] / 255
+    yy, xx = np.mgrid[0:fg.shape[0], 0:fg.shape[1]]
+    d = np.hypot(xx - seed[0], yy - seed[1])
+    skin = warrior_skin(r, g, b, h, s, v) & (v >= 0.45)
+    strict = fg & (d <= R) & (v >= 0.08) & (v <= 0.30) & (s <= 0.20) & (np.abs(b - r) <= 8) & ~skin
+    loose = fg & (d <= R + 5) & (v >= 0.05) & (v <= 0.36) & (s <= 0.32) & (np.abs(b - r) <= 14) & ~skin
+    lab, n = ndi.label(strict, structure=np.ones((3, 3)))
+    if n == 0:
+        return np.zeros(fg.shape, bool)
+    near = [i for i in range(1, n + 1) if (lab == i).sum() >= 25 and d[lab == i].min() <= 12]
+    if not near:
+        return np.zeros(fg.shape, bool)
+    core = np.isin(lab, near)
+    hair = core.copy()
+    for _ in range(3):
+        hair = ndi.binary_dilation(hair) & loose | hair
+    hair = ndi.binary_closing(hair, iterations=2)
+    hair = ndi.binary_fill_holes(hair) & fg & ~skin
+    lab2, n2 = ndi.label(hair)
+    if n2:
+        sz = ndi.sum(hair, lab2, range(1, n2 + 1))
+        hair = np.isin(lab2, 1 + np.where(sz >= 60)[0])
+    return hair
+
+
+# FRAME OVERRIDES (2026-11-25): a few frames need a different setting than their character's profile. The Rogue's chin rule (nothing of the hair colour below the chin, because her scarf lies there) cuts the hair
+# of a head that is thrown back with a flat line while her hair hangs on below it (the hit's frame 2, the death's frame 3), so there it is switched off. {character: {folder: {frame: {setting: value}}}}
+FRAME_OVERRIDES = {"rogue": {"hit": {2: {"chin": None}}, "death": {3: {"chin": None}}}}
+
+
+def mask_for_strip(path, P, frame, seeds=None, overrides=None):
     im = Image.open(path).convert("RGBA")
     rgba = np.array(im)
     W = rgba.shape[1]
@@ -175,7 +303,9 @@ def mask_for_strip(path, P, frame):
     mask = np.zeros(rgba.shape[:2], bool)
     counts = []
     for x in range(0, W, step):
-        mask[:, x:x + step] = hair_in_frame(rgba[:, x:x + step], P)
+        seed = (seeds or {}).get(x // step + 1)                            # a seeded frame: see WARRIOR_SEEDS
+        Pf = dict(P, **(overrides or {}).get(x // step + 1, {}))
+        mask[:, x:x + step] = hair_from_seed(rgba[:, x:x + step], seed) if seed else hair_in_frame(rgba[:, x:x + step], Pf)
         counts.append(int(mask[:, x:x + step].sum()))
     return rgba, mask, counts
 
@@ -213,7 +343,7 @@ def main():
         (ROOT / "source" / "hair_check").mkdir(exist_ok=True)
         for c in names:
             for strip in sorted((ROOT / "Animations" / c.capitalize()).glob("*/*_strip.png")):
-                rgba, mask, counts = mask_for_strip(strip, PROFILES[c], a.frame)
+                rgba, mask, counts = mask_for_strip(strip, PROFILES[c], a.frame, WARRIOR_SEEDS.get(strip.parent.name) if c == "warrior" else None, FRAME_OVERRIDES.get(c, {}).get(strip.parent.name))
                 out = strip.with_name(strip.name[:-len(".png")] + ".hair-mask.png")
                 Image.fromarray((mask * 255).astype(np.uint8)).save(out)
                 contact_sheet(rgba, mask, a.frame, ROOT / "source" / "hair_check" / (c + "_" + strip.parent.name + ".png"))
