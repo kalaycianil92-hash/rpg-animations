@@ -1,0 +1,34 @@
+MAGE RUN REDRAW BY POSE TRANSFER (v4, written 2026-11-25, after the user asked "why didn't we use the actual run sheet? What if it mixes the feet?").
+
+WHY THIS ONE: the run she has in the page already has the poses the user approved on 2026-11-01 ("Run animation is just fine"): five frames that are one full stride of two different steps, with the legs alternating correctly. Only her LOOK is wrong (the head too big, a profile face). So instead of asking for new poses (v3, where an image generator may mix up the feet: repeat the same leg forward, swap the near and far leg), this prompt gives those five poses and asks to redraw the same woman in them. The heads of the pose sheet are blanked out (grey ovals of her real head size, 15% of her height) so the generator cannot copy the wrong head.
+
+HOW TO USE
+- Attach TWO images, in this order: 1. Animations/Mage/run/source/pose_reference_mage_run_v4_3x2.png (the five poses, heads blanked); 2. Animations/Mage/reference_image.png (her look). Ask for a 3:2 image (ChatGPT: 1536 x 1024). Paste everything between the two lines of equals signs.
+- Check each panel against the same panel of image 1 before anything else: the same boot on the floor, the same leg lifted, the same leg in front. Then the face and the head size against her idle.
+- Save it in inbox/ (for example inbox/mage_run_pose_transfer_1.png). Then I cut it at the same scale as the poses (the five panels line up with the current strip, so the staff marks can be moved over), remake the masks and anchor the orb or book.
+
+==============================================================================
+OUTPUT: exactly ONE static image, a PNG sprite sheet, and nothing else. Do NOT create a GIF, an animation, a video, a preview, extra images, alternate versions or a second attempt. No other files.
+
+Two images are attached.
+
+IMAGE 1 is a POSE SHEET: five running poses of a woman, in a grid of 3 columns x 2 rows (panels 1 to 3 on the top row, panels 4 and 5 on the bottom row, the sixth panel empty). Her heads are blanked out with plain grey ovals on purpose. Take from image 1 ONLY the poses: the position of the legs and boots, the arms and fists, the lean of the body, the flow of the robe and the braid, and where the figure stands in its panel.
+
+IMAGE 2 is THE CHARACTER: a slender female elf mage with long pointed ears, fair skin, green eyes and a calm, focused expression, long golden-blonde hair swept back from the face and tied into one long braid, a deep royal-blue robe with gold trim and a light-blue front panel, a high collar, wide trumpet-shaped sleeves with gold-trimmed cuffs, a brown leather belt with a small pouch, the robe reaching mid-calf and open at the front over dark fitted leggings, and brown leather boots. Take her look ONLY from image 2: her face, her head, her hair, her proportions, her colours and the painted game-sprite style with its outlines.
+
+TASK: redraw the five poses of image 1, panel for panel, as the woman of image 2. Panel 1 of your sheet has the pose of panel 1 of image 1, and so on to panel 5. The sixth panel stays empty.
+
+THE LEGS MUST MATCH IMAGE 1 EXACTLY in every panel: the same boot on the floor, the same leg lifted, the same leg in front of the other, the same bend of the knees. Do not swap the legs and do not repeat one pose: the five poses are five different moments of a run and the legs alternate between them exactly as in image 1. The fists and arms are where they are in image 1 too.
+
+HER HEAD: draw her real head from image 2 on every figure, in place of the grey oval: the same face in the same THREE-QUARTER angle as in image 2 (both eyes visible, not a flat profile), looking forward to the right with a determined, calm expression, the same green eyes, the same ear size, the hair swept back into the braid. The head (from the top of the hair to the chin) is about 15% of her height, the size of the grey oval: NOT bigger. No grey ovals in your picture.
+
+HER BODY: slender, with her proportions from image 2 (long legs, narrow shoulders). Each figure stands where it stands in its panel of image 1, at the same size, its boots on the same invisible floor line.
+
+NO ITEMS AND NO EFFECTS: no staff, no orb, no book, no weapon. Both hands are empty, tight closed fists, as in image 1. No glow, sparks, dust, motion lines or effects of any kind.
+
+BACKGROUND AND LAYOUT: one flat pure magenta (#FF00FF) background filling the whole image, identical in every pixel (not the grey of image 1). No gradient, floor, ground line, shadow or vignette. No grid lines or borders between panels. The whole character, with the robe, the braid, the hands and the feet, stays fully inside its own panel and never touches a panel edge. The sixth panel is empty magenta. No text, numbers or labels. No magenta or pink on the character herself.
+
+CHECK BEFORE YOU FINISH: in every panel the legs and boots are exactly as in the same panel of image 1; every head is her real head from image 2, in three-quarter view and no bigger than the grey oval; five different poses; the same woman, the same size and the same floor line in all five panels; empty fists; magenta background; one image only.
+
+FINAL REMINDER: output ONE single static PNG image only. No GIF, no extra images.
+==============================================================================

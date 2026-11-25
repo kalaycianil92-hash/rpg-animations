@@ -521,7 +521,7 @@
       <label id="cbStateWrap" style="display:none">The target in the preview <select id="cbState"><option value="none">Normal</option><option value="burn1">Burning (1 stack)</option><option value="burn2">Burning (2 stacks)</option><option value="burn3">Burning (3 stacks)</option></select></label>
       <label id="slStateWrap" style="display:none">The target in the preview <select id="slState"><option value="none">Normal</option><option value="chilled">Chilled (guaranteed crit)</option><option value="frozen">Frozen (+100% damage, Magic Def -25%)</option></select></label>
       <label id="slFireWrap" style="display:none">Shatter Lance fires on frame <input type="number" id="slFire" value="4" min="4" max="8" style="width:56px"></label>
-      <label id="slHoldWrap" style="display:none">Charge frames last <input type="number" id="slHold" value="300" min="80" max="1000" step="20" style="width:64px"> ms each</label>
+      <label id="slHoldWrap" style="display:none">Charge frames last <input type="number" id="slHold" value="450" min="80" max="1000" step="20" style="width:64px"> ms each</label>
       <label id="slMarkWrap" style="display:none"><input type="checkbox" id="slMark"> Mark where the lance forms on the stage</label>
       <button id="slReset" style="display:none">Reset the line</button>
       <button id="fbPreview">Preview Firebolt (loops)</button>
@@ -3825,9 +3825,14 @@
   }
   function nzp(i) { var v = Math.sin(i * 12.9898) * 43758.5453; return v - Math.floor(v); }
   // One run of the skill on the cast pack's clock. Returns the time the crack reaches the target and a function that lets the inferno's heat hit.
-  // Frame 3 (where the aura reaches 100%) lasts PC_FRAME3_MS in all, at 100% speed, whatever the fps: the extra ms for each frame of the cast, the shape playPose wants.
-  var PC_FRAME3_MS = 350;
-  function pcHolds() { var h = []; h[2] = Math.max(0, PC_FRAME3_MS - 1000 / (+$("fps_attack").value || 12)); return h; }
+  // Frame 3 (where the aura reaches 100%) lasts PC_FRAME3_MS, at 100% speed, whatever the fps; every frame before the release lasts PC_SLOW times longer still (2026-11-25, the user: the cast frames
+  // 50% longer, so frame 3 is 525 ms and frames 1, 2 and 4 are 1.5 normal frames): the extra ms for each frame of the cast, the shape playPose wants.
+  var PC_FRAME3_MS = 350, PC_SLOW = 1.5, PC_DARK = 0.95;                             // PC_DARK: how dark the stage gets behind the two fighters during the cast
+  function pcHolds() {
+    var fm = 1000 / (+$("fps_attack").value || 12), rel = Math.max(1, +$("hitFrame").value || 5), h = [];
+    for (var i = 0; i < rel - 1; i++) h[i] = Math.max(0, (i === 2 ? PC_FRAME3_MS : fm) * PC_SLOW - fm);
+    return h;
+  }
   function startPyroclasm(clk, T, opts) {
     var F = fbParams("pyroclasm"), fm = clk.frameMs, at = function (f, fr) { return clkAt(clk, f, fr); }, u = uW.offsetWidth, seed = (clk.t0 | 0) + 79;
     var rel = Math.max(1, F.release), chg = Math.min(F.charge, rel), tRel = at(rel, 0.15), g = fzGeom(T, F, u), rw = rectIn(uW);
@@ -3835,6 +3840,7 @@
     var x0 = rw.left + rw.width * 0.572 + u * 0.1, y0 = rw.top + rw.height * 0.918, x1 = gE.cx, y1 = g.gy, len = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)) || 1;
     var tD = tRel + 140 / speed, crawl = Math.max(220, len / (u * 6 * SPEED_K * F.speed / 1000)) / speed, tArr = tD + crawl;                // 6 character widths per second at 100%
     var lenT = Math.sqrt((g.cx - x0) * (g.cx - x0) + (y1 - y0) * (y1 - y0)), tPass = dodge ? tD + crawl * (1 - Math.pow(1 - Math.min(1, lenT / len), 1 / 1.6)) : tArr;   // when the head of the crack passes the target (the crack's head is eased with the power 1.6)
+    tcDim(at(1, 0), at(1, 0.6), tRel, tArr, tArr + 450 / speed, PC_DARK, "12,4,2");   // the stage goes dark (an ember-black) behind the two fighters over frame 1, stays dark until the release, eases to a third while the crack runs and is gone 450 ms after the eruption
     fxAdd({ t0: at(chg), t1: tArr + 600 / speed, tRel: tRel, tHit: tArr, T: T, draw: function (ctx, now, L) { fbLightDraw(ctx, now, L, F, u); } });
     fxAdd({ t0: at(chg), t1: tRel + 190 / speed, tRel: tRel, rnd: rngOf(seed), rnd2: rngOf(seed + 9), ps: [], cps: [], T: T, head: pcSeed, draw: function (ctx, now, L) { fbChargeDraw(ctx, now, L, F, u); cbCompress(ctx, now, L, F, u); } });
     fxAdd({ t0: at(chg), t1: tArr, tEnd: tArr, g: g, draw: function (ctx, now, L) { pcEarthDraw(ctx, now, L, F, u); } });
@@ -3851,12 +3857,13 @@
       description: "The mage's cast, no projectile: a vortex of fire forms at the top of the staff, falls into the ground at her feet on the release frame, a crack of lava runs along the ground to the target and a towering inferno erupts there. Heavy magical damage; the target is left with 3 Burn stacks at once.",
       pack: { animation: "cast", file: packFile.attack, fps: +$("fps_attack").value || 12, hitFrame: F.release, releaseFrame: F.release },
       palette: { name: F.palName, core: F.pal.core, mid: F.pal.mid, glow: F.pal.glow, deep: F.pal.deep, flash: F.pal.flash },
-      params: { look: F.painted ? "painted" : "code", textures: F.painted ? PCTEX_NEED : undefined, intensity: F.k, towerSize: F.size, speed: F.speed, shake: F.shake, impact: F.imp, frame3Ms: Math.max(PC_FRAME3_MS, 1000 / (+$("fps_attack").value || 12)), unit: "character (frame) width in px: all sizes are shares of it" },
+      params: { look: F.painted ? "painted" : "code", textures: F.painted ? PCTEX_NEED : undefined, intensity: F.k, towerSize: F.size, speed: F.speed, shake: F.shake, impact: F.imp, frame3Ms: Math.max(PC_FRAME3_MS, 1000 / (+$("fps_attack").value || 12)) * PC_SLOW, chargeSlow: PC_SLOW, darkStage: PC_DARK, unit: "character (frame) width in px: all sizes are shares of it" },
       rules: [
         { always: true, damage: "heavy magical damage (about 2x a normal cast)", applies: { status: "burn", stacks: 3, turns: BURN_TURNS } }
       ],
       timeline: [
-        { frame: 1, until: "release", effect: "fire_aura", note: "painted look only: the picture fire_aura wrapped round the mage like a cylinder that turns (as in the Firebolt json), 30% visible on frame 1, 60% on frame 2, 100% from frame 3 until the release frame (frame 3 is held for 350 ms in all, params.frame3Ms, so the 100% lasts; each level is reached over the first half of its frame, the last in about 1.3 normal frames), turning faster as it builds; at the release it bursts outwards (grows by 40%) and fades in 220 ms" },
+        { frame: 1, until: "release", effect: "dark_stage", note: "the stage goes dark BEHIND the two fighters (an ember-black at params.darkStage, 95%), so only the mage and the target stay lit: in over the first 60% of frame 1, full until the release, down to a third by the eruption, gone 450 ms later. Every frame before the release lasts params.chargeSlow (1.5) times its normal length (2026-11-25)" },
+        { frame: 1, until: "release", effect: "fire_aura", note: "painted look only: the picture fire_aura wrapped round the mage like a cylinder that turns (as in the Firebolt json), 30% visible on frame 1, 60% on frame 2, 100% from frame 3 until the release frame (frame 3 is held for params.frame3Ms in all, 525 ms, so the 100% lasts; each level is reached over the first half of its frame, the last in about 1.3 normal frames), turning faster as it builds; at the release it bursts outwards (grows by 40%) and fades in 220 ms" },
         { frame: F.charge, effect: "orb_charge", until: "release", note: "glow around the orb (centre from the hand marks) growing to 15% of the character width, a pulsing ring, six embers orbiting it, flame lobes and flame particles rising; embers streak into the vortex and a ring of heat closes on it" },
         { frame: F.charge, effect: "vortex_form", until: "release", note: "a spiral of fire (painted: the picture pc_seed; code: five spiral arms of glow) turns at about 0.7 turns a second at the top of the staff, growing from 25% to 40% of the character width and fading in" },
         { frame: F.charge, effect: "earth_glow", until: "arrival", note: "the ground under the target glows red, widening from 20% to 70% of a character width and pulsing, brighter with the square of the time" },
@@ -4076,13 +4083,16 @@
     var S = { x: P.tail.x + Math.cos(P.ang) * sl * 0.4, y: P.tail.y + Math.sin(P.ang) * sl * 0.4 }, ang = Math.atan2(aim.y - S.y, aim.x - S.x);
     return { P: P, S: S, E: { x: aim.x - Math.cos(ang) * sl * 0.35, y: aim.y - Math.sin(ang) * sl * 0.35 }, sl: sl, ang: ang };
   }
-  // The two charge frames (the shard's beats) are held longer than a normal frame, so it looks like the lance is being charged: "Charge frames last" in the panel (300 ms each by default).
+  // The two charge frames (the shard's beats) are held longer than a normal frame, so it looks like the lance is being charged: "Charge frames last" in the panel (450 ms each by default), and the
+  // frame the lance forms on lasts 1.5 normal frames (2026-11-25, the user: the three charge frames 50% longer; the beats were 300 ms and the forming frame a normal one).
   // Returns the extra ms to add to each frame of the cast (at 100% speed), the shape playPose wants.
   function slHolds() {
     var fire = slFireFrame(), per = Math.max(+$("slHold").value || 0, 0), natural = 1000 / (+$("fps_attack").value || 12), h = [];
     h[fire - 4] = h[fire - 3] = Math.max(0, per - natural);
+    h[fire - 2] = 0.5 * natural;
     return h;
   }
+  var SL_DARK = 0.95;                                                                 // how dark the stage gets behind the two fighters during the lance's charge (2026-11-25, the user)
   // The lance's charge frost: stronger than the other skills' charge, building until the lance is fired. Round the orb: a bigger cold glow, a crown of ice spikes that grows and turns, frost rings that
   // pulse outwards, eight glints and a swirl of mist. At the top of the staff: orbiting glints and rising mist. And a faint cold light on the mage herself.
   function slChargeFrost(ctx, now, L, F, u) {
@@ -4241,6 +4251,7 @@
     var D = Math.max(1, Math.sqrt((t.x - a.x) * (t.x - a.x) + (t.y - a.y) * (t.y - a.y))), flight = Math.max(110, D / (u * SL_SPEED * SPEED_K * F.speed / 1000)) / speed;   // about 12 character widths per second at 100%, never under 110 ms: it is fired at once
     var dg = opts && opts.dodge ? dodgeFlight(T, flight, D, u, SL_EASE) : null, fl = dg ? dg.flight : flight, pass = dg ? dg.pass : flight;
     var bolt = { t0: tF, t1: tF + fl + 1000 / speed, tHit: tF + fl, T: T, beyond: dg ? dg.beyond : 0, pw: SL_EASE, rnd: rngOf(seed + 3), draw: function (ctx, now, L) { slBoltDraw(ctx, now, L, F, u); } };   // (the layer outlives the flight: the mist lingers)
+    tcDim(at(fire - 3, 0), at(fire - 3, 0.6), tF, tF + pass, tF + pass + 450 / speed, SL_DARK);   // the stage goes dark behind the two fighters over the first charge frame, stays dark until the lance is fired, eases to a third by the strike and is gone 450 ms later
     fxAdd({ t0: at(fire - 3), t1: tF + fl + 60, tRel: tF, tHit: tF + fl, bolt: bolt, T: T, draw: function (ctx, now, L) { fbLightDraw(ctx, now, L, F, u); } });
     fxAdd({ t0: at(fire - 3), t1: tF + 190 / speed, tRel: tF, rnd: rngOf(seed), rnd2: rngOf(seed + 11), ps: [], fps: [], T: T, noShard: true, flashPt: function () { return slLaunch(T, F, u).S; }, draw: function (ctx, now, L) { icChargeDraw(ctx, now, L, F, u); slChargeFrost(ctx, now, L, F, u); } });
     fxAdd({ t0: at(fire - 3), t1: tF, tFire: tF, t2: at(fire - 2), t3: at(fire - 1), rnd: rngOf(seed + 7), ps: [], T: T, draw: function (ctx, now, L) { slFormDraw(ctx, now, L, F, u); } });
@@ -4255,13 +4266,14 @@
       description: "The mage's cast, in four beats on four frames: a small ice shard fades in at a line marked by hand (50%, then 100%), a massive spire of crystallized magic forms out of it, is fired at once and explodes on the target. A frozen target's block is shattered (+100% damage, Magic Def -25% for 2 turns); a chilled target takes a guaranteed critical hit.",
       pack: { animation: "cast", file: packFile.attack, fps: +$("fps_attack").value || 12, hitFrame: fire, releaseFrame: fire },
       palette: { name: F.palName, core: F.pal.core, mid: F.pal.mid, glow: F.pal.glow, deep: F.pal.deep, flash: F.pal.flash },
-      params: { look: F.painted ? "painted" : "code", textures: F.painted ? SLTEX_NEED : undefined, intensity: F.k, lanceSize: F.size, speed: F.speed, trail: F.trail, shake: F.shake, impact: F.imp, fireFrame: fire, chargeFrameMs: Math.max(+$("slHold").value || 0, 1000 / (+$("fps_attack").value || 12)), unit: "character (frame) width in px: all sizes are shares of it" },
+      params: { look: F.painted ? "painted" : "code", textures: F.painted ? SLTEX_NEED : undefined, intensity: F.k, lanceSize: F.size, speed: F.speed, trail: F.trail, shake: F.shake, impact: F.imp, fireFrame: fire, chargeFrameMs: Math.max(+$("slHold").value || 0, 1000 / (+$("fps_attack").value || 12)), formFrameMs: 1.5 * 1000 / (+$("fps_attack").value || 12), darkStage: SL_DARK, unit: "character (frame) width in px: all sizes are shares of it" },
       form: { tail: r3(slForm.tail), tip: r3(slForm.tip), note: "The line marked on the stage on the first beat's frame (the fire frame minus 3): where the ice shard fades in and where the lance grows from. tail and tip are [x, y] in character widths from the orb's centre on the screen, x toward the target (mirrored when the mage faces left), y up. The shard fills the line; the lance's tail sits on the tail and it points along the line. The orb moves with the hand, so the whole thing follows it through the frames." },
       rules: [
         { if: "target is Frozen", damage: "+100%", removes: "frozen (the block is shattered)", applies: { status: "magic_def_down", amount: -0.25, turns: 2 } },
         { if: "target is Chilled and not Frozen", critical: "guaranteed" }
       ],
       timeline: [
+        { frame: fire - 3, until: "fire", effect: "dark_stage", note: "the stage goes dark BEHIND the two fighters (a blue-black at params.darkStage, 95%), so only the mage and the target stay lit: in over the first 60% of frame fire - 3, full until the lance is fired, down to a third by the strike, gone 450 ms later (2026-11-25). The three charge frames are 50% longer than they were: fire - 3 and fire - 2 last params.chargeFrameMs (450 ms), fire - 1 lasts params.formFrameMs (1.5 normal frames)" },
         { frame: fire - 3, effect: "orb_charge", until: "fire", note: "cold glow around the orb, a pale ring, five glints, mist; a glow and glints at the top of the staff (no small crystal)" },
         { frame: fire - 3, effect: "frost_charge", until: "fire", note: "on top of orb_charge, building until the lance is fired: round the orb a bigger cold glow, a crown of ten ice spikes (growing to 9% of the character width, turning slowly), two frost rings pulsing outwards, eight orbiting glints and a swirl of mist; at the top of the staff five orbiting glints and rising mist; a faint cold light on the mage. The two charge frames (fire - 3 and fire - 2) are held for params.chargeFrameMs each (the cast's frames are otherwise 1000 / fps long), so the pose stays on them" },
         { frame: fire - 3, until: "fire", effect: "frost_aura", note: "painted only: the picture frost_aura (a vertical vortex of ice wisps, from the user's frostAura.png; also used by Ice Shard and Deep Freeze) wrapped round the mage like a cylinder that turns (64 slices, repeated twice round, radius 40% and height 115% of the character width, standing on the ground line, the base ellipse tilted by 20%); the back half is drawn behind her, the front half over her; 30% visible on frame fire - 3, 60% on fire - 2, 100% on fire - 1 (each level is reached over the first half of its frame, 60% of the last), turning at about 0.24 turns a second and faster as the charge builds; on the fire frame it expands by 40% and fades in 220 ms" },

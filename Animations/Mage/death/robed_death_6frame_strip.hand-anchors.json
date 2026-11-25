@@ -35,50 +35,50 @@
      "tracks": {
       "main": [
        {
-        "x": 0.806,
-        "y": 0.28,
+        "x": 0.809,
+        "y": 0.279,
         "a": 0,
         "front": false,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.796,
-        "y": 0.31,
+        "x": 0.761,
+        "y": 0.312,
         "a": 0,
         "front": false,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.684,
-        "y": 0.238,
+        "x": 0.638,
+        "y": 0.228,
         "a": 0,
         "front": false,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.683,
-        "y": 0.344,
+        "x": 0.66,
+        "y": 0.351,
         "a": 0,
         "front": false,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.551,
-        "y": 0.436,
+        "x": 0.514,
+        "y": 0.42,
         "a": 0,
         "front": false,
         "hide": false,
         "w": 1
        },
        {
-        "x": 0.444,
-        "y": 0.706,
+        "x": 0.508,
+        "y": 0.816,
         "a": 0,
-        "front": false,
+        "front": true,
         "hide": false,
         "w": 1
        }
