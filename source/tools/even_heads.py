@@ -36,8 +36,24 @@ ap.add_argument("--grow", action="store_true", help="also enlarge a head that is
 ap.add_argument("--min-ratio", type=float, default=1.0, help="leave a frame alone unless its head is at least this many times the idle's (a second, light pass for the frames the first pass could not shrink enough because of --min-scale: --min-ratio 1.06)")
 ap.add_argument("--dry-run", action="store_true")
 ap.add_argument("--preview", default="", help="write before / after head crops of every processed frame to this png")
+ap.add_argument("--cubic", action="store_true", help="resample the head with bicubic interpolation (sharper than the default bilinear; use it when heads are ENLARGED with --grow)")
+ap.add_argument("--uniform", type=float, default=0.0, help="scale EVERY head by exactly this factor (no measuring against the reference; e.g. 1.087 makes every head 8.7%% bigger). The 2026-11-26 Cleric change: "
+                "the user preferred the run sheet's head, which is 1/0.92 of the idle's")
+ap.add_argument("--clean", action="store_true", help="keep only the hair's largest blob and the blobs within 14 px of it (stray hair-coloured pixels on an arm or a shoulder must not stretch the head area)")
 a = ap.parse_args()
 P = HM.PROFILES[a.char]
+
+
+def clean_hair(hair):
+    """the largest blob of the hair mask and every blob within 14 px of it"""
+    n, lab = cv2.connectedComponents(hair.astype(np.uint8), connectivity=8)
+    if n <= 2:
+        return hair
+    sizes = np.bincount(lab.ravel())[1:]
+    big = (lab == (1 + int(np.argmax(sizes)))).astype(np.uint8)
+    near = cv2.dilate(big, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (29, 29))) > 0
+    keep = np.unique(lab[near & (lab > 0)])
+    return np.isin(lab, keep[keep > 0])
 
 
 def head_size(hair):
@@ -84,7 +100,8 @@ def shrink_head(f, hm, piv, s0):
     pm = f.astype(np.float32)
     al = pm[..., 3:4] / 255.0
     pm[..., :3] *= al                                                                      # premultiplied: no dark fringes
-    out = cv2.remap(pm, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0, 0))
+    out = cv2.remap(pm, mx, my, cv2.INTER_CUBIC if a.cubic else cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0, 0))
+    out[..., 3] = np.clip(out[..., 3], 0, 255)                                             # (bicubic can overshoot a little at the outline)
     a2 = out[..., 3:4] / 255.0
     rgb = np.where(a2 > 1e-3, out[..., :3] / np.maximum(a2, 1e-3), 0)
     return np.dstack([np.clip(rgb, 0, 255), out[..., 3]]).astype(np.uint8)
@@ -101,10 +118,27 @@ for path in a.strips:
     out_frames, rows = [], []
     for i, f in enumerate(frames):
         hair = HM.hair_in_frame(f, P)
+        if a.clean:
+            hair = clean_hair(hair)
         S = head_size(hair)
         if S is None:
             out_frames.append(f)
             rows.append("frame %d: no hair found, left alone" % (i + 1))
+            continue
+        if a.uniform:                                                                          # one exact factor for every head, no measuring
+            hm, c, r, piv = head_geometry(f, hair)
+            g = shrink_head(f, hm, piv, a.uniform)
+            out_frames.append(g)
+            rows.append("frame %d: head scaled by %.3f around (%.0f, %.0f)" % (i + 1, a.uniform, piv[0], piv[1]))
+            if a.preview:
+                x0, y0 = int(max(c[0] - 1.6 * r, 0)), int(max(c[1] - 1.7 * r, 0))
+                box = (x0, y0, min(x0 + int(3.2 * r), f.shape[1]), min(y0 + int(3.6 * r), f.shape[0]))
+                pair = []
+                for src in (f, g):
+                    bg = Image.new("RGBA", (f.shape[1], f.shape[0]), (58, 62, 78, 255))
+                    bg.alpha_composite(Image.fromarray(src))
+                    pair.append(bg.crop(box).resize((200, 225), Image.LANCZOS))
+                crops.append((pathlib.Path(path).parent.name + " %d" % (i + 1), pair))
             continue
         ratio = S / target
         if ratio < a.min_ratio:

@@ -1538,7 +1538,7 @@
   }
   // The portraits (2026-11-12): a round picture of each fighter drawn from FRAME 1 OF ITS IDLE STRIP: a square crop of the head (the five heroes) or of the whole face and body (the slimes, the Elite, the King with his crown), HUD_CROP =
   // [x, y, side] in the 512 px cell, measured on the strips (docs/HUD.md). The hero faces right (toward the VS) as drawn; the enemy is mirrored to face left, toward the VS. The goblin placeholder has no picture: a green face is drawn.
-  var HUD_CROP = { warrior: [238, 51, 124], mage: [228, 54, 124], rogue: [243, 53, 124], assassin: [253, 39, 124], spellblade: [255, 44, 124], cleric: [246, 55, 110],
+  var HUD_CROP = { warrior: [238, 51, 124], mage: [228, 54, 124], rogue: [243, 53, 124], assassin: [253, 39, 124], spellblade: [255, 44, 124], cleric: [241, 47, 120],
     fire_slime: [60, 100, 380], ice_slime: [85, 160, 350], lightning_slime: [60, 120, 385], dark_slime: [55, 95, 380], elite_slime: [110, 160, 290], slime_king: [90, 100, 310] };
   var hudCache = {};
   function hudPlaceholder(x, W, H, kind) {                                            // a stand-in face: the goblin (green, pointed ears, a grin), or a plain disc
@@ -5614,8 +5614,14 @@
         for (j = 0; j < ms.length; j++) {
           m = ms[j]; s = (now - t1 - m.d) / m.life; if (s <= 0 || s >= 1 || now > t3 + 200 * sc) continue;
           e = ease(s); pos = bez({ x: p.x + m.jx * u, y: p.y }, { x: p.x + (m.jx + m.bend) * u * 2, y: (p.y + p.gy) / 2 }, { x: p.fx + m.ex * u, y: p.gy - 3 }, e);
+  // THE SCREEN GOES DARK (2026-11-25, the user: "add screen goes dark effect for Sanctified Judgment and Spiteful Covenant"): the shared tcDim (the Thunderclap's and Execute's), the stage darkens BEHIND the
+  // two fighters so only they and the light stay lit. Judgment: in over the raise (frame 2), full for the call (frame 3, the sky opening and the beam charging), held until the pillar lands, eased to a third over
+  // 0.35 s, gone about 0.8 s later; a near-black with a hint of indigo. Covenant: in over the first bowed frame, full while he pays and through the roar's first flash, eased after it, gone about 1.2 s after the roar; a crimson-black (the pact's colour; the user, 2026-11-25: halfway between the first crimson-black 24,2,5 and plain black).
+  // It is added FIRST so every effect drawn behind the fighters (the sky, the seal, the wings, the barrier's far side) stays bright over the dark. JUD_DARK, COV_DARK: how dark (0..1).
+  var JUD_DARK = 0.9, COV_DARK = 0.9;                                               // (0.8 at first; the user, 2026-11-25: 0.9)
           a = Math.sin(s * 3.1416);
           glowDot(ctx, pos.x, pos.y, u * m.s * 3.4, COV.red, 0.85 * a); glowDot(ctx, pos.x, pos.y, u * m.s * 1.5, "255,150,120", 0.9 * a);
+    tcDim(at(2, 0), at(3, 0), tI, tI + 350 * sc, tI + 1150 * sc, JUD_DARK, "5,4,14");   // the screen goes dark for the call and stays dark until the pillar lands
         }
         if (now >= tLock) {
           for (j = 0; j < sp.length; j++) {
@@ -5676,10 +5682,10 @@
     } else if (kind === "dark") {
       if (back) {
         pcTex(ctx, pcN("dd_seal", "dk_ripple"), h.x, h.gy, u * (0.62 + 0.2 * lv), null, 0.85 * lv * br, {});                                    // a dark seal on the floor
-        pcTex(ctx, pcN("dd_smoke", "dk_geyser"), h.x + Math.sin(t * 1.3) * u * 0.01, h.gy, u * 0.5, h.H * 1.25 * Math.min(1, lv * 1.2), 0.26 * lv, { ay: 1 });   // a column of smoke behind him
+        pcTex(ctx, pcN("dd_smoke", "dk_geyser"), h.x + Math.sin(t * 1.3) * u * 0.01, h.gy, u * 0.5, h.H * 1.25 * Math.min(1, lv * 1.2), 0.26 * lv, { ay: 0.92, round: true });   // a column of smoke behind him
       } else {
         for (i = 0; i < 2; i++) {                                                                                                                  // claws rising from the ground at his feet
-          pcTex(ctx, pcN("dd_claws", "dk_tendrils"), h.x + (i ? 1 : -1) * u * 0.16, h.gy, u * 0.36, null, 0.6 * lv * (0.85 + 0.15 * Math.sin(t * 3 + i * 2)), { ay: 1, flip: i === 1, rot: Math.sin(t * 1.7 + i * 1.5) * 0.05 });
+          pcTex(ctx, pcN("dd_claws", "dk_tendrils"), h.x + (i ? 1 : -1) * u * 0.16, h.gy, u * 0.36, null, 0.6 * lv * (0.85 + 0.15 * Math.sin(t * 3 + i * 2)), { ay: 0.92, round: true, flip: i === 1, rot: Math.sin(t * 1.7 + i * 1.5) * 0.05 });
         }
         if (pcImg("dd_veil")) pcTex(ctx, "dd_veil", h.x, h.gy, u * 0.5, h.H * 1.15, 0.3 * lv * (0.85 + 0.15 * Math.sin(t * 2.3)), { ay: 1 });       // two ribbons of smoke at his sides
         pcTex(ctx, pcN("dd_motes", "dk_motes"), h.x, h.cy - ((t * 0.16) % 1) * h.H * 0.3, u * 0.7, null, 0.5 * lv, {});
@@ -5706,7 +5712,7 @@
   function pcN(nw, old) { return pcImg(nw) ? nw : old; }                              // the tailored piece when it is loaded, else the older generic one
   function pcTex(ctx, name, x, y, w, h, a, o) {                                      // an additive picture w x h px (h null: its own proportions), the point (o.ax, o.ay) of it (0..1, default the middle) on (x, y), turned by o.rot, mirrored by o.flip, tinted by o.tint
     o = o || {};
-    var im = pcImg(name, o.tint); if (!im || a <= 0.01 || w < 1) return false;
+    var im = o.round ? pcRounded(name, o.tint) : pcImg(name, o.tint); if (!im || a <= 0.01 || w < 1) return false;
     var iw = im.naturalWidth || im.width, ih = im.naturalHeight || im.height, ax = o.ax === undefined ? 0.5 : o.ax, ay = o.ay === undefined ? 0.5 : o.ay;
     if (h == null) h = w * ih / iw;
     ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, a); ctx.translate(x, y); if (o.rot) ctx.rotate(o.rot); if (o.flip) ctx.scale(-1, 1);
@@ -5763,6 +5769,7 @@
         if (post > 0 && post < 1200 * sc) pcTex(cb, pcN("hj_shock", "hl_halo"), g.x, g.gy, u * (0.35 + 1.1 * e), null, 0.85 * (1 - clamp01(post / (1100 * sc))), {});
       },
       draw: function (ctx, now) {
+    tcDim(at(1, 0.15), at(2, 0), tLock + 150 * sc, tLock + 450 * sc, tLock + 1200 * sc, COV_DARK, "12,1,3");   // the screen goes dark (crimson-black) while he pays
         var q = smiteTip(), u = uW.offsetWidth, hold = clamp01((now - tH + 60) / 140) * (now < tS ? 1 : clamp01(1 - (now - tS) / 160)), g = pcTarget(T), post = now - tI, dx, dy, e, a;
         if (q && now >= tH - 60 && now <= tS + 200) {
           if (pcImg("hj_beam")) pcTex(ctx, "hj_beam", q.x, q.y, u * 0.08, q.y, 0.9 * hold, { ay: 1 });
@@ -5806,8 +5813,9 @@
         e = pcEase(post / (330 * sc)); a = 1 - clamp01(post / (520 * sc));
         pcTex(ctx, "dk_burst", g.x, g.cy, u * (0.45 + 0.9 * e), null, 0.95 * a, { rot: post * 0.0004 });
         a = 1 - clamp01((post - 150 * sc) / (900 * sc)); e = pcEase(post / (400 * sc));
-        pcTex(ctx, pcN("dd_smoke", "dk_geyser"), g.x, g.gy, u * 0.4, g.h * 1.25 * (0.3 + 0.7 * e), 0.8 * a, { ay: 1 });
-        pcTex(ctx, pcN("dd_claws", "dk_tendrils"), g.x, g.gy, u * 0.5, null, 0.9 * a * e, { ay: 1 });
+        pcTex(ctx, "dk_fissure", g.x, g.gy, u * (0.45 + 0.5 * e), null, 0.95 * a, { ay: 0.62 });   // the ground cracks open under it at the same time, with flames rising from them (the user, 2026-11-25: the glow sheet's 3rd piece)
+        pcTex(ctx, pcN("dd_smoke", "dk_geyser"), g.x, g.gy, u * 0.4, g.h * 1.25 * (0.3 + 0.7 * e), 0.8 * a, { ay: 0.86, round: true });   // (lower, with a rounded base)
+        pcTex(ctx, pcN("dd_claws", "dk_tendrils"), g.x, g.gy, u * 0.5, null, 0.9 * a * e, { ay: 0.88, round: true });
         pcTex(ctx, pcN("dd_motes", "dk_motes"), g.x, g.cy - post * 0.00012 * speed * u, u * 0.8, null, 0.85 * (1 - clamp01(post / (1300 * sc))), {});
       } });
   }
@@ -5837,7 +5845,8 @@
           e = clamp01(post / (520 * sc));
           pcTex(ctx, pcN("dd_implode", "dk_ripple"), g.x, g.cy, u * (0.9 - 0.65 * e), null, 0.95 * (1 - e * e * 0.7), { rot: -post * 0.004 * speed });   // the ring collapses into its chest: the pull
           a = 1 - clamp01((post - 100 * sc) / (800 * sc));
-          pcTex(ctx, pcN("dd_smoke", "dk_geyser"), g.x, g.gy, u * 0.34, g.h * 1.1 * (0.3 + 0.7 * pcEase(post / (400 * sc))), 0.75 * a, { ay: 1 });
+          pcTex(ctx, "dk_fissure", g.x, g.gy, u * (0.4 + 0.45 * pcEase(post / (400 * sc))), null, 0.9 * a, { ay: 0.62 });   // the ground cracks open under the smoke at the same time (2026-11-25)
+          pcTex(ctx, pcN("dd_smoke", "dk_geyser"), g.x, g.gy, u * 0.34, g.h * 1.1 * (0.3 + 0.7 * pcEase(post / (400 * sc))), 0.75 * a, { ay: 0.86, round: true });   // (lower, with a rounded base)
           for (k = 0; k < 3; k++) {                                                  // the stolen life flies back to him
             s = clamp01((post - 120 * sc - k * 110 * sc) / (520 * sc)); if (s <= 0 || s >= 1) continue; p = { x: g.x - dx * s, y: g.cy - dy * s };
             if (pcImg("dd_wisp")) pcTex(ctx, "dd_wisp", p.x, p.y, u * 0.5, null, 0.95 * Math.sin(s * 3.1416), { rot: ang + 3.1416, ax: 0.9 });
@@ -5878,6 +5887,30 @@
 
   // COVENANT: the Aegis's angry twin, in CRIMSON (the tailored cp_* pieces; the older gold pieces tinted in code are the fallback): while he pays a contract seal (cp_seal) burns under him and a heartbeat ring (cp_heart) beats, embers rain on him (cp_rain)
   // and crimson flames rise; at the roar chains break open on his chest (cp_chains), a shockwave crown (cp_roar) runs out over the ground, five big flames (cp_flames) erupt BEHIND him and a SHIELD of its own (cp_shield) stands in front of him for the CAST only
+  // A ROUNDED BASE (2026-11-25, the user about the dark smoke after the hit of Dark Penance and Unholy Siphon: "it should originate from lower. Also it seems to be cut sharp at ground level, I would be happy if
+  // it would look more rounder"). The pieces that rise from the ground (dd_smoke, dd_claws and their fallbacks) end in a flat bright line where the sheet's panel ended. With o.round the picture is drawn through a
+  // mask: from 62% of its height down it fades inside a half ellipse (full in the middle, gone at the sides and at the very bottom), blended in so there is no seam, and the callers anchor it lower (ay below 1) so the
+  // soft rounded base sits on and a little below the ground line. One mask per picture, made once.
+  var pcRoundCache = {};
+  function pcRounded(name, tint) {
+    var im = pcImg(name, tint); if (!im) return null;
+    var key = name + "|" + (tint || "") + "|round", c = pcRoundCache[key], iw, ih, y0, x, d, p, i, j, v, dx, t, e, s, m;
+    if (c) return c;
+    iw = im.naturalWidth || im.width; ih = im.naturalHeight || im.height; y0 = ih * 0.62;
+    c = document.createElement("canvas"); c.width = iw; c.height = ih; x = c.getContext("2d"); x.drawImage(im, 0, 0);
+    d = x.getImageData(0, 0, iw, ih); p = d.data;
+    for (j = Math.floor(y0); j < ih; j++) {
+      v = (j - y0) / (ih - y0); s = clamp01(v / 0.35); s = s * s * (3 - 2 * s);                  // how far into the base (blended in over the first third: no seam at 62%)
+      for (i = 0; i < iw; i++) {
+        dx = (i - iw / 2) / (iw / 2); t = dx * dx + v * v;                                            // inside the half ellipse when t < 1
+        e = clamp01((1 - t) / 0.45); e = e * e * (3 - 2 * e);
+        m = 1 + (e - 1) * s;
+        p[(j * iw + i) * 4 + 3] *= m;
+      }
+    }
+    x.putImageData(d, 0, 0);
+    pcRoundCache[key] = c; return c;
+  }
   // (COV_HOLD_MS after the lock, then it melts away while the glass settles into the Aegis's steady Barrier look: covGlass); when the barrier breaks (he falls) the shield shows cracked (cp_cracked) for the break.
   var COV_TINT = "rgba(255,62,44,0.62)", COV_TINT2 = "rgba(255,120,70,0.4)";
   function covenantPaint(clk, hitF, A, L) {
