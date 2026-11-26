@@ -453,6 +453,7 @@
       <button id="stopPrev">Stop</button>
       <label id="spitWrap" style="display:none"><input type="checkbox" id="spitBurn"> The monster's spit and slam always inflict their status, Burn or Chilled (otherwise 25% and 50% of the time; Cinder Burst detonates the burns instead)</label>
       <label id="monAtkWrap" style="display:none">Monster's attack <select id="monAtk"><option value="alt">Alternate all five attacks</option><option value="spit">Ember Spit</option><option value="slam">Magma Slam</option><option value="cinder">Cinder Burst</option><option value="eruption">Magma Eruption</option><option value="bounce">Inferno Bounce</option><option value="decree">Royal Decree</option><option value="heal">Royal Restoration</option><option value="wrath">Kingdom's Wrath</option><option value="judgment">Absolute Judgment</option></select></label>
+      <label id="kjLookWrap" style="display:none" title="the Slime King's Absolute Judgment: the painted pillar of light from the holy sheet (with its sky, seal, star, flare and feathers) or the first code pillar">Absolute Judgment look <select id="kjLook"><option value="painted">Painted (the holy sheet)</option><option value="code">Code (the first version)</option></select></label>
       <div id="monPrevRow" style="display:none; flex-wrap:wrap; gap:8px; align-items:center; color:var(--dim); font-size:13px">Monster animations:
         <button id="monSpitPrev">Ember Spit (loops)</button> <button id="monPrevBounce">Inferno Bounce (loops)</button> <button id="monPrevEruption">Magma Eruption (loops)</button> <button id="monPrevCinder">Cinder Burst (loops)</button> <button id="monPrevSlam">Magma Slam (loops)</button> <button id="monPrevHit">Hit (loops)</button> <button id="monPrevDeath">Death (loops)</button> <button id="monPrevDodge">Dodge (loops)</button> <button id="monPrevBlock">Block (loops)</button> <button id="monPrevDecree" style="display:none">Royal Decree (loops)</button> <button id="monPrevWrath" style="display:none">Kingdom's Wrath (loops)</button> <button id="monPrevJudg" style="display:none">Absolute Judgment (loops)</button> <button id="monPrevHeal" style="display:none">Royal Restoration (loops)</button></div>
       <label>Fighters' distance from the stage edge <input type="range" id="edge" min="0" max="20" value="3" style="width:110px"> <span id="edgeV">3%</span></label>
@@ -1566,6 +1567,7 @@
     var key = monKey, m = MONSTERS[key], idle = m && (m.anims || []).filter(function (a) { return a.slot === "idle"; })[0];
     $("hpG").classList.toggle("boss", !!(m && m.king));
     $("ktPanel").style.display = m && m.king ? "" : "none";                          // (the Treasure look panel is for the King's hoard)
+    $("kjLookWrap").style.display = m && m.king ? "" : "none";                       // (the Absolute Judgment look select is for the King)
     $("hpG").querySelector(".hp-tag").textContent = m && m.king ? "Boss" : "Foe";
     hudFace($("ptG"), "G:" + key, idle && idle.src, HUD_CROP[hudCropKey(key)], true, "goblin");
   }
@@ -9225,7 +9227,7 @@
   //   ROYAL RESTORATION (heal): healAct, the golden light, rising sparkles and a green +N, the HP bar goes up;
   //   KINGDOM'S WRATH (140%) and ABSOLUTE JUDGMENT (156%): raiseAct on the staff-raise sheet (slot raise): the staff is held high (frames 4 and 5 held) while the sky answers: fire, ice, lightning and dark strike
   //     in turn (comets from the top of the stage, each element's own impact) or a pillar of light and a judgment ring (the holy finale); the command frame 6 follows.
-  // The effects are code (glows, particles) until the painted HOLY sheet arrives. The damage numbers are placeholders (KING_POW, relative to the turn's damage: docs/SKILL_BEHAVIOR_LATER.md); the statuses of the elements are
+  // The effects are code (glows, particles); the Absolute Judgment has the painted pillar of the Cleric's holy sheet on top since 2026-11-26 (kingJudgPaint; 'Absolute Judgment look' select). The damage numbers are placeholders (KING_POW, relative to the turn's damage: docs/SKILL_BEHAVIOR_LATER.md); the statuses of the elements are
   // applied only by the Royal Decree (the spit's own chances); the Wrath and the Judgment deal damage only.
   var KING_POW = { spit: 1, decree: 1.18, slam: 1.91, wrath: 3.18, judgment: 3.55 }, KING_HEAL = 0.2, KING_ELEMS = ["fire", "ice", "lightning", "dark"], WRATH_HOLD = 1500, JUDG_HOLD = 1000;
   var ELEM_RGB = { fire: "255,150,50", ice: "130,210,255", lightning: "200,210,255", dark: "170,100,255", holy: "255,226,140" };
@@ -9333,19 +9335,19 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
       glowDot(ctx, x, y, 22, rgb, 0.9 * a); glowDot(ctx, x, y, 9, "255,255,255", a);
     } });
   }
-  function judgmentFx(tPre, tHit, x, gy, u) {                                        // ABSOLUTE JUDGMENT: a pillar of light descends from the sky, flares at tHit and fades; two rings run out along the ground; sparkles climb it
+  function judgmentFx(tPre, tHit, x, gy, u, painted) {                               // ABSOLUTE JUDGMENT: a pillar of light descends from the sky, flares at tHit and fades; two rings run out along the ground; sparkles climb it (painted: the painted pillar and ring replace the code ones; the glows and sparkles stay)
     var rnd = rngOf(tHit | 0), sp = [], i;
     for (i = 0; i < 20; i++) sp.push({ dx: (rnd() - 0.5) * u * 0.5, ph: rnd(), sp: 0.5 + rnd() * 0.8, s: 0.01 + rnd() * 0.01 });
     fxAdd({ t0: tPre, t1: tHit + 1100 / speed, draw: function (ctx, now) {
       var pre = clamp01((now - tPre) / Math.max(1, tHit - tPre)), post = now >= tHit ? clamp01((now - tHit) * speed / 950) : 0, bot = now < tHit ? gy * Math.pow(pre, 1.6) : gy, w = u * (0.14 + (now < tHit ? 0.14 * pre : 0.3 * Math.sin(Math.min(1, post * 3) * 1.5708))) * (1 - post * 0.55),
         a = now < tHit ? 0.2 + 0.55 * pre : 0.95 * (1 - post * post), g = ctx.createLinearGradient(x - w, 0, x + w, 0), j, rk, p;
       g.addColorStop(0, "rgba(255,200,90,0)"); g.addColorStop(0.32, "rgba(255,214,120," + (0.5 * a).toFixed(3) + ")"); g.addColorStop(0.5, "rgba(255,253,240," + Math.min(1, a).toFixed(3) + ")"); g.addColorStop(0.68, "rgba(255,214,120," + (0.5 * a).toFixed(3) + ")"); g.addColorStop(1, "rgba(255,200,90,0)");
-      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = g; ctx.fillRect(x - w, -4, w * 2, bot + 4); ctx.restore();
-      glowDot(ctx, x, bot, u * (0.2 + 0.25 * (now < tHit ? pre : 1 - post)), HOLY_PAL.mid, 0.8 * a);
+      if (!painted) { ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = g; ctx.fillRect(x - w, -4, w * 2, bot + 4); ctx.restore(); }
+      glowDot(ctx, x, bot, u * (0.2 + 0.25 * (now < tHit ? pre : 1 - post)), HOLY_PAL.mid, (painted ? 0.55 : 0.8) * a);
       if (now >= tHit) {
         glowDot(ctx, x, gy - u * 0.2, u * (0.4 + 0.5 * post), HOLY_PAL.glow, 0.5 * (1 - post)); glowDot(ctx, x, gy - u * 0.2, u * 0.25, HOLY_PAL.core, 0.9 * (1 - post * 2 > 0 ? 1 - post * 2 : 0));
         for (j = 0; j < 2; j++) {                                                    // the judgment rings
-          rk = clamp01(post * 1.4 - j * 0.25); if (rk <= 0 || rk >= 1) continue;
+          rk = clamp01(post * 1.4 - j * 0.25); if (painted || rk <= 0 || rk >= 1) continue;
           ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.strokeStyle = "rgba(" + HOLY_PAL.mid + "," + (0.8 * (1 - rk)).toFixed(3) + ")"; ctx.lineWidth = Math.max(1.5, u * 0.018 * (1 - rk));
           ctx.beginPath(); ctx.ellipse(x, gy, u * (0.15 + 0.9 * rk), u * (0.15 + 0.9 * rk) * 0.22, 0, 0, 6.2832); ctx.stroke(); ctx.restore();
         }
@@ -9356,6 +9358,68 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
         glowDot(ctx, x + p.dx * (0.4 + w / u), bot - rk * bot * 0.9, u * p.s * 2.2, HOLY_PAL.core, 0.7 * Math.sin(rk * 3.1416) * a);
       }
     } });
+  }
+  // ABSOLUTE JUDGMENT, PAINTED (2026-11-26, the user: "change the Slime King's Absolute Judgment animation, it is pure code; the 3rd frame of holy_judgement_vfx_sheet.png would suit nicely; add more drawn effects
+  // from the sheet as you see fit"). The sheet is the Cleric's tailored holy sheet, already cut into source/assets/fx/hj_*.png (Animations/Cleric/vfx/source/cut_tailored_sheets.py); its 3rd picture is hj_pillar.
+  // On the pack's clock (raiseAct): while the staff rises a star of light (hj_cross) over a small sun (hj_nimbus) gathers on the staff's crystal; while it is HELD the sky opens above the target (hj_sky), an ornate
+  // seal (hj_seal) grows on the ground under it and a few feathers drift down (hj_feathers); 320 ms before the verdict a thin beam (hj_beam) comes down from the sky with the pillar's light behind it, and at the
+  // verdict the full PILLAR (hj_pillar, a second wide faint copy mirrored behind it) stands on the target, a cross-shaped flare (hj_cross) and a sun burst (hj_nimbus) at its chest, a shockwave ring (hj_shock)
+  // runs out over the ground, the seal flares and feathers rise; the pillar holds half a second and fades. A dodged verdict: the pillar falls on the empty place (narrower), no flare. The code glows, sparkles
+  // and the holy impact stay under it; the code pillar and rings are not drawn. The target's place is taken once, at the start (a dodging hero moves out of the pillar). 'Code' in the select = the first version.
+  function kjTarget(T) {
+    var fg = fzFig(T), r;
+    if (fg) return { x: fg.cx, gy: fg.gy, cy: fg.gy - fg.h * 0.55 };
+    r = rectIn(T.unit); return { x: r.left + r.width * 0.5, gy: r.top + r.height * 0.97, cy: r.top + r.height * 0.45 };
+  }
+  function kingJudgPaint(T, pk, tStar, tHold, tPre, tH, miss) {
+    var g = kjTarget(T), sc = 1 / speed;
+    fxAdd({ t0: tStar, t1: tH + 1600 * sc,
+      drawBack: function (cb, now) {                                                 // on the ground, behind the fighters: the seal, its flare and the shockwave ring
+        var uH = uW.offsetWidth, prog = pcEase((now - tHold) / Math.max(1, tH - tHold)), post = now - tH, out = 1 - clamp01((post - 700 * sc) / (900 * sc)), e = post > 0 ? pcEase(post / (520 * sc)) : 0, w, fl;
+        if (now < tHold || out <= 0.01) return;
+        fl = post > 0 ? 1 + 0.6 * (1 - clamp01(post / (500 * sc))) : 1;
+        w = uH * (0.6 + 0.45 * prog) * (1 + 0.3 * e);
+        pcTex(cb, "hj_seal", g.x, g.gy, w, w * 0.4, out * (0.2 + 0.6 * prog) * fl, {});
+        if (post > 0 && !miss) { w = uH * (0.6 + 2.1 * e); pcTex(cb, "hj_shock", g.x, g.gy, w, w * 0.3, 0.9 * (1 - e), {}); }
+        var k = pcEase(post / (110 * sc)), f = 1 - clamp01((post - 520 * sc) / (800 * sc)), W = uH * (miss ? 0.45 : 0.66) * (0.45 + 0.55 * k);
+        if (post >= 0 && f > 0.01) {                                                   // the verdict's pillar stands BEHIND the target (a faint copy over it, in draw): the target stays visible inside the light
+          pcTex(cb, "hj_pillar", g.x, g.gy + uH * 0.03, W, g.gy + uH * 0.05, 0.98 * f, { ay: 1 });
+          pcTex(cb, "hj_pillar", g.x, g.gy + uH * 0.03, W * 1.9, g.gy + uH * 0.05, 0.32 * f, { ay: 1, flip: true });
+        }
+      },
+      draw: function (ctx, now) {
+        var uH = uW.offsetWidth, uK = uH * kingK(), post = now - tH, prog = pcEase((now - tHold) / Math.max(1, tH - tHold)), c, tp, a, e, k, f, bot, pre, W;
+        if (now <= tH + 200 * sc) {                                                    // the staff's crystal gathers a star of light over a small sun
+          tp = kingTipAt(pk, monFrame); c = pcEase((now - tStar) / Math.max(1, tHold - tStar)) * (post > 0 ? 1 - clamp01(post / (200 * sc)) : 1);
+          if (tp && c > 0.01) {
+            pcTex(ctx, "hj_nimbus", tp.x, tp.y, uK * (0.12 + 0.12 * c), null, 0.35 * c, { rot: now * 0.0006 * speed });
+            pcTex(ctx, "hj_cross", tp.x, tp.y, uK * (0.08 + 0.12 * c) * (0.92 + 0.08 * Math.sin(now * 0.012)), null, 0.9 * c, {});
+          }
+        }
+        if (now >= tHold && post < 900 * sc)                                           // the sky opens above the target
+          pcTex(ctx, "hj_sky", g.x, 0, uH * (0.8 + 1.0 * prog), null, (0.12 + 0.75 * prog) * (post > 0 ? 1 - clamp01(post / (900 * sc)) : 1), { ay: 0 });
+        if (now >= tHold && now < tH)                                                  // feathers drifting down
+          pcTex(ctx, "hj_feathers", g.x, g.gy * 0.5 + Math.sin(now * 0.0021) * uH * 0.02 + prog * uH * 0.06, uH * 0.7, g.gy * 0.9, 0.5 * prog, {});
+        if (now >= tPre && now < tH) {                                                 // the beam comes down from the sky, the pillar's light behind it
+          pre = clamp01((now - tPre) / Math.max(1, tH - tPre)); bot = (g.gy + uH * 0.05) * Math.pow(pre, 1.6);
+          ctx.save(); ctx.beginPath(); ctx.rect(g.x - uH * 1.2, -10, uH * 2.4, bot + 10); ctx.clip();
+          pcTex(ctx, "hj_pillar", g.x, g.gy + uH * 0.03, uH * 0.4, g.gy + uH * 0.05, 0.35 * pre, { ay: 1 });
+          pcTex(ctx, "hj_beam", g.x, g.gy + uH * 0.03, uH * 0.16, g.gy + uH * 0.05, 0.6 + 0.4 * pre, { ay: 1 });
+          ctx.restore();
+          return;
+        }
+        if (post < 0) return;
+        k = pcEase(post / (110 * sc)); f = 1 - clamp01((post - 520 * sc) / (800 * sc)); W = uH * (miss ? 0.45 : 0.66) * (0.45 + 0.55 * k);
+        if (f > 0.01) {                                                                // the verdict: the full pillar is drawn behind (drawBack); over the target only a faint veil of it and the beam's core
+          pcTex(ctx, "hj_pillar", g.x, g.gy + uH * 0.03, W, g.gy + uH * 0.05, 0.3 * f, { ay: 1 });
+          pcTex(ctx, "hj_beam", g.x, g.gy + uH * 0.03, uH * 0.16, g.gy + uH * 0.05, 0.45 * f * (1 - k * 0.5), { ay: 1 });
+        }
+        if (miss) return;
+        e = pcEase(post / (420 * sc)); a = 1 - clamp01(post / (560 * sc));
+        pcTex(ctx, "hj_nimbus", g.x, g.cy, uH * (0.4 + 0.9 * e), null, 0.5 * a, { rot: post * 0.0005 });                // a sun burst behind the flare
+        pcTex(ctx, "hj_cross", g.x, g.cy, uH * (0.35 + 1.05 * e), null, 0.95 * a, {});                                     // the cross-shaped flare
+        pcTex(ctx, "hj_feathers", g.x, g.cy - post * 0.00012 * speed * uH, uH * 0.95, null, 0.85 * (1 - clamp01(post / (1400 * sc))), {});   // feathers rising
+      } });
   }
   async function raiseAct(e, myRun, A, T, kind) {                                    // KINGDOM'S WRATH (kind "wrath") and ABSOLUTE JUDGMENT ("judgment"): the staff held high, the sky answers
     var pk = monPackOf("raise"), u = uW.offsetWidth * kingK(), pv = !!e.preview, unit = 1000 / pk.fps, fm = unit / speed, wrath = kind === "wrath", H = (wrath ? WRATH_HOLD : JUDG_HOLD) / unit;
@@ -9388,7 +9452,9 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
         if (T.hp <= 0 && !pv) break;
       }
     } else {
-      judgmentFx(tH[0] - 320 / speed, tH[0], tx, tgy, u);
+      var kjP = $("kjLook").value !== "code" && !!pcImg("hj_pillar");                // the painted look (default) when the holy sheet's pieces are loaded; 'Code' = the first version
+      if (kjP) kingJudgPaint(T, pk, t0 + starts[2], t0 + starts[3], tH[0] - 320 / speed, tH[0], !!e.dodge);
+      judgmentFx(tH[0] - 320 / speed, tH[0], tx, tgy, u, kjP);
       await bsWait(tH[0]);
       if (myRun !== run) return;
       if (e.dodge) { if (!pv) { say(A.name + " passes Absolute Judgment, but " + T.name + " slips away.", "g"); floatNumber(T, "MISS", "miss"); } }
