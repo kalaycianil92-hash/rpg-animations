@@ -168,6 +168,13 @@
   .gear { position: absolute; top: 0; left: -25%; width: 150%; height: 100%; pointer-events: none; }
   .gear.back { z-index: 0; }
   .gear.front { z-index: 3; }
+  /* Rarity glow (2026-11-26, see RARITY in the script): per slot (weapon, off hand) a halo canvas behind the body (rb, under the back item) and one over it (rf, under the front item),
+     breathing with the tier's own depth and pace; rs carries the motes, glints and embers over everything. It is game art like the idle, so 'reduce motion' does not stop it. */
+  .gear.rg { mix-blend-mode: screen; animation: rgBreath var(--rg-ms, 3000ms) ease-in-out infinite alternate; }
+  .gear.rb { z-index: 0; }
+  .gear.rf { z-index: 2; }
+  .gear.rs { z-index: 4; mix-blend-mode: screen; }
+  @keyframes rgBreath { from { opacity: var(--rg-lo, .8); } to { opacity: 1; } }
   .marks { width: 100%; box-sizing: border-box; height: 90px; background: #0b0914; color: var(--fg); border: 1px solid var(--line); border-radius: 3px; padding: 6px; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; resize: vertical; }
   .wmsg { color: var(--heal); font-size: 13px; }
   .rcsw { display: inline-flex; gap: 4px; align-items: center; flex-wrap: wrap; }
@@ -433,6 +440,8 @@
       <label data-chars="mage">Mage's far hand carries <select id="farHand"><option value="orb">the orb</option><option value="book">the spell book</option></select></label>
       <label data-chars="warrior">Warrior's near hand carries <select id="nearHand"><option value="sword">a sword</option><option value="shield">a shield</option></select></label>
       <label data-chars="cleric">Cleric's main hand carries <select id="clericWeapon"><option value="mace">the mace (Templar)</option><option value="wand">the wand (Occultist)</option></select></label>
+      <label>Weapon rarity <select id="rgWeapon"></select></label>
+      <label>Off-hand rarity <select id="rgOff"></select></label>
       <label><input type="checkbox" id="showW" checked> Show weapons</label>
     </div>
     <div class="fields" data-chars="warrior mage rogue cleric" id="rcBox">
@@ -1465,9 +1474,11 @@
   // Draws one frame's weapons into two canvases (behind the body, in front of it).
   function drawGearTo(cb, cf, pose, i) {
     var p = packs[pose], set = anchorSets[pose];
+    rgCur = null;
     if (!p) return;
     var L = layout(p), W = p.nw / L.cols, H = p.nh / L.rows;
     var M = Math.round(W / 4), CW = W + 2 * M;                          // a quarter of the frame extra on each side (see .gear)
+    rgCur = { W: W, H: H, M: M, CW: CW, items: [], body: { img: p.img, sx: (i % L.cols) * W, sy: Math.floor(i / L.cols) * H } };   // what the rarity glow draws round (rgPaint, rgTick), and the body that dims it
     if (cb.canvas.width !== CW || cb.canvas.height !== H) { cb.canvas.width = cf.canvas.width = CW; cb.canvas.height = cf.canvas.height = H; }
     cb.setTransform(1, 0, 0, 1, 0, 0); cf.setTransform(1, 0, 0, 1, 0, 0);
     cb.clearRect(0, 0, CW, H); cf.clearRect(0, 0, CW, H);
@@ -1481,6 +1492,8 @@
       if (!an || an.hide || (tk === "off" && cfg.kind === "none")) return;
       marks[tk] = { an: an, cfg: cfg, front: !!an.front || fa };
       drawItemOn(marks[tk].front ? cf : cb, itemFor(set, tk), cfg, an, W, H);
+      var role = rgRole(set, tk, cfg), tier = rgPick[role] || 0, im = itemFor(set, tk);
+      if (tier > 0 && im && im.naturalHeight) rgCur.items.push({ im: im, cfg: cfg, an: an, front: marks[tk].front, role: role, tier: tier, W: W, H: H, M: M });
     });
     if (!$("fistOn").checked) return;
     Object.keys(marks).forEach(function (tk) {
@@ -1495,13 +1508,171 @@
   }
   function applyWeapon(pose, i) {
     var sp = uW.querySelector(".sprite"), back = sp && sp.querySelector(".gear.back"), front = sp && sp.querySelector(".gear.front");
-    if (back && front) drawGearTo(back.getContext("2d"), front.getContext("2d"), pose, i);
+    if (back && front) { drawGearTo(back.getContext("2d"), front.getContext("2d"), pose, i); rgPaint(sp); }
   }
+  // ---------------------------------------------------------------- rarity glow (2026-11-26)
+  // The user: "common no aura, uncommon a very slight but noticeable green aura, rare blue, epic purple, legendary yellow, mythic orange glow; code only, I trust your taste".
+  // The colours are the hues of the game's TIER_COLORS (InfinityTower src/App.jsx), more saturated: its pastel UI colours turned whitish as light. Each item glows with the rarity of its SLOT: the WEAPON (the far-hand sword, the dagger, the staff, the
+  // mace, the wand) or the OFF HAND (the shield, the orb, the spell book, the cutlass = the game's Scimitar, the Warrior's second sword); "Weapon rarity" and "Off-hand rarity" in
+  // "Weapons and hands" pick them, remembered per character in this browser. The look grows with the tier (every number below is a share of the frame width W):
+  //  - a HALO: the item's silhouette, thickened by `dil` and blurred by `halo`, drawn UNDER the item (behind the body for an item behind it, over the body for one in front), so only a
+  //    soft light round the outline shows; from Rare a bright thin RIM hugs the edge, from Epic a wide faint OUTER bloom;
+  //  - a BREATH: the halo's opacity swings from `lo` to 1 and back every `ms` (CSS, .gear.rg), deeper and quicker with the tier;
+  //  - from Epic MOTES drift up off the item's edge (`motes` per second), from Legendary GLINTS twinkle on the edge, Mythic's motes are EMBERS (yellow-white cooling to orange, flickering).
+  var RARITY = [
+    { name: "Common" },
+    { name: "Uncommon",  col: "80,230,100",  halo: 0.016, dil: 0.004, a: 0.75, rim: null,          rimA: 0,    outer: 0,    lo: 0.70, ms: 3400, motes: 0,   glints: 0 },
+    { name: "Rare",      col: "60,150,255",  halo: 0.019, dil: 0.005, a: 0.85, rim: "170,210,255", rimA: 0.55, outer: 0,    lo: 0.65, ms: 3000, motes: 0,   glints: 0 },
+    { name: "Epic",      col: "175,95,255",  halo: 0.022, dil: 0.006, a: 0.90, rim: "225,190,255", rimA: 0.65, outer: 0.14, lo: 0.60, ms: 2600, motes: 2.2, glints: 0 },
+    { name: "Legendary", col: "255,200,40",  halo: 0.025, dil: 0.007, a: 1.00, rim: "255,238,170", rimA: 0.75, outer: 0.18, lo: 0.58, ms: 2200, motes: 3,   glints: 1.6 },
+    { name: "Mythic",    col: "255,112,24",  halo: 0.028, dil: 0.008, a: 1.00, rim: "255,196,120", rimA: 0.85, outer: 0.24, lo: 0.55, ms: 1800, motes: 5,   glints: 1.6, embers: true }
+  ];
+  var rgPick = { weapon: 0, off: 0 }, rgCur = null, RG_KEY = "wvg-rarity", RG_BODY_CUT = 0.5;
+  var RG_GAIN = 1.2;                                                                 // 2026-11-26, the user: "most stages are so bright it is kinda unnoticeable, increase all of them around 20%": every halo, rim, bloom and particle x1.2
+  var RG_BLUR = (function () { try { return typeof document.createElement("canvas").getContext("2d").filter === "string"; } catch (e) { return false; } })();   // (without canvas blur the halo is the thickened silhouette, fainter)
+  function rgRole(set, tk, cfg) {                                                    // which slot an item belongs to: "weapon" or "off"
+    var pic = cfg.kind === "shield" ? "shield" : String(cfg.pic || "");
+    if (/^(shield|orb|book|cutlass)$/.test(pic)) return "off";
+    if (/^(staff|mace|wand|dagger)$/.test(pic)) return "weapon";
+    if (String(set.character || "").toLowerCase().indexOf("mage") >= 0) return tk === "main" ? "off" : "weapon";   // (an old mage file without pictures: orb in the far hand, staff in the near one)
+    return tk === "main" ? "weapon" : "off";                                         // a sword: the far hand's is the weapon, the near hand's the off hand
+  }
+  var rgSilCache = [];
+  function rgSil(im, col) {                                                          // the item's silhouette filled with one colour (its alpha kept), made once per picture and colour
+    for (var i = 0; i < rgSilCache.length; i++) if (rgSilCache[i].im === im && rgSilCache[i].col === col) return rgSilCache[i].cv;
+    var cv = document.createElement("canvas"), c = cv.getContext("2d");
+    cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+    c.drawImage(im, 0, 0); c.globalCompositeOperation = "source-in"; c.fillStyle = "rgb(" + col + ")"; c.fillRect(0, 0, cv.width, cv.height);
+    rgSilCache.push({ im: im, col: col, cv: cv }); return cv;
+  }
+  var rgScratch = null;
+  function rgPass(ctx, items, col, dil, blur, alpha) {                               // one layer of the halo: the silhouettes (thickened by dil px) blurred by blur px, onto ctx
+    var cw = ctx.canvas.width, ch = ctx.canvas.height;
+    if (!rgScratch) rgScratch = document.createElement("canvas");
+    if (rgScratch.width !== cw || rgScratch.height !== ch) { rgScratch.width = cw; rgScratch.height = ch; }
+    var o = rgScratch.getContext("2d"), n = dil > 0.5 ? 8 : 0, k;
+    o.setTransform(1, 0, 0, 1, 0, 0); o.clearRect(0, 0, cw, ch);
+    items.forEach(function (it) {
+      var sil = rgSil(it.im, col), s = it.cfg.length * it.W / it.im.naturalHeight;
+      for (k = -1; k < n; k++) {
+        var ox = k < 0 ? 0 : Math.cos(k / n * 6.2832) * dil, oy = k < 0 ? 0 : Math.sin(k / n * 6.2832) * dil;
+        o.setTransform(1, 0, 0, 1, it.M + ox, oy);
+        o.translate(it.an.x * it.W, it.an.y * it.H); o.rotate(it.an.a * Math.PI / 180); o.scale(s * (it.an.w || 1), s);
+        o.drawImage(sil, -sil.width / 2, -it.cfg.pivot * sil.height);
+      }
+    });
+    var al = (RG_BLUR ? alpha : alpha * 0.45) * RG_GAIN;
+    ctx.save();
+    if (RG_BLUR && blur > 0.3) ctx.filter = "blur(" + blur.toFixed(1) + "px)";
+    for (; al > 0.05; al -= 1) { ctx.globalAlpha = Math.min(1, al); ctx.drawImage(rgScratch, 0, 0); }   // (above 1 the layer is drawn twice)
+    ctx.restore();
+  }
+  function rgPaint(sp) {                                                             // the halos of the frame on screen (called with every frame, after the weapons are drawn)
+    var cvs = sp.querySelectorAll(".gear.rg"), st = rgCur;
+    [].forEach.call(cvs, function (cv) {
+      var role = cv.getAttribute("data-role"), front = cv.classList.contains("rf"), ctx = cv.getContext("2d");
+      var items = st ? st.items.filter(function (it) { return it.role === role && it.front === front; }) : [];
+      if (st && (cv.width !== st.CW || cv.height !== st.H)) { cv.width = st.CW; cv.height = st.H; }
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+      var tier = rgPick[role] || 0, R = RARITY[tier];
+      if (cv._tier !== tier) { cv._tier = tier; cv.style.setProperty("--rg-lo", R.lo || 1); cv.style.setProperty("--rg-ms", (R.ms || 3000) + "ms"); }
+      if (!items.length || !tier) return;
+      var W = st.W;
+      if (R.outer) rgPass(ctx, items, R.col, R.dil * W, R.halo * W * 1.9, R.outer);    // the wide faint bloom (kept faint: stronger, it tints the face and reads as the CHARACTER glowing)
+      rgPass(ctx, items, R.col, R.dil * W, R.halo * W, R.a);                          // the halo
+      if (R.rim) rgPass(ctx, items, R.rim, 0, Math.max(1, W * 0.0035), R.rimA);       // the bright rim on the edge
+      if (front && st.body.img && st.body.img.naturalWidth) {                          // over the body the halo of an item in front is dimmed (RG_BODY_CUT): a full halo there tinted the hair and the face
+        ctx.save(); ctx.globalCompositeOperation = "destination-out"; ctx.globalAlpha = RG_BODY_CUT;
+        ctx.drawImage(st.body.img, st.body.sx, st.body.sy, W, st.H, st.M, 0, W, st.H); ctx.restore();
+      }
+    });
+  }
+  // Motes, glints and embers: a small particle layer (.gear.rs) redrawn every animation frame. They are born on the item's OUTLINE (rgEdge: never under the hand on the grip)
+  // in the coordinates of the frame, so a swing leaves them behind like a faint trail; a frozen hero (heldFrozen) makes none and stops breathing.
+  var rgEdgeCache = [], rgParts = [], rgLastT = 0, rgDotCache = {}, rgStarCache = {};
+  function rgEdge(im) {                                                              // points on the picture's outline (picture px), made once per picture
+    for (var i = 0; i < rgEdgeCache.length; i++) if (rgEdgeCache[i].im === im) return rgEdgeCache[i].pts;
+    var W = im.naturalWidth, H = im.naturalHeight, st = Math.max(2, Math.round(Math.max(W, H) / 140)), pts = [], d = null, x, y, a;
+    try { var cv = document.createElement("canvas"), c = cv.getContext("2d"); cv.width = W; cv.height = H; c.drawImage(im, 0, 0); d = c.getImageData(0, 0, W, H).data; } catch (e) {}
+    if (d) {
+      a = function (xx, yy) { return xx < 0 || yy < 0 || xx >= W || yy >= H ? 0 : d[(yy * W + xx) * 4 + 3]; };
+      for (y = 0; y < H; y += st) for (x = 0; x < W; x += st) if (a(x, y) > 110 && (a(x - st, y) < 50 || a(x + st, y) < 50 || a(x, y - st) < 50 || a(x, y + st) < 50)) pts.push([x, y]);
+    }
+    rgEdgeCache.push({ im: im, pts: pts }); return pts;
+  }
+  function rgPt(it, px, py) {                                                        // a point of the item's picture to the particle canvas (the same frame space as the weapons)
+    var im = it.im, s = it.cfg.length * it.W / im.naturalHeight, a = it.an.a * Math.PI / 180, lx = (px - im.naturalWidth / 2) * s * (it.an.w || 1), ly = (py - it.cfg.pivot * im.naturalHeight) * s;
+    return [it.M + it.an.x * it.W + lx * Math.cos(a) - ly * Math.sin(a), it.an.y * it.H + lx * Math.sin(a) + ly * Math.cos(a)];
+  }
+  function rgDot(col) {                                                              // a soft round light in one colour (32 px, drawn scaled)
+    if (rgDotCache[col]) return rgDotCache[col];
+    var cv = document.createElement("canvas"), c = cv.getContext("2d"), g; cv.width = cv.height = 32;
+    g = c.createRadialGradient(16, 16, 0, 16, 16, 16); g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(0.25, "rgba(" + col + ",0.9)"); g.addColorStop(0.6, "rgba(" + col + ",0.25)"); g.addColorStop(1, "rgba(" + col + ",0)");
+    c.fillStyle = g; c.fillRect(0, 0, 32, 32); return (rgDotCache[col] = cv);
+  }
+  function rgStar(col) {                                                             // a four-pointed glint (64 px): two thin tapered rays and a hot core
+    if (rgStarCache[col]) return rgStarCache[col];
+    var cv = document.createElement("canvas"), c = cv.getContext("2d"), g, r; cv.width = cv.height = 64;
+    for (r = 0; r < 2; r++) {
+      c.save(); c.translate(32, 32); c.rotate(r * Math.PI / 2); c.scale(1, 0.09);
+      g = c.createRadialGradient(0, 0, 0, 0, 0, 32); g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(0.35, "rgba(" + col + ",0.7)"); g.addColorStop(1, "rgba(" + col + ",0)");
+      c.fillStyle = g; c.beginPath(); c.arc(0, 0, 32, 0, 6.2832); c.fill(); c.restore();
+    }
+    g = c.createRadialGradient(32, 32, 0, 32, 32, 9); g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(1, "rgba(" + col + ",0)");
+    c.fillStyle = g; c.fillRect(0, 0, 64, 64); return (rgStarCache[col] = cv);
+  }
+  function rgSpawn(it, kind) {                                                       // one particle on a random point of the item's outline (kind: 0 mote, 1 glint, 2 ember)
+    var pts = rgEdge(it.im), q, tries = 0, nh = it.im.naturalHeight, W = it.W, R = RARITY[it.tier];
+    if (!pts.length) return;
+    do { q = pts[Math.floor(Math.random() * pts.length)]; tries++; } while (it.cfg.overlay && Math.abs(q[1] / nh - it.cfg.pivot) < 0.09 && tries < 8);   // not under the hand on the grip
+    var xy = rgPt(it, q[0], q[1]);
+    rgParts.push({ x: xy[0], y: xy[1], vx: (Math.random() - 0.5) * W * 0.03, vy: -W * (kind === 2 ? 0.07 + Math.random() * 0.06 : kind === 1 ? 0 : 0.025 + Math.random() * 0.03),
+      t: 0, life: kind === 1 ? 420 + Math.random() * 260 : kind === 2 ? 700 + Math.random() * 600 : 1000 + Math.random() * 700, r: W * (kind === 1 ? 0.022 + Math.random() * 0.012 : 0.004 + Math.random() * 0.004),
+      kind: kind, col: R.col, rim: R.rim || R.col, ph: Math.random() * 6.28, rot: Math.random() * 0.6 - 0.3, W: W });
+  }
+  function rgTick(now) {
+    requestAnimationFrame(rgTick);
+    var dt = Math.min(100, rgLastT ? now - rgLastT : 16) * (typeof speed === "number" ? speed : 1); rgLastT = now;
+    var cv = uW.querySelector(".gear.rs"), frozen = typeof heldFrozen === "function" && heldFrozen(FIGHTERS.W), st = rgCur;
+    [].forEach.call(uW.querySelectorAll(".gear.rg"), function (g) { var ps = frozen ? "paused" : ""; if (g.style.animationPlayState !== ps) g.style.animationPlayState = ps; });
+    if (!cv) { rgParts.length = 0; return; }
+    if (st && (cv.width !== st.CW || cv.height !== st.H)) { cv.width = st.CW; cv.height = st.H; rgParts.length = 0; }
+    if (st && !frozen && !document.hidden) st.items.forEach(function (it) {             // new particles: on average R.motes and R.glints per second per item
+      var R = RARITY[it.tier];
+      if (R.motes && Math.random() < R.motes * dt / 1000) rgSpawn(it, R.embers ? 2 : 0);
+      if (R.glints && Math.random() < R.glints * dt / 1000) rgSpawn(it, 1);
+    });
+    if (!rgParts.length && !cv._dirty) return;
+    var c = cv.getContext("2d"); c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height); cv._dirty = rgParts.length > 0;
+    c.globalCompositeOperation = "lighter";
+    rgParts = rgParts.filter(function (p) {
+      if (!frozen) { p.t += dt; p.x += p.vx * dt / 1000 + Math.sin(p.ph + p.t * 0.004) * p.W * 0.0004; p.y += p.vy * dt / 1000; }
+      var k = p.t / p.life; if (k >= 1) return false;
+      var fade = Math.sin(Math.PI * Math.min(1, k)), s;
+      if (p.kind === 1) {                                                            // a glint: swells and shrinks, turning a little
+        s = p.r * (0.3 + 0.7 * fade); c.save(); c.globalAlpha = Math.min(1, 0.85 * fade * RG_GAIN); c.translate(p.x, p.y); c.rotate(p.rot + k * 0.5); c.drawImage(rgStar(p.rim), -s, -s, s * 2, s * 2); c.restore();
+      } else {                                                                       // a mote (an ember cools from yellow-white to the tier's orange and flickers)
+        var col = p.kind === 2 ? (k < 0.35 ? p.rim : p.col) : p.col, fl = p.kind === 2 ? 0.65 + 0.35 * Math.sin(p.ph + p.t * 0.03) : 1;
+        s = p.r * (p.kind === 2 ? 1.3 - 0.6 * k : 1) * 2.2; c.globalAlpha = Math.min(1, 0.9 * fade * fl * RG_GAIN); c.drawImage(rgDot(col), p.x - s, p.y - s, s * 2, s * 2);
+      }
+      return true;
+    });
+    c.globalAlpha = 1; c.globalCompositeOperation = "source-over";
+  }
+  requestAnimationFrame(rgTick);
+  function rgLoad(ch) {                                                              // the rarities chosen for a character (remembered in this browser)
+    var v = {}; try { v = (JSON.parse(localStorage.getItem(RG_KEY) || "{}") || {})[ch] || {}; } catch (e) {}
+    var cl = function (n) { n = Math.round(+n || 0); return n < 0 || n > 5 ? 0 : n; };
+    rgPick = { weapon: cl(v.weapon), off: cl(v.off) };
+    if ($("rgWeapon")) { $("rgWeapon").value = rgPick.weapon; $("rgOff").value = rgPick.off; }
+  }
+  function rgSave() { try { var all = JSON.parse(localStorage.getItem(RG_KEY) || "{}") || {}; all[curChar] = rgPick; localStorage.setItem(RG_KEY, JSON.stringify(all)); } catch (e) {} }
   function refreshWarrior() {
     var p = packs.idle;
     if (!p) return;
     var L = layout(p);
-    $("sW").innerHTML = '<canvas class="gear back"></canvas><div class="sheet"><div class="up"></div></div><canvas class="gear front"></canvas>';
+    $("sW").innerHTML = '<canvas class="gear rg rb" data-role="weapon"></canvas><canvas class="gear rg rb" data-role="off"></canvas><canvas class="gear back"></canvas><div class="sheet"><div class="up"></div></div>' +
+      '<canvas class="gear rg rf" data-role="weapon"></canvas><canvas class="gear rg rf" data-role="off"></canvas><canvas class="gear front"></canvas><canvas class="gear rs"></canvas>';   // (rg, rs: the rarity glow, see RARITY)
     uW.style.aspectRatio = (p.nw / L.cols) + " / " + (p.nh / L.rows);
     uW.classList.add("big"); uG.classList.add("big");
     playPose("idle", true);
@@ -3483,7 +3654,7 @@
   function wardDraw(ctx, now, L, F, u) {
     var g = L.g, age = (now - L.t0) * speed, k = Math.min(1, F.k), R = g.r.height * 0.42, dt = L.last ? Math.min(60, now - L.last) * speed : 0, rnd = L.rnd, i;
     L.last = now;
-    var appear = clamp01(age / 450), a = age < 450 ? 1 - 0.62 * appear : 0.38 + 0.05 * Math.sin(now * 0.003), scale = 1 + 0.35 * (1 - appear) * (1 - appear), rot = now * 0.0003 * speed;
+    var appear = clamp01(age / 450), a = age < 450 ? 1 - 0.62 * appear : 0.38 * (1 - clamp01((age - 450) / WARD_FADE)), scale = 1 + 0.35 * (1 - appear) * (1 - appear), rot = now * 0.0003 * speed;   // (it fades out after the crack: see WARD_FADE)
     if (!L.burst) {                                                                  // it cracks: pieces drift off the rim
       L.burst = true;
       for (i = 0; i < Math.round(10 * F.imp * k); i++) { var an = rnd() * 6.2832; icP(L.ps, "slab", g.cx + Math.cos(an) * R, g.cyb + Math.sin(an) * R, Math.cos(an) * 0.2 * u / 1000, Math.sin(an) * 0.2 * u / 1000, 700 + rnd() * 400, u * (0.016 + rnd() * 0.014), rnd() * 6.28, (rnd() - 0.5) * 0.02); }
@@ -3493,10 +3664,13 @@
     else wardCode(ctx, g.cx, g.cyb, R * scale, rot, a * k, F.pal, age < 450 ? 1 - appear * 0.75 : 0.25);
     icParticles(ctx, L.ps, dt, F, u);
   }
+  // 2026-11-26, the user: only Burn, Chilled, Frozen and Shocked (and the barriers, the Rogue's Elusive) stay on a fighter for the whole status; "other effects like Magic Def down should only be visible during the
+  // application for once". So the ward flashes, cracks and fades out (WARD_FADE ms after the crack); T.magDef keeps the status (its turns and the icon under the HP bar) until it runs out.
+  var WARD_FADE = 600;
   function applyWard(T, turns) {
     clearWard(T);
     var F = fbParams("lance"), u = uW.offsetWidth, g = fzGeom(T, F, u), seed = performance.now() | 0;
-    var L = { t0: performance.now(), t1: Infinity, g: g, T: T, rnd: rngOf(seed + 11), ps: [], draw: function (ctx, now, L2) { wardDraw(ctx, now, L2, F, u); } };
+    var t0 = performance.now(), L = { t0: t0, t1: t0 + (450 + WARD_FADE + 150) / speed, g: g, T: T, rnd: rngOf(seed + 11), ps: [], draw: function (ctx, now, L2) { wardDraw(ctx, now, L2, F, u); } };
     fxAdd(L); T.magDef = { turns: turns, layer: L };
     setTimeout(function () { if (T.magDef) floatNumber(T, "-25% MAGIC DEF", "debuff"); }, 350 / speed);
   }
@@ -5440,8 +5614,14 @@
     var r = rectIn(sh), k = r.width / 512, f = JUD.fist[cf.i];
     return { x: r.left + f[0] * k, y: r.top + f[1] * k };
   }
+  // THE SCREEN GOES DARK (2026-11-25, the user: "add screen goes dark effect for Sanctified Judgment and Spiteful Covenant"): the shared tcDim (the Thunderclap's and Execute's), the stage darkens BEHIND the
+  // two fighters so only they and the light stay lit. Judgment: in over the raise (frame 2), full for the call (frame 3, the sky opening and the beam charging), held until the pillar lands, eased to a third over
+  // 0.35 s, gone about 0.8 s later; a near-black with a hint of indigo. Covenant: in over the first bowed frame, full while he pays and through the roar's first flash, eased after it, gone about 1.2 s after the roar; a crimson-black (the pact's colour; the user, 2026-11-25: halfway between the first crimson-black 24,2,5 and plain black).
+  // It is added FIRST so every effect drawn behind the fighters (the sky, the seal, the wings, the barrier's far side) stays bright over the dark. JUD_DARK, COV_DARK: how dark (0..1).
+  var JUD_DARK = 0.9, COV_DARK = 0.9;                                               // (0.8 at first; the user, 2026-11-25: 0.9)
   function startJudgment(clk, hitF, T, miss) {
     var at = function (f, fr) { return clkAt(clk, f, fr); }, tR = at(2, 0), tV = at(hitF, 0), tI = at(hitF, 0.4), P = HOLY_PAL, sc = 1 / speed;
+    tcDim(at(2, 0), at(3, 0), tI, tI + 350 * sc, tI + 1150 * sc, JUD_DARK, "5,4,14");   // the screen goes dark for the call and stays dark until the pillar lands
     var ease = function (v) { v = clamp01(v); return v * v * (3 - 2 * v); };
     var geo = function () { var r = rectIn(T.unit); return { x: r.left + r.width * 0.5, gy: r.top + r.height * 0.97, top: r.top }; };
     var col = function (ctx, x, w, y1, rgb, a) { var g = ctx.createLinearGradient(x - w / 2, 0, x + w / 2, 0); g.addColorStop(0, "rgba(" + rgb + ",0)"); g.addColorStop(0.5, "rgba(" + rgb + "," + a.toFixed(3) + ")"); g.addColorStop(1, "rgba(" + rgb + ",0)"); ctx.fillStyle = g; ctx.fillRect(x - w / 2, 0, w, y1); };
@@ -5589,6 +5769,7 @@
   function startCovenant(clk, hitF, A, opt) {
     opt = opt || {};
     var at = function (f, fr) { return clkAt(clk, f, fr); }, t1 = at(1, 0), tPay = at(1, 0.6), t3 = at(3, 0), tLock = at(hitF, 0), sc = 1 / speed, my = run, rnd = rngOf((t1 | 0) + 13), ms = [], sp = [], i, L;
+    tcDim(at(1, 0.15), at(2, 0), tLock + 150 * sc, tLock + 450 * sc, tLock + 1200 * sc, COV_DARK, "12,1,3");   // the screen goes dark (crimson-black) while he pays
     var ease = function (v) { v = clamp01(v); return v * v * (3 - 2 * v); };
     for (i = 0; i < 24; i++) ms.push({ d: i * ((t3 - t1) * 0.85 / 24), life: Math.max(620 * sc, (t3 - t1) * 0.3), jx: (rnd() - 0.5) * 0.07, ex: (rnd() - 0.5) * 0.16, bend: (rnd() - 0.5) * 0.12, s: 0.008 + rnd() * 0.008 });
     for (i = 0; i < 22; i++) sp.push({ a: (rnd() - 0.5) * 1.6, v: 0.08 + rnd() * 0.22, d: rnd() * 260 * sc, life: (700 + rnd() * 500) * sc, s: 0.005 + rnd() * 0.006, x: (rnd() - 0.5) * 2 });
@@ -5614,14 +5795,8 @@
         for (j = 0; j < ms.length; j++) {
           m = ms[j]; s = (now - t1 - m.d) / m.life; if (s <= 0 || s >= 1 || now > t3 + 200 * sc) continue;
           e = ease(s); pos = bez({ x: p.x + m.jx * u, y: p.y }, { x: p.x + (m.jx + m.bend) * u * 2, y: (p.y + p.gy) / 2 }, { x: p.fx + m.ex * u, y: p.gy - 3 }, e);
-  // THE SCREEN GOES DARK (2026-11-25, the user: "add screen goes dark effect for Sanctified Judgment and Spiteful Covenant"): the shared tcDim (the Thunderclap's and Execute's), the stage darkens BEHIND the
-  // two fighters so only they and the light stay lit. Judgment: in over the raise (frame 2), full for the call (frame 3, the sky opening and the beam charging), held until the pillar lands, eased to a third over
-  // 0.35 s, gone about 0.8 s later; a near-black with a hint of indigo. Covenant: in over the first bowed frame, full while he pays and through the roar's first flash, eased after it, gone about 1.2 s after the roar; a crimson-black (the pact's colour; the user, 2026-11-25: halfway between the first crimson-black 24,2,5 and plain black).
-  // It is added FIRST so every effect drawn behind the fighters (the sky, the seal, the wings, the barrier's far side) stays bright over the dark. JUD_DARK, COV_DARK: how dark (0..1).
-  var JUD_DARK = 0.9, COV_DARK = 0.9;                                               // (0.8 at first; the user, 2026-11-25: 0.9)
           a = Math.sin(s * 3.1416);
           glowDot(ctx, pos.x, pos.y, u * m.s * 3.4, COV.red, 0.85 * a); glowDot(ctx, pos.x, pos.y, u * m.s * 1.5, "255,150,120", 0.9 * a);
-    tcDim(at(2, 0), at(3, 0), tI, tI + 350 * sc, tI + 1150 * sc, JUD_DARK, "5,4,14");   // the screen goes dark for the call and stays dark until the pillar lands
         }
         if (now >= tLock) {
           for (j = 0; j < sp.length; j++) {
@@ -5710,6 +5885,30 @@
     return c;
   }
   function pcN(nw, old) { return pcImg(nw) ? nw : old; }                              // the tailored piece when it is loaded, else the older generic one
+  // A ROUNDED BASE (2026-11-25, the user about the dark smoke after the hit of Dark Penance and Unholy Siphon: "it should originate from lower. Also it seems to be cut sharp at ground level, I would be happy if
+  // it would look more rounder"). The pieces that rise from the ground (dd_smoke, dd_claws and their fallbacks) end in a flat bright line where the sheet's panel ended. With o.round the picture is drawn through a
+  // mask: from 62% of its height down it fades inside a half ellipse (full in the middle, gone at the sides and at the very bottom), blended in so there is no seam, and the callers anchor it lower (ay below 1) so the
+  // soft rounded base sits on and a little below the ground line. One mask per picture, made once.
+  var pcRoundCache = {};
+  function pcRounded(name, tint) {
+    var im = pcImg(name, tint); if (!im) return null;
+    var key = name + "|" + (tint || "") + "|round", c = pcRoundCache[key], iw, ih, y0, x, d, p, i, j, v, dx, t, e, s, m;
+    if (c) return c;
+    iw = im.naturalWidth || im.width; ih = im.naturalHeight || im.height; y0 = ih * 0.62;
+    c = document.createElement("canvas"); c.width = iw; c.height = ih; x = c.getContext("2d"); x.drawImage(im, 0, 0);
+    d = x.getImageData(0, 0, iw, ih); p = d.data;
+    for (j = Math.floor(y0); j < ih; j++) {
+      v = (j - y0) / (ih - y0); s = clamp01(v / 0.35); s = s * s * (3 - 2 * s);                  // how far into the base (blended in over the first third: no seam at 62%)
+      for (i = 0; i < iw; i++) {
+        dx = (i - iw / 2) / (iw / 2); t = dx * dx + v * v;                                            // inside the half ellipse when t < 1
+        e = clamp01((1 - t) / 0.45); e = e * e * (3 - 2 * e);
+        m = 1 + (e - 1) * s;
+        p[(j * iw + i) * 4 + 3] *= m;
+      }
+    }
+    x.putImageData(d, 0, 0);
+    pcRoundCache[key] = c; return c;
+  }
   function pcTex(ctx, name, x, y, w, h, a, o) {                                      // an additive picture w x h px (h null: its own proportions), the point (o.ax, o.ay) of it (0..1, default the middle) on (x, y), turned by o.rot, mirrored by o.flip, tinted by o.tint
     o = o || {};
     var im = o.round ? pcRounded(name, o.tint) : pcImg(name, o.tint); if (!im || a <= 0.01 || w < 1) return false;
@@ -5769,7 +5968,6 @@
         if (post > 0 && post < 1200 * sc) pcTex(cb, pcN("hj_shock", "hl_halo"), g.x, g.gy, u * (0.35 + 1.1 * e), null, 0.85 * (1 - clamp01(post / (1100 * sc))), {});
       },
       draw: function (ctx, now) {
-    tcDim(at(1, 0.15), at(2, 0), tLock + 150 * sc, tLock + 450 * sc, tLock + 1200 * sc, COV_DARK, "12,1,3");   // the screen goes dark (crimson-black) while he pays
         var q = smiteTip(), u = uW.offsetWidth, hold = clamp01((now - tH + 60) / 140) * (now < tS ? 1 : clamp01(1 - (now - tS) / 160)), g = pcTarget(T), post = now - tI, dx, dy, e, a;
         if (q && now >= tH - 60 && now <= tS + 200) {
           if (pcImg("hj_beam")) pcTex(ctx, "hj_beam", q.x, q.y, u * 0.08, q.y, 0.9 * hold, { ay: 1 });
@@ -5887,30 +6085,6 @@
 
   // COVENANT: the Aegis's angry twin, in CRIMSON (the tailored cp_* pieces; the older gold pieces tinted in code are the fallback): while he pays a contract seal (cp_seal) burns under him and a heartbeat ring (cp_heart) beats, embers rain on him (cp_rain)
   // and crimson flames rise; at the roar chains break open on his chest (cp_chains), a shockwave crown (cp_roar) runs out over the ground, five big flames (cp_flames) erupt BEHIND him and a SHIELD of its own (cp_shield) stands in front of him for the CAST only
-  // A ROUNDED BASE (2026-11-25, the user about the dark smoke after the hit of Dark Penance and Unholy Siphon: "it should originate from lower. Also it seems to be cut sharp at ground level, I would be happy if
-  // it would look more rounder"). The pieces that rise from the ground (dd_smoke, dd_claws and their fallbacks) end in a flat bright line where the sheet's panel ended. With o.round the picture is drawn through a
-  // mask: from 62% of its height down it fades inside a half ellipse (full in the middle, gone at the sides and at the very bottom), blended in so there is no seam, and the callers anchor it lower (ay below 1) so the
-  // soft rounded base sits on and a little below the ground line. One mask per picture, made once.
-  var pcRoundCache = {};
-  function pcRounded(name, tint) {
-    var im = pcImg(name, tint); if (!im) return null;
-    var key = name + "|" + (tint || "") + "|round", c = pcRoundCache[key], iw, ih, y0, x, d, p, i, j, v, dx, t, e, s, m;
-    if (c) return c;
-    iw = im.naturalWidth || im.width; ih = im.naturalHeight || im.height; y0 = ih * 0.62;
-    c = document.createElement("canvas"); c.width = iw; c.height = ih; x = c.getContext("2d"); x.drawImage(im, 0, 0);
-    d = x.getImageData(0, 0, iw, ih); p = d.data;
-    for (j = Math.floor(y0); j < ih; j++) {
-      v = (j - y0) / (ih - y0); s = clamp01(v / 0.35); s = s * s * (3 - 2 * s);                  // how far into the base (blended in over the first third: no seam at 62%)
-      for (i = 0; i < iw; i++) {
-        dx = (i - iw / 2) / (iw / 2); t = dx * dx + v * v;                                            // inside the half ellipse when t < 1
-        e = clamp01((1 - t) / 0.45); e = e * e * (3 - 2 * e);
-        m = 1 + (e - 1) * s;
-        p[(j * iw + i) * 4 + 3] *= m;
-      }
-    }
-    x.putImageData(d, 0, 0);
-    pcRoundCache[key] = c; return c;
-  }
   // (COV_HOLD_MS after the lock, then it melts away while the glass settles into the Aegis's steady Barrier look: covGlass); when the barrier breaks (he falls) the shield shows cracked (cp_cracked) for the break.
   var COV_TINT = "rgba(255,62,44,0.62)", COV_TINT2 = "rgba(255,120,70,0.4)";
   function covenantPaint(clk, hitF, A, L) {
@@ -10132,8 +10306,8 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   // it all the way back, not halfway). The page plays 1, 2, 3, 4, 5, 3, 6 (GUARD_ORDER): frame 3 again on the way back, so the shield drifts down instead of snapping. What the page adds is small: a little rigid-stone lean
   // and hunker (CSS rotate / scale, GUARD_LEAN / GUARD_SY: the sheet's body only lowers about 3 px), dust pushed out at its feet at the brace, and THE SHIELD'S LIGHT, which now follows the shield: a DOM layer inside the sprite
   // (an SVG in the 512 cell's own coordinates, a unit-square shield path moved and scaled to the shield's box in each frame, GUARD_BOXES, measured by template) with a steel-blue outline that flares when the shield arrives
-  // at the face (frame 4), a bright band sweeping across it, two rings that leave it, then a faint pulsing edge back at the rest place for as long as the buff lasts (GUARD_TURNS of the Elite's own turns; the page only DRAWS
-  // the buff, the game applies the numbers: Defense up). A DEFENSE UP number appears at the held frame. Nothing is dealt: no target, no damage.
+  // at the face (frame 4), a bright band sweeping across it, two rings that leave it, and it fades when the shield is home (until 2026-11-26 a faint pulsing edge stayed for as long as the buff lasted, GUARD_TURNS of the
+  // Elite's own turns; the user wants a Defense up seen only when it is applied: the status and its HUD icon still last; the page only DRAWS the buff, the game applies the numbers: Defense up). A DEFENSE UP number appears at the held frame. Nothing is dealt: no target, no damage.
   var GUARD_ORDER = [0, 1, 2, 3, 4, 2, 5], GUARD_HOLDS = [1, 1.2, 1.3, 2.4, 2.4, 1.1, 1.3];
   var GUARD_LEAN = [0, 1, 2, 3, 3, 2, 0], GUARD_SY = [1, 0.99, 0.98, 0.96, 0.96, 0.98, 1], GUARD_SX = [1, 1.005, 1.01, 1.015, 1.015, 1.01, 1], GUARD_TURNS = 2;
   var GUARD_BOXES = [[150, 296, 102, 142], [165, 288, 97, 142], [193, 285, 120, 150], [285, 280, 111, 140], [285, 280, 111, 140], [152, 298, 102, 140]];   // the shield's box (x, y, w, h) in the 512 cell, per sheet frame
@@ -10159,11 +10333,6 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
   function guardSweep(g, ms) {                                                        // the bright band runs across the shield (unit square), clipped to it
     anim(guardQ(g, "sweep"), [{ opacity: 0, transform: "translateX(0px)" }, { opacity: 1, transform: "translateX(0.2px)", offset: 0.25 }, { opacity: 1, transform: "translateX(0.9px)", offset: 0.75 }, { opacity: 0, transform: "translateX(1.2px)" }], ms, "ease-in-out").catch(function () {});
   }
-  function guardRest(g) {                                                             // the buff's faint aura: the edge breathes while the status lasts
-    var ed = guardQ(g, "edge");
-    ed.style.opacity = 0.4;
-    if (ed.animate) { try { ed.animate([{ opacity: 0.25 }, { opacity: 0.55 }, { opacity: 0.25 }], { duration: 2600 / speed, iterations: Infinity }); } catch (er) {} }
-  }
   function guardDustFx(t0, cx, gy, u) {                                              // it digs in: stone dust pushed out at both sides of its feet and a faint ring on the ground
     var rnd = rngOf(t0 | 0), puffs = [], i;
     for (i = 0; i < 10; i++) puffs.push({ s: i < 5 ? -1 : 1, x0: u * (0.12 + rnd() * 0.12), r: u * (0.03 + rnd() * 0.035), v: 0.5 + rnd() * 0.7, h: 0.01 + rnd() * 0.035, a: 0.25 + rnd() * 0.25 });
@@ -10177,7 +10346,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
       }
     } });
   }
-  function clearGuardEl(g) { if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } } }
+  function clearGuardEl(g, ms) { if (g && g.parentNode) { try { g.animate([{ opacity: 1 }, { opacity: 0 }], ms || 300).finished.then(function () { if (g.parentNode) g.parentNode.removeChild(g); }, function () { if (g.parentNode) g.parentNode.removeChild(g); }); } catch (er) { g.parentNode.removeChild(g); } } }
   function clearGuard(A) {
     if (!A.guard) return;
     var g = A.guard.el; A.guard = null; clearGuardEl(g);
@@ -10186,7 +10355,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     var pk = monPackOf("guard"), u = uW.offsetWidth, n = GUARD_ORDER.length, fm = 1000 / pk.fps / speed, starts = [], tot = 0, i, pv = !!e.preview, el = monEl;
     for (i = 0; i < n; i++) { starts.push(tot); tot += fm * GUARD_HOLDS[i]; }
     var t0 = performance.now(), r0 = rectIn(el), cx = r0.left + r0.width / 2, gy = r0.top + r0.height - r0.width * 42 / 512;
-    var g = A.guard ? A.guard.el : guardGlowEl();
+    var g = (A.guard && A.guard.el) || guardGlowEl();                                // (a guard set from the status test panel has no light of its own yet)
     if (!g.parentNode) el.appendChild(g);
     if (g.getAnimations) g.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });          // (the resting pulse of an earlier cast must not fight the flares)
     guardPlace(g, 0);
@@ -10207,10 +10376,10 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     if (!pv) { floatNumber(A, "DEFENSE UP", "guard"); say(A.name + " hunkers down behind its shield: Defense raised for " + GUARD_TURNS + " turns (Stone Guard).", "g"); }
     await played;
     if (myRun !== run) return;
-    guardPlace(g, 5);                                                                 // the shield is home again: the faint aura stays there
+    guardPlace(g, 5);                                                                 // the shield is home again
     if (g.getAnimations) g.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
     if (pv) clearGuardEl(g);
-    else { if (A.guard) { A.guard.turns = GUARD_TURNS; A.guard.fresh = true; } else A.guard = { turns: GUARD_TURNS, fresh: true, el: g }; guardRest(g); }
+    else { if (A.guard) { A.guard.turns = GUARD_TURNS; A.guard.fresh = true; A.guard.el = g; } else A.guard = { turns: GUARD_TURNS, fresh: true, el: g }; clearGuardEl(g, 600); }   // (2026-11-26, the user: a Defense up shows only when it is applied: the light fades, the status and its icon stay)
     uG.style.transform = "";
     monStartIdle();
   }
@@ -10356,6 +10525,14 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     try { localStorage.setItem(CLERICWEAPON_KEY, this.value); } catch (e) {}
     if (curFrame) applyWeapon(curFrame.pose, curFrame.i);
   };
+  ["rgWeapon", "rgOff"].forEach(function (id) {                                       // the rarity of the weapon and of the off hand (the glow, see RARITY): per character, remembered in this browser
+    $(id).innerHTML = RARITY.map(function (R, n) { return '<option value="' + n + '"' + (R.col ? ' style="color:rgb(' + R.col + ')"' : "") + ">" + R.name + "</option>"; }).join("");
+    $(id).onchange = function () {
+      rgPick[id === "rgWeapon" ? "weapon" : "off"] = +this.value; rgSave();
+      if (curFrame) applyWeapon(curFrame.pose, curFrame.i);
+    };
+  });
+  rgLoad(curChar || "warrior");                                                     // (curChar is set further down: the page starts with the Warrior)
   $("clear").onclick = function () {
     slashSheet = null;
     packs = {}; anchorSets = {}; player.token++;
@@ -10455,6 +10632,7 @@ hlHead(ctx, now, pos.x, pos.y, dir, F, u, 1, rnd);
     if (!ch) return Promise.resolve();
     curChar = key;
     rcSelect(key);                                                                    // (the Recolour tool: this character's colours, before its strips load)
+    rgLoad(key);                                                                      // (and its weapon and off-hand rarities)
     applyCharUi();
     stageNo = 1;
     bgSync();

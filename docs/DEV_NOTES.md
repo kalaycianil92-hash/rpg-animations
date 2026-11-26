@@ -77,6 +77,20 @@ The Claude desktop browser pane is usually a hidden page. What that breaks, and 
 4. **Internals.** The page keeps everything inside one function. To inspect, build a copy for testing only (never ship it): in `source/dist`, copy the built page to `_dbg.html` and insert before its last `})();` a line such as `window.__dbg = { packs: () => packs, cur: () => curFrame, clock: () => player.clock, blades: bladeSegs, drawGearTo };`. Serve the project with `python -m http.server 8765 --bind 127.0.0.1` (the page's own file also works from `file://`, but the pane could not open `file://` URLs), open `http://127.0.0.1:8765/source/dist/_dbg.html?v=N` and change `N` each time (the pane caches). Delete the debug copy and stop both servers afterwards.
 5. **What to check for a new effect or animation:** console errors (`read_console_messages`), full fights in both scenarios (win and lose) with the new thing on and off, and the composite images at the key moments.
 
+## Rarity glow on weapons and off hands (2026-11-26)
+
+The user: "common no aura, uncommon a very slight but noticeable green aura, rare blue, epic purple, legendary yellow, mythic orange; code only, no drawn sheet; I trust your taste". Built in the test page (`RARITY`, `rgPaint`, `rgTick` next to `drawGearTo`), **all code**:
+
+- **Picking it:** "Weapon rarity" and "Off-hand rarity" in the weapons row of the panel, remembered **per character** in this browser (`wvg-rarity`). Common (the default) draws nothing.
+- **Which item is which slot** (`rgRole`, by the item's picture): the WEAPON is the Warrior's far-hand sword, the dagger, the staff, the mace or the wand; the OFF HAND is the shield, the orb, the spell book, the cutlass (the game's Scimitar) or the Warrior's second sword. So the Mage's off hand is her orb or book and her weapon the staff; the Rogue's weapon is the dagger, her off hand the cutlass.
+- **The look grows with the tier:** a soft HALO round the item's outline (its silhouette thickened and blurred, drawn under the item: behind the body for an item behind it, over the body for one in front, and there dimmed by half over the body (`RG_BODY_CUT`) because a full halo tinted the hair and the face); from Rare a bright thin RIM on the edge; from Epic a faint wider BLOOM; a BREATH (the halo's opacity, slower and shallower for the low tiers: 3.4 s for Uncommon, 1.8 s for Mythic); from Epic MOTES drift up off the edge, from Legendary GLINTS twinkle on it, Mythic's motes are EMBERS (yellow-white cooling to orange, flickering). Particles are never born under the hand on the grip.
+- **Brightness (2026-11-26, round 2):** the user found it hard to see on the bright stages and asked for about 20% more: `RG_GAIN` 1.2 multiplies every halo, rim, bloom and particle (a layer above 1 is drawn twice).
+- **Colours:** the hues of the game's `TIER_COLORS`, more saturated (the pastel UI colours looked whitish as light): green 80,230,100, blue 60,150,255, purple 175,95,255, gold 255,200,40, orange 255,112,24.
+- **Size:** every number is a share of the frame width, and the frame is shown at about a third of its size on the stage (a 512 px frame in a 184 px unit), so the halos look generous at full size and right on the stage; the first, smaller values were invisible on the stage.
+- **Layers:** inside the hero's sprite, per slot a halo canvas behind (`.gear.rg.rb`, z 0, before the back item) and one in front (`.gear.rg.rf`, z 2, under the front item), plus one particle canvas (`.gear.rs`, z 4), all `mix-blend-mode: screen`; they follow tall frames like the weapon canvases (class `gear`). The halos are redrawn with each frame; the breath is CSS (`rgBreath`); the particles run on their own animation-frame loop in frame space, so a swing leaves them behind like a faint trail.
+- **Frozen** (`heldFrozen`): no new particles and the breath pauses. **Reduce motion** does not turn it off (it is game art like the idle; the browser pane reports reduce motion, and the user's Windows probably does too).
+- **Not covered:** the Winter's Kiss thrown dagger and the Execute broadsword (drawn by their skills, not by the weapon layer), the monsters (their items are painted into their sprites), the hand tool.
+
 ## Porting to the game (Pixi) checklist
 
 - Carry over the strips, `hand-anchors/3`, `frame-placement/1` and `skill-fx/1` files as they are.
@@ -84,6 +98,7 @@ The Claude desktop browser pane is usually a hidden page. What that breaks, and 
 - Weapons: draw each item as a sprite of height `length x 512 px` (times the character's on-screen scale over 512), hung from the grip point (`pivot`), rotated about it by `a`, squashed by `w`, in the layer order of `FORMATS.md`. Precompute the hand layers once at load time (the skin-colour rule in `buildHand`) or bake them into small sprites; do not run the pixel search while the game is running.
 - Movement: apply the path as an offset from the fighter's home position, in character widths and distance-to-target units as defined in `FORMATS.md`.
 - Effects: port `boltPts` and the drawing passes (Pixi `Graphics` or a mesh with additive blending), the layers and their timeline from the `skill-fx/1` file, particles for sparks, a ticker for fades, a container shake for the screen shake.
+- Rarity glow: a blurred copy of the item sprite in the tier colour under the item (Pixi `BlurFilter` or a pre-blurred texture per item), additive, its alpha breathing; motes and glints as a small particle emitter on the item's outline (see "Rarity glow" above for the numbers).
 - Keep combat logic and rendering separate: the test page's fake battle log stands in for the game's combat simulation (`simulateCombat`), which should feed `act`-like playback.
 
 ## The Rogue's backstab (2026-11-04)
